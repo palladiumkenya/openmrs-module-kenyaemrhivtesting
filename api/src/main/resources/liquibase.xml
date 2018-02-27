@@ -52,6 +52,15 @@
             <column name="relationship_type" type="int">
                 <constraints nullable="false"  />
             </column>
+            <column name="appointment_date" type="datetime">
+                <constraints nullable="true"  />
+            </column>
+            <column name="baseline_hiv_status" type="int">
+                <constraints nullable="false"  />
+            </column>
+            <column name="ipv_outcome" type="int">
+                <constraints nullable="false"  />
+            </column>
             <column name="patient_id" type="int">
                 <constraints nullable="true" />
             </column>
