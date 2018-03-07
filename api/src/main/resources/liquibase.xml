@@ -15,7 +15,7 @@
         <comment>
             Create table to hold contacts to a patient
         </comment>
-        <createTable tableName="patient_contact">
+        <createTable tableName="PATIENT_CONTACT">
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true" />
             </column>

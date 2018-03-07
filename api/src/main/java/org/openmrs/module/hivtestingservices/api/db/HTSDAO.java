@@ -14,13 +14,14 @@
 package org.openmrs.module.hivtestingservices.api.db;
 
 import org.openmrs.module.hivtestingservices.api.HTSService;
-
+import java.util.List;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
 /**
  *  Database methods for {@link HTSService}.
  */
 public interface HTSDAO {
-	
-	/*
-	 * Add DAO methods here
-	 */
+     void persistPatientContact(PatientContact patientContact);
+     List<PatientContact> getPatientContact();
+     void deletePatientContact(int theId);
+     List<PatientContact> searchPatientContact(String searchName);
 }

@@ -17,28 +17,56 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.hivtestingservices.api.HTSService;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import org.openmrs.module.hivtestingservices.api.db.hibernate.PatientContactService;
 /**
  * It is a default implementation of {@link HTSService}.
  */
-public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
+public class PatientContactServiceImpl extends BaseOpenmrsService implements PatientContactService {
 	
 	protected final Log log = LogFactory.getLog(this.getClass());
-	
-	private HTSDAO dao;
+
+	private HTSDAO patientContactDAO;
 	
 	/**
      * @param dao the dao to set
      */
     public void setDao(HTSDAO dao) {
-	    this.dao = dao;
+	    this.patientContactDAO = dao;
     }
     
     /**
      * @return the dao
      */
     public HTSDAO getDao() {
-	    return dao;
+	    return patientContactDAO;
+    }
+    @Override
+    @Transactional
+    public  List<PatientContact> getPatientContacts(){
+
+        return patientContactDAO.getPatientContact();
+    }
+    @Override
+    @Transactional
+    public void persistPatientContact(PatientContact patientContact){
+        patientContactDAO.persistPatientContact(patientContact);
+    }
+
+    @Override
+    @Transactional
+    public List<PatientContact> searchPatientContact(String searchName) {
+
+        return patientContactDAO.searchPatientContact(searchName);
+    }
+
+    @Override
+    @Transactional
+    public void deletePatientContact(int theId){
+        patientContactDAO.deletePatientContact(theId);
     }
 }
