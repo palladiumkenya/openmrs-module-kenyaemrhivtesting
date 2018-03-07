@@ -77,12 +77,12 @@ public class HTSDAOImpl implements HTSDAO{
         //only search by name if name is not empty
         if(searchName!=null && searchName.trim().length()>0){
 
-          /*  TODO query =currentSession.createQuery("from PatientContact where lower(firstName) like :searchName or lower(lastName) like :searchName or lower(middleName) like :searchName",PatientContact.class);*/
+          /*  TODO Error here query =currentSession.createQuery("from PatientContact where lower(firstName) like :searchName or lower(lastName) like :searchName or lower(middleName) like :searchName",PatientContact.class);*/
             query.setParameter("searchName","%"+searchName.toLowerCase()+"%");
         }
         else{
             //the searchName is empty...so list patient contacts
-           /*TODO query = currentSession.createQuery("from PatientContact",PatientContact.class);*/
+           /*TODO Error here query = currentSession.createQuery("from PatientContact",PatientContact.class);*/
         }
         //Execute query and get the result list
         List<PatientContact> contacts = query.list();
