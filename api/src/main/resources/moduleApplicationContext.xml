@@ -24,16 +24,16 @@
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>${project.parent.groupId}.${project.parent.artifactId}.api.HTSService</value>
+				<value>org.openmrs.module.hivtestingservices.api.HTSService</value>
 				<bean
 					class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager">
 						<ref bean="transactionManager" />
 					</property>
 					<property name="target">
-						<bean class="${project.parent.groupId}.${project.parent.artifactId}.api.impl.HTSServiceImpl">
-							<property name="dao">
-								<bean class="${project.parent.groupId}.${project.parent.artifactId}.api.db.hibernate.HibernateHTSDAO">
+						<bean class="org.openmrs.module.hivtestingservices.api.impl.HTSServiceImpl">
+							<property name="patientContactDAO">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO">
 									<property name="sessionFactory">
 										<ref bean="sessionFactory" />
 									</property>
@@ -51,5 +51,6 @@
 			</list>
 		</property>
 	</bean>
-	
+
+
 </beans>

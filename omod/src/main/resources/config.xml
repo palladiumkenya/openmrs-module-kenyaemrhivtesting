@@ -36,10 +36,12 @@
 	</extension>
 	
 	<!-- Maps hibernate file's, if present -->
+
 	<mappingFiles>
-				
+
+		PatientContact.hbm.xml
 		HTSObject.hbm.xml
-				
+
 	</mappingFiles>
 
 	<!-- Internationalization -->

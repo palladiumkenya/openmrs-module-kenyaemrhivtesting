@@ -15,7 +15,7 @@
         <comment>
             Create table to hold contacts to a patient
         </comment>
-        <createTable tableName="patient_contact">
+        <createTable tableName="kenyaemr_hiv_testing_patient_contact">
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true" />
             </column>
@@ -34,7 +34,7 @@
             <column name="last_name" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="sex" type="int">
+            <column name="sex" type="varchar(10)">
                 <constraints nullable="false" unique="false" />
             </column>
             <column name="birth_date" type="datetime">
