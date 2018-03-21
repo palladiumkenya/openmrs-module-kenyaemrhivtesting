@@ -7,7 +7,7 @@
 
     <!--  HTS database DESIGN SCHEMA -->
 
-    <changeSet id="kenyaemr_hiv_testing" author="aojwang">
+    <changeSet id="kenyaemr_hiv_testing_001" author="aojwang">
 
         <preConditions onFail="MARK_RAN">
             <not><tableExists tableName="patient_contact" /></not>
