@@ -15,7 +15,11 @@
         <comment>
             Create table to hold contacts to a patient
         </comment>
+<<<<<<< HEAD:omod/src/main/resources/liquibase.xml
         <createTable tableName="kenyaemr_hiv_testing_patient_contact">
+=======
+        <createTable tableName="PATIENT_CONTACT">
+>>>>>>> 0720e461083128f6a35a78a9423b8a334c83c83a:api/src/main/resources/liquibase.xml
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true" />
             </column>
