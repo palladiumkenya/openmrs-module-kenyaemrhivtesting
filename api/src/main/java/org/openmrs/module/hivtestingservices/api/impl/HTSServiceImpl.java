@@ -17,7 +17,6 @@ package org.openmrs.module.hivtestingservices.api.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.hivtestingservices.api.HTSService;
-<<<<<<< HEAD:api/src/main/java/org/openmrs/module/hivtestingservices/api/impl/HTSServiceImpl.java
 import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
@@ -54,45 +53,11 @@ public class HTSServiceImpl implements HTSService{
         return patientContactDAO;
     }
 
-=======
-import org.openmrs.module.hivtestingservices.api.PatientContact;
-import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import org.openmrs.module.hivtestingservices.api.db.hibernate.PatientContactService;
-/**
- * It is a default implementation of {@link HTSService}.
- */
-public class PatientContactServiceImpl extends BaseOpenmrsService implements PatientContactService {
-	
-	protected final Log log = LogFactory.getLog(this.getClass());
-
-	private HTSDAO patientContactDAO;
-	
-	/**
-     * @param dao the dao to set
-     */
-    public void setDao(HTSDAO dao) {
-	    this.patientContactDAO = dao;
-    }
-    
-    /**
-     * @return the dao
-     */
-    public HTSDAO getDao() {
-	    return patientContactDAO;
-    }
->>>>>>> 0720e461083128f6a35a78a9423b8a334c83c83a:api/src/main/java/org/openmrs/module/hivtestingservices/api/impl/PatientContactServiceImpl.java
     @Override
     @Transactional
     public  List<PatientContact> getPatientContacts(){
 
-<<<<<<< HEAD:api/src/main/java/org/openmrs/module/hivtestingservices/api/impl/HTSServiceImpl.java
         return patientContactDAO.getPatientContacts();
-=======
-        return patientContactDAO.getPatientContact();
->>>>>>> 0720e461083128f6a35a78a9423b8a334c83c83a:api/src/main/java/org/openmrs/module/hivtestingservices/api/impl/PatientContactServiceImpl.java
     }
     @Override
     @Transactional
@@ -112,7 +77,6 @@ public class PatientContactServiceImpl extends BaseOpenmrsService implements Pat
     public void deletePatientContact(int theId){
         patientContactDAO.deletePatientContact(theId);
     }
-<<<<<<< HEAD:api/src/main/java/org/openmrs/module/hivtestingservices/api/impl/HTSServiceImpl.java
 
     @Override
     public void onStartup() {
@@ -126,6 +90,3 @@ public class PatientContactServiceImpl extends BaseOpenmrsService implements Pat
 
 
 }
-=======
-}
->>>>>>> 0720e461083128f6a35a78a9423b8a334c83c83a:api/src/main/java/org/openmrs/module/hivtestingservices/api/impl/PatientContactServiceImpl.java
