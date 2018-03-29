@@ -13,16 +13,11 @@
  */
 package org.openmrs.module.hivtestingservices.api.impl;
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.hivtestingservices.api.HTSService;
-import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
-import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,8 +69,8 @@ public class HTSServiceImpl implements HTSService{
 
     @Override
     @Transactional
-    public void deletePatientContact(int theId){
-        patientContactDAO.deletePatientContact(theId);
+    public void voidPatientContact(int theId){
+        patientContactDAO.voidPatientContact(theId);
     }
 
     @Override

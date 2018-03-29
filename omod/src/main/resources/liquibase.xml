@@ -10,7 +10,7 @@
     <changeSet id="kenyaemr_hiv_testing_001" author="aojwang">
 
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="patient_contact" /></not>
+            <not><tableExists tableName="kenyaemr_hiv_testing_patient_contact" /></not>
         </preConditions>
         <comment>
             Create table to hold contacts to a patient
@@ -76,8 +76,59 @@
             <column name="date_voided" type="datetime"/>
             <column name="voided_reason" type="varchar(255)"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="patient_contact" baseColumnNames="patient_related_to" constraintName="patient_contact_related_patient" referencedTableName="patient" referencedColumnNames="patient_id" deferrable="false" initiallyDeferred="false" />
-        <addForeignKeyConstraint baseTableName="patient_contact" baseColumnNames="obs_group_id" constraintName="patient_contact_obs_group"	referencedTableName="obs" referencedColumnNames="concept_id"	deferrable="false" initiallyDeferred="false" />
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="patient_related_to" constraintName="patient_contact_related_patient" referencedTableName="patient" referencedColumnNames="patient_id" deferrable="false" initiallyDeferred="false" />
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id" constraintName="patient_contact_obs_group"	referencedTableName="obs" referencedColumnNames="concept_id"	deferrable="false" initiallyDeferred="false" />
     </changeSet>
+    <changeSet id="kenyaemr_hiv_testing_002" author="schege">
+
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="kenyaemr_hiv_testing_client_trace" /></not>
+        </preConditions>
+        <comment>
+            Create table to hold traces to a client
+        </comment>
+        <createTable tableName="kenyaemr_hiv_testing_client_trace">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="client_id" type="int">
+                <constraints nullable="false" unique="false" />
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="contact_type" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="unique_patient_no" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="facility_linked_to" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="health_worker_handed_to" type="int">
+                <constraints nullable="false" unique="false" />
+            </column>
+            <column name="remarks" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column defaultValueBoolean="false" name="voided" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+            <column name="date_voided" type="datetime"/>
+            <column name="voided_reason" type="varchar(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_client_trace" baseColumnNames="client_id" constraintName="tracing_related_patient_contact" referencedTableName="kenyaemr_hiv_testing_patient_contact" referencedColumnNames="id" deferrable="false" initiallyDeferred="false" />
+    </changeSet>
+
 
 </databaseChangeLog>

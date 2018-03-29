@@ -18,7 +18,7 @@ public class PatientContact {
     private String firstName;
     private String middleName;
     private String lastName;
-    private int sex;
+    private String sex;
     private Date birthDate;
     private String physicalAddress;
     private String phoneContact;
@@ -39,7 +39,7 @@ public class PatientContact {
     public PatientContact() {
     }
 
-    public PatientContact(String uuid,/* int obsGroupId, */String firstName, String middleName, String lastName, int sex, Date birthDate, String physicalAddress, String phoneContact, /*int patientRelatedTo,*/ String relationType, Date appointmentDate, int baselineHivStatus, int ipvOutcome, Date dateCreated, int changedBy, Date dateChanged, boolean voided, int voidedBy, Date dateVoided, String voidedReason) {
+    public PatientContact(String uuid,/* int obsGroupId, */String firstName, String middleName, String lastName, String sex, Date birthDate, String physicalAddress, String phoneContact, /*int patientRelatedTo,*/ String relationType, Date appointmentDate, int baselineHivStatus, int ipvOutcome, Date dateCreated, int changedBy, Date dateChanged, boolean voided, int voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
        // this.obsGroupId = obsGroupId;
         this.firstName = firstName;
@@ -118,11 +118,11 @@ public class PatientContact {
         this.lastName = lastName;
     }
 
-    public int getSex() {
+    public String getSex() {
         return sex;
     }
 
-    public void setSex(int sex) {
+    public void setSex(String sex) {
         this.sex = sex;
     }
 

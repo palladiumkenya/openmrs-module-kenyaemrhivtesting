@@ -23,6 +23,6 @@ import java.util.List;
 public interface HTSDAO {
     void persistPatientContact(PatientContact patientContact);
     List<PatientContact> getPatientContacts();
-    void deletePatientContact(int theId);
+    void voidPatientContact(int theId);
     List<PatientContact> searchPatientContact(String searchName);
 }

@@ -30,6 +30,10 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+
 @Repository("org.openmrs.module.hivtestingservices.api.db.HTSDAO")
 public class HibernateHTSDAO implements HTSDAO{
 	protected final Log log = LogFactory.getLog(this.getClass());
@@ -74,9 +78,10 @@ public class HibernateHTSDAO implements HTSDAO{
 		return criteria.list();
 	}
 	@Override
-	public void deletePatientContact(int theId){
+	public void voidPatientContact(int theId){
 
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+		//CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
 
 		//sessionFactory.getCurrentSession().createQuery("update PatientContact set voided = 'true' where id=:theId").executeUpdate();
 		//getSessionFactory().getCurrentSession().createQuery(query).executeUpdate();

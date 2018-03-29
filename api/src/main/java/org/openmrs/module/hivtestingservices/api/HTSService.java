@@ -14,6 +14,7 @@
 package org.openmrs.module.hivtestingservices.api;
 
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.hivtestingservices.api.impl.ClientTrace;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
@@ -35,5 +36,5 @@ public interface HTSService extends OpenmrsService {
     public List<PatientContact> getPatientContacts();
     public void persistPatientContact(PatientContact patientContact);
     public List<PatientContact> searchPatientContact(String searchName);
-    public void deletePatientContact (int theId);
+    public void voidPatientContact(int theId);
 }

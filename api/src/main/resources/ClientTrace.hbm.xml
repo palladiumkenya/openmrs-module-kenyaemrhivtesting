@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="org.openmrs.module.hivtestingservices">
+
+	<class name="org.openmrs.module.hivtestingservices.api.impl.ClientTrace"
+		table="kenyaemr_hiv_testing_client_trace">
+		<id name="id" type="int" column="id" unsaved-value="0">
+			<generator class="native" />
+		</id>
+		<discriminator column="id" insert="false" />
+		<many-to-one name="clientId" class="org.openmrs.module.hivtestingservices.api.impl.PatientContact" column="client_id"/>
+		<property name="uuid" type="java.lang.String" column="uuid" length="38" unique="true" />
+		<property name="contactType" type ="java.lang.String" column ="contact_type" length="50"/>
+		<property name="status" type="java.lang.String" column="status" length="50"/>
+		<property name="uniquePatientNo" type="java.lang.String" column="unique_patient_no" length="50"/>
+		<property name="facilityLinkedTo" type="java.lang.String" column ="facility_linked_to" length="255"/>
+		<property name="healthWorkerHandedTo" type="java.lang.String" column="health_worker_handed_to"/>
+		<property name="remarks" type ="java.lang.String" column ="remarks" length="255"/>
+		<property name="date" type="java.lang.String" column ="phone_contact" length="255"/>
+		<property name="dateCreated" type="java.util.Date" column="date_created" length="19"/>
+		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
+		<property name="dateChanged" type="java.util.Date" column="date_changed" length="19"/>
+		<property name="voided" type="java.lang.Boolean" column="voided" length="1"/>
+		<many-to-one name="voidedBy" class ="org.openmrs.User" column="voided_by"/>
+		<property name="dateVoided" type ="java.util.Date" column ="date_voided" length="19"/>
+		<property name="voidedReason" type="java.lang.String" column="voided_reason" length="255"/>
+
+
+	</class>
+
+</hibernate-mapping>
