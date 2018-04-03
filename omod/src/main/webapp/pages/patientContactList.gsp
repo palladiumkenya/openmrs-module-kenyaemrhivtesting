@@ -96,7 +96,7 @@ div.section-title {
                 <div class="grid">
                     <div class="column-one">&nbsp;</div>
 
-                    <div class="column-two">${rel.firsName}</div>
+                    <div class="column-two">${rel.firstName}</div>
 
                     <div class="column-three">${rel.middleName}</div>
 
@@ -106,7 +106,7 @@ div.section-title {
 
                     <div class="column-six">${rel.physicalAddress}</div>
 
-                    <div class="column-seven">${rel.phone}</div>
+                    <div class="column-seven">${rel.phoneContact}</div>
                 </div>
 
                 <div class="clear"></div>

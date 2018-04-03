@@ -23,7 +23,7 @@
 		<constructor-arg value="Patients Contacts" />
 		<constructor-arg value="hivtestingservices/patientContactList.page" />
 		<constructor-arg value="SpeedPhasesReports:apps/example.png" />
-		<constructor-arg value="1100007" />
+		<constructor-arg value="110001" />
 	</bean>
 	
 	<!-- Services accessible via Context.getService() -->

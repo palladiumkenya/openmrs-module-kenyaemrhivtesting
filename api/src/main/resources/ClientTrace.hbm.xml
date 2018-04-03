@@ -5,13 +5,13 @@
 
 <hibernate-mapping package="org.openmrs.module.hivtestingservices">
 
-	<class name="org.openmrs.module.hivtestingservices.api.impl.ClientTrace"
+	<class name="org.openmrs.module.hivtestingservices.api.ClientTrace"
 		table="kenyaemr_hiv_testing_client_trace">
 		<id name="id" type="int" column="id" unsaved-value="0">
 			<generator class="native" />
 		</id>
 		<discriminator column="id" insert="false" />
-		<many-to-one name="clientId" class="org.openmrs.module.hivtestingservices.api.impl.PatientContact" column="client_id"/>
+		<many-to-one name="clientId" class="org.openmrs.module.hivtestingservices.api.PatientContact" column="client_id"/>
 		<property name="uuid" type="java.lang.String" column="uuid" length="38" unique="true" />
 		<property name="contactType" type ="java.lang.String" column ="contact_type" length="50"/>
 		<property name="status" type="java.lang.String" column="status" length="50"/>
