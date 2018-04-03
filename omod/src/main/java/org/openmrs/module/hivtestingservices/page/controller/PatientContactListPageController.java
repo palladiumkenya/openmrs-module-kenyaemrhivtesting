@@ -7,18 +7,19 @@ import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
 import org.openmrs.module.kenyaui.annotation.AppPage;
-/*import org.openmrs.ui.framework.SimpleObject;
+import org.openmrs.ui.framework.Model;
+import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.page.PageModel;
-import org.openmrs.ui.framework.page.PageRequest;*/
+import org.openmrs.ui.framework.page.PageRequest;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,6 @@ public class PatientContactListPageController {
     private HTSService htsService;
 
     public void controller(@RequestParam(value="patientContactId") PatientContact patientContact,
-                           @SpringBean KenyaUiUtils kenyaUi,
-                           UiUtils ui,
                            PageRequest pageRequest,
                            PageModel model) {
         Map<String, Object> params = new HashMap<String, Object>();
@@ -42,16 +41,16 @@ public class PatientContactListPageController {
         model.addAttribute("contacts",patientContacts);
     }
 
- /*   @RequestMapping("/contactlist")
+  /*  @RequestMapping("/patientContactList")
     public String listPatientContacts(Model model) {
         //get patient contacts from the service
         List<PatientContact> patientContacts = htsService.getPatientContacts();
         model.addAttribute("patientContacts", patientContacts);
         return "patientContactList";
 
-    }
+    }*/
 
-    @RequestMapping("/addPatientContact")
+ /*   @RequestMapping("/addPatientContact")
     public String addPatientContact(Model model){
 
         //Model attribute to bind the form data
