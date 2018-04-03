@@ -14,10 +14,7 @@
 package org.openmrs.module.hivtestingservices.api;
 
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.hivtestingservices.api.impl.ClientTrace;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
 
 import java.util.List;
 

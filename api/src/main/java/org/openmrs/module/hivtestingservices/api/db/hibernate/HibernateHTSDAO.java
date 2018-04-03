@@ -13,34 +13,22 @@
  */
 package org.openmrs.module.hivtestingservices.api.db.hibernate;
 import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.db.hibernate.DbSession;
 import org.hibernate.Query;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
+
 import org.springframework.stereotype.Repository;
 import org.hibernate.SessionFactory;
-import org.springframework.stereotype.Service;
-import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
 
-@Repository("org.openmrs.module.hivtestingservices.api.db.HTSDAO")
 public class HibernateHTSDAO implements HTSDAO{
 	protected final Log log = LogFactory.getLog(this.getClass());
 
-	//Inject the session factory
-	//@Autowired
-	SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
 	/**
 	 * @Autowired
 	private HTSDAO htsDAO;

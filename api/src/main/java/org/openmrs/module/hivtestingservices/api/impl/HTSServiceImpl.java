@@ -15,7 +15,9 @@ package org.openmrs.module.hivtestingservices.api.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.hivtestingservices.api.HTSService;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,13 +28,11 @@ import java.util.List;
 /**
  * It is a default implementation of {@link HTSService}.
  */
-@Service("HTSServiceImpl")
-@Component
-public class HTSServiceImpl implements HTSService{
+
+public class HTSServiceImpl extends BaseOpenmrsService implements HTSService{
 
     protected final Log log = LogFactory.getLog(this.getClass());
 
-    @Autowired
     private HibernateHTSDAO patientContactDAO;
 
     public void setPatientContactDAO(HibernateHTSDAO patientContactDAO) {
@@ -49,26 +49,23 @@ public class HTSServiceImpl implements HTSService{
     }
 
     @Override
-    @Transactional
     public  List<PatientContact> getPatientContacts(){
 
         return patientContactDAO.getPatientContacts();
     }
+
     @Override
-    @Transactional
     public void persistPatientContact(PatientContact patientContact){
         patientContactDAO.persistPatientContact(patientContact);
     }
 
     @Override
-    @Transactional
     public List<PatientContact> searchPatientContact(String searchName) {
 
         return patientContactDAO.searchPatientContact(searchName);
     }
 
     @Override
-    @Transactional
     public void voidPatientContact(int theId){
         patientContactDAO.voidPatientContact(theId);
     }

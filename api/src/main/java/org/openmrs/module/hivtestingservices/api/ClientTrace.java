@@ -1,4 +1,4 @@
-package org.openmrs.module.hivtestingservices.api.impl;
+package org.openmrs.module.hivtestingservices.api;
 
 import java.util.Date;
 

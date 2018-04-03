@@ -5,7 +5,7 @@
 
 <hibernate-mapping package="org.openmrs.module.hivtestingservices">
 
-	<class name="org.openmrs.module.hivtestingservices.api.impl.PatientContact"
+	<class name="org.openmrs.module.hivtestingservices.api.PatientContact"
 		table="kenyaemr_hiv_testing_patient_contact">
 		<id name="id" type="int" column="id" unsaved-value="0">
 			<generator class="native" />
