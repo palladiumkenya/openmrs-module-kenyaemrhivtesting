@@ -9,13 +9,13 @@
 	<name>HTS in KenyaEMR Module</name>
 	<description>Provides HTS features in KenyaEMR</description>
 	<url>https://wiki.openmrs.org/display/docs/HTS+in+KenyaEMR+Module+Module</url>
-	
+
 	<developers>
 		<developer>
 			<name>Palladium Developers</name>
 		</developer>
 	</developers>
-	
+
 	<organization>
 		<name>OpenMRS</name>
 		<url>http://openmrs.org</url>
@@ -31,7 +31,7 @@
 		<module>api</module>
 		<module>omod</module>
 	</modules>
-	
+
 	<properties>
 		<openMRSVersion>1.9.10</openMRSVersion>
 		<!-- Module dependencies -->
@@ -45,6 +45,8 @@
 		<reportingVersion>0.9.8.1</reportingVersion>
 		<serializationxstreamVersion>0.2.7</serializationxstreamVersion>
 		<uiframeworkVersion>3.3.1</uiframeworkVersion>
+     	<kenyacoreVersion>2.2</kenyacoreVersion>
+		<kenyauiVersion>2.0.3</kenyauiVersion>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -124,6 +126,27 @@
 				<scope>provided</scope>
 			</dependency>
 
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>kenyacore-api</artifactId>
+                <version>${kenyacoreVersion}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>kenyacore-test</artifactId>
+                <version>${kenyacoreVersion}</version>
+                <scope>test</scope>
+            </dependency>
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>kenyaui-api</artifactId>
+				<version>${kenyauiVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+
+
 			<!-- End OpenMRS modules -->
 
 			<!-- Begin OpenMRS core -->
@@ -168,7 +191,7 @@
 				<scope>test</scope>
 			</dependency>
 
-			<!-- End OpenMRS core -->
+            <!-- End OpenMRS core -->
 
 			<!-- Begin external libraries -->
 
@@ -210,6 +233,7 @@
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>

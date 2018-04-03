@@ -14,7 +14,12 @@
 package org.openmrs.module.hivtestingservices.api;
 
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.hivtestingservices.api.impl.ClientTrace;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.openmrs.module.hivtestingservices.api.impl.PatientContact;
+
+import java.util.List;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.
@@ -23,14 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
  * <code>
  * Context.getService(HTSService.class).someMethod();
  * </code>
- * 
+ *
  * @see org.openmrs.api.context.Context
  */
 @Transactional
 public interface HTSService extends OpenmrsService {
-     
-	/*
-	 * Add service methods here
-	 * 
-	 */
+    public List<PatientContact> getPatientContacts();
+    public void persistPatientContact(PatientContact patientContact);
+    public List<PatientContact> searchPatientContact(String searchName);
+    public void voidPatientContact(int theId);
 }
