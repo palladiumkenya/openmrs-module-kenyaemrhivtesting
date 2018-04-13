@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.hivtestingservices.api.db;
 
+import org.openmrs.Patient;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import java.util.List;
@@ -21,8 +22,10 @@ import java.util.List;
  *  Database methods for {@link HTSService}.
  */
 public interface HTSDAO {
-    public void persistPatientContact(PatientContact patientContact);
+    public PatientContact savePatientContact(PatientContact patientContact);
+    public List<PatientContact> getPatientContactByPatient(Patient patient);
     public List<PatientContact> getPatientContacts();
     public void voidPatientContact(int theId);
     public List<PatientContact> searchPatientContact(String searchName);
+    public PatientContact getPatientContactByID (Integer patientContactId);
 }

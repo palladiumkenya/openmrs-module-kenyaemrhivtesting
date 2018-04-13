@@ -42,6 +42,7 @@
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>kenyaui-api</artifactId>
 		</dependency>
+
 		<!-- Begin OpenMRS core -->
 
 		<dependency>

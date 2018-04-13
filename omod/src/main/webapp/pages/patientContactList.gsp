@@ -15,7 +15,7 @@ div.grid div {
 }
 
 div.column-one {
-    width: 300px;
+    width: 200px;
 }
 
 div.column-two {
@@ -23,19 +23,23 @@ div.column-two {
 }
 
 div.column-three {
-    width: 120px;
+    width: 180px;
 }
 
 div.column-four {
-    width: 120px;
+    width: 140px;
 }
 
 div.column-five {
-    width: 120px;
+    width: 160px;
 }
 
 div.column-six {
-    width: 100px;
+    width: 180px;
+}
+
+div.column-seven {
+    width: 180px;
 }
 
 div.clear {
@@ -68,24 +72,26 @@ div.section-title {
         <div class="ke-panel-heading">Patient Contacts</div>
 
         <div class="ke-panel-content">
-            <div class="section-title">Patient Contacts list</div>
+            <div class="section-title"></div>
 
             <div class="clear"></div>
+
             <% if (contacts) { %>
             <div class="grid">
-                <div class="column-one">&nbsp;</div>
 
-                <div class="column-one">First Name</div>
+                <div class="column-one col-header">Name</div>
 
-                <div class="column-two col-header">Middle name</div>
+                <div class="column-two col-header">Gender</div>
 
-                <div class="column-three col-header">Last Name</div>
+                <div class="column-three col-header">Physical Address</div>
 
-                <div class="column-four col-header">Sex</div>
+                <div class="column-four col-header">Phone</div>
 
-                <div class="column-five col-header">Physical Address</div>
+                <div class="column-five col-header">Relationship</div>
 
-                <div class="column-six col-header">Phone</div>
+                <div class="column-six col-header">Baseline HIV Test</div>
+
+                <div class="column-seven col-header">Appointment Date</div>
             </div>
 
             <div class="clear"></div>
@@ -94,31 +100,42 @@ div.section-title {
 
             <div class="ke-stack-item">
                 <div class="grid">
-                    <div class="column-one">&nbsp;</div>
 
-                    <div class="column-two">${rel.firstName}</div>
+                    <div class="column-one">${rel.lastName + ' ' + rel.firstName + ' ' + rel.middleName}</div>
 
-                    <div class="column-three">${rel.middleName}</div>
+                    <div class="column-two">${rel.sex}</div>
 
-                    <div class="column-four">${rel.lastName}</div>
+                    <div class="column-three">${rel.physicalAddress}</div>
 
-                    <div class="column-five">${rel.sex}</div>
+                    <div class="column-four">${rel.phoneContact}</div>
 
-                    <div class="column-six">${rel.physicalAddress}</div>
+                    <div class="column-five">${rel.relationType}</div>
 
-                    <div class="column-seven">${rel.phoneContact}</div>
+                    <div class="column-six">${rel.baselineHivStatus}</div>
+
+                    <div class="column-seven">${rel.appointmentDate}</div>
                 </div>
 
                 <div class="clear"></div>
-            </div>
 
+            </div>
+            <% }
+            } else { %>
+            No Patient Contact found
+            <% } %>
         </div>
 
         <div class="clear"></div>
+
     </div>
-    <% } } else { %>
-    No Patient Contact found
-    <% } %>
+    <div align="center">
+
+        <button type="button"
+                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientId: patient.id,  returnUrl: ui.thisUrl() ])}')">
+            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Add Contact
+        </button>
+
+    </div>
 </div>
 
 

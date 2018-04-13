@@ -43,6 +43,7 @@ public class ClientTrace {
         this.voidedReason = voidedReason;
         this.date = date;
     }
+
     public int getId() {
         return id;
     }
@@ -50,6 +51,7 @@ public class ClientTrace {
     public void setId(int id) {
         this.id = id;
     }
+
     public PatientContact getClientId() {
         return clientId;
     }

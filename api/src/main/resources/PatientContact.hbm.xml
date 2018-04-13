@@ -16,15 +16,15 @@
 		<property name="firstName" type ="java.lang.String" column ="first_name" length="255"/>
 		<property name="middleName" type="java.lang.String" column="middle_name" length="255"/>
 		<property name="lastName" type="java.lang.String" column="last_name" length="255"/>
-		<property name="sex" type="int" column ="sex" length="1"/>
+		<property name="sex" type="java.lang.String" column ="sex" length="1"/>
 		<property name="birthDate" type="java.util.Date" column="birth_date"/>
 		<property name="physicalAddress" type ="java.lang.String" column ="physical_address" length="255"/>
 		<property name="phoneContact" type="java.lang.String" column ="phone_contact" length="255"/>
+		<property name="relationType" type="java.lang.String" column ="relationship_type" length="255"/>
 		<many-to-one name="patientRelatedTo" class="org.openmrs.Patient" column ="patient_related_to"/>
-		<property name="relationType" type = "java.lang.String" column="relationship_type"/>
 		<property name="appointmentDate" type = "java.util.Date" column ="appointment_date"/>
-		<property name="baselineHivStatus" type = "int" column ="baseline_hiv_status"/>
-		<property name="ipvOutcome" type="int" column = "ipv_outcome"/>
+		<property name="baselineHivStatus" type = "java.lang.String" column ="baseline_hiv_status" length="255"/>
+		<property name="ipvOutcome" type="java.lang.String" column = "ipv_outcome" length="255"/>
 		<many-to-one name="patient" class="org.openmrs.Patient" not-null="true" column="patient_id"/>
 		<property name="dateCreated" type="java.util.Date" column="date_created" length="19"/>
 		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
@@ -32,7 +32,7 @@
 		<property name="voided" type="java.lang.Boolean" column="voided" length="1"/>
 		<many-to-one name="voidedBy" class ="org.openmrs.User" column="voided_by"/>
 		<property name="dateVoided" type ="java.util.Date" column ="date_voided" length="19"/>
-		<property name="voidedReason" type="java.lang.String" column="voided_reason" length="255"/>
+		<property name="voidReason" type="java.lang.String" column="voided_reason" length="255"/>
 
 
 	</class>

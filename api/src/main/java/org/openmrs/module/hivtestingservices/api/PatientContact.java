@@ -1,18 +1,16 @@
 package org.openmrs.module.hivtestingservices.api;
 
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import org.openmrs.patient.*;
-import org.openmrs.Patient;
-import org.openmrs.User;
-import javax.persistence.*;
-import java.util.Date;
+import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Obs;
+import org.openmrs.Patient;
 
-public class PatientContact {
+import java.util.Date;
+import java.util.UUID;
 
-    private int id;
+public class PatientContact extends BaseOpenmrsData {
+
+    private Integer id;
     private String uuid;
     private Obs obsGroupId;
     private String firstName;
@@ -25,23 +23,22 @@ public class PatientContact {
     private Patient patientRelatedTo;
     private String relationType;
     private Date appointmentDate;
-    private int baselineHivStatus;
-    private int ipvOutcome;
+    private String baselineHivStatus;
+    private String ipvOutcome;
     private Patient patient;
-    private Date dateCreated;
-    private int changedBy;
-    private Date dateChanged;
-    private boolean voided;
-    private int voidedBy;
-    private Date dateVoided;
-    private String voidedReason;
+
 
     public PatientContact() {
+        prePersist();
     }
 
-    public PatientContact(String uuid,/* int obsGroupId, */String firstName, String middleName, String lastName, String sex, Date birthDate, String physicalAddress, String phoneContact, /*int patientRelatedTo,*/ String relationType, Date appointmentDate, int baselineHivStatus, int ipvOutcome, Date dateCreated, int changedBy, Date dateChanged, boolean voided, int voidedBy, Date dateVoided, String voidedReason) {
+    public PatientContact(String uuid, String firstName, String middleName,
+                          String lastName, String sex, Date birthDate, String physicalAddress,
+                          String phoneContact, String relationType, Date appointmentDate,
+                          String baselineHivStatus, String ipvOutcome, Date dateCreated,
+                          Integer changedBy, Date dateChanged, boolean voided, Integer voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
-       // this.obsGroupId = obsGroupId;
+        // this.obsGroupId = obsGroupId;
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -49,26 +46,26 @@ public class PatientContact {
         this.birthDate = birthDate;
         this.physicalAddress = physicalAddress;
         this.phoneContact = phoneContact;
-       // this.patientRelatedTo = patientRelatedTo;
+        // this.patientRelatedTo = patientRelatedTo;
         this.relationType = relationType;
         this.appointmentDate = appointmentDate;
         this.baselineHivStatus = baselineHivStatus;
         this.ipvOutcome = ipvOutcome;
-        this.dateCreated = dateCreated;
-        this.changedBy = changedBy;
-        this.dateChanged = dateChanged;
-        this.voided = voided;
-        this.voidedBy = voidedBy;
-        this.dateVoided = dateVoided;
-        this.voidedReason = voidedReason;
+
+    }
+
+
+    public void prePersist() {
+
+        if (null == getUuid())
+            setUuid(UUID.randomUUID().toString());
     }
 
     public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid)
-    {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
@@ -76,16 +73,10 @@ public class PatientContact {
         return obsGroupId;
     }
 
-   /* public int getObsGroupId() {
-        return obsGroupId;
-    }
 
-    public void setObsGroupId(int obsGroupId){
+    public void setObsGroupId(Obs obsGroupId) {
         this.obsGroupId = obsGroupId;
-    }*/
-   public void setObsGroupId(Obs obsGroupId) {
-       this.obsGroupId = obsGroupId;
-   }
+    }
 
     public Patient getPatientRelatedTo() {
         return patientRelatedTo;
@@ -94,6 +85,7 @@ public class PatientContact {
     public void setPatientRelatedTo(Patient patientRelatedTo) {
         this.patientRelatedTo = patientRelatedTo;
     }
+
     public String getFirstName() {
         return firstName;
     }
@@ -150,14 +142,6 @@ public class PatientContact {
         this.phoneContact = phoneContact;
     }
 
-    /*public int getPatientRelatedTo() {
-        return patientRelatedTo;
-    }
-
-    public void setPatientRelatedTo(int patientRelatedTo) {
-        this.patientRelatedTo = patientRelatedTo;
-    }*/
-
     public String getRelationType() {
         return relationType;
     }
@@ -174,83 +158,27 @@ public class PatientContact {
         this.appointmentDate = appointmentDate;
     }
 
-    public int getBaselineHivStatus() {
+    public String getBaselineHivStatus() {
         return baselineHivStatus;
     }
 
-    public void setBaselineHivStatus(int baselineHivStatus) {
+    public void setBaselineHivStatus(String baselineHivStatus) {
         this.baselineHivStatus = baselineHivStatus;
     }
 
-    public int getIpvOutcome() {
+    public String getIpvOutcome() {
         return ipvOutcome;
     }
 
-    public void setIpvOutcome(int ipvOutcome) {
+    public void setIpvOutcome(String ipvOutcome) {
         this.ipvOutcome = ipvOutcome;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    public int getChangedBy() {
-        return changedBy;
-    }
-
-    public void setChangedBy(int changedBy) {
-        this.changedBy = changedBy;
-    }
-
-    public Date getDateChanged() {
-        return dateChanged;
-    }
-
-    public void setDateChanged(Date dateChanged) {
-        this.dateChanged = dateChanged;
-    }
-
-    public boolean isVoided() {
-        return voided;
-    }
-
-    public void setVoided(boolean voided) {
-        this.voided = voided;
-    }
-
-    public int getVoidedBy() {
-        return voidedBy;
-    }
-
-    public void setVoidedBy(int voidedBy) {
-        this.voidedBy = voidedBy;
-    }
-
-    public Date getDateVoided() {
-        return dateVoided;
-    }
-
-    public void setDateVoided(Date dateVoided) {
-        this.dateVoided = dateVoided;
-    }
-
-    public String getVoidedReason() {
-        return voidedReason;
-    }
-
-    public void setVoidedReason(String voidedReason) {
-        this.voidedReason = voidedReason;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

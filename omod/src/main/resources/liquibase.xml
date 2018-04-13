@@ -22,8 +22,8 @@
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true" />
             </column>
-            <column name="obs_group_id" type="int">
-                <constraints nullable="false" unique="true" />
+            <column name="obs_group_id" type="int" >
+                <constraints nullable="true" unique="false" />
             </column>
             <column name="first_name" type="varchar(255)">
                 <constraints nullable="false" />
@@ -49,17 +49,17 @@
             <column name="patient_related_to" type="int">
                 <constraints nullable="false" />
             </column>
-            <column name="relationship_type" type="int">
+            <column name="relationship_type" type="varchar(255)">
                 <constraints nullable="false"  />
             </column>
             <column name="appointment_date" type="datetime">
                 <constraints nullable="true"  />
             </column>
-            <column name="baseline_hiv_status" type="int">
-                <constraints nullable="false"  />
+            <column name="baseline_hiv_status" type="varchar(255)">
+                <constraints nullable="true"  />
             </column>
-            <column name="ipv_outcome" type="int">
-                <constraints nullable="false"  />
+            <column name="ipv_outcome" type="varchar(255)">
+                <constraints nullable="true"  />
             </column>
             <column name="patient_id" type="int">
                 <constraints nullable="true" />
@@ -76,8 +76,8 @@
             <column name="date_voided" type="datetime"/>
             <column name="voided_reason" type="varchar(255)"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="patient_related_to" constraintName="patient_contact_related_patient" referencedTableName="patient" referencedColumnNames="patient_id" deferrable="false" initiallyDeferred="false" />
-        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id" constraintName="patient_contact_obs_group"	referencedTableName="obs" referencedColumnNames="concept_id"	deferrable="false" initiallyDeferred="false" />
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="patient_related_to" constraintName="patient_contact_related_patient" referencedTableName="patient" referencedColumnNames="patient_id" />
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id" constraintName="patient_contact_obs_group"	referencedTableName="obs" referencedColumnNames="concept_id" />
     </changeSet>
     <changeSet id="kenyaemr_hiv_testing_002" author="schege">
 

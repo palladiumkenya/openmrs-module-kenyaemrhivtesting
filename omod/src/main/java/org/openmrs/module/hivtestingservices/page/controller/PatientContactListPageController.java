@@ -25,39 +25,17 @@ public class PatientContactListPageController {
     protected static final Log log = LogFactory.getLog(PatientContactListPageController.class);
 
     public void controller(@SpringBean KenyaUiUtils kenyaUi,
+                           @RequestParam(value = "patientId") Patient patient,
                            UiUtils ui, PageModel model) {
+        System.out.println("Patient id is ================" + patient.getPatientId());
+        HTSService htsService = Context.getService(HTSService.class);
+        List<PatientContact> patientContacts = htsService.getPatientContactByPatient(patient);
 
-        HTSService service = Context.getService(HTSService.class);
-        System.out.println("Testing service ================ " + service.getPatientContacts().size());
-        List<PatientContact> patientContacts = service.getPatientContacts();
         model.put("contacts", patientContacts);
+        model.put("patient", patient);
+
     }
-
-  /*  @RequestMapping("/patientContactList")
-    public String listPatientContacts(Model model) {
-        //get patient contacts from the service
-        List<PatientContact> patientContacts = htsService.getPatientContacts();
-        model.addAttribute("patientContacts", patientContacts);
-        return "patientContactList";
-
-    }*/
-
- /*   @RequestMapping("/addPatientContact")
-    public String addPatientContact(Model model){
-
-        //Model attribute to bind the form data
-        PatientContact patientContact = new PatientContact();
-        model.addAttribute("patientContact",patientContact);
-        return "addPatientContact";
-    }
-
-  /*  @PostMapping("/savePatientContact"){
-
-        public String savePatientContact(@ModelAttribute("patientContact") PatientContact patientContact){
-    //save patient contact using the service
-            htsService.persistPatientContact(patientContact);
-        }*/
-    }
+}
 
 
 
