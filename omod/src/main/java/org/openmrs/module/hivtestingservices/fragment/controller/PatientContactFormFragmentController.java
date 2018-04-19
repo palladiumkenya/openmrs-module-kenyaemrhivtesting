@@ -255,7 +255,6 @@ public class PatientContactFormFragmentController{
             this.ipvOutcome = ipvOutcome;
         }
 
-
     }
 
 
