@@ -16,7 +16,9 @@ package org.openmrs.module.hivtestingservices.api.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
+import org.openmrs.api.db.DAOException;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.hivtestingservices.api.ClientTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
@@ -33,11 +35,18 @@ import java.util.List;
 
 public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
 
-
-
     protected final Log log = LogFactory.getLog(this.getClass());
 
     private HibernateHTSDAO patientContactDAO;
+    private HibernateHTSDAO clientTraceDAO;
+
+    public HibernateHTSDAO getClientTraceDAO() {
+        return clientTraceDAO;
+    }
+
+    public void setClientTraceDAO(HibernateHTSDAO clientTraceDAO) {
+        this.clientTraceDAO = clientTraceDAO;
+    }
 
     @Override
     public List<PatientContact> getPatientContacts() {
@@ -46,8 +55,9 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
 
     @Override
     public PatientContact savePatientContact(PatientContact patientContact) {
-        return  patientContactDAO.savePatientContact(patientContact);
+        return patientContactDAO.savePatientContact(patientContact);
     }
+
     public void setPatientContactDAO(HibernateHTSDAO patientContactDAO) {
         this.patientContactDAO = patientContactDAO;
     }
@@ -79,6 +89,12 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     @Override
     public List<PatientContact> getPatientContactByPatient(Patient patient) {
         return patientContactDAO.getPatientContactByPatient(patient);
+    }
+
+    @Override
+    public ClientTrace saveClientTrace(ClientTrace clientTrace) {
+
+        return clientTraceDAO.saveClientTrace(clientTrace);
     }
 
     @Override

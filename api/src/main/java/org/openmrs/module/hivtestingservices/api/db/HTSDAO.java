@@ -14,6 +14,7 @@
 package org.openmrs.module.hivtestingservices.api.db;
 
 import org.openmrs.Patient;
+import org.openmrs.module.hivtestingservices.api.ClientTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import java.util.List;
@@ -28,4 +29,5 @@ public interface HTSDAO {
     public void voidPatientContact(int theId);
     public List<PatientContact> searchPatientContact(String searchName);
     public PatientContact getPatientContactByID (Integer patientContactId);
+    public ClientTrace saveClientTrace(ClientTrace clientTrace);
 }

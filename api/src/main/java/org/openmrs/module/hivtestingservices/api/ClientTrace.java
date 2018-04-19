@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class ClientTrace {
 
-    private int id;
+    private Integer id;
     private PatientContact clientId;
     private String uuid;
     private String contactType;
@@ -14,13 +14,6 @@ public class ClientTrace {
     private String healthWorkerHandedTo;
     private String remarks;
     private Date date;
-    private Date dateCreated;
-    private int changedBy;
-    private Date dateChanged;
-    private boolean voided;
-    private int voidedBy;
-    private Date dateVoided;
-    private String voidedReason;
 
 
     public ClientTrace() {
@@ -34,13 +27,7 @@ public class ClientTrace {
         this.facilityLinkedTo = facilityLinkedTo;
         this.healthWorkerHandedTo = healthWorkerHandedTo;
         this.remarks = remarks;
-        this.dateCreated = dateCreated;
-        this.changedBy = changedBy;
-        this.dateChanged = dateChanged;
-        this.voided = voided;
-        this.voidedBy = voidedBy;
-        this.dateVoided = dateVoided;
-        this.voidedReason = voidedReason;
+
         this.date = date;
     }
 
@@ -124,60 +111,5 @@ public class ClientTrace {
         this.date = date;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    public int getChangedBy() {
-        return changedBy;
-    }
-
-    public void setChangedBy(int changedBy) {
-        this.changedBy = changedBy;
-    }
-
-    public Date getDateChanged() {
-        return dateChanged;
-    }
-
-    public void setDateChanged(Date dateChanged) {
-        this.dateChanged = dateChanged;
-    }
-
-    public boolean isVoided() {
-        return voided;
-    }
-
-    public void setVoided(boolean voided) {
-        this.voided = voided;
-    }
-
-    public int getVoidedBy() {
-        return voidedBy;
-    }
-
-    public void setVoidedBy(int voidedBy) {
-        this.voidedBy = voidedBy;
-    }
-
-    public Date getDateVoided() {
-        return dateVoided;
-    }
-
-    public void setDateVoided(Date dateVoided) {
-        this.dateVoided = dateVoided;
-    }
-
-    public String getVoidedReason() {
-        return voidedReason;
-    }
-
-    public void setVoidedReason(String voidedReason) {
-        this.voidedReason = voidedReason;
-    }
 }
 

@@ -27,7 +27,7 @@ public class PatientContactListPageController {
     public void controller(@SpringBean KenyaUiUtils kenyaUi,
                            @RequestParam(value = "patientId") Patient patient,
                            UiUtils ui, PageModel model) {
-        System.out.println("Patient id is ================" + patient.getPatientId());
+
         HTSService htsService = Context.getService(HTSService.class);
         List<PatientContact> patientContacts = htsService.getPatientContactByPatient(patient);
 

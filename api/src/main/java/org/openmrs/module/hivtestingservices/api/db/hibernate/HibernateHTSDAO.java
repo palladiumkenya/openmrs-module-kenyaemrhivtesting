@@ -17,6 +17,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.hivtestingservices.api.ClientTrace;
 import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,5 +111,11 @@ public class HibernateHTSDAO implements HTSDAO {
         return (PatientContact) this.sessionFactory.getCurrentSession().get(PatientContact.class, patientContactId);
     }
 
+    @Override
+    public ClientTrace saveClientTrace(ClientTrace clientTrace) throws DAOException {
+
+        sessionFactory.getCurrentSession().saveOrUpdate(clientTrace);
+        return clientTrace;
+    }
 
 }

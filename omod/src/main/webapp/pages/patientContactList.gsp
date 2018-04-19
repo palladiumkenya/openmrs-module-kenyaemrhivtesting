@@ -19,15 +19,15 @@ div.column-one {
 }
 
 div.column-two {
-    width: 100px;
+    width: 80px;
 }
 
 div.column-three {
-    width: 180px;
+    width: 160px;
 }
 
 div.column-four {
-    width: 140px;
+    width: 120px;
 }
 
 div.column-five {
@@ -35,11 +35,14 @@ div.column-five {
 }
 
 div.column-six {
-    width: 180px;
+    width: 160px;
 }
 
 div.column-seven {
-    width: 180px;
+    width: 160px;
+}
+div.column-eight {
+    width: 100px;
 }
 
 div.clear {
@@ -92,6 +95,8 @@ div.section-title {
                 <div class="column-six col-header">Baseline HIV Test</div>
 
                 <div class="column-seven col-header">Appointment Date</div>
+
+                <div class="column-eight col-header"></div>
             </div>
 
             <div class="clear"></div>
@@ -114,6 +119,16 @@ div.section-title {
                     <div class="column-six">${rel.baselineHivStatus}</div>
 
                     <div class="column-seven">${rel.appointmentDate}</div>
+
+                    <div class="column-eight">
+
+                    <button type="button"
+                            onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientId: patient.id,  returnUrl: ui.thisUrl() ])}')">
+                        %{--<img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/>--}% Trace
+                    </button>
+
+                    </div>
+
                 </div>
 
                 <div class="clear"></div>
@@ -128,6 +143,7 @@ div.section-title {
         <div class="clear"></div>
 
     </div>
+
     <div align="center">
 
         <button type="button"
