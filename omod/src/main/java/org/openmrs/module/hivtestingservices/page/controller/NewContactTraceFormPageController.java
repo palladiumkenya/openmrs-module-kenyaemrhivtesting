@@ -9,7 +9,7 @@ public class NewContactTraceFormPageController {
 
 
 
-    public void controller(@RequestParam("traceRelatedContact") PatientContact patientContact,
+    public void controller(@RequestParam("contactId") PatientContact patientContact,
                            @RequestParam("returnUrl") String url,
                            PageModel model) {
 

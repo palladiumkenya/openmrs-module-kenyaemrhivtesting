@@ -123,8 +123,8 @@ div.section-title {
                     <div class="column-eight">
 
                     <button type="button"
-                            onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientId: patientContact.id,  returnUrl: ui.thisUrl() ])}')">
-                        %{--<img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/>--}% Trace
+                            onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ contactId: rel.id,  returnUrl: ui.thisUrl() ])}')">
+                        <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Trace
                     </button>
 
                     </div>

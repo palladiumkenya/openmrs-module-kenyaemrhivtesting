@@ -1,7 +1,6 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
-
-import org.openmrs.Patient;
-import org.openmrs.module.hivtestingservices.api.ClientTrace;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.kenyaui.form.AbstractWebForm;
@@ -13,17 +12,14 @@ import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.openmrs.api.context.Context;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class ContactTracingFormFragmentController {
-    public void controller(@FragmentParam(value = "clientTrace", required = false) ClientTrace clientTrace,
-                           @RequestParam(value = "patientContactId", required = true) PatientContact patientContact,
+    public void controller(@FragmentParam(value = "traceId", required = false) ContactTrace contactTrace,
+                           @RequestParam(value = "returnUrl") String returnUrl,
+                           @RequestParam(value = "patientContact") PatientContact patientContact,
                            PageModel model) {
-        ClientTrace exists = clientTrace != null ? clientTrace : null;
+        ContactTrace exists = contactTrace != null ? contactTrace : null;
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
 
     }
@@ -31,14 +27,14 @@ public class ContactTracingFormFragmentController {
     public SimpleObject saveClientTrace(@MethodParam("newContactTraceForm") @BindParams ContactTraceForm
                                                 form, UiUtils ui) {
         ui.validate(form, form, null);
-        ClientTrace clientTrace = form.save();
-        return SimpleObject.create("id", clientTrace.getClientId().getId());
+        ContactTrace contactTrace = form.save();
+        return SimpleObject.create("traceId", contactTrace.getId());
     }
 
-    public ContactTraceForm newContactTraceForm(@RequestParam(value = "id", required = false) ClientTrace
-                                                        clientTrace, @RequestParam(value = "traceRelatedContact", required = true) PatientContact patientContact) {
-        if (clientTrace !=null){
-            return new ContactTraceForm(clientTrace, patientContact);
+    public ContactTraceForm newContactTraceForm(@RequestParam(value = "traceId", required = false) ContactTrace
+                                                        contactTrace, @RequestParam(value = "patientContactId", required = true) PatientContact patientContact) {
+        if (contactTrace !=null){
+            return new ContactTraceForm(contactTrace, patientContact);
         }
         else {
             return new ContactTraceForm(patientContact);
@@ -46,8 +42,8 @@ public class ContactTracingFormFragmentController {
     }
 
     public class ContactTraceForm extends AbstractWebForm{
-        private ClientTrace original;
-        private PatientContact traceRelatedContact;
+        private ContactTrace original;
+        private PatientContact patientContact;
         private String contactType;
         private String status;
         private String uniquePatientNo;
@@ -60,27 +56,27 @@ public class ContactTracingFormFragmentController {
         }
 
         public ContactTraceForm(PatientContact patientContact) {
-            this.traceRelatedContact = patientContact;
+            this.patientContact = patientContact;
         }
 
-        public ContactTraceForm(ClientTrace clientTrace, PatientContact patientContact) {
-            this.original = clientTrace;
-            this.contactType = clientTrace.getContactType();
-            this.status = clientTrace.getStatus();
-            this.uniquePatientNo = clientTrace.getUniquePatientNo();
-            this.facilityLinkedTo = clientTrace.getFacilityLinkedTo();
-            this.healthWorkerHandedTo = clientTrace.getHealthWorkerHandedTo();
-            this.remarks = clientTrace.getRemarks();
+        public ContactTraceForm(ContactTrace contactTrace, PatientContact patientContact) {
+            this.original = contactTrace;
+            this.contactType = contactTrace.getContactType();
+            this.status = contactTrace.getStatus();
+            this.uniquePatientNo = contactTrace.getUniquePatientNo();
+            this.facilityLinkedTo = contactTrace.getFacilityLinkedTo();
+            this.healthWorkerHandedTo = contactTrace.getHealthWorkerHandedTo();
+            this.remarks = contactTrace.getRemarks();
 
         }
-        public ClientTrace save(){
-            ClientTrace toSave;
+        public ContactTrace save(){
+            ContactTrace toSave;
             if (original !=null){
 
                 toSave = original;
             }
             else{
-                toSave = new ClientTrace();
+                toSave = new ContactTrace();
             }
             toSave.setContactType(contactType);
             toSave.setStatus(status);
@@ -88,7 +84,7 @@ public class ContactTracingFormFragmentController {
             toSave.setFacilityLinkedTo(facilityLinkedTo);
             toSave.setHealthWorkerHandedTo(healthWorkerHandedTo);
             toSave.setRemarks(remarks);
-            ClientTrace cTrace = Context.getService(HTSService.class).saveClientTrace(toSave);
+            ContactTrace cTrace = Context.getService(HTSService.class).saveClientTrace(toSave);
             return cTrace;
 
         }
@@ -97,27 +93,23 @@ public class ContactTracingFormFragmentController {
         public void validate(Object o, Errors errors) {
             require(errors, "contactType");
             require(errors, "status");
-            require(errors, "uniquePatientNo");
-            require(errors, "facilityLinkedTo");
-            require(errors, "healthWorkerHandedTo");
-            require(errors, "remarks");
 
         }
 
-        public ClientTrace getOriginal() {
+        public ContactTrace getOriginal() {
             return original;
         }
 
-        public void setOriginal(ClientTrace original) {
+        public void setOriginal(ContactTrace original) {
             this.original = original;
         }
 
-        public PatientContact getTraceRelatedContact() {
-            return traceRelatedContact;
+        public PatientContact getpatientContact() {
+            return patientContact;
         }
 
-        public void setTraceRelatedContact(PatientContact traceRelatedContact) {
-            this.traceRelatedContact = traceRelatedContact;
+        public void setpatientContact(PatientContact patientContact) {
+            this.patientContact = patientContact;
         }
 
         public String getContactType() {

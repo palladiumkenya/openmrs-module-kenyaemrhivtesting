@@ -37,9 +37,7 @@
 
 <form id="patient-contact-trace-form" method="post"
       action="${ui.actionLink("hivtestingservices", "contactTracingForm", "saveClientTrace")}">
-    <% if (command.original) { %>
-    <input type="hidden" name="id" value="${command.original.id}"/>
-    <% } %>
+
 
     <div class="ke-panel-content">
 
@@ -51,7 +49,7 @@
     </div>
     <fieldset>
         <legend>Date</legend>
-        <input type="hidden" name="traceRelatedContact" value="${currentPatient.id}"/>
+
         <% date.each { %>
         ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
         <% } %>
@@ -115,7 +113,7 @@
             }
         });
 
-    }); // end of jQuery initialization block
+    }); // end of jQuery initialization bloc
 
 
 </script>

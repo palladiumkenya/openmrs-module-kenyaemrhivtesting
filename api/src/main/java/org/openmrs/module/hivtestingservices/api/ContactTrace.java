@@ -2,11 +2,12 @@ package org.openmrs.module.hivtestingservices.api;
 
 import java.util.Date;
 
-public class ClientTrace {
+public class ContactTrace {
+
 
     private Integer id;
-    private PatientContact clientId;
     private String uuid;
+    private PatientContact patientContact;
     private String contactType;
     private String status;
     private String uniquePatientNo;
@@ -14,12 +15,19 @@ public class ClientTrace {
     private String healthWorkerHandedTo;
     private String remarks;
     private Date date;
+    Date dateCreated;
+    int changedBy;
+    Date dateChanged;
+    boolean voided;
+    int voidedBy;
+    Date dateVoided;
+    String voidedReason;
 
 
-    public ClientTrace() {
+    public ContactTrace() {
     }
 
-    public ClientTrace(String uuid, String contactType, String status, String uniquePatientNo, String facilityLinkedTo, String healthWorkerHandedTo, String remarks, Date date, Date dateCreated, int changedBy, Date dateChanged, boolean voided, int voidedBy, Date dateVoided, String voidedReason) {
+    public ContactTrace(String uuid, String contactType, String status, String uniquePatientNo, String facilityLinkedTo, String healthWorkerHandedTo, String remarks, Date date, Date dateCreated, int changedBy, Date dateChanged, boolean voided, int voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
         this.contactType = contactType;
         this.status = status;
@@ -39,12 +47,12 @@ public class ClientTrace {
         this.id = id;
     }
 
-    public PatientContact getClientId() {
-        return clientId;
+    public PatientContact getPatientContact() {
+        return patientContact;
     }
 
-    public void setClientId(PatientContact clientId) {
-        this.clientId = clientId;
+    public void setPatientContact(PatientContact patientContact) {
+        this.patientContact = patientContact;
     }
 
     public String getUuid() {
@@ -94,7 +102,6 @@ public class ClientTrace {
     public void setHealthWorkerHandedTo(String healthWorkerHandedTo) {
         this.healthWorkerHandedTo = healthWorkerHandedTo;
     }
-
     public String getRemarks() {
         return remarks;
     }
@@ -111,5 +118,60 @@ public class ClientTrace {
         this.date = date;
     }
 
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public int getChangedBy() {
+        return changedBy;
+    }
+
+    public void setChangedBy(int changedBy) {
+        this.changedBy = changedBy;
+    }
+
+    public Date getDateChanged() {
+        return dateChanged;
+    }
+
+    public void setDateChanged(Date dateChanged) {
+        this.dateChanged = dateChanged;
+    }
+
+    public boolean isVoided() {
+        return voided;
+    }
+
+    public void setVoided(boolean voided) {
+        this.voided = voided;
+    }
+
+    public int getVoidedBy() {
+        return voidedBy;
+    }
+
+    public void setVoidedBy(int voidedBy) {
+        this.voidedBy = voidedBy;
+    }
+
+    public Date getDateVoided() {
+        return dateVoided;
+    }
+
+    public void setDateVoided(Date dateVoided) {
+        this.dateVoided = dateVoided;
+    }
+
+    public String getVoidedReason() {
+        return voidedReason;
+    }
+
+    public void setVoidedReason(String voidedReason) {
+        this.voidedReason = voidedReason;
+    }
 }
 

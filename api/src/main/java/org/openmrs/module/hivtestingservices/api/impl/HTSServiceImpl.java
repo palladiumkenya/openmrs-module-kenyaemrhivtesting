@@ -16,16 +16,11 @@ package org.openmrs.module.hivtestingservices.api.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
-import org.openmrs.api.db.DAOException;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.hivtestingservices.api.ClientTrace;
+import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -92,9 +87,9 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
-    public ClientTrace saveClientTrace(ClientTrace clientTrace) {
+    public ContactTrace saveClientTrace(ContactTrace contactTrace) {
 
-        return clientTraceDAO.saveClientTrace(clientTrace);
+        return clientTraceDAO.saveClientTrace(contactTrace);
     }
 
     @Override
