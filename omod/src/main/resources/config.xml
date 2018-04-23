@@ -34,7 +34,7 @@
 	<mappingFiles>
 
 		PatientContact.hbm.xml
-		ClientTrace.hbm.xml
+		ContactTrace.hbm.xml
 		HTSObject.hbm.xml
 
 	</mappingFiles>

@@ -19,6 +19,7 @@ public class ContactTracingFormFragmentController {
                            @RequestParam(value = "returnUrl") String returnUrl,
                            @RequestParam(value = "patientContact") PatientContact patientContact,
                            PageModel model) {
+        System.out.println("Hitting trace form fragment nooooooooooooooooooooow =============================");
         ContactTrace exists = contactTrace != null ? contactTrace : null;
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
 
@@ -28,11 +29,11 @@ public class ContactTracingFormFragmentController {
                                                 form, UiUtils ui) {
         ui.validate(form, form, null);
         ContactTrace contactTrace = form.save();
-        return SimpleObject.create("traceId", contactTrace.getId());
+        return SimpleObject.create("id", contactTrace.getId());
     }
 
-    public ContactTraceForm newContactTraceForm(@RequestParam(value = "traceId", required = false) ContactTrace
-                                                        contactTrace, @RequestParam(value = "patientContactId", required = true) PatientContact patientContact) {
+    public ContactTraceForm newContactTraceForm(@RequestParam(value = "id", required = false) ContactTrace
+                                                        contactTrace, @RequestParam(value = "patientContact", required = true) PatientContact patientContact) {
         if (contactTrace !=null){
             return new ContactTraceForm(contactTrace, patientContact);
         }
@@ -56,10 +57,13 @@ public class ContactTracingFormFragmentController {
         }
 
         public ContactTraceForm(PatientContact patientContact) {
+            System.out.println("Getting in const with patient contact as param ================================");
             this.patientContact = patientContact;
         }
 
         public ContactTraceForm(ContactTrace contactTrace, PatientContact patientContact) {
+            System.out.println("Getting in const with two params ================================");
+
             this.original = contactTrace;
             this.contactType = contactTrace.getContactType();
             this.status = contactTrace.getStatus();

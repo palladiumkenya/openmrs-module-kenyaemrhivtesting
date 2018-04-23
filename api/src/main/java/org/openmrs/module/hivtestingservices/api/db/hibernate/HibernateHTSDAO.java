@@ -117,4 +117,8 @@ public class HibernateHTSDAO implements HTSDAO {
         return contactTrace;
     }
 
+    public ContactTrace getPatientContactTraceById(Integer patientContactTraceId) {
+        return (ContactTrace) this.sessionFactory.getCurrentSession().get(ContactTrace.class, patientContactTraceId);
+
+    }
 }

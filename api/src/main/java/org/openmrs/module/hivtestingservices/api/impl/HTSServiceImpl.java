@@ -93,6 +93,11 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
+    public ContactTrace getPatientContactTraceById(Integer patientContactTraceId) {
+        return clientTraceDAO.getPatientContactTraceById(patientContactTraceId);
+    }
+
+    @Override
     public void onStartup() {
 
     }

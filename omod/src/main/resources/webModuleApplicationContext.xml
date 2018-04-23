@@ -29,6 +29,9 @@
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
 	
 	<context:component-scan base-package="org.openmrs.module.hivtestingservices.web.controller" />
+	<!-- Converters will be automatically picked up by the conversionService bean -->
+	<bean class="org.openmrs.module.hivtestingservices.converter.StringToContactTraceConverter"/>
+	<bean class="org.openmrs.module.hivtestingservices.converter.StringToPatientContactConverter"/>
 
-		
+
 </beans>
