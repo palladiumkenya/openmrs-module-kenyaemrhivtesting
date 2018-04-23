@@ -4,7 +4,6 @@ import java.util.Date;
 
 public class ContactTrace {
 
-
     private Integer id;
     private String uuid;
     private PatientContact patientContact;
@@ -16,10 +15,10 @@ public class ContactTrace {
     private String remarks;
     private Date date;
     Date dateCreated;
-    int changedBy;
+    Integer changedBy;
     Date dateChanged;
     boolean voided;
-    int voidedBy;
+    Integer voidedBy;
     Date dateVoided;
     String voidedReason;
 
@@ -27,7 +26,7 @@ public class ContactTrace {
     public ContactTrace() {
     }
 
-    public ContactTrace(String uuid, String contactType, String status, String uniquePatientNo, String facilityLinkedTo, String healthWorkerHandedTo, String remarks, Date date, Date dateCreated, int changedBy, Date dateChanged, boolean voided, int voidedBy, Date dateVoided, String voidedReason) {
+    public ContactTrace(String uuid, String contactType, String status, String uniquePatientNo, String facilityLinkedTo, String healthWorkerHandedTo, String remarks, Date traceDate) {
         this.uuid = uuid;
         this.contactType = contactType;
         this.status = status;
@@ -36,14 +35,14 @@ public class ContactTrace {
         this.healthWorkerHandedTo = healthWorkerHandedTo;
         this.remarks = remarks;
 
-        this.date = date;
+        this.date = traceDate;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -126,11 +125,11 @@ public class ContactTrace {
         this.dateCreated = dateCreated;
     }
 
-    public int getChangedBy() {
+    public Integer getChangedBy() {
         return changedBy;
     }
 
-    public void setChangedBy(int changedBy) {
+    public void setChangedBy(Integer changedBy) {
         this.changedBy = changedBy;
     }
 
@@ -150,11 +149,11 @@ public class ContactTrace {
         this.voided = voided;
     }
 
-    public int getVoidedBy() {
+    public Integer getVoidedBy() {
         return voidedBy;
     }
 
-    public void setVoidedBy(int voidedBy) {
+    public void setVoidedBy(Integer voidedBy) {
         this.voidedBy = voidedBy;
     }
 

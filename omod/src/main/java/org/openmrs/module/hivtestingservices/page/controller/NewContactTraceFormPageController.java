@@ -9,10 +9,11 @@ public class NewContactTraceFormPageController {
 
 
 
-    public void controller(@RequestParam("contactId") PatientContact patientContact,
+    public void controller(@RequestParam("patientContact") PatientContact patientContact,
                            @RequestParam("returnUrl") String url,
                            PageModel model) {
 
+        System.out.println("Patient contact id: ==============" + patientContact.getId());
         model.addAttribute("patientContact", patientContact);
         model.addAttribute("returnUrl", url);
 

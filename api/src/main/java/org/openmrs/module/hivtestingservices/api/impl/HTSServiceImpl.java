@@ -78,7 +78,7 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
 
     @Override
     public PatientContact getPatientContactByID(Integer patientContactId) {
-        return null;
+        return patientContactDAO.getPatientContactByID(patientContactId);
     }
 
     @Override

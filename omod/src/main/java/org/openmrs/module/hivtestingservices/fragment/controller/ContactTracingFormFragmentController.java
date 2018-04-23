@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Date;
 
 public class ContactTracingFormFragmentController {
-    public void controller(@FragmentParam(value = "traceId", required = false) ContactTrace contactTrace,
+    public void controller(@FragmentParam(value = "id", required = false) ContactTrace contactTrace,
                            @RequestParam(value = "returnUrl") String returnUrl,
                            @RequestParam(value = "patientContact") PatientContact patientContact,
                            PageModel model) {
