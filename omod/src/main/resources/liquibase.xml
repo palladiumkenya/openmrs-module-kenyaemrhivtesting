@@ -129,6 +129,11 @@
         </createTable>
         <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_client_trace" baseColumnNames="client_id" constraintName="tracing_related_patient_contact" referencedTableName="kenyaemr_hiv_testing_patient_contact" referencedColumnNames="id" deferrable="false" initiallyDeferred="false" />
     </changeSet>
+    <changeSet author="aojwang" id="kenyaemr_hiv_testing_003">
+        <addColumn tableName="kenyaemr_hiv_testing_client_trace">
+            <column name="encounter_date" type="datetime"/>
+        </addColumn>
+    </changeSet>
 
 
 </databaseChangeLog>
