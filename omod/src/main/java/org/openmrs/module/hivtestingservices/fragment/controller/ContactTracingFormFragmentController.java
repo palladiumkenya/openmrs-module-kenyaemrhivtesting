@@ -1,4 +1,5 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -12,7 +13,10 @@ import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ContactTracingFormFragmentController {
     public void controller(@FragmentParam(value = "id", required = false) ContactTrace contactTrace,
@@ -20,19 +24,40 @@ public class ContactTracingFormFragmentController {
                            @RequestParam(value = "patientContact") PatientContact patientContact,
                            PageModel model) {
         ContactTrace exists = contactTrace != null ? contactTrace : null;
+        model.addAttribute("patientContact", patientContact);
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
+        model.addAttribute("contactOptions", contactTypeList());
+        model.addAttribute("tracingOutcomeOptions", tracingOutcomeList());
 
+    }
+
+    private List<String> tracingOutcomeList() {
+        return Arrays.asList(
+                new String("Contacted and Linked"),
+                new String("Contacted and not Linked")
+        );
+    }
+    private List<String> contactTypeList() {
+        return Arrays.asList(
+                new String("Physical"),
+                new String("Phone"),
+                new String("Escorted")
+        );
     }
 
     public SimpleObject saveClientTrace(@MethodParam("newContactTraceForm") @BindParams ContactTraceForm
-                                                form, UiUtils ui) {
+                                                form,
+                                        UiUtils ui) {
         ui.validate(form, form, null);
         ContactTrace contactTrace = form.save();
-        return SimpleObject.create("traceId", contactTrace.getId());
+        return SimpleObject.create(
+                "patientContactId", contactTrace.getPatientContact().getId(),
+                "patientId", contactTrace.getPatientContact().getPatientRelatedTo().getPatientId()
+        );
     }
 
-    public ContactTraceForm newContactTraceForm(@RequestParam(value = "traceId", required = false) ContactTrace
-                                                        contactTrace, @RequestParam(value = "patientContactId", required = true) PatientContact patientContact) {
+    public ContactTraceForm newContactTraceForm(@RequestParam(value = "id", required = false) ContactTrace
+                                                        contactTrace, @RequestParam(value = "patientContact") PatientContact patientContact) {
         if (contactTrace !=null){
             return new ContactTraceForm(contactTrace, patientContact);
         }
@@ -60,6 +85,7 @@ public class ContactTracingFormFragmentController {
         }
 
         public ContactTraceForm(ContactTrace contactTrace, PatientContact patientContact) {
+
             this.original = contactTrace;
             this.contactType = contactTrace.getContactType();
             this.status = contactTrace.getStatus();
@@ -78,6 +104,8 @@ public class ContactTracingFormFragmentController {
             else{
                 toSave = new ContactTrace();
             }
+            toSave.setPatientContact(patientContact);
+            toSave.setDate(date);
             toSave.setContactType(contactType);
             toSave.setStatus(status);
             toSave.setUniquePatientNo(uniquePatientNo);

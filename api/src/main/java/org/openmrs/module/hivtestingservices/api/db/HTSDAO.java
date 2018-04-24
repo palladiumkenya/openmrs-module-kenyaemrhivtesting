@@ -30,4 +30,7 @@ public interface HTSDAO {
     public List<PatientContact> searchPatientContact(String searchName);
     public PatientContact getPatientContactByID (Integer patientContactId);
     public ContactTrace saveClientTrace(ContactTrace contactTrace);
+    public ContactTrace getPatientContactTraceById(Integer patientContactTraceId);
+
+    List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact);
 }

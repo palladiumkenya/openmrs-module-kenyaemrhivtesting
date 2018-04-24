@@ -1,8 +1,11 @@
 package org.openmrs.module.hivtestingservices.api;
 
-import java.util.Date;
+import org.openmrs.BaseOpenmrsData;
 
-public class ContactTrace {
+import java.util.Date;
+import java.util.UUID;
+
+public class ContactTrace extends BaseOpenmrsData {
 
     private Integer id;
     private String uuid;
@@ -14,16 +17,9 @@ public class ContactTrace {
     private String healthWorkerHandedTo;
     private String remarks;
     private Date date;
-    Date dateCreated;
-    Integer changedBy;
-    Date dateChanged;
-    boolean voided;
-    Integer voidedBy;
-    Date dateVoided;
-    String voidedReason;
-
 
     public ContactTrace() {
+        prePersist();
     }
 
     public ContactTrace(String uuid, String contactType, String status, String uniquePatientNo, String facilityLinkedTo, String healthWorkerHandedTo, String remarks, Date traceDate) {
@@ -38,6 +34,11 @@ public class ContactTrace {
         this.date = traceDate;
     }
 
+    public void prePersist() {
+
+        if (null == getUuid())
+            setUuid(UUID.randomUUID().toString());
+    }
     public Integer getId() {
         return id;
     }
@@ -115,62 +116,6 @@ public class ContactTrace {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    public Integer getChangedBy() {
-        return changedBy;
-    }
-
-    public void setChangedBy(Integer changedBy) {
-        this.changedBy = changedBy;
-    }
-
-    public Date getDateChanged() {
-        return dateChanged;
-    }
-
-    public void setDateChanged(Date dateChanged) {
-        this.dateChanged = dateChanged;
-    }
-
-    public boolean isVoided() {
-        return voided;
-    }
-
-    public void setVoided(boolean voided) {
-        this.voided = voided;
-    }
-
-    public Integer getVoidedBy() {
-        return voidedBy;
-    }
-
-    public void setVoidedBy(Integer voidedBy) {
-        this.voidedBy = voidedBy;
-    }
-
-    public Date getDateVoided() {
-        return dateVoided;
-    }
-
-    public void setDateVoided(Date dateVoided) {
-        this.dateVoided = dateVoided;
-    }
-
-    public String getVoidedReason() {
-        return voidedReason;
-    }
-
-    public void setVoidedReason(String voidedReason) {
-        this.voidedReason = voidedReason;
     }
 }
 

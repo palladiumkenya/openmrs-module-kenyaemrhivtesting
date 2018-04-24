@@ -33,15 +33,6 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     protected final Log log = LogFactory.getLog(this.getClass());
 
     private HibernateHTSDAO patientContactDAO;
-    private HibernateHTSDAO clientTraceDAO;
-
-    public HibernateHTSDAO getClientTraceDAO() {
-        return clientTraceDAO;
-    }
-
-    public void setClientTraceDAO(HibernateHTSDAO clientTraceDAO) {
-        this.clientTraceDAO = clientTraceDAO;
-    }
 
     @Override
     public List<PatientContact> getPatientContacts() {
@@ -89,7 +80,17 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     @Override
     public ContactTrace saveClientTrace(ContactTrace contactTrace) {
 
-        return clientTraceDAO.saveClientTrace(contactTrace);
+        return patientContactDAO.saveClientTrace(contactTrace);
+    }
+
+    @Override
+    public ContactTrace getPatientContactTraceById(Integer patientContactTraceId) {
+        return patientContactDAO.getPatientContactTraceById(patientContactTraceId);
+    }
+
+    @Override
+    public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact) {
+        return patientContactDAO.getContactTraceByPatientContact(patientContact);
     }
 
     @Override
