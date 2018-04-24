@@ -12,7 +12,10 @@ import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ContactTracingFormFragmentController {
     public void controller(@FragmentParam(value = "id", required = false) ContactTrace contactTrace,
@@ -22,7 +25,23 @@ public class ContactTracingFormFragmentController {
         System.out.println("Hitting trace form fragment nooooooooooooooooooooow =============================");
         ContactTrace exists = contactTrace != null ? contactTrace : null;
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
+        model.addAttribute("contactOptions", contactTypeList());
+        model.addAttribute("tracingOutcomeOptions", tracingOutcomeList());
 
+    }
+
+    private List<String> tracingOutcomeList() {
+        return Arrays.asList(
+                new String("Contacted and Linked"),
+                new String("Contacted and not Linked")
+        );
+    }
+    private List<String> contactTypeList() {
+        return Arrays.asList(
+                new String("Physical"),
+                new String("Phone"),
+                new String("Escorted")
+        );
     }
 
     public SimpleObject saveClientTrace(@MethodParam("newContactTraceForm") @BindParams ContactTraceForm

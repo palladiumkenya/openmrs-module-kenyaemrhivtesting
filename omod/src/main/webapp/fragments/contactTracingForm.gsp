@@ -10,6 +10,7 @@
 
     def patientContactTracing = [
             [
+
                     [object: command, property: "contactType", label: "Contact Type"],
                     [object: command, property: "status", label: "Status"]
 
@@ -48,47 +49,76 @@
         <div class="ke-form-instructions">
             <strong>*</strong> indicates a required field
         </div>
+
+        <fieldset>
+            <legend>Tracing Date</legend>
+
+            <% date.each { %>
+            ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
+            <% } %>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Tracing Details</legend>
+            <table>
+                <tr>
+                    <td class="ke-field-label">Contact Type</td>
+                    <td class="ke-field-label">Outcome</td>
+                </tr>
+                <tr>
+                    <td style="width: 270px">
+                        <select name="contactType" id="contactType">
+                            <option></option>
+                            <% contactOptions.each { %>
+                            <option value="${it}">${it}</option>
+                            <% } %>
+                        </select>
+                    </td>
+                    <td style="width: 260px">
+                        <select name="status" id="tracingOutcome">
+                            <option></option>
+                            <% tracingOutcomeOptions.each { %>
+                            <option value="${it}">${it}</option>
+                            <% } %>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+        </fieldset>
+
+        <fieldset id="linkageSection">
+            <legend>Linkage Details</legend>
+            <% linkageToCare.each { %>
+            ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
+            <% } %>
+        </fieldset>
+
+        <fieldset>
+            <legend>Remarks</legend>
+            <table>
+                <tr>
+                    <td class="ke-field-label">Provider Remarks</td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea name="remarks" rows="5" cols="80"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <div class="ke-panel-footer">
+            <button type="submit">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Create Contact Trace"}
+            </button>
+            <% if (config.returnUrl) { %>
+            <button type="button" class="cancel-button"><img
+                    src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
+            <% } %>
+        </div>
     </div>
-    <fieldset>
-        <legend>Date</legend>
-
-        <% date.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
-
-    </fieldset>
-
-    <fieldset>
-        <legend>Contact Tracing</legend>
-        <% patientContactTracing.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
-    </fieldset>
-
-    <fieldset>
-        <legend>Linkage to Care</legend>
-        <% linkageToCare.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
-    </fieldset>
-
-    <fieldset>
-        <legend>Remarks</legend>
-        <% remarks.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
-    </fieldset>
-
-    <div class="ke-panel-footer">
-        <button type="submit">
-            <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Create Contact Trace"}
-        </button>
-        <% if (config.returnUrl) { %>
-        <button type="button" class="cancel-button"><img
-                src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
-        <% } %>
-    </div>
-
 </form>
 
 
@@ -97,6 +127,8 @@
     //On ready
     jQuery(function () {
         //defaults
+
+        jQuery("#linkageSection").hide(); //hide linkage section
 
         jQuery('#patient-contact-trace-form .cancel-button').click(function () {
             ui.navigate('${ config.returnUrl }');
@@ -111,6 +143,34 @@
                     <% } %>
                 } else {
                     kenyaui.notifyError('Saving contact tracing was successful, but with unexpected response');
+                }
+            }
+        });
+
+        jQuery('#tracingOutcome').change(function () {
+            var selectedOutcome = jQuery(this).val();
+            var contactType = jQuery("#contactType").val();
+
+            if(contactType != "") {
+                if (selectedOutcome == "Contacted and Linked") {
+                    jQuery("#linkageSection").show();
+                } else {
+                    jQuery("#linkageSection input").val("");
+                    jQuery("#linkageSection").hide();
+                }
+            }
+        });
+
+        jQuery('#contactType').change(function () {
+            var selectedOutcome = jQuery(this).val();
+            var outcome = jQuery("#tracingOutcome").val();
+
+            if(selectedOutcome != "" && outcome != "") {
+                if (outcome == "Contacted and Linked") {
+                    jQuery("#linkageSection").show();
+                } else {
+                    jQuery("#linkageSection input").val("");
+                    jQuery("#linkageSection").hide();
                 }
             }
         });
