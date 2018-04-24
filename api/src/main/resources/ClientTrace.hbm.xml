@@ -19,7 +19,6 @@
 		<property name="facilityLinkedTo" type="java.lang.String" column ="facility_linked_to" length="255"/>
 		<property name="healthWorkerHandedTo" type="java.lang.String" column="health_worker_handed_to"/>
 		<property name="remarks" type ="java.lang.String" column ="remarks" length="255"/>
-		<property name="date" type="java.lang.String" column ="phone_contact" length="255"/>
 		<property name="dateCreated" type="java.util.Date" column="date_created" length="19"/>
 		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
 		<property name="dateChanged" type="java.util.Date" column="date_changed" length="19"/>

@@ -151,7 +151,7 @@
 
 <div class="ke-panel-footer">
     <button type="submit">
-        <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Create Patient Contact"}
+        <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Save Patient Contact"}
     </button>
     <% if (config.returnUrl) { %>
     <button type="button" class="cancel-button"><img
