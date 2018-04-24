@@ -14,7 +14,6 @@ public class NewContactTraceFormPageController {
                            @RequestParam("returnUrl") String url,
                            PageModel model) {
 
-        System.out.println("Patient contact id: ==============" + patientContact.getId());
         model.addAttribute("patientContact", patientContact);
         model.addAttribute("patient", patient);
         model.addAttribute("returnUrl", url);

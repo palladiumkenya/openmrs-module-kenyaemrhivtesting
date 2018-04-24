@@ -14,7 +14,6 @@ div.grid div {
     height: 30px;
 }
 
-
 div.column-one {
     width: 180px;
 }
@@ -71,69 +70,75 @@ div.section-title {
 
 <div class="ke-page-content">
     <div class="ke-panel-frame">
-        <div class="ke-panel-heading">Contact Traces</div>
+        <div class="ke-panel-heading">Contact Tracing</div>
 
         <div class="ke-panel-content">
             ${ui.includeFragment("hivtestingservices", "patientContactProfile", [patientContact: patientContact.id])}
-            <div class="section-title"></div>
 
-            <div class="clear"></div>
+            <fieldset>
+                <legend>Trace History</legend>
 
-            <% if (traces) { %>
-            <div class="grid">
+                <div class="section-title"></div>
 
-                <div class="column-one col-header">Date</div>
+                <div class="clear"></div>
 
-                <div class="column-two col-header">Contact Type</div>
-
-                <div class="column-three col-header">Status</div>
-
-                <div class="column-four col-header">Facility Linked To</div>
-
-                <div class="column-five col-header">Health Worker Handed To</div>
-
-                <div class="column-six col-header">Remarks</div>
-
-            </div>
-
-            <div class="clear"></div>
-
-            <% traces.each { rel -> %>
-
-            <div class="ke-stack-item">
+                <% if (traces) { %>
                 <div class="grid">
 
-                    <div class="column-one">${rel.date}</div>
+                    <div class="column-one col-header">Date</div>
 
-                    <div class="column-two">${rel.contactType}</div>
+                    <div class="column-two col-header">Contact Type</div>
 
-                    <div class="column-three">${rel.status}</div>
+                    <div class="column-three col-header">Status</div>
 
-                    <div class="column-four">${rel.facilityLinkedTo}</div>
+                    <div class="column-four col-header">Facility Linked To</div>
 
-                    <div class="column-five">${rel.healthWorkerHandedTo}</div>
+                    <div class="column-five col-header">Health Worker Handed To</div>
 
-                    <div class="column-six">${rel.remarks}</div>
+                    <div class="column-six col-header">Remarks</div>
 
                 </div>
 
                 <div class="clear"></div>
 
-            </div>
-            <% }
-            } else { %>
-            No Contact trace found
-            <% } %>
+                <% traces.each { rel -> %>
+
+                <div class="ke-stack-item">
+                    <div class="grid">
+
+                        <div class="column-one">${rel.date}</div>
+
+                        <div class="column-two">${rel.contactType}</div>
+
+                        <div class="column-three">${rel.status}</div>
+
+                        <div class="column-four">${rel.facilityLinkedTo}</div>
+
+                        <div class="column-five">${rel.healthWorkerHandedTo}</div>
+
+                        <div class="column-six">${rel.remarks}</div>
+
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>
+                <% }
+                } else { %>
+                No Contact trace found
+                <% } %>
+            </fieldset>
         </div>
 
         <div class="clear"></div>
 
     </div>
+
     <div align="center">
 
         <button type="button"
-                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientContactId: patientContact.id,  returnUrl: ui.thisUrl() ])}')">
-            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Trace Contact
+                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientContact: patientContact.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
+            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Add Trace
         </button>
 
     </div>
