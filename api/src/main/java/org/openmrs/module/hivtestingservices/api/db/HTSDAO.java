@@ -31,4 +31,6 @@ public interface HTSDAO {
     public PatientContact getPatientContactByID (Integer patientContactId);
     public ContactTrace saveClientTrace(ContactTrace contactTrace);
     public ContactTrace getPatientContactTraceById(Integer patientContactTraceId);
+
+    List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact);
 }

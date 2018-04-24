@@ -1,4 +1,5 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -45,14 +46,18 @@ public class ContactTracingFormFragmentController {
     }
 
     public SimpleObject saveClientTrace(@MethodParam("newContactTraceForm") @BindParams ContactTraceForm
-                                                form, UiUtils ui) {
+                                                form,
+                                        UiUtils ui) {
         ui.validate(form, form, null);
         ContactTrace contactTrace = form.save();
-        return SimpleObject.create("id", contactTrace.getId());
+        return SimpleObject.create(
+                "patientContactId", contactTrace.getPatientContact().getId(),
+                "patientId", contactTrace.getPatientContact().getPatientRelatedTo().getPatientId()
+        );
     }
 
     public ContactTraceForm newContactTraceForm(@RequestParam(value = "id", required = false) ContactTrace
-                                                        contactTrace, @RequestParam(value = "patientContact", required = true) PatientContact patientContact) {
+                                                        contactTrace, @RequestParam(value = "patientContact") PatientContact patientContact) {
         if (contactTrace !=null){
             return new ContactTraceForm(contactTrace, patientContact);
         }
@@ -76,12 +81,10 @@ public class ContactTracingFormFragmentController {
         }
 
         public ContactTraceForm(PatientContact patientContact) {
-            System.out.println("Getting in const with patient contact as param ================================");
             this.patientContact = patientContact;
         }
 
         public ContactTraceForm(ContactTrace contactTrace, PatientContact patientContact) {
-            System.out.println("Getting in const with two params ================================");
 
             this.original = contactTrace;
             this.contactType = contactTrace.getContactType();
@@ -101,6 +104,8 @@ public class ContactTracingFormFragmentController {
             else{
                 toSave = new ContactTrace();
             }
+            toSave.setPatientContact(patientContact);
+            toSave.setDate(date);
             toSave.setContactType(contactType);
             toSave.setStatus(status);
             toSave.setUniquePatientNo(uniquePatientNo);

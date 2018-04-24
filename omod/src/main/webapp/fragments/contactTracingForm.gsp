@@ -38,6 +38,7 @@
 
 <form id="patient-contact-trace-form" method="post"
       action="${ui.actionLink("hivtestingservices", "contactTracingForm", "saveClientTrace")}">
+    <input type="hidden" name="patientContact" value="${patientContact.id}"/>
     <% if (command.original) { %>
     <input type="hidden" name="id" value="${command.original.id}"/>
     <% } %>
@@ -131,11 +132,11 @@
         });
         kenyaui.setupAjaxPost('patient-contact-trace-form', {
             onSuccess: function (data) {
-                if (data.id) {
+                if (data.patientContactId) {
                     <% if (config.returnUrl) { %>
                     ui.navigate('${ config.returnUrl }');
                     <% } else { %>
-                    ui.navigate('hivtestingservices', 'patientContactForm', {patientContactId: data.id});
+                    ui.navigate('hivtestingservices', 'contactTraceList', {patientContact: data.patientContactId, patientId: data.patientId});
                     <% } %>
                 } else {
                     kenyaui.notifyError('Saving contact tracing was successful, but with unexpected response');
