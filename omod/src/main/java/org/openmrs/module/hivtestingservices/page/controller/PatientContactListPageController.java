@@ -65,7 +65,8 @@ public class PatientContactListPageController {
                     "phoneContact", contact.getPhoneContact(),
                     "relationType", formatRelationshipType(contact.getRelationType()),
                     "baselineHivStatus", contact.getBaselineHivStatus(),
-                    "appointmentDate",  kenyaUi.formatDate(contact.getAppointmentDate())
+                    "appointmentDate",  kenyaUi.formatDate(contact.getAppointmentDate()),
+                    "birthDate", kenyaUi.formatDate(contact.getBirthDate())
             );
             objects.add(contactObject);
 

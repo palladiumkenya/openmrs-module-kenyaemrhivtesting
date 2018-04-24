@@ -1,5 +1,5 @@
 <%
-    ui.decorateWith("kenyaui", "panel", [heading: (command.original ? "Edit" : "Add") + " ContactTracing", frameOnly: true])
+    ui.decorateWith("kenyaui", "panel", [heading: (command.original ? "Edit" : "Add") + " Contact Tracing", frameOnly: true])
 
     def date = [
             [
@@ -44,6 +44,7 @@
 
     <div class="ke-panel-content">
 
+    ${ui.includeFragment("hivtestingservices", "patientContactProfile", [patientContact: patientContact.id])}
         <div class="ke-form-globalerrors" style="display: none"></div>
 
         <div class="ke-form-instructions">
@@ -51,16 +52,11 @@
         </div>
 
         <fieldset>
-            <legend>Tracing Date</legend>
+            <legend>Tracing</legend>
 
             <% date.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
             <% } %>
-
-        </fieldset>
-
-        <fieldset>
-            <legend>Tracing Details</legend>
             <table>
                 <tr>
                     <td class="ke-field-label">Contact Type</td>

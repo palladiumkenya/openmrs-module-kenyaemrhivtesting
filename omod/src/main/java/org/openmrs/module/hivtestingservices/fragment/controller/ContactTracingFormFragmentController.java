@@ -22,8 +22,8 @@ public class ContactTracingFormFragmentController {
                            @RequestParam(value = "returnUrl") String returnUrl,
                            @RequestParam(value = "patientContact") PatientContact patientContact,
                            PageModel model) {
-        System.out.println("Hitting trace form fragment nooooooooooooooooooooow =============================");
         ContactTrace exists = contactTrace != null ? contactTrace : null;
+        model.addAttribute("patientContact", patientContact);
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
         model.addAttribute("contactOptions", contactTypeList());
         model.addAttribute("tracingOutcomeOptions", tracingOutcomeList());
