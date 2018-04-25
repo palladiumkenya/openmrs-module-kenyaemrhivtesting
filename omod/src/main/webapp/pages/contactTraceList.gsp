@@ -96,6 +96,9 @@ div.section-title {
                     <div class="column-five col-header">Health Worker Handed To</div>
 
                     <div class="column-six col-header">Remarks</div>
+                    <div style="float: left; width: 60px">
+
+                    </div>
 
                 </div>
 
@@ -117,6 +120,12 @@ div.section-title {
                         <div class="column-five">${rel.healthWorkerHandedTo}</div>
 
                         <div class="column-six">${rel.remarks}</div>
+                        <div style="float: left; width: 60px">
+                            <button type="button"
+                                    onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientContact: patientContact.id, patientId: currentPatient.patientId, traceId: rel.id,  returnUrl: ui.thisUrl() ])}')">
+                                <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Edit Trace
+                            </button>
+                        </div>
 
                     </div>
 

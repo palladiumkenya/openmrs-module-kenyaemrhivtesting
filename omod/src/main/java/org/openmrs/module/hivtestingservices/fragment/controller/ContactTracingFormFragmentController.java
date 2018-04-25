@@ -1,5 +1,5 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
-import org.openmrs.Patient;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -23,11 +23,13 @@ public class ContactTracingFormFragmentController {
                            @RequestParam(value = "returnUrl") String returnUrl,
                            @RequestParam(value = "patientContact") PatientContact patientContact,
                            PageModel model) {
+
         ContactTrace exists = contactTrace != null ? contactTrace : null;
         model.addAttribute("patientContact", patientContact);
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
         model.addAttribute("contactOptions", contactTypeList());
         model.addAttribute("tracingOutcomeOptions", tracingOutcomeList());
+
 
     }
 
@@ -59,6 +61,8 @@ public class ContactTracingFormFragmentController {
     public ContactTraceForm newContactTraceForm(@RequestParam(value = "id", required = false) ContactTrace
                                                         contactTrace, @RequestParam(value = "patientContact") PatientContact patientContact) {
         if (contactTrace !=null){
+            System.out.println("Debugging: inside newContactTraceForm. Contact trace exists Id is " + contactTrace.getId());
+
             return new ContactTraceForm(contactTrace, patientContact);
         }
         else {
@@ -93,6 +97,7 @@ public class ContactTracingFormFragmentController {
             this.facilityLinkedTo = contactTrace.getFacilityLinkedTo();
             this.healthWorkerHandedTo = contactTrace.getHealthWorkerHandedTo();
             this.remarks = contactTrace.getRemarks();
+            this.date = contactTrace.getDate();
 
         }
         public ContactTrace save(){
