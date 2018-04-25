@@ -71,7 +71,6 @@ public class PatientContactFormFragmentController{
 
     public EditPatientContactForm newEditPatientContactForm(@RequestParam(value = "id", required = false) PatientContact patientContact, @RequestParam(value = "patientRelatedTo", required = true) Patient patient) {
         if (patientContact != null) {
-
             return new EditPatientContactForm(patientContact, patient);
         } else {
             return new EditPatientContactForm(patient);
@@ -93,7 +92,6 @@ public class PatientContactFormFragmentController{
         private Date appointmentDate;
         private String baselineHivStatus;
         private String ipvOutcome;
-
 
         public EditPatientContactForm() {
         }
@@ -123,7 +121,6 @@ public class PatientContactFormFragmentController{
         public PatientContact save() {
             PatientContact toSave;
             if (original != null) {
-
                 toSave = original;
             } else {
                 toSave = new PatientContact();
@@ -268,6 +265,5 @@ public class PatientContactFormFragmentController{
         }
 
     }
-
 
 }

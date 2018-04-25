@@ -15,7 +15,7 @@ div.grid div {
 }
 
 div.column-one {
-    width: 200px;
+    width: 180px;
 }
 
 div.column-two {
@@ -31,18 +31,23 @@ div.column-four {
 }
 
 div.column-five {
-    width: 160px;
+    width: 120px;
 }
 
 div.column-six {
-    width: 160px;
+    width: 140px;
 }
 
 div.column-seven {
-    width: 160px;
+    width: 140px;
 }
+
 div.column-eight {
     width: 100px;
+}
+
+div.column-nine {
+    width: 80px;
 }
 
 div.clear {
@@ -97,13 +102,15 @@ div.section-title {
                 <div class="column-seven col-header">Appointment Date</div>
 
                 <div class="column-eight col-header"></div>
+
+                <div class="column-nine col-header"></div>
             </div>
 
             <div class="clear"></div>
 
             <% contacts.each { rel -> %>
 
-            <div class="ke-stack-item">
+            <div class="ke-stack-item ke-navigable" ng-click="onResultClick(patientContact)">
                 <div class="grid">
 
                     <div class="column-one">${rel.fullName}</div>
@@ -122,11 +129,20 @@ div.section-title {
 
                     <div class="column-eight">
 
+
                     <button type="button"
                             onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "contactTraceList", [ patientContact: rel.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
-                        <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Trace History
+                        <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/>History
                     </button>
 
+
+                    </div>
+
+                    <div class="column-nine">
+                        <button type="button"
+                                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientContact: rel.id,patientId: currentPatient.id, returnUrl: ui.thisUrl() ])}')">
+                            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Edit
+                        </button>
                     </div>
 
                 </div>
@@ -148,11 +164,9 @@ div.section-title {
 
         <button type="button"
                 onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientId: patient.id,  returnUrl: ui.thisUrl() ])}')">
-            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Add Contact
+            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/>Add Contact
         </button>
 
     </div>
+
 </div>
-
-
-

@@ -1,3 +1,4 @@
+
 package org.openmrs.module.hivtestingservices.page.controller;
 
 import org.openmrs.Patient;
@@ -33,3 +34,4 @@ public class ContactTraceListPageController {
     }
 
 }
+

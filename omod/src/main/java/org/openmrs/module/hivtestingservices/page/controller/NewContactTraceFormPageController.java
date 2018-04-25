@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class NewContactTraceFormPageController {
 
 
-
     public void controller(@RequestParam("patientContact") PatientContact patientContact,
                            @RequestParam("patientId") Patient patient,
                            @RequestParam(value = "traceId", required = false) ContactTrace contactTrace,
