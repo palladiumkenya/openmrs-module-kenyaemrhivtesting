@@ -131,10 +131,5 @@ public class HibernateHTSDAO implements HTSDAO {
 
     }
 
-    @Override
-    public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact) {
-        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(ContactTrace.class);
-        criteria.add(Restrictions.eq("patientContact", patientContact));
-        return criteria.list();
-    }
+
 }

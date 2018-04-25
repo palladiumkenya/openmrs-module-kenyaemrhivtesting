@@ -43,11 +43,11 @@ div.column-seven {
 }
 
 div.column-eight {
-    width: 120px;
+    width: 100px;
 }
 
 div.column-nine {
-    width: 100px;
+    width: 80px;
 }
 
 div.clear {
@@ -132,14 +132,9 @@ div.section-title {
 
                     <button type="button"
                             onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "contactTraceList", [ patientContact: rel.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
-                        <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Trace History
+                        <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/>History
                     </button>
 
-
-                        <button type="button"
-                                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "contactTraceList", [ patientContact: rel.id,patientId: currentPatient.id, returnUrl: ui.thisUrl() ])}')">
-                            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> History
-                        </button>
 
                     </div>
 
