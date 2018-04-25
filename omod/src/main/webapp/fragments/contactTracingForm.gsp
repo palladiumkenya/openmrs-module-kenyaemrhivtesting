@@ -68,7 +68,7 @@
                         <select name="contactType" id="contactType">
                             <option></option>
                             <% contactOptions.each { %>
-                            <option value="${it}">${it}</option>
+                            <option ${(command.contactType == null)? "" : it == command.contactType ? "selected" : ""} value="${it}">${it}</option>
                             <% } %>
                         </select>
                     </td>
@@ -76,7 +76,7 @@
                         <select name="status" id="tracingOutcome">
                             <option></option>
                             <% tracingOutcomeOptions.each { %>
-                            <option value="${it}">${it}</option>
+                            <option ${(command.status == null)? "" : it == command.status ? "selected" : ""} value="${it}">${it}</option>
                             <% } %>
                         </select>
                     </td>
@@ -100,7 +100,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <textarea name="remarks" rows="5" cols="80"></textarea>
+                        <textarea name="remarks" rows="5" cols="80">${(command.remarks != null)? command.remarks : ""}</textarea>
                     </td>
                 </tr>
             </table>
@@ -125,7 +125,12 @@
     jQuery(function () {
         //defaults
 
-        jQuery("#linkageSection").hide(); //hide linkage section
+        <% if (command.original != null  &&  command.status == "Contacted and Linked") { %>
+            jQuery("#linkageSection").show(); //hide linkage section
+            <% } else { %>
+            jQuery("#linkageSection").hide(); //hide linkage section
+        <% } %>
+
 
         jQuery('#patient-contact-trace-form .cancel-button').click(function () {
             ui.navigate('${ config.returnUrl }');

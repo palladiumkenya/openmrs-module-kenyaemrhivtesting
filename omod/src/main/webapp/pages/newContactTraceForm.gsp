@@ -11,5 +11,5 @@
     </div>
 </div>
 <div class="ke-page-content">
-    ${ ui.includeFragment("hivtestingservices", "contactTracingForm") }
+    ${ ui.includeFragment("hivtestingservices", "contactTracingForm", [id: contactTrace != null? contactTrace.id : null]) }
 </div>
