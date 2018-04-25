@@ -41,6 +41,7 @@
 		PatientContact.hbm.xml
 		ContactTrace.hbm.xml
 		HTSObject.hbm.xml
+		AOPEncounterEntry.hbm.xml
 
 	</mappingFiles>
 

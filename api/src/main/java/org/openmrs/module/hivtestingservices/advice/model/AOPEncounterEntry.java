@@ -4,7 +4,7 @@ import org.openmrs.BaseOpenmrsData;
 
 import java.util.Date;
 
-public class KenyaemrAOPEncounterAdvice extends BaseOpenmrsData {
+public class AOPEncounterEntry extends BaseOpenmrsData {
 
     private Integer id;
     private String encounterUUID;

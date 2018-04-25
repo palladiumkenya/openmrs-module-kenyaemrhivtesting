@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -86,6 +87,21 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     @Override
     public ContactTrace getPatientContactTraceById(Integer patientContactTraceId) {
         return patientContactDAO.getPatientContactTraceById(patientContactTraceId);
+    }
+
+    @Override
+    public AOPEncounterEntry saveAopEncounterEntry(AOPEncounterEntry aopEncounterEntry) {
+        return patientContactDAO.saveAopEncounterEntry(aopEncounterEntry);
+    }
+
+    @Override
+    public AOPEncounterEntry getAopEncounterEntry(Integer entryId) {
+        return patientContactDAO.getAopEncounterEntry(entryId);
+    }
+
+    @Override
+    public List<AOPEncounterEntry> getAopEncounterEntryList() {
+        return patientContactDAO.getAopEncounterEntryList();
     }
 
     @Override
