@@ -30,8 +30,8 @@
 
 
                     [object: command, property: "baselineHivStatus", label: "Baseline HIV status"],
-                    [object: command, property: "appointmentDate", label: "Appointment date"],
-                    [object: command, property: "ipvOutcome", label: "IPV Outcome"]
+                    [object: command, property: "appointmentDate", label: "Appointment date"]
+
 
             ]
     ]
@@ -86,68 +86,99 @@
 
     </fieldset>
 
-</div>
+    <fieldset>
+        <legend>Contact</legend>
 
-<fieldset>
-    <legend>Contact</legend>
+        <% addressRows.each { %>
+        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
+        <% } %>
 
-    <% addressRows.each { %>
-    ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-    <% } %>
+    </fieldset>
+
+    <fieldset>
+        <legend>Relationship</legend>
+        <% relTypeOptions.each { %>
+        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
+        <% } %>
+    </fieldset>
+
+    <fieldset class="ipvAssessmentTable">
+        <legend>IPV Assessment</legend>
+        <table>
+            <tr>
+                <td>
+                    <label class="ke-field-label">1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?</label>
+                </td><td>
+                <span class="ke-field-content">
+                    <input type="radio" name="question-1" class="question-1" value="1065"/> Yes
+                    <input type="radio" name="question-1" class="question-1" value="1066"/> No
+                </span>
+            </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ke-field-label">2. Has he/she ever threatened to hurt you?</label>
+                </td><td>
+                <span class="ke-field-content">
+                    <input type="radio" name="question-2" class="question-2" value="1065"/> Yes
+                    <input type="radio" name="question-2" class="question-2" value="1066"/> No
+                </span>
+            </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ke-field-label">3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?</label>
+                </td><td>
+                <span class="ke-field-content">
+                    <input type="radio" name="question-3" class="question-3" value="1065"/> Yes
+                    <input type="radio" name="question-3" class="question-3" value="1066"/> No
+                </span>
+            </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td class="ke-field-label">IPV Outcome</td>
+            </tr>
+            <tr>
+                <td>
+                    <select name="ipvOutcome" id="ipvOutcome">
+                        <option></option>
+                        <% ipvOutcomeOptions.each { %>
+                        <option value="${it}">${it}</option>
+                        <% } %>
+                    </select>
+                </td>
+            </tr>
+        </table>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>Baseline Information</legend>
+        <table>
+            <tr>
+                <td class="ke-field-label">HIV Status</td>
+                <td class="ke-field-label">Appointment</td>
+            </tr>
+            <tr>
+                <td style="width: 270px">
+                    <select name="baselineHivStatus" id="baselineHivStatus">
+                        <option></option>
+                        <% hivStatusOptions.each { %>
+                        <option value="${it}">${it}</option>
+                        <% } %>
+                    </select>
+                </td>
+                <td style="width: 270px">
+                    ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
+                </td>
+            </tr>
+        </table>
+    </fieldset>
 
 </fieldset>
 
-<fieldset>
-    <legend>Relationship</legend>
-    <% relTypeOptions.each { %>
-    ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-    <% } %>
-</fieldset>
-
-<fieldset class="ipvAssessmentTable">
-    <legend>IPV Assessment</legend>
-    <table>
-        <tr>
-            <td>
-                <label class="ke-field-label">1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?</label>
-            </td><td>
-            <span class="ke-field-content">
-                <input type="radio" name="question-1" class="question-1" value="1065"/> Yes
-                <input type="radio" name="question-1" class="question-1" value="1066"/> No
-            </span>
-        </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="ke-field-label">2. Has he/she ever threatened to hurt you?</label>
-            </td><td>
-            <span class="ke-field-content">
-                <input type="radio" name="question-2" class="question-2" value="1065"/> Yes
-                <input type="radio" name="question-2" class="question-2" value="1066"/> No
-            </span>
-        </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="ke-field-label">3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?</label>
-            </td><td>
-            <span class="ke-field-content">
-                <input type="radio" name="question-3" class="question-3" value="1065"/> Yes
-                <input type="radio" name="question-3" class="question-3" value="1066"/> No
-            </span>
-        </td>
-        </tr>
-    </table>
-</fieldset>
-
-<fieldset>
-    <legend>hivData</legend>
-    <% hivData.each { %>
-    ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-    <% } %>
-</fieldset>
-
-</fieldset>
 
 <div class="ke-panel-footer">
     <button type="submit">
@@ -157,7 +188,21 @@
     <button type="button" class="cancel-button"><img
             src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
     <% } %>
+
+    <div class="ke-panel-footer">
+        <button type="submit">
+            <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Create Patient Contact"}
+        </button>
+        <% if (config.returnUrl) { %>
+        <button type="button" class="cancel-button"><img
+                src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
+        <% } %>
+    </div>
+
+
 </div>
+
+
 
 </form>
 

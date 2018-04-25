@@ -113,21 +113,27 @@ div.section-title {
             <div class="ke-stack-item ke-navigable" ng-click="onResultClick(patientContact)">
                 <div class="grid">
 
-                    <div class="column-one">${rel.lastName + ' ' + rel.firstName + ' ' + rel.middleName}</div>
+                    <div class="column-one">${rel.fullName}</div>
 
                     <div class="column-two">${rel.sex}</div>
 
-                    <div class="column-three">${rel.physicalAddress}</div>
+                    <div class="column-three">${rel.physicalAddress?:""}</div>
 
-                    <div class="column-four">${rel.phoneContact}</div>
+                    <div class="column-four">${rel.phoneContact?:""}</div>
 
                     <div class="column-five">${rel.relationType}</div>
 
-                    <div class="column-six">${rel.baselineHivStatus}</div>
+                    <div class="column-six">${rel.baselineHivStatus?:''}</div>
 
-                    <div class="column-seven">${rel.appointmentDate}</div>
+                    <div class="column-seven">${rel.appointmentDate?:''}</div>
 
                     <div class="column-eight">
+
+
+                    <button type="button"
+                            onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "contactTraceList", [ patientContact: rel.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
+                        <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Trace History
+                    </button>
 
 
                         <button type="button"
@@ -169,4 +175,3 @@ div.section-title {
     </div>
 
 </div>
-

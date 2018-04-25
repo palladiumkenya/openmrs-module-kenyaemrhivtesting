@@ -15,6 +15,7 @@ import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +33,18 @@ public class PatientContactFormFragmentController{
 
         model.addAttribute("command", newEditPatientContactForm(exists, patient));
         model.addAttribute("relationshipTypeOptions", getRelationshipTypeOptions());
+        model.addAttribute("hivStatusOptions", hivStatusOptions());
+        model.addAttribute("ipvOutcomeOptions", ipvOutcomeOptions());
 
+
+    }
+
+    private List<String> hivStatusOptions() {
+        return Arrays.asList("Unknown", "Positive", "Negative");
+    }
+
+    private List<String> ipvOutcomeOptions() {
+        return Arrays.asList("True", "False");
     }
 
     protected List<SimpleObject> getRelationshipTypeOptions() {
