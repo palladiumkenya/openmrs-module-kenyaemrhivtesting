@@ -28,6 +28,8 @@ import java.util.List;
 import org.hibernate.SessionFactory;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 
+import javax.persistence.criteria.CriteriaBuilder;
+
 
 public class HibernateHTSDAO implements HTSDAO {
     protected final Log log = LogFactory.getLog(this.getClass());
@@ -64,6 +66,13 @@ public class HibernateHTSDAO implements HTSDAO {
     public List<PatientContact> getPatientContactByPatient(Patient patient) {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
         criteria.add(Restrictions.eq("patientRelatedTo", patient));
+        return criteria.list();
+    }
+
+    @Override
+    public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact) {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(ContactTrace.class);
+        criteria.add(Restrictions.eq("patientContact", patientContact));
         return criteria.list();
     }
 
@@ -122,10 +131,5 @@ public class HibernateHTSDAO implements HTSDAO {
 
     }
 
-    @Override
-    public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact) {
-        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(ContactTrace.class);
-        criteria.add(Restrictions.eq("patientContact", patientContact));
-        return criteria.list();
-    }
+
 }

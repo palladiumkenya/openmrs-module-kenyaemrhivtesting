@@ -1,56 +1,43 @@
 <%
     ui.decorateWith("kenyaemr", "standardPage", [patient: currentPatient, layout: "sidebar"])
     def menuItems = [
-            [label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("kenyaemr", "patientContactList", [patient: currentPatient, patientId: currentPatient.patientId])]
+            [label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("hivtestingservices", "patientContactList", [patient: currentPatient, patientId: currentPatient.patientId])]
     ]
 %>
 <style>
 div.grid {
     display: block;
 }
-
 div.grid div {
     float: left;
     height: 30px;
 }
-
 div.column-one {
     width: 180px;
 }
-
 div.column-two {
-    width: 80px;
+    width: 140px;
 }
-
 div.column-three {
-    width: 160px;
+    width: 200px;
 }
-
 div.column-four {
-    width: 120px;
+    width: 200px;
 }
-
 div.column-five {
-    width: 160px;
+    width: 200px;
 }
-
 div.column-six {
-    width: 160px;
-}
-
-div.column-seven {
-    width: 180px;
+    width: 200px;
 }
 
 div.clear {
     clear: both;
 }
-
 .col-header {
     font-weight: bold;
     font-size: 14px;
 }
-
 div.section-title {
     color: black;
     font-weight: bold;
