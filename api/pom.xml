@@ -119,11 +119,19 @@
 
 
 		<!-- End OpenMRS core
+
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>4.1.2.RELEASE</version>
 		</dependency>-->
+
+		<!-- external dependencies-->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+		</dependency>
 
 	</dependencies>
 
