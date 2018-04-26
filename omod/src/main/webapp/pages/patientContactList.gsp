@@ -140,7 +140,7 @@ div.section-title {
 
                     <div class="column-nine">
                         <button type="button"
-                                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientContact: rel.id,patientId: currentPatient.id, returnUrl: ui.thisUrl() ])}')">
+                                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientContactId: rel.id, patientId: currentPatient.id, returnUrl: ui.thisUrl() ])}')">
                             <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Edit
                         </button>
                     </div>

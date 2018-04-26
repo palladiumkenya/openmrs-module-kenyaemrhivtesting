@@ -173,4 +173,11 @@
         </createTable>
     </changeSet>
 
+    <changeSet author="aojwang" id="kenyaemr_hiv_testing_006">
+        <modifyDataType
+                columnName="relationship_type"
+                newDataType="int"
+                tableName="kenyaemr_hiv_testing_patient_contact"/>
+    </changeSet>
+
 </databaseChangeLog>

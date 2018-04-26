@@ -56,14 +56,13 @@ public class PatientContactProfileFragmentController {
 
     }
 
-    private String formatRelationshipType(String typeId) {
+    private String formatRelationshipType(Integer typeId) {
         PersonService personService = Context.getPersonService();
-        if (org.apache.commons.lang.StringUtils.isBlank(typeId)) {
+        if (typeId == null) {
             return null;
-        } else if (ConversionUtil.onlyDigits(typeId)) {
-            return personService.getRelationshipType(Integer.valueOf(typeId)).getaIsToB();
+        } else {
+            return personService.getRelationshipType(typeId).getaIsToB();
         }
-        return null;
     }
 
     private Integer calculateContactAge(Date birthdate, Date onDate) {

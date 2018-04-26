@@ -1,7 +1,7 @@
 <%
-    ui.decorateWith("kenyaemr", "standardPage", [patient: currentPatient, layout: "sidebar"])
+    ui.decorateWith("kenyaemr", "standardPage", [patient: patient, layout: "sidebar"])
     def menuItems = [
-            [label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("hivtestingservices", "patientContactList", [patient: currentPatient, patientId: currentPatient.patientId])]
+            [label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to home", href: ui.pageLink("hivtestingservices", "patientContactList", [patient: patient, patientId: patient.patientId])]
     ]
 %>
 
@@ -11,5 +11,5 @@
     </div>
 </div>
 <div class="ke-page-content">
-    ${ ui.includeFragment("hivtestingservices", "patientContactForm", [ patientId: currentPatient.id, returnUrl: ui.pageLink("hivtestingservices", "patientContactList", [patientId: currentPatient.patientId]) ]) }
+    ${ ui.includeFragment("hivtestingservices", "patientContactForm", [ patientId: patient.id, patientContact: patientContact != null? patientContact.id : null, returnUrl: ui.pageLink("hivtestingservices", "patientContactList", [patientId: patient.patientId]) ]) }
 </div>

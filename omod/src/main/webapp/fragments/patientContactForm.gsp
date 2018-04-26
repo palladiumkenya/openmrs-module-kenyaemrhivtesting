@@ -18,13 +18,6 @@
             ]
     ]
 
-    def relTypeOptions = [
-            [
-                    [object: command, property: "relationType", label: "Relationship to patient", config: [options: relationshipTypeOptions]]
-            ]
-    ]
-
-
     def hivData = [
             [
 
@@ -97,9 +90,21 @@
 
     <fieldset>
         <legend>Relationship</legend>
-        <% relTypeOptions.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
+        <table>
+            <tr>
+                <td class="ke-field-label">Relationship to Patient</td>
+            </tr>
+            <tr>
+                <td style="width: 260px">
+                    <select name="relationType" id="relationType">
+                        <option></option>
+                        <% relationshipTypeOptions.each { %>
+                        <option ${(command.relationType == null)? "" : it.value == command.relationType ? "selected" : ""} value="${it.value}">${it.label}</option>
+                        <% } %>
+                    </select>
+                </td>
+            </tr>
+        </table>
     </fieldset>
 
     <fieldset class="ipvAssessmentTable">
