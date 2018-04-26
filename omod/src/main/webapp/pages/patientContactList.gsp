@@ -110,7 +110,7 @@ div.section-title {
 
             <% contacts.each { rel -> %>
 
-            <div class="ke-stack-item ke-navigable" ng-click="onResultClick(patientContact)">
+            <div class="ke-stack-item ke-navigable">
                 <div class="grid">
 
                     <div class="column-one">${rel.fullName}</div>
