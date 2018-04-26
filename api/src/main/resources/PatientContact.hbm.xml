@@ -20,7 +20,7 @@
 		<property name="birthDate" type="java.util.Date" column="birth_date"/>
 		<property name="physicalAddress" type ="java.lang.String" column ="physical_address" length="255"/>
 		<property name="phoneContact" type="java.lang.String" column ="phone_contact" length="255"/>
-		<property name="relationType" type="java.lang.String" column ="relationship_type" length="255"/>
+		<property name="relationType" type="java.lang.Integer" column ="relationship_type" length="19"/>
 		<many-to-one name="patientRelatedTo" class="org.openmrs.Patient" column ="patient_related_to"/>
 		<property name="appointmentDate" type = "java.util.Date" column ="appointment_date"/>
 		<property name="baselineHivStatus" type = "java.lang.String" column ="baseline_hiv_status" length="255"/>

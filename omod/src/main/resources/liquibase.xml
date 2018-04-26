@@ -143,5 +143,41 @@
                         tableName="kenyaemr_hiv_testing_client_trace"/>
     </changeSet>
 
+    <changeSet id="kenyaemr_hiv_testing_005" author="aojwang">
+
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="kenyaemr_aop_encounter_entry" /></not>
+        </preConditions>
+        <comment>
+            Create table to hold aop encounter entries
+        </comment>
+        <createTable tableName="kenyaemr_aop_encounter_entry">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="encounter_uuid" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="form_uuid" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="target_module" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="int">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="aojwang" id="kenyaemr_hiv_testing_006">
+        <modifyDataType
+                columnName="relationship_type"
+                newDataType="int"
+                tableName="kenyaemr_hiv_testing_patient_contact"/>
+    </changeSet>
 
 </databaseChangeLog>

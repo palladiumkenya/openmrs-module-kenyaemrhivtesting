@@ -21,8 +21,13 @@
 	
 	<!-- Module Activator -->
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.HTSinKenyaEMRActivator</activator>
-	
-	
+
+	<!-- Adding encounter advice for family history form submitted by mUzima-->
+	<advice>
+		<point>org.openmrs.api.EncounterService</point>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.advice.PatientContactListProcessor</class>
+	</advice>
+
 	<!-- Adds link to admin page -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
@@ -36,6 +41,7 @@
 		PatientContact.hbm.xml
 		ContactTrace.hbm.xml
 		HTSObject.hbm.xml
+		AOPEncounterEntry.hbm.xml
 
 	</mappingFiles>
 

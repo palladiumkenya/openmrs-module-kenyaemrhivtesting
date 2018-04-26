@@ -88,7 +88,7 @@ public class PatientContactFormFragmentController{
         private String physicalAddress;
         private String phoneContact;
         private Patient patientRelatedTo;
-        private String relationType;
+        private Integer relationType;
         private Date appointmentDate;
         private String baselineHivStatus;
         private String ipvOutcome;
@@ -232,11 +232,11 @@ public class PatientContactFormFragmentController{
             this.patientRelatedTo = patientRelatedTo;
         }
 
-        public String getRelationType() {
+        public Integer getRelationType() {
             return relationType;
         }
 
-        public void setRelationType(String relationType) {
+        public void setRelationType(Integer relationType) {
             this.relationType = relationType;
         }
 

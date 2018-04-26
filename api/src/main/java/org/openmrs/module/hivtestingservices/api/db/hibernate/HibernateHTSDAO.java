@@ -17,6 +17,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
 import org.apache.commons.logging.Log;
@@ -73,6 +74,25 @@ public class HibernateHTSDAO implements HTSDAO {
     public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact) {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(ContactTrace.class);
         criteria.add(Restrictions.eq("patientContact", patientContact));
+        return criteria.list();
+    }
+
+    @Override
+    public AOPEncounterEntry saveAopEncounterEntry(AOPEncounterEntry aopEncounterEntry) {
+        sessionFactory.getCurrentSession().saveOrUpdate(aopEncounterEntry);
+        return aopEncounterEntry;
+    }
+
+    @Override
+    public AOPEncounterEntry getAopEncounterEntry(Integer entryId) {
+        return (AOPEncounterEntry) this.sessionFactory.getCurrentSession().get(AOPEncounterEntry.class, entryId);
+
+    }
+
+    @Override
+    public List<AOPEncounterEntry> getAopEncounterEntryList() {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(AOPEncounterEntry.class);
+        criteria.add(Restrictions.eq("status", 0));
         return criteria.list();
     }
 

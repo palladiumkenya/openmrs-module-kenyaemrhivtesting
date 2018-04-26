@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="org.openmrs.module.hivtestingservices.advice.model">
+
+	<class name="org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry"
+		table="kenyaemr_aop_encounter_entry">
+		<id name="id" type="int" column="id" unsaved-value="0">
+			<generator class="native" />
+		</id>
+		<discriminator column="id" insert="false" />
+		<property name="encounterUUID" type="java.lang.String" column="encounter_uuid" length="50" unique="true" />
+		<property name="formUUID" type ="java.lang.String" column ="form_uuid" length="50"/>
+		<property name="status" type="java.lang.Integer" column="status" length="50"/>
+		<property name="targetModule" type="java.lang.String" column="target_module" length="255"/>
+		<property name="dateCreated" type="java.util.Date" column="date_created" length="19"/>
+
+	</class>
+
+</hibernate-mapping>
