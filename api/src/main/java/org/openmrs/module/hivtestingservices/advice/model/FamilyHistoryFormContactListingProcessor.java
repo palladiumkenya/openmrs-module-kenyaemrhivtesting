@@ -40,6 +40,7 @@ public class FamilyHistoryFormContactListingProcessor {
         List<AOPEncounterEntry> aopEntries = htsService.getAopEncounterEntryList();
         for(AOPEncounterEntry aopEntry : aopEntries) {
             Encounter enc = encounterService.getEncounterByUuid(aopEntry.getEncounterUUID());
+            boolean errorOccured = false;
 
             // construct object for each contact and process them
                 List<Obs> obs = obsService.getObservations(
@@ -61,12 +62,20 @@ public class FamilyHistoryFormContactListingProcessor {
                         PatientContact contact = extractFamilyAndPartnerTestingRows(o.getGroupMembers());
                         contact.setObsGroupId(o);
                         contact.setPatientRelatedTo(Context.getPatientService().getPatient(o.getPersonId()));
-                        htsService.savePatientContact(contact);
+                        try {
+                            htsService.savePatientContact(contact);
+                        } catch (Exception e) {
+                            errorOccured = true;
+                        }
                     }
                 }
             // update processed aop entry
-            aopEntry.setStatus(1);
-                htsService.saveAopEncounterEntry(aopEntry);
+            if(!errorOccured) {
+                aopEntry.setStatus(1);
+            } else {
+                aopEntry.setStatus(2); // using code 2 for error
+            }
+            htsService.saveAopEncounterEntry(aopEntry);
         }
     }
 

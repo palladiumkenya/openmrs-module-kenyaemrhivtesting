@@ -7,7 +7,6 @@ import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.springframework.aop.AfterReturningAdvice;
 
-import javax.naming.Context;
 import java.lang.reflect.Method;
 import java.util.Date;
 
@@ -19,12 +18,8 @@ public class PatientContactListProcessor implements AfterReturningAdvice {
     public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
 
         if (method.getName().equals("saveEncounter")) {
-
-            System.out.println("KenyaEMR HIV Testing. Method: " + method.getName() +
-                    ". After advice called. Go ahead and implement it");
             Encounter encounter = (Encounter) args[0];
             if(encounter != null && encounter.getForm().getUuid().equals(HIV_FAMILY_HISTORY)) {
-                System.out.println("Hiv testing Kenyaemr. Got desired form");
                 AOPEncounterEntry entry = new AOPEncounterEntry();
                 entry.setDateCreated(new Date());
                 entry.setEncounterUUID(encounter.getUuid());
@@ -32,7 +27,6 @@ public class PatientContactListProcessor implements AfterReturningAdvice {
                 entry.setTargetModule("HTS");
                 entry.setStatus(0);
                 org.openmrs.api.context.Context.getService(HTSService.class).saveAopEncounterEntry(entry);
-                System.out.println("Successfully saved Family History Form AOP Entry");
             }
         }
     }
