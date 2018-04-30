@@ -250,10 +250,8 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
 
             var relType = jq(this).val();
 
-            console.log('Relationship type ' + relType);
-
         /*    if (relType === "Spouse" || relType === "Partner") */
-             if (relType === "6" || relType === "7") {
+             if (relType === "5617" || relType === "163565") {
 
                 jq('.ipvAssessmentTable').show();
             }

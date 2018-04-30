@@ -130,7 +130,7 @@ public class HTSContactListingFormProcessor {
             } else if (obs.getConcept().getConceptId().equals(nextTestingDateConcept )) {
                 nextTestDate = obs.getValueDate();
             } else if (obs.getConcept().getConceptId().equals(relationshipConcept) ) {
-                relType = relationshipConverter(obs.getValueCoded());
+                relType = obs.getValueCoded().getConceptId();
             } else if (obs.getConcept().getConceptId().equals(ageUnitConcept) ) {
                 ageUnit = obs.getValueCoded().getConceptId();
             } else if (obs.getConcept().getConceptId().equals(sexConcept) ) {

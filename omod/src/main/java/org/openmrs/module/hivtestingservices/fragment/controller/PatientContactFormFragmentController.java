@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller for adding and editing Patient Contacts
@@ -50,15 +52,29 @@ public class PatientContactFormFragmentController{
     protected List<SimpleObject> getRelationshipTypeOptions() {
         List<SimpleObject> options = new ArrayList<SimpleObject>();
 
-        for (RelationshipType type : Context.getPersonService().getAllRelationshipTypes()) {
+        /*for (RelationshipType type : Context.getPersonService().getAllRelationshipTypes()) {
             if (type.getaIsToB().equals(type.getbIsToA())) {
                 options.add(SimpleObject.create("value", type.getId(), "label", type.getaIsToB()));
             }
             else {
                 options.add(SimpleObject.create("value", type.getId(), "label", type.getaIsToB()));
             }
-        }
+        }*/
+        for (Map.Entry<Integer, String> option : createRelationshipOptionsFromConcepts().entrySet())
+            options.add(SimpleObject.create("value", option.getKey(), "label", option.getValue()));
 
+        return options;
+    }
+
+    private Map<Integer, String> createRelationshipOptionsFromConcepts() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(970, "Mother");
+        options.put(971, "Father");
+        options.put(972, "Sibling");
+        options.put(1528, "Child");
+        options.put(5617, "Spouse");
+        options.put(163565, "Partner");
+        options.put(162221, "Co-wife");
         return options;
     }
     public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {
