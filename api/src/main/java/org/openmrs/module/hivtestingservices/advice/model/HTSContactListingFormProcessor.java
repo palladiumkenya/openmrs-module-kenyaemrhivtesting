@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class FamilyHistoryFormContactListingProcessor {
+public class HTSContactListingFormProcessor {
 
-    protected static final Log log = LogFactory.getLog(FamilyHistoryFormContactListingProcessor.class);
+    protected static final Log log = LogFactory.getLog(HTSContactListingFormProcessor.class);
 
     HTSService htsService = Context.getService(HTSService.class);
     EncounterService encounterService = Context.getEncounterService();
@@ -105,7 +105,9 @@ public class FamilyHistoryFormContactListingProcessor {
         Integer relationshipConcept = 1560;
         Integer baselineHivStatusConcept =1169;
         Integer nextTestingDateConcept = 164400;
-        Integer ageUnitConcept = 1732;
+        Integer ageUnitConcept = 163541;
+        Integer sexConcept = 1533;
+        Integer phoneNumberConcept = 159635;
 
         Integer relType = null;
         Integer age = 0;
@@ -113,6 +115,8 @@ public class FamilyHistoryFormContactListingProcessor {
         Date nextTestDate = null;
         String contactName = null;
         Integer ageUnit = null;
+        String sex = null;
+        String phoneNumber = null;
 
 
         for(Obs obs:obsList) {
@@ -129,6 +133,10 @@ public class FamilyHistoryFormContactListingProcessor {
                 relType = relationshipConverter(obs.getValueCoded());
             } else if (obs.getConcept().getConceptId().equals(ageUnitConcept) ) {
                 ageUnit = obs.getValueCoded().getConceptId();
+            } else if (obs.getConcept().getConceptId().equals(sexConcept) ) {
+                sex = sexConverter(obs.getValueCoded());
+            } else if (obs.getConcept().getConceptId().equals(phoneNumberConcept) ) {
+                phoneNumber = obs.getValueText();
             }
         }
         if(contactName != null) {
@@ -137,7 +145,9 @@ public class FamilyHistoryFormContactListingProcessor {
             contact.setBaselineHivStatus(baselineStatus);
             contact.setAppointmentDate(nextTestDate);
             contact.setBirthDate(calculateDobFromAge(age, ageUnit));
-            contact.setSex("Undefined");
+            contact.setSex(sex != null? sex :"Undefined");
+            if (phoneNumber != null)
+                contact.setPhoneContact(phoneNumber);
 
             return contact;
         }
@@ -180,6 +190,13 @@ public class FamilyHistoryFormContactListingProcessor {
         hivStatusList.put(conceptService.getConcept(1405), "Exposed");
         hivStatusList.put(conceptService.getConcept(1067), "Unknown");
         return hivStatusList.get(key);
+    }
+
+    String sexConverter (Concept key) {
+        Map<Concept, String> sexOptions = new HashMap<Concept, String>();
+        sexOptions.put(conceptService.getConcept(1534), "M");
+        sexOptions.put(conceptService.getConcept(1535), "F");
+        return sexOptions.get(key);
     }
 
 }

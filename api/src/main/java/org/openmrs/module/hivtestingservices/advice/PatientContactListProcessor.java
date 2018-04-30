@@ -13,13 +13,13 @@ import java.util.Date;
 public class PatientContactListProcessor implements AfterReturningAdvice {
 
     private Log log = LogFactory.getLog(this.getClass());
-    public static final String HIV_FAMILY_HISTORY = "7efa0ee0-6617-4cd7-8310-9f95dfee7a82";
+    public static final String CONTACT_LISTING_FORM = "d4493a7c-49fc-11e8-842f-0ed5f89f718b";
     @Override
     public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
 
         if (method.getName().equals("saveEncounter")) {
             Encounter encounter = (Encounter) args[0];
-            if(encounter != null && encounter.getForm().getUuid().equals(HIV_FAMILY_HISTORY)) {
+            if(encounter != null && encounter.getForm().getUuid().equals(CONTACT_LISTING_FORM)) {
                 AOPEncounterEntry entry = new AOPEncounterEntry();
                 entry.setDateCreated(new Date());
                 entry.setEncounterUUID(encounter.getUuid());

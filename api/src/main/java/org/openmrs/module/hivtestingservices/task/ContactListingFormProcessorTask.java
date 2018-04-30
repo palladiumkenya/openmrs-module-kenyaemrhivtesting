@@ -11,16 +11,9 @@ package org.openmrs.module.hivtestingservices.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Transaction;
-import org.hibernate.jdbc.Work;
 import org.openmrs.api.context.Context;
-import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.openmrs.module.hivtestingservices.advice.model.FamilyHistoryFormContactListingProcessor;
+import org.openmrs.module.hivtestingservices.advice.model.HTSContactListingFormProcessor;
 import org.openmrs.scheduler.tasks.AbstractTask;
-
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Periodically refreshes ETL tables
@@ -39,7 +32,7 @@ public class ContactListingFormProcessorTask extends AbstractTask {
 			if (!Context.isAuthenticated()) {
 				authenticate();
 			}
-			FamilyHistoryFormContactListingProcessor processor = new FamilyHistoryFormContactListingProcessor();
+			HTSContactListingFormProcessor processor = new HTSContactListingFormProcessor();
 			processor.processAOPEncounterEntries();
 
 		}
