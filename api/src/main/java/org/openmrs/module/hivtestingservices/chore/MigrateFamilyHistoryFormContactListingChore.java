@@ -1,14 +1,13 @@
-package org.openmrs.module.hivtestingservices.advice.model;
+package org.openmrs.module.hivtestingservices.chore;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.Period;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
@@ -23,59 +22,62 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HTSContactListingFormProcessor {
-
-    protected static final Log log = LogFactory.getLog(HTSContactListingFormProcessor.class);
+public class MigrateFamilyHistoryFormContactListingChore {
 
     HTSService htsService = Context.getService(HTSService.class);
     EncounterService encounterService = Context.getEncounterService();
     ObsService obsService = Context.getObsService();
     ConceptService conceptService = Context.getConceptService();
 
-    public void processAOPEncounterEntries() {
 
+    public void perform() throws APIException {
         String familyHistoryGroupingConcept = "160593AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        String HIV_FAMILY_HISTORY = "7efa0ee0-6617-4cd7-8310-9f95dfee7a82";
 
-        // Fetch aop entries
-        List<AOPEncounterEntry> aopEntries = htsService.getAopEncounterEntryList();
-        for(AOPEncounterEntry aopEntry : aopEntries) {
-            Encounter enc = encounterService.getEncounterByUuid(aopEntry.getEncounterUUID());
+        List<Encounter> familyHistoryEncounters = encounterService.getEncounters(
+                null,
+                null,
+                null,
+                null,
+                Arrays.asList(Context.getFormService().getFormByUuid(HIV_FAMILY_HISTORY)),
+                null,
+                null,
+                null,
+                null,
+                false
+        );
+        // Fetch contact entries
+
+        for(Encounter  enc : familyHistoryEncounters) {
             boolean errorOccured = false;
 
             // construct object for each contact and process them
-                List<Obs> obs = obsService.getObservations(
-                        Arrays.asList(Context.getPersonService().getPerson(enc.getPatient().getPersonId())),
-                        Arrays.asList(enc),
-                        Arrays.asList(conceptService.getConceptByUuid(familyHistoryGroupingConcept)),
-                        null,
-                        null,
-                        null,
-                        Arrays.asList("obsId"),
-                        null,
-                        null,
-                        null,
-                        null,
-                        false
-                );
-                for(Obs o: obs) {
-                    if (extractFamilyAndPartnerTestingRows(o.getGroupMembers()) != null) {
-                        PatientContact contact = extractFamilyAndPartnerTestingRows(o.getGroupMembers());
-                        contact.setObsGroupId(o);
-                        contact.setPatientRelatedTo(Context.getPatientService().getPatient(o.getPersonId()));
-                        try {
-                            htsService.savePatientContact(contact);
-                        } catch (Exception e) {
-                            errorOccured = true;
-                        }
+            List<Obs> obs = obsService.getObservations(
+                    Arrays.asList(Context.getPersonService().getPerson(enc.getPatient().getPersonId())),
+                    Arrays.asList(enc),
+                    Arrays.asList(conceptService.getConceptByUuid(familyHistoryGroupingConcept)),
+                    null,
+                    null,
+                    null,
+                    Arrays.asList("obsId"),
+                    null,
+                    null,
+                    null,
+                    null,
+                    false
+            );
+            for(Obs o: obs) {
+                if (extractFamilyAndPartnerTestingRows(o.getGroupMembers()) != null) {
+                    PatientContact contact = extractFamilyAndPartnerTestingRows(o.getGroupMembers());
+                    contact.setObsGroupId(o);
+                    contact.setPatientRelatedTo(Context.getPatientService().getPatient(o.getPersonId()));
+                    try {
+                        htsService.savePatientContact(contact);
+                    } catch (Exception e) {
+                        errorOccured = true;
                     }
                 }
-            // update processed aop entry
-            if(!errorOccured) {
-                aopEntry.setStatus(1);
-            } else {
-                aopEntry.setStatus(2); // using code 2 for error
             }
-            htsService.saveAopEncounterEntry(aopEntry);
         }
     }
 
@@ -105,9 +107,10 @@ public class HTSContactListingFormProcessor {
         Integer relationshipConcept = 1560;
         Integer baselineHivStatusConcept =1169;
         Integer nextTestingDateConcept = 164400;
-        Integer ageUnitConcept = 163541;
+        Integer ageUnitConcept = 1732;
         Integer sexConcept = 1533;
         Integer phoneNumberConcept = 159635;
+        Integer relationshipStatusConcept = 163607;
 
         Integer relType = null;
         Integer age = 0;
@@ -117,6 +120,7 @@ public class HTSContactListingFormProcessor {
         Integer ageUnit = null;
         String sex = null;
         String phoneNumber = null;
+        boolean processFormData = false;
 
 
         for(Obs obs:obsList) {
@@ -137,7 +141,13 @@ public class HTSContactListingFormProcessor {
                 sex = sexConverter(obs.getValueCoded());
             } else if (obs.getConcept().getConceptId().equals(phoneNumberConcept) ) {
                 phoneNumber = obs.getValueText();
+            } else if (obs.getConcept().getConceptId().equals(relationshipStatusConcept) ) {
+                processFormData = true;
             }
+        }
+
+        if (!processFormData) {
+            return null;
         }
         if(contactName != null) {
             PatientContact contact = fillContactName(contactName);
@@ -158,7 +168,7 @@ public class HTSContactListingFormProcessor {
     private Date calculateDobFromAge(int age, Integer unit) {
         LocalDate now = LocalDate.now(DateTimeZone.forID("Africa/Nairobi"));
         Period agePeriod;
-        if(unit == 1734) { // age provided in years
+        if(unit == null || unit == 1734) { // age provided in years
             agePeriod = new Period(age, 0, 0, 0, 0, 0, 0, 0);
         } else { // age provided in months
             agePeriod = new Period(0, age, 0, 0, 0, 0, 0, 0);
