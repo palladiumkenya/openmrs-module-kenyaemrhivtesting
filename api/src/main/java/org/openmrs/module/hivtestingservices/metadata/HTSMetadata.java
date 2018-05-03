@@ -14,11 +14,8 @@
 
 package org.openmrs.module.hivtestingservices.metadata;
 
-import org.openmrs.PatientIdentifierType;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.springframework.stereotype.Component;
-
-import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.*;
 
 /**
  * Metadata constants
@@ -30,7 +27,8 @@ public class HTSMetadata extends AbstractMetadataBundle {
 
 	@Override
 	public void install() throws Exception {
-		install(globalProperty(MODULE_ID +".contactListingMigrationChore", "Migrates contact previously listed using family history form", "false"));
+		// doing this in the scheduled task so that previous value set is preserved
+		//install(globalProperty(MODULE_ID +".contactListingMigrationChore", "Migrates contact previously listed using family history form", "false"));
 
 
 	}

@@ -39,9 +39,16 @@ public class ContactListingOneTImeMigrationTask extends AbstractTask {
 			AdministrationService service = Context.getAdministrationService();
 			GlobalProperty choreStatus = service.getGlobalPropertyObject("hivtestingservices.contactListingMigrationChore");
 
-			System.out.println("in the scheduled event. ");
-			System.out.println("value of global property tracker. " + choreStatus.getPropertyValue());
-			if (!"true".equals(choreStatus.getPropertyValue())) {
+			// create global property if none exists.
+			if (choreStatus == null) {
+				System.out.println("Creating property and running chore for contact listing");
+				MigrateFamilyHistoryFormContactListingChore processor = new MigrateFamilyHistoryFormContactListingChore();
+				processor.perform();
+				GlobalProperty property = new GlobalProperty("hivtestingservices.contactListingMigrationChore", "true");
+				property.setDescription("Migrates contact previously listed using family history form");
+				service.saveGlobalProperty(property);
+
+			} else if (!"true".equals(choreStatus.getPropertyValue())) {
 				System.out.println("the task should run.");
 				MigrateFamilyHistoryFormContactListingChore processor = new MigrateFamilyHistoryFormContactListingChore();
 				processor.perform();
