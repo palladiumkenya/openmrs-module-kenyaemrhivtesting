@@ -35,13 +35,13 @@ div.section-title {
 	<div class="ke-panel-frame">
 		<div class="ke-panel-heading">Family/Partner Tree </div>
 		<div class="ke-panel-content">
-            <div class="section-title">Testing Statistics</div><div class="clear"></div>
+            <div class="section-title">Contacts Testing Statistics</div><div class="clear"></div>
             <div class="grid">
                 <div class="column-one">&nbsp;</div>
-                <div class="column-two col-header">Total Contacts</div>
+                <div class="column-two col-header">Total</div>
                 <div class="column-three col-header">Known Status</div>
-                <div class="column-four col-header">Positive Contacts</div>
-                <div class="column-five col-header">Linked Patients</div>
+                <div class="column-four col-header">Positive</div>
+                <div class="column-five col-header">Linked</div>
             </div>
             <div class="clear"></div>
             <div class="grid">
@@ -52,6 +52,7 @@ div.section-title {
                 <div class="column-five col-header">${stats.linkedPatients}</div>
             </div>
             <div class="clear"></div>
+            <hr/>
 
         <div class="section-title">Contacts registered in the facility</div><div class="clear"></div>
 			<% if (enrolledRelationships) { %>
@@ -85,19 +86,21 @@ div.section-title {
 			<% } %>
 		</div>
 
+        <hr/>
+
         <div class="ke-panel-content">
-            <div class="section-title">HIV Negative Contacts registered <br/> in this facility</div><div class="clear"></div>
-            <% if (hivNegativeRelationships) { %>
+            <div class="section-title">HIV Negative Contacts registered in this facility</div><div class="clear"></div>
+            <% if (registeredContacts) { %>
             <div class="grid">
                 <div class="column-one">&nbsp;</div>
                 <div class="column-two col-header">Age</div>
-                <div class="column-three col-header">Last Test</div>
+                <div class="column-three col-header">Last Test Date</div>
                 <div class="column-four col-header">Test Result</div>
-                <div class="column-five col-header">Next Test Date</div>
-                <div class="column-six col-header">Status</div>
+                <div class="column-five col-header">In Care</div>
+                <div class="column-six col-header">UPN</div>
             </div>
             <div class="clear"></div>
-            <% hivNegativeRelationships.each { rel -> %>
+            <% registeredContacts.each { rel -> %>
             <div class="ke-stack-item">
                 <div class="grid">
                     <div class="column-one">
@@ -106,8 +109,8 @@ div.section-title {
                     <div class="column-two">${rel.age}</div>
                     <div class="column-three">${rel.lastTestDate}</div>
                     <div class="column-four">${rel.lastTestResult}</div>
-                    <div class="column-five">${rel.nextTestDate}</div>
-                    <div class="column-six">${rel.status}</div>
+                    <div class="column-five">${rel.inCare}</div>
+                    <div class="column-six">${rel.upn}</div>
                 </div>
                 <div class="clear"></div>
 
@@ -116,18 +119,18 @@ div.section-title {
             No record was found
             <% } %>
         </div>
-
+        <hr/>
         <div class="ke-panel-content">
-            <div class="section-title">Contacts not registered <br/> in the facility</div><div class="clear"></div>
+            <div class="section-title">Contacts not registered in the facility</div><div class="clear"></div>
             <% if (otherContacts) { %>
             <div class="grid">
                 <div class="column-one">&nbsp;</div>
                 <div class="column-two col-header">Age</div>
                 <div class="column-three col-header">Baseline Status</div>
-                <div class="column-four col-header">Test Date</div>
-                <div class="column-five col-header">Test Result</div>
-                <div class="column-six col-header">In Care</div>
-                <div class="column-five col-header">ART No</div>
+                <div class="column-four col-header">In Care</div>
+                <div class="column-five col-header">Facility</div>
+                <div class="column-six col-header">UPN</div>
+                <div class="column-five col-header">Appointment Date</div>
             </div>
             <div class="clear"></div>
             <% otherContacts.each { rel -> %>
@@ -136,12 +139,12 @@ div.section-title {
                     <div class="column-one">
                         ${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: ui.format(rel.relationType), value: rel.fullName ]) }
                     </div>
-                    <div class="column-two">${rel.birthDate}</div>
+                    <div class="column-two">${rel.age}</div>
                     <div class="column-three">${rel.baselineHivStatus}</div>
-                    <div class="column-four">${rel.appointmentDate}</div>
-                    <div class="column-five"></div>
-                    <div class="column-six"></div>
-                    <div class="column-five"></div>
+                    <div class="column-four">${rel.inCare}</div>
+                    <div class="column-five">${rel.facilityLinkedTo}</div>
+                    <div class="column-six">${rel.upn}</div>
+                    <div class="column-five">${rel.appointmentDate}</div>
                 </div>
                 <div class="clear"></div>
 
