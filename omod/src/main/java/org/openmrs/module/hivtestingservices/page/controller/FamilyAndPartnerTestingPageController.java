@@ -29,6 +29,7 @@ import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
+import org.openmrs.api.FormService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
@@ -45,6 +46,8 @@ import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -190,11 +193,10 @@ public class FamilyAndPartnerTestingPageController {
                         "status", alive ? "Dead" : "Alive",
                         "art_no", UPN != null ? UPN.toString() : ""
                 ));
-            } else { // this is for hiv negative patients, not enrolled in HIV program
+            } else { // this is for contacts registered but not enrolled in HIV program
 
-                Encounter lastContactEncounter = lastEncounter(patientService.getPatient(person.getId()), encounterService.getEncounterTypeByUuid(HTS_ENCOUNTER_TYPE));
-
-
+                EncounterType hts_enc_type = encounterService.getEncounterTypeByUuid(HTS_ENCOUNTER_TYPE);
+                Encounter contactLastEncounter = lastEncounter(patientService.getPatient(person.getId()), hts_enc_type);
 
                 String lastTestDate = null;
                 String lastTestResult = null;
@@ -204,36 +206,53 @@ public class FamilyAndPartnerTestingPageController {
                 List<Obs> testObs = null;
 
                 // Extract last test information for negative patients
-                if (lastContactEncounter != null) {
+                if (contactLastEncounter != null) {
 
                     //check which form
-                    String encounterFormUuid = lastContactEncounter.getForm().getUuid();
-                    lastTestDate = DATE_FORMAT.format(lastContactEncounter.getEncounterDatetime());
+                    String encounterFormUuid = contactLastEncounter.getForm().getUuid();
+                    lastTestDate = DATE_FORMAT.format(contactLastEncounter.getEncounterDatetime());
 
                     if (encounterFormUuid.equals(HTS_INITIAL_TEST) || encounterFormUuid.equals(HTS_CONFIRMATORY_TEST)) {
 
-                        testObs = getObsForEncounter(Context.getPersonService().getPerson(lastContactEncounter.getPatient().getPersonId()), lastContactEncounter, Arrays.asList(conceptService.getConcept(hivFinalResultConcept)) );
+                        testObs = getObsForEncounter(Context.getPersonService().getPerson(contactLastEncounter.getPatient().getPersonId()), contactLastEncounter, Arrays.asList(conceptService.getConcept(hivFinalResultConcept)) );
 
                     } else if (encounterFormUuid.equals(REFERRAL_AND_LINKAGE)) {
+
                         List<Concept> referralConcepts = Arrays.asList(
                                 conceptService.getConcept(contactStatusConcept),
                                 conceptService.getConcept(upnConcept),
                                 conceptService.getConcept(facilityLinkedToConcept)
                         );
-                        testObs = getObsForEncounter(Context.getPersonService().getPerson(lastContactEncounter.getPatient().getPersonId()), lastContactEncounter, referralConcepts);
 
+                        Patient client = contactLastEncounter.getPatient();
+                        testObs = getObsForEncounter(Context.getPersonService().getPerson(contactLastEncounter.getPatient().getPersonId()), contactLastEncounter, referralConcepts);
+
+                        //get last hts form:
+                        FormService formService = Context.getFormService();
+                        Encounter lastHtsEnc = lastEncounter(client, hts_enc_type, Arrays.asList(
+                                formService.getFormByUuid(HTS_INITIAL_TEST),
+                                formService.getFormByUuid(HTS_CONFIRMATORY_TEST)
+                        ));
+
+                        List<Obs> lastHtsObs = getObsForEncounter(Context.getPersonService().getPerson(contactLastEncounter.getPatient().getPersonId()), lastHtsEnc, Arrays.asList(conceptService.getConcept(hivFinalResultConcept)) );
+                        if (lastHtsObs != null && lastHtsObs.size() > 0) {
+                            testObs.addAll(lastHtsObs);
+                        }
                     }
 
 
                     for(Obs o: testObs) {
                         if (o.getConcept().getConceptId().equals(hivFinalResultConcept) ) {
                             lastTestResult = hivStatusConverter(o.getValueCoded());
+                            lastTestDate = DATE_FORMAT.format(o.getObsDatetime());
                         } else if (o.getConcept().getConceptId().equals(contactStatusConcept)) {
                             linkageStatus = o.getValueCoded().getConceptId().equals(1065) ? "Yes" : "No";
                         } else if (o.getConcept().getConceptId().equals(facilityLinkedToConcept)) {
                             facilityLinked = o.getValueText();
                         } else if (o.getConcept().getConceptId().equals(upnConcept)) {
-                            upn = o.getValueNumeric().toString();
+                            NumberFormat nf = DecimalFormat.getInstance();
+                            nf.setMaximumFractionDigits(0);
+                            upn = String.valueOf(o.getValueNumeric().intValue());
                         }
                     }
                 }
@@ -284,6 +303,17 @@ public class FamilyAndPartnerTestingPageController {
             }
         }
 
+        /**
+         * add those linked but still not enrolled
+         */
+
+        for (SimpleObject row : registeredRelationships) {
+
+            if ((row.get("inCare") != null && row.get("inCare").equals("Yes"))) {
+                linkedPatients++;
+            }
+        }
+
 		/*
 			compute known status
 		 */
@@ -293,6 +323,13 @@ public class FamilyAndPartnerTestingPageController {
 
         for (SimpleObject row : externalPatients) {
             if ((row.get("baselineHivStatus") != null && !row.get("baselineHivStatus").equals("Unknown"))) {
+                knownStatus++;
+            }
+        }
+
+        // add for registered contacts
+        for (SimpleObject row : registeredRelationships) {
+            if ((row.get("lastTestResult") != null && (row.get("lastTestResult").equals("Positive")) || row.get("lastTestResult").equals("Negative"))) {
                 knownStatus++;
             }
         }
@@ -309,6 +346,15 @@ public class FamilyAndPartnerTestingPageController {
                 positiveContacts++;
             }
         }
+
+        // add for registered contacts
+        for (SimpleObject row : registeredRelationships) {
+            if ((row.get("lastTestResult") != null && row.get("lastTestResult").equals("Positive"))) {
+                positiveContacts++;
+            }
+        }
+
+
 
         return SimpleObject.create(
                 "totalContacts", totalContacts,

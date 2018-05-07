@@ -99,6 +99,17 @@ public class HibernateHTSDAO implements HTSDAO {
     }
 
     @Override
+    public PatientContact getPatientContactEntryForPatient(Patient patient) {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+        criteria.add(Restrictions.eq("patient", patient));
+        criteria.add(Restrictions.eq("voided", false));
+        if(!CollectionUtils.isEmpty(criteria.list())){
+            return (PatientContact) criteria.list().get(0);
+        }
+        return null;
+    }
+
+    @Override
     public List<PatientContact> getPatientContacts() {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
         criteria.add(Restrictions.eq("voided", false));

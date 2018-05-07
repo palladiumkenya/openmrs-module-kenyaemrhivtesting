@@ -110,6 +110,11 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
+    public PatientContact getPatientContactEntryForPatient(Patient patient) {
+        return patientContactDAO.getPatientContactEntryForPatient(patient);
+    }
+
+    @Override
     public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact) {
 
         return patientContactDAO.getContactTraceByPatientContact(patientContact);

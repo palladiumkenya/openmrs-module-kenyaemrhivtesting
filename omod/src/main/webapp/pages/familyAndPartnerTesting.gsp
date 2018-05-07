@@ -20,6 +20,11 @@ div.section-title {
     float: left;
     font-size: 16px;
 }
+.line-separator {
+    height: 1px;
+    background: #717171;
+    border-bottom:1px solid #313030;
+}
 </style>
 <script type="text/javascript">
 
@@ -52,9 +57,9 @@ div.section-title {
                 <div class="column-five col-header">${stats.linkedPatients}</div>
             </div>
             <div class="clear"></div>
-            <hr/>
+            <div class="line-separator"></div>
 
-        <div class="section-title">Contacts registered in the facility</div><div class="clear"></div>
+        <div class="section-title">Contacts Enrolled in the facility (In Care)</div><div class="clear"></div>
 			<% if (enrolledRelationships) { %>
             <div class="grid">
                 <div class="column-one">&nbsp;</div>
@@ -85,11 +90,10 @@ div.section-title {
             No record was found
 			<% } %>
 		</div>
-
-        <hr/>
+        <div class="line-separator"></div>
 
         <div class="ke-panel-content">
-            <div class="section-title">HIV Negative Contacts registered in this facility</div><div class="clear"></div>
+            <div class="section-title">Contacts registered in this facility (Not in Care)</div><div class="clear"></div>
             <% if (registeredContacts) { %>
             <div class="grid">
                 <div class="column-one">&nbsp;</div>
@@ -119,7 +123,7 @@ div.section-title {
             No record was found
             <% } %>
         </div>
-        <hr/>
+        <div class="line-separator"></div>
         <div class="ke-panel-content">
             <div class="section-title">Contacts not registered in the facility</div><div class="clear"></div>
             <% if (otherContacts) { %>
@@ -153,6 +157,7 @@ div.section-title {
             No record was found
             <% } %>
         </div>
+        <div class="line-separator"></div>
 
 	</div>
 </div>
