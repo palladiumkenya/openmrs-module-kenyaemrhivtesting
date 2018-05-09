@@ -41,8 +41,10 @@ public interface HTSService extends OpenmrsService {
     public ContactTrace saveClientTrace(ContactTrace contactTrace);
     public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact);
     public ContactTrace getPatientContactTraceById (Integer patientContactId);
+    public ContactTrace getLastTraceForPatientContact (PatientContact patientContact);
     public AOPEncounterEntry saveAopEncounterEntry(AOPEncounterEntry aopEncounterEntry);
     public AOPEncounterEntry getAopEncounterEntry(Integer entryId);
     public List<AOPEncounterEntry> getAopEncounterEntryList();
+    public PatientContact getPatientContactEntryForPatient(Patient patient);
 
 }

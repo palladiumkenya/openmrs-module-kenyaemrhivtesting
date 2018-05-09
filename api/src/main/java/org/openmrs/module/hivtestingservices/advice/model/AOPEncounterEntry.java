@@ -13,6 +13,9 @@ public class AOPEncounterEntry extends BaseOpenmrsData {
     private Integer status;
     private Date dateCreated;
 
+    public AOPEncounterEntry() {
+    }
+
     @Override
     public Integer getId() {
         return id;

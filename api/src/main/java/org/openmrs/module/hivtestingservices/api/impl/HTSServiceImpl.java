@@ -90,6 +90,11 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
+    public ContactTrace getLastTraceForPatientContact(PatientContact patientContact) {
+        return patientContactDAO.getLastTraceForPatientContact(patientContact);
+    }
+
+    @Override
     public AOPEncounterEntry saveAopEncounterEntry(AOPEncounterEntry aopEncounterEntry) {
         return patientContactDAO.saveAopEncounterEntry(aopEncounterEntry);
     }
@@ -102,6 +107,11 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     @Override
     public List<AOPEncounterEntry> getAopEncounterEntryList() {
         return patientContactDAO.getAopEncounterEntryList();
+    }
+
+    @Override
+    public PatientContact getPatientContactEntryForPatient(Patient patient) {
+        return patientContactDAO.getPatientContactEntryForPatient(patient);
     }
 
     @Override
