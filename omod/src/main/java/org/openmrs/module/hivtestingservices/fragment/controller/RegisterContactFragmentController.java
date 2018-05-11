@@ -16,6 +16,7 @@ package org.openmrs.module.hivtestingservices.fragment.controller;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
@@ -24,9 +25,15 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.Person;
 import org.openmrs.PersonAddress;
 import org.openmrs.PersonName;
+import org.openmrs.Relationship;
+import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.hivtestingservices.util.Utils;
+import org.openmrs.module.hivtestingservices.validator.TelephoneNumberValidator;
 import org.openmrs.module.hivtestingservices.wrapper.PatientWrapper;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.kenyaui.form.AbstractWebForm;
@@ -38,6 +45,7 @@ import org.openmrs.ui.framework.annotation.FragmentParam;
 import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.fragment.FragmentModel;
 import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.util.PrivilegeConstants;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -45,8 +53,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -69,6 +79,8 @@ public class RegisterContactFragmentController {
 	private static final String STUDENT = "159465AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	private static final String DRIVER = "159466AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	private static final String OTHER_NON_CODED = "5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	private static final String IN_SCHOOL = "5629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	private static final String ORPHAN = "1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 	static final String MARRIED_POLYGAMOUS = "159715AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	static final String MARRIED_MONOGAMOUS = "5555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -80,7 +92,13 @@ public class RegisterContactFragmentController {
 	static final String YES = "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	static final String NO = "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	ConceptService conceptService = Context.getConceptService();
-	//private static final String INSCHOOL = Dictionary.INSCHOOL;
+	PersonService personService = Context.getPersonService();
+
+	String siblingRelType = "8d91a01c-c2cc-11de-8d13-0010c6dffd0f";
+	String parentChildRelType = "8d91a210-c2cc-11de-8d13-0010c6dffd0f";
+	String spouseRelType = "d6895098-5d8d-11e3-94ee-b35a4132a5e3";
+	String partnerRelType = "007b765f-6725-4ae9-afee-9966302bace4";
+	String cowifeRelType = "2ac0d501-eadc-4624-b982-563c70035d46";
 
 	/**
 	 * Main controller method
@@ -92,7 +110,9 @@ public class RegisterContactFragmentController {
 						   @FragmentParam(value = "person", required = false) Person person,
 						   FragmentModel model) {
 
-		model.addAttribute("command", newEditPatientForm(patientContact));
+		model.addAttribute("patientRelatedTo", patientContact.getPatientRelatedTo());
+		model.addAttribute("patientContact", patientContact);
+		model.addAttribute("command", newPatientContactForm(patientContact));
 
 		model.addAttribute("civilStatusConcept", conceptService.getConceptByUuid(CIVIL_STATUS));
 		model.addAttribute("occupationConcept", conceptService.getConceptByUuid(OCCUPATION));
@@ -180,7 +200,7 @@ public class RegisterContactFragmentController {
 	 * @param ui the UI utils
 	 * @return a simple object { patientId }
 	 */
-	public SimpleObject savePatient(@MethodParam("newEditPatientForm") @BindParams EditPatientForm form, UiUtils ui) {
+	public SimpleObject savePatient(@MethodParam("newPatientContactForm") @BindParams EditPatientForm form, UiUtils ui) {
 		ui.validate(form, form, null);
 
 		Patient patient = form.save();
@@ -198,7 +218,7 @@ public class RegisterContactFragmentController {
 	 * @param patientContact the PatientContact
 	 * @return the form
 	 */
-	public EditPatientForm newEditPatientForm(@RequestParam(value = "patientContact", required = false) PatientContact patientContact) {
+	public EditPatientForm newPatientContactForm(@RequestParam(value = "patientContact") PatientContact patientContact) {
 
 			return new EditPatientForm(patientContact); // For creating patient and person from scratch
 
@@ -210,6 +230,8 @@ public class RegisterContactFragmentController {
 	public class EditPatientForm extends AbstractWebForm {
 
 		private Person original;
+		private Patient patientRelatedTo;
+		private PatientContact patientContact;
 		private Location location;
 		private PersonName personName;
 		private Date birthdate;
@@ -242,8 +264,8 @@ public class RegisterContactFragmentController {
 		 * Creates an edit form for a new patient
 		 */
 		public EditPatientForm() {
-			//location = Context.getService(KenyaEmrService.class).getDefaultLocation();
-
+			location = getDefaultLocation();
+			original = new Person();
 			personName = new PersonName();
 			personAddress = new PersonAddress();
 		}
@@ -253,8 +275,6 @@ public class RegisterContactFragmentController {
 		 */
 		public EditPatientForm(PatientContact contact) {
 			this();
-
-			original = new Person();
 
 			if (contact.getLastName() != null)
 				personName.setFamilyName(contact.getLastName());
@@ -277,6 +297,10 @@ public class RegisterContactFragmentController {
 			birthdate = contact.getBirthDate();
 			birthdateEstimated = true;
 			dead = false;
+
+			// set related patient
+			patientRelatedTo = contact.getPatientRelatedTo();
+
 		}
 
 		/**
@@ -306,18 +330,18 @@ public class RegisterContactFragmentController {
 				errors.rejectValue("deathDate", "Must be empty if patient not deceased");
 			}
 
-			/*if (StringUtils.isNotBlank(telephoneContact)) {
+			if (StringUtils.isNotBlank(telephoneContact)) {
 				validateField(errors, "telephoneContact", new TelephoneNumberValidator());
 			}
 			if (StringUtils.isNotBlank(nextOfKinContact)) {
 				validateField(errors, "nextOfKinContact", new TelephoneNumberValidator());
-			}*/
+			}
 
 			validateField(errors, "personAddress");
 
-			validateIdentifierField(errors, "nationalIdNumber", PatientWrapper.NATIONAL_ID);
-			validateIdentifierField(errors, "patientClinicNumber", PatientWrapper.PATIENT_CLINIC_NUMBER);
-			validateIdentifierField(errors, "uniquePatientNumber", PatientWrapper.UNIQUE_PATIENT_NUMBER);
+			validateIdentifierField(errors, "nationalIdNumber", Utils.NATIONAL_ID);
+			validateIdentifierField(errors, "patientClinicNumber", Utils.PATIENT_CLINIC_NUMBER);
+			validateIdentifierField(errors, "uniquePatientNumber", Utils.UNIQUE_PATIENT_NUMBER);
 
 			// check birth date against future dates and really old dates
 			if (birthdate != null) {
@@ -366,42 +390,22 @@ public class RegisterContactFragmentController {
 		 */
 		@Override
 		public Patient save() {
-			Patient toSave;
 
-			if (original != null && original.isPatient()) { // Editing an existing patient
-				toSave = (Patient) original;
-			}
-			else if (original != null) {
-				toSave = new Patient(original); // Creating a patient from an existing person
-			}
-			else {
-				toSave = new Patient(); // Creating a new patient and person
-			}
-
+			Patient toSave = new Patient(); // Creating a new patient and person
 			toSave.setGender(gender);
 			toSave.setBirthdate(birthdate);
 			toSave.setBirthdateEstimated(birthdateEstimated);
 			toSave.setDead(dead);
 			toSave.setDeathDate(deathDate);
 			toSave.setCauseOfDeath(dead ? conceptService.getConceptByUuid(CAUSE_OF_DEATH_PLACEHOLDER) : null);
+			toSave.addName(personName);
+			toSave.addAddress(personAddress);
 
-			if (anyChanges(toSave.getPersonName(), personName, "givenName", "familyName")) {
-				if (toSave.getPersonName() != null) {
-					voidData(toSave.getPersonName());
-				}
-				toSave.addName(personName);
-			}
-
-			if (anyChanges(toSave.getPersonAddress(), personAddress, "address1", "address2", "address5", "address6", "countyDistrict","address3","cityVillage","stateProvince","country","postalCode","address4")) {
-				if (toSave.getPersonAddress() != null) {
-					voidData(toSave.getPersonAddress());
-				}
-				toSave.addAddress(personAddress);
-			}
 
 			PatientWrapper wrapper = new PatientWrapper(toSave);
+			wrapper.getPerson();
 
-			/*wrapper.getPerson().setTelephoneContact(telephoneContact);
+			wrapper.getPerson().setTelephoneContact(telephoneContact);
 			wrapper.setNationalIdNumber(nationalIdNumber, location);
 			wrapper.setPatientClinicNumber(patientClinicNumber, location);
 			wrapper.setUniquePatientNumber(uniquePatientNumber, location);
@@ -414,7 +418,7 @@ public class RegisterContactFragmentController {
 			wrapper.setNearestHealthFacility(nearestHealthFacility);
 			wrapper.setEmailAddress(emailAddress);
 			wrapper.setGuardianFirstName(guardianFirstName);
-			wrapper.setGuardianLastName(guardianLastName);*/
+			wrapper.setGuardianLastName(guardianLastName);
 
 			// Make sure everyone gets an OpenMRS ID
 			PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, PatientWrapper.OPENMRS_ID);
@@ -441,20 +445,22 @@ public class RegisterContactFragmentController {
 			List<Obs> obsToSave = new ArrayList<Obs>();
 			List<Obs> obsToVoid = new ArrayList<Obs>();
 
-			/*handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(Dictionary.CIVIL_STATUS), savedMaritalStatus, maritalStatus);
-			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(Dictionary.OCCUPATION), savedOccupation, occupation);
-			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(Dictionary.EDUCATION), savedEducation, education);
-			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(Dictionary.IN_SCHOOL), savedInSchool, inSchool);
-			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(Dictionary.ORPHAN), savedOrphan, orphan);
-*/
+			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(CIVIL_STATUS), null, maritalStatus);
+			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(OCCUPATION), null, occupation);
+			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(EDUCATION), null, education);
+			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(IN_SCHOOL), null, inSchool);
+			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(ORPHAN), null, orphan);
 
-			for (Obs o : obsToVoid) {
-				Context.getObsService().voidObs(o, "KenyaEMR edit patient");
-			}
 
 			for (Obs o : obsToSave) {
 				Context.getObsService().saveObs(o, "KenyaEMR edit patient");
 			}
+
+			// add relationship and update PatientContact record
+			addRelationship(patientRelatedTo, ret, patientContact.getRelationType());
+			patientContact.setPatient(ret);
+			Context.getService(HTSService.class).savePatientContact(patientContact);
+
 
 			return ret;
 		}
@@ -481,7 +487,7 @@ public class RegisterContactFragmentController {
 					o.setPerson(patient);
 					o.setConcept(question);
 					o.setObsDatetime(new Date());
-					//o.setLocation(Context.getService(KenyaEmrService.class).getDefaultLocation());
+					o.setLocation(getDefaultLocation());
 					o.setValueCoded(newValue);
 					obsToSave.add(o);
 				}
@@ -510,7 +516,7 @@ public class RegisterContactFragmentController {
 					o.setPerson(patient);
 					o.setConcept(question);
 					o.setObsDatetime(new Date());
-					//o.setLocation(Context.getService(KenyaEmrService.class).getDefaultLocation());
+					o.setLocation(getDefaultLocation());
 					o.setValueBoolean(newValue);
 					obsToSave.add(o);
 				}
@@ -518,6 +524,74 @@ public class RegisterContactFragmentController {
 		}
 
 
+		public Location getDefaultLocation() {
+			try {
+				Context.addProxyPrivilege(PrivilegeConstants.VIEW_LOCATIONS);
+				Context.addProxyPrivilege(PrivilegeConstants.VIEW_GLOBAL_PROPERTIES);
+				String GP_DEFAULT_LOCATION = "kenyaemr.defaultLocation";
+				GlobalProperty gp = Context.getAdministrationService().getGlobalPropertyObject(GP_DEFAULT_LOCATION);
+				return gp != null ? ((Location) gp.getValue()) : null;
+			}
+			finally {
+				Context.removeProxyPrivilege(PrivilegeConstants.VIEW_LOCATIONS);
+				Context.removeProxyPrivilege(PrivilegeConstants.VIEW_GLOBAL_PROPERTIES);
+			}
+
+		}
+
+		private void addRelationship(Person patient, Person contact, Integer relationshipType) {
+
+			Person personA, personB;
+			RelationshipType type;
+
+			if (relationshipType == 970 || relationshipType == 971) {
+				personA = contact;
+				personB = patient;
+				type = personService.getRelationshipTypeByUuid(parentChildRelType);
+			} else if (relationshipType == 1528) {
+				personA = patient;
+				personB = contact;
+				type = personService.getRelationshipTypeByUuid(parentChildRelType);
+			} else {
+				personA = contact;
+				personB = patient;
+				type = personService.getRelationshipTypeByUuid(relationshipOptionsToRelTypeMapper(relationshipType));
+			}
+
+/*+----------------------+--------------------------------------+------------+--------------+
+| relationship_type_id | uuid                                 | a_is_to_b  | b_is_to_a    |
++----------------------+--------------------------------------+------------+--------------+
+|                    1 | 8d919b58-c2cc-11de-8d13-0010c6dffd0f | Doctor     | Patient      |
+|                    2 | 8d91a01c-c2cc-11de-8d13-0010c6dffd0f | Sibling    | Sibling      |
+|                    3 | 8d91a210-c2cc-11de-8d13-0010c6dffd0f | Parent     | Child        |
+|                    4 | 8d91a3dc-c2cc-11de-8d13-0010c6dffd0f | Aunt/Uncle | Niece/Nephew |
+|                    5 | 5f115f62-68b7-11e3-94ee-6bef9086de92 | Guardian   | Dependant    |
+|                    6 | d6895098-5d8d-11e3-94ee-b35a4132a5e3 | Spouse     | Spouse       |
+|                    7 | 007b765f-6725-4ae9-afee-9966302bace4 | Partner    | Partner      |
+|                    8 | 2ac0d501-eadc-4624-b982-563c70035d46 | Co-wife    | Co-wife      |
++----------------------+--------------------------------------+------------+--------------+
+*/
+
+			Relationship rel = new Relationship();
+			rel.setRelationshipType(type);
+			rel.setPersonA(personA);
+			rel.setPersonB(personB);
+
+			Context.getPersonService().saveRelationship(rel);
+		}
+
+		private String relationshipOptionsToRelTypeMapper (Integer relType) {
+			Map<Integer, String> options = new HashMap<Integer, String>();
+
+			options.put(970, parentChildRelType);
+			options.put(971, parentChildRelType);
+			options.put(972, siblingRelType);
+			options.put(1528, parentChildRelType);
+			options.put(5617, spouseRelType);
+			options.put(163565, partnerRelType);
+			options.put(162221, cowifeRelType);
+			return options.get(relType);
+		}
 		/**
 		 * @return the original
 		 */
@@ -530,6 +604,22 @@ public class RegisterContactFragmentController {
 		 */
 		public void setOriginal(Patient original) {
 			this.original = original;
+		}
+
+		public Patient getPatientRelatedTo() {
+			return patientRelatedTo;
+		}
+
+		public void setPatientRelatedTo(Patient patientRelatedTo) {
+			this.patientRelatedTo = patientRelatedTo;
+		}
+
+		public PatientContact getPatientContact() {
+			return patientContact;
+		}
+
+		public void setPatientContact(PatientContact patientContact) {
+			this.patientContact = patientContact;
 		}
 
 		/**

@@ -59,9 +59,10 @@
     ]
 %>
 
-<form id="edit-patient-form" method="post" action="${ui.actionLink("kenyaemr", "patient/editPatient", "savePatient")}">
+<form id="edit-patient-form" method="post" action="${ui.actionLink("hivtestingservices", "registerContact", "savePatient")}">
     <% if (command.original) { %>
-    <input type="hidden" name="personId" value="${command.original.id}"/>
+    <input type="hidden" name="patientRelatedTo" value="${patientRelatedTo.patientId}"/>
+    <input type="hidden" name="patientContact" value="${patientContact.id}"/>
     <% } %>
 
     <div class="ke-panel-content">
@@ -248,11 +249,7 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         kenyaui.setupAjaxPost('edit-patient-form', {
             onSuccess: function (data) {
                 if (data.id) {
-                    <% if (config.returnUrl) { %>
-                    ui.navigate('${ config.returnUrl }');
-                    <% } else { %>
                     ui.navigate('kenyaemr', 'registration/registrationViewPatient', {patientId: data.id});
-                    <% } %>
                 } else {
                     kenyaui.notifyError('Saving patient was successful, but unexpected response');
                 }
