@@ -145,6 +145,13 @@ div.section-title {
                         </button>
                     </div>
 
+                    <div style="float: left;width: 100px">
+                        <button type="button"
+                                onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: rel.id, returnUrl: ui.thisUrl() ])}')">
+                            <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Register
+                        </button>
+                    </div>
+
                 </div>
 
                 <div class="clear"></div>
