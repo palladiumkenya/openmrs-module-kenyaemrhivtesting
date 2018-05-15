@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
@@ -36,6 +37,13 @@ public class PatientContactListPageController {
 
         HTSService htsService = Context.getService(HTSService.class);
         List<PatientContact> patientContacts = htsService.getPatientContactByPatient(patient);
+
+        PatientContact contactEntry = htsService.getPatientContactEntryForPatient(patient);
+        List<ContactTrace> contactTrace = htsService.getContactTraceByPatientContact(contactEntry);
+
+        model.put("traces", contactTrace);
+        model.put("patientContact", contactEntry);
+
 
         model.put("contacts", patientContactFormatter(kenyaUi, patientContacts));
         model.put("patient", patient);
