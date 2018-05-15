@@ -246,6 +246,7 @@ div.section-title {
                 </div>
             </div>
             <div class="clear"></div>
+            <% if (patientContact) { %>
             <div align="center">
 
                 <button type="button"
@@ -254,6 +255,7 @@ div.section-title {
                 </button>
 
             </div>
+            <% }%>
 
         </div>
 
