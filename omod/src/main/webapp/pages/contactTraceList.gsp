@@ -6,8 +6,8 @@
 %>
 <style>
 div.grid {
-    display: block;
-}
+     display: block;
+ }
 div.grid div {
     float: left;
     height: 30px;
