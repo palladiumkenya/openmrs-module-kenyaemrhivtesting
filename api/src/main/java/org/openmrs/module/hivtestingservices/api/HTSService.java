@@ -15,6 +15,7 @@ package org.openmrs.module.hivtestingservices.api;
 
 import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -40,5 +41,10 @@ public interface HTSService extends OpenmrsService {
     public ContactTrace saveClientTrace(ContactTrace contactTrace);
     public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact);
     public ContactTrace getPatientContactTraceById (Integer patientContactId);
+    public ContactTrace getLastTraceForPatientContact (PatientContact patientContact);
+    public AOPEncounterEntry saveAopEncounterEntry(AOPEncounterEntry aopEncounterEntry);
+    public AOPEncounterEntry getAopEncounterEntry(Integer entryId);
+    public List<AOPEncounterEntry> getAopEncounterEntryList();
+    public PatientContact getPatientContactEntryForPatient(Patient patient);
 
 }

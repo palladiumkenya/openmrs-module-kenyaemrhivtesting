@@ -13,10 +13,13 @@
  */
 package org.openmrs.module.hivtestingservices.api.db.hibernate;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
 import org.apache.commons.logging.Log;
@@ -77,6 +80,36 @@ public class HibernateHTSDAO implements HTSDAO {
     }
 
     @Override
+    public AOPEncounterEntry saveAopEncounterEntry(AOPEncounterEntry aopEncounterEntry) {
+        sessionFactory.getCurrentSession().saveOrUpdate(aopEncounterEntry);
+        return aopEncounterEntry;
+    }
+
+    @Override
+    public AOPEncounterEntry getAopEncounterEntry(Integer entryId) {
+        return (AOPEncounterEntry) this.sessionFactory.getCurrentSession().get(AOPEncounterEntry.class, entryId);
+
+    }
+
+    @Override
+    public List<AOPEncounterEntry> getAopEncounterEntryList() {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(AOPEncounterEntry.class);
+        criteria.add(Restrictions.eq("status", 0));
+        return criteria.list();
+    }
+
+    @Override
+    public PatientContact getPatientContactEntryForPatient(Patient patient) {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+        criteria.add(Restrictions.eq("patient", patient));
+        criteria.add(Restrictions.eq("voided", false));
+        if(!CollectionUtils.isEmpty(criteria.list())){
+            return (PatientContact) criteria.list().get(0);
+        }
+        return null;
+    }
+
+    @Override
     public List<PatientContact> getPatientContacts() {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
         criteria.add(Restrictions.eq("voided", false));
@@ -88,10 +121,6 @@ public class HibernateHTSDAO implements HTSDAO {
     public void voidPatientContact(int theId) {
 
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
-        //CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
-
-        //sessionFactory.getCurrentSession().createQuery("update PatientContact set voided = 'true' where id=:theId").executeUpdate();
-        //getSessionFactory().getCurrentSession().createQuery(query).executeUpdate();
     }
 
     @Override
@@ -102,14 +131,9 @@ public class HibernateHTSDAO implements HTSDAO {
         //only search by name if name is not empty
         if (searchName != null && searchName.trim().length() > 0) {
 
-            //query = this.sessionFactory.getCurrentSession().createQuery("FROM PatientContact where lower(firstName) like :searchName or lower(lastName) like :searchName or lower(middleName) like :searchName");
-            //query.setParameter("searchName","%"+searchName.toLowerCase()+"%");
-
         } else {
-            //the searchName is empty...so list patient contacts
-            //query = this.sessionFactory.getCurrentSession().createQuery("FROM PatientContact");
+
         }
-        //Execute query and get the result list
         List<PatientContact> contacts = query.list();
         return contacts;
     }
@@ -129,6 +153,21 @@ public class HibernateHTSDAO implements HTSDAO {
     public ContactTrace getPatientContactTraceById(Integer patientContactTraceId) {
         return (ContactTrace) this.sessionFactory.getCurrentSession().get(ContactTrace.class, patientContactTraceId);
 
+    }
+
+    @Override
+    public ContactTrace getLastTraceForPatientContact(PatientContact patientContact) {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(ContactTrace.class);
+        criteria.add(Restrictions.eq("voided", false));
+        criteria.add(Restrictions.eq("patientContact", patientContact));
+        criteria.addOrder(Order.desc("date"));
+        criteria.addOrder(Order.desc("id"));
+        criteria.setMaxResults(1);
+        //return result
+        if(!CollectionUtils.isEmpty(criteria.list())){
+            return (ContactTrace) criteria.list().get(0);
+        }
+        return null;
     }
 
 

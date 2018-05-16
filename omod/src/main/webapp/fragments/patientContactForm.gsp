@@ -1,5 +1,5 @@
 <%
-    ui.decorateWith("kenyaui", "panel", [heading: (command.original ? "Edit" : "Add") + " Contacts", frameOnly: true])
+    ui.decorateWith("kenyaui", "panel", [heading: (command.original ? "Edit" : "Add") + " Patient Contact", frameOnly: true])
 
     def nameFields = [
             [
@@ -17,13 +17,6 @@
 
             ]
     ]
-
-    def relTypeOptions = [
-            [
-                    [object: command, property: "relationType", label: "Relationship to patient", config: [options: relationshipTypeOptions]]
-            ]
-    ]
-
 
     def hivData = [
             [
@@ -97,21 +90,33 @@
 
     <fieldset>
         <legend>Relationship</legend>
-        <% relTypeOptions.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
+        <table>
+            <tr>
+                <td class="ke-field-label">Relationship to Patient</td>
+            </tr>
+            <tr>
+                <td style="width: 260px">
+                    <select name="relationType" id="relationType">
+                        <option></option>
+                        <% relationshipTypeOptions.each { %>
+                        <option ${(command.relationType == null)? "" : it.value == command.relationType ? "selected" : ""} value="${it.value}">${it.label}</option>
+                        <% } %>
+                    </select>
+                </td>
+            </tr>
+        </table>
     </fieldset>
 
-    <fieldset class="ipvAssessmentTable">
-        <legend>IPV Assessment</legend>
+    <fieldset class="ipvQuestions">
+        <legend>IPV Questions</legend>
         <table>
             <tr>
                 <td>
                     <label class="ke-field-label">1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?</label>
                 </td><td>
                 <span class="ke-field-content">
-                    <input type="radio" name="question-1" class="question-1" value="1065"/> Yes
-                    <input type="radio" name="question-1" class="question-1" value="1066"/> No
+                    <input type="radio" name="physicalAssault" class="ipv" value="1065"/> Yes
+                    <input type="radio" name="physicalAssault" class="ipv" value="1066"/> No
                 </span>
             </td>
             </tr>
@@ -120,8 +125,8 @@
                     <label class="ke-field-label">2. Has he/she ever threatened to hurt you?</label>
                 </td><td>
                 <span class="ke-field-content">
-                    <input type="radio" name="question-2" class="question-2" value="1065"/> Yes
-                    <input type="radio" name="question-2" class="question-2" value="1066"/> No
+                    <input type="radio" name="threatened" class="ipv" value="1065"/> Yes
+                    <input type="radio" name="threatened" class="ipv" value="1066"/> No
                 </span>
             </td>
             </tr>
@@ -130,12 +135,15 @@
                     <label class="ke-field-label">3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?</label>
                 </td><td>
                 <span class="ke-field-content">
-                    <input type="radio" name="question-3" class="question-3" value="1065"/> Yes
-                    <input type="radio" name="question-3" class="question-3" value="1066"/> No
+                    <input type="radio" name="sexualAssault" class="ipv" value="1065"/> Yes
+                    <input type="radio" name="sexualAssault" class="ipv" value="1066"/> No
                 </span>
             </td>
             </tr>
         </table>
+    </fieldset>
+    <fieldset class="ipvOutcome">
+        <legend>IPV Outcome</legend>
         <table>
             <tr>
                 <td class="ke-field-label">IPV Outcome</td>
@@ -145,7 +153,8 @@
                     <select name="ipvOutcome" id="ipvOutcome">
                         <option></option>
                         <% ipvOutcomeOptions.each { %>
-                        <option value="${it}">${it}</option>
+                        <option ${(command.ipvOutcome == null) ? "" : it == command.ipvOutcome ? "selected" : ""}
+                                value="${it}">${it}</option>
                         <% } %>
                     </select>
                 </td>
@@ -166,7 +175,10 @@
                     <select name="baselineHivStatus" id="baselineHivStatus">
                         <option></option>
                         <% hivStatusOptions.each { %>
-                        <option value="${it}">${it}</option>
+                        <option ${
+                                (command.baselineHivStatus == null) ? "" : it == command.baselineHivStatus ? "selected" : ""}
+                                value="${it}">${it}
+                        </option>
                         <% } %>
                     </select>
                 </td>
@@ -177,7 +189,7 @@
         </table>
     </fieldset>
 
-</fieldset>
+
 
 
 <div class="ke-panel-footer">
@@ -220,6 +232,44 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
     //On ready
     jQuery(function () {
         //defaults
+        const YES_CONCEPT_ID = 1065;
+        const NO_CONCEPT_ID = 1066;
+        var assessmentYesResponses = [];
+        var assessmentNoResponses = [];
+        const TOTAL_RESPONSES = 3 ;
+
+        // Add event listener for opening and closing details
+        jQuery('.ipv').on('click', function () {
+            var radio = jQuery(this).closest('input[type=radio]');
+            var value = radio.val();
+            if (value == YES_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES ) {
+
+                assessmentYesResponses.push(value);
+            }
+            if (value == NO_CONCEPT_ID && assessmentNoResponses.length <= TOTAL_RESPONSES) {
+
+                assessmentNoResponses.push(value);
+                 }
+
+            if (value == NO_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES ) {
+
+                assessmentYesResponses.pop();
+            }
+
+            if (assessmentYesResponses.length == 0 && assessmentNoResponses.length == 0) {
+                alert("Please select an IPV question")
+            } else {
+                if (assessmentYesResponses.length > 0) {
+
+                    jQuery('#ipvOutcome').val("True");
+
+                } else {
+                    jQuery('#ipvOutcome').val("False");
+
+                }
+            }
+
+        });
 
         jQuery('#from-age-button').appendTo(jQuery('#from-age-button-placeholder'));
         jQuery('#edit-patient-contact-form .cancel-button').click(function () {
@@ -240,20 +290,22 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         });
 
         //IPV validation
-        jq(".ipvAssessmentTable").hide();
+        jq('.ipvQuestions').hide();
+        jq('.ipvOutcome').hide();
         jq("select[name='relationType']").change(function () {
 
             var relType = jq(this).val();
 
             console.log('Relationship type ' + relType);
 
-        /*    if (relType === "Spouse" || relType === "Partner") */
-             if (relType === "6" || relType === "7") {
+            if (relType === "5617" || relType === "163565"/* Spouse or Partner*/) {
 
-                jq('.ipvAssessmentTable').show();
+                jq('.ipvQuestions').show();
+                jq('.ipvOutcome').show();
             }
             else {
-                jq('.ipvAssessmentTable').hide();
+                jq('.ipvQuestions').hide();
+                jq('.ipvOutcome').hide();
             }
         });
 

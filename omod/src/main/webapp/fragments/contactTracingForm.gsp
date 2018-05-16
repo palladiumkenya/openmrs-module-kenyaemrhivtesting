@@ -68,7 +68,7 @@
                         <select name="contactType" id="contactType">
                             <option></option>
                             <% contactOptions.each { %>
-                            <option value="${it}">${it}</option>
+                            <option ${(command.contactType == null)? "" : it == command.contactType ? "selected" : ""} value="${it}">${it}</option>
                             <% } %>
                         </select>
                     </td>
@@ -76,7 +76,7 @@
                         <select name="status" id="tracingOutcome">
                             <option></option>
                             <% tracingOutcomeOptions.each { %>
-                            <option value="${it}">${it}</option>
+                            <option ${(command.status == null)? "" : it == command.status ? "selected" : ""} value="${it}">${it}</option>
                             <% } %>
                         </select>
                     </td>
@@ -100,7 +100,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <textarea name="remarks" rows="5" cols="80"></textarea>
+                        <textarea name="remarks" rows="5" cols="80">${(command.remarks != null)? command.remarks : ""}</textarea>
                     </td>
                 </tr>
             </table>
@@ -110,10 +110,10 @@
             <button type="submit">
                 <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Create Contact Trace"}
             </button>
-            <% if (config.returnUrl) { %>
+
             <button type="button" class="cancel-button"><img
                     src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
-            <% } %>
+
         </div>
     </div>
 </form>
@@ -125,7 +125,12 @@
     jQuery(function () {
         //defaults
 
-        jQuery("#linkageSection").hide(); //hide linkage section
+        <% if (command.original != null  &&  command.status == "Contacted and Linked") { %>
+            jQuery("#linkageSection").show(); //hide linkage section
+            <% } else { %>
+            jQuery("#linkageSection").hide(); //hide linkage section
+        <% } %>
+
 
         jQuery('#patient-contact-trace-form .cancel-button').click(function () {
             ui.navigate('${ config.returnUrl }');
@@ -136,7 +141,7 @@
                     <% if (config.returnUrl) { %>
                     ui.navigate('${ config.returnUrl }');
                     <% } else { %>
-                    ui.navigate('hivtestingservices', 'contactTraceList', {patientContact: data.patientContactId, patientId: data.patientId});
+                    ui.navigate('hivtestingservices', 'contactTraceList', {patientId: patient.patientId, patientContact:patientContact.id});
                     <% } %>
                 } else {
                     kenyaui.notifyError('Saving contact tracing was successful, but with unexpected response');

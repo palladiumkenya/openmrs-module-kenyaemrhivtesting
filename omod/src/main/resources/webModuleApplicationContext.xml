@@ -32,6 +32,8 @@
 	<!-- Converters will be automatically picked up by the conversionService bean -->
 	<bean class="org.openmrs.module.hivtestingservices.converter.StringToContactTraceConverter"/>
 	<bean class="org.openmrs.module.hivtestingservices.converter.StringToPatientContactConverter"/>
+	<bean class="org.openmrs.module.hivtestingservices.converter.IntegerToContactTraceConverter"/>
+	<bean class="org.openmrs.module.hivtestingservices.converter.IntegerToPatientContactConverter"/>
 
 
 </beans>

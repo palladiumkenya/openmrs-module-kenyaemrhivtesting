@@ -1,5 +1,5 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
-import org.openmrs.Patient;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -15,6 +15,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -23,11 +24,13 @@ public class ContactTracingFormFragmentController {
                            @RequestParam(value = "returnUrl") String returnUrl,
                            @RequestParam(value = "patientContact") PatientContact patientContact,
                            PageModel model) {
+
         ContactTrace exists = contactTrace != null ? contactTrace : null;
         model.addAttribute("patientContact", patientContact);
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
         model.addAttribute("contactOptions", contactTypeList());
         model.addAttribute("tracingOutcomeOptions", tracingOutcomeList());
+
 
     }
 
@@ -59,6 +62,7 @@ public class ContactTracingFormFragmentController {
     public ContactTraceForm newContactTraceForm(@RequestParam(value = "id", required = false) ContactTrace
                                                         contactTrace, @RequestParam(value = "patientContact") PatientContact patientContact) {
         if (contactTrace !=null){
+
             return new ContactTraceForm(contactTrace, patientContact);
         }
         else {
@@ -93,6 +97,7 @@ public class ContactTracingFormFragmentController {
             this.facilityLinkedTo = contactTrace.getFacilityLinkedTo();
             this.healthWorkerHandedTo = contactTrace.getHealthWorkerHandedTo();
             this.remarks = contactTrace.getRemarks();
+            this.date = contactTrace.getDate();
 
         }
         public ContactTrace save(){
@@ -121,6 +126,19 @@ public class ContactTracingFormFragmentController {
         public void validate(Object o, Errors errors) {
             require(errors, "contactType");
             require(errors, "status");
+
+            if (date != null) {
+                if (date.after(new Date())) {
+                    errors.rejectValue("date", "Cannot be in the future");
+                } else {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.YEAR, -120);
+                    if (date.before(calendar.getTime())) {
+                        errors.rejectValue("date", " error.date.invalid");
+                    }
+                }
+            }
 
         }
 

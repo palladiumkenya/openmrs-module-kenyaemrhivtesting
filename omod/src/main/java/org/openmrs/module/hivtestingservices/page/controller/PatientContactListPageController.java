@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
@@ -21,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AppPage("kenyaemrpatientcontact.home")
 public class PatientContactListPageController {
@@ -34,6 +37,23 @@ public class PatientContactListPageController {
 
         HTSService htsService = Context.getService(HTSService.class);
         List<PatientContact> patientContacts = htsService.getPatientContactByPatient(patient);
+
+        PatientContact contactEntry = htsService.getPatientContactEntryForPatient(patient);
+        List<ContactTrace> contactTrace = htsService.getContactTraceByPatientContact(contactEntry);
+
+        String lastTraceStatus;
+        if (htsService.getLastTraceForPatientContact(contactEntry) != null) {
+
+            lastTraceStatus = htsService.getLastTraceForPatientContact(contactEntry).getStatus();
+
+        } else {
+            lastTraceStatus = "";
+        }
+
+        model.put("lastTraceStatus", lastTraceStatus);
+        model.put("traces", contactTrace);
+        model.put("patientContact", contactEntry);
+
 
         model.put("contacts", patientContactFormatter(kenyaUi, patientContacts));
         model.put("patient", patient);
@@ -75,14 +95,24 @@ public class PatientContactListPageController {
         return objects;
     }
 
-    private String formatRelationshipType(String typeId) {
-        PersonService personService = Context.getPersonService();
-        if (org.apache.commons.lang.StringUtils.isBlank(typeId)) {
+    private String formatRelationshipType(Integer typeId) {
+        if (typeId == null) {
             return null;
-        } else if (ConversionUtil.onlyDigits(typeId)) {
-            return personService.getRelationshipType(Integer.valueOf(typeId)).getaIsToB();
+        } else {
+            return relationshipOptions().get(typeId);
         }
-        return null;
+    }
+
+    private Map<Integer, String> relationshipOptions () {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(970, "Mother");
+        options.put(971, "Father");
+        options.put(972, "Sibling");
+        options.put(1528, "Child");
+        options.put(5617, "Spouse");
+        options.put(163565, "Partner");
+        options.put(162221, "Co-wife");
+        return options;
     }
 
 }

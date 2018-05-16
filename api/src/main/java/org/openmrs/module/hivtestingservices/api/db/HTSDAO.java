@@ -14,6 +14,7 @@
 package org.openmrs.module.hivtestingservices.api.db;
 
 import org.openmrs.Patient;
+import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -31,5 +32,10 @@ public interface HTSDAO {
     public PatientContact getPatientContactByID (Integer patientContactId);
     public ContactTrace saveClientTrace(ContactTrace contactTrace);
     public ContactTrace getPatientContactTraceById(Integer patientContactTraceId);
+    public ContactTrace getLastTraceForPatientContact (PatientContact patientContact);
     List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact);
+    public AOPEncounterEntry saveAopEncounterEntry(AOPEncounterEntry aopEncounterEntry);
+    public AOPEncounterEntry getAopEncounterEntry(Integer entryId);
+    public List<AOPEncounterEntry> getAopEncounterEntryList();
+    public PatientContact getPatientContactEntryForPatient(Patient patient);
 }

@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PatientContactProfileFragmentController {
     public void controller(@SpringBean KenyaUiUtils kenyaUi, @RequestParam(value = "patientContact") PatientContact patientContact,
@@ -56,15 +58,26 @@ public class PatientContactProfileFragmentController {
 
     }
 
-    private String formatRelationshipType(String typeId) {
-        PersonService personService = Context.getPersonService();
-        if (org.apache.commons.lang.StringUtils.isBlank(typeId)) {
+    private String formatRelationshipType(Integer typeId) {
+        if (typeId == null) {
             return null;
-        } else if (ConversionUtil.onlyDigits(typeId)) {
-            return personService.getRelationshipType(Integer.valueOf(typeId)).getaIsToB();
+        } else {
+            return relationshipOptions().get(typeId);
         }
-        return null;
     }
+
+    private Map<Integer, String> relationshipOptions () {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(970, "Mother");
+        options.put(971, "Father");
+        options.put(972, "Sibling");
+        options.put(1528, "Child");
+        options.put(5617, "Spouse");
+        options.put(163565, "Partner");
+        options.put(162221, "Co-wife");
+        return options;
+    }
+
 
     private Integer calculateContactAge(Date birthdate, Date onDate) {
             if (birthdate == null) {

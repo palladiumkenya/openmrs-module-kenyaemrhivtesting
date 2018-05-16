@@ -27,7 +27,17 @@ public class ContactTraceListPageController {
         HTSService htsService = Context.getService(HTSService.class);
         List<ContactTrace> contactTrace = htsService.getContactTraceByPatientContact(patientContact);
 
-        model.put("traces", contactTrace);
+        String lastTraceStatus;
+        if (htsService.getLastTraceForPatientContact(patientContact) != null) {
+
+            lastTraceStatus = htsService.getLastTraceForPatientContact(patientContact).getStatus();
+
+        } else {
+            lastTraceStatus = "";
+        }
+
+        model.put("lastTraceStatus", lastTraceStatus);
+        model.put("traces",contactTrace);
         model.put("patientContact", patientContact);
         model.put("currentPatient", patient);
 

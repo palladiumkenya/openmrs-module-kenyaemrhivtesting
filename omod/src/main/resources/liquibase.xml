@@ -143,5 +143,95 @@
                         tableName="kenyaemr_hiv_testing_client_trace"/>
     </changeSet>
 
+    <changeSet id="kenyaemr_hiv_testing_005" author="aojwang">
+
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="kenyaemr_aop_encounter_entry" /></not>
+        </preConditions>
+        <comment>
+            Create table to hold aop encounter entries
+        </comment>
+        <createTable tableName="kenyaemr_aop_encounter_entry">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="encounter_uuid" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="form_uuid" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="target_module" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="int">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="aojwang" id="kenyaemr_hiv_testing_006">
+        <modifyDataType
+                columnName="relationship_type"
+                newDataType="int"
+                tableName="kenyaemr_hiv_testing_patient_contact"/>
+    </changeSet>
+
+    <!--Adding scheduled task to periodically refresh ETL tables-->
+    <changeSet id="kenyaemr_hiv_testing_007" author="aojwang">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.ContactListingFormProcessorTask'
+                And name = 'HTS Contact Listing form processor'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting Contact Listing Processor Task into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="HTS Contact Listing form processor" />
+            <column name="description" value="Processes patient contacts listed through contact listing form on mobile client" />
+            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ContactListingFormProcessorTask" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="2017-11-28T23:59:59" />
+            <column name="repeat_interval" value="7200" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="uuid" value="8241376e-4954-11e8-842f-0ed5f89f718b" />
+        </insert>
+    </changeSet>
+
+    <changeSet author="aojwang" id="kenyaemr_hiv_testing_008">
+        <dropForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" constraintName="patient_contact_obs_group"/>
+    </changeSet>
+
+    <changeSet author="aojwang" id="kenyaemr_hiv_testing_009">
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id" constraintName="list_group_id"	referencedTableName="obs" referencedColumnNames="obs_id" />
+    </changeSet>
+
+    <!--Adding scheduled task to process migration of contact lists from family history form-->
+    <changeSet id="kenyaemr_hiv_testing_010" author="aojwang">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.ContactListingOneTImeMigrationTask'
+                And name = 'HTS Contact Listing migration processor'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting Contact Listing migration Processor Task into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="HTS Contact Listing migration processor" />
+            <column name="description" value="Migrates patient contacts previously listed using family history form" />
+            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ContactListingOneTImeMigrationTask" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="2017-11-28T23:59:59" />
+            <column name="repeat_interval" value="7200" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="uuid" value="493a4754-4dea-11e8-9c2d-fa7ae01bbebc" />
+        </insert>
+    </changeSet>
 
 </databaseChangeLog>
