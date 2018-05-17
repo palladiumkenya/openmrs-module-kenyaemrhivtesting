@@ -110,10 +110,10 @@
             <button type="submit">
                 <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Create Contact Trace"}
             </button>
-            <% if (config.returnUrl) { %>
+
             <button type="button" class="cancel-button"><img
                     src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
-            <% } %>
+
         </div>
     </div>
 </form>
@@ -141,7 +141,7 @@
                     <% if (config.returnUrl) { %>
                     ui.navigate('${ config.returnUrl }');
                     <% } else { %>
-                    ui.navigate('hivtestingservices', 'contactTraceList', {patientContact: data.patientContactId, patientId: data.patientId});
+                    ui.navigate('hivtestingservices', 'contactTraceList', {patientId: patient.patientId, patientContact:patientContact.id});
                     <% } %>
                 } else {
                     kenyaui.notifyError('Saving contact tracing was successful, but with unexpected response');

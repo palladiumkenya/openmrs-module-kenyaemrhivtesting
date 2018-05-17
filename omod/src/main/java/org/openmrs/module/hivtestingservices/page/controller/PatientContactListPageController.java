@@ -41,6 +41,16 @@ public class PatientContactListPageController {
         PatientContact contactEntry = htsService.getPatientContactEntryForPatient(patient);
         List<ContactTrace> contactTrace = htsService.getContactTraceByPatientContact(contactEntry);
 
+        String lastTraceStatus;
+        if (htsService.getLastTraceForPatientContact(contactEntry) != null) {
+
+            lastTraceStatus = htsService.getLastTraceForPatientContact(contactEntry).getStatus();
+
+        } else {
+            lastTraceStatus = "";
+        }
+
+        model.put("lastTraceStatus", lastTraceStatus);
         model.put("traces", contactTrace);
         model.put("patientContact", contactEntry);
 

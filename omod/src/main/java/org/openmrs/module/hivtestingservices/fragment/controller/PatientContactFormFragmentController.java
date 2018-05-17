@@ -174,6 +174,19 @@ public class PatientContactFormFragmentController{
                     }
                 }
             }
+
+            if (appointmentDate != null) {
+                if (appointmentDate.before(new Date())) {
+                    errors.rejectValue("appointmentDate", "Cannot be in the past");
+                } else {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.YEAR, -120);
+                    if (appointmentDate.before(calendar.getTime())) {
+                        errors.rejectValue("appointmentDate", " error.date.invalid");
+                    }
+                }
+            }
         }
 
         public PatientContact getOriginal() {

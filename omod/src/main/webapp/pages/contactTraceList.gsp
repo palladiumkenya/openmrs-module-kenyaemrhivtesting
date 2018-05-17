@@ -6,8 +6,8 @@
 %>
 <style>
 div.grid {
-    display: block;
-}
+     display: block;
+ }
 div.grid div {
     float: left;
     height: 30px;
@@ -31,13 +31,19 @@ div.column-six {
     width: 200px;
 }
 
+div.column-seven {
+    width: 200px;
+}
+
 div.clear {
     clear: both;
 }
+
 .col-header {
     font-weight: bold;
     font-size: 14px;
 }
+
 div.section-title {
     color: black;
     font-weight: bold;
@@ -61,7 +67,7 @@ div.section-title {
 
         <div class="ke-panel-content">
             ${ui.includeFragment("hivtestingservices", "patientContactProfile", [patientContact: patientContact.id])}
-
+            <input type="hidden" name="lTraceStat" value="${lastTraceStatus}" id="lTraceStat"/>
             <fieldset>
                 <legend>Trace History</legend>
 
@@ -83,9 +89,8 @@ div.section-title {
                     <div class="column-five col-header">Health Worker Handed To</div>
 
                     <div class="column-six col-header">Remarks</div>
-                    <div style="float: left; width: 60px">
 
-                    </div>
+                    <div class="column-seven col-header"></div>
 
                 </div>
 
@@ -93,7 +98,7 @@ div.section-title {
 
                 <% traces.each { rel -> %>
 
-                <div class="ke-stack-item">
+                <div class="ke-stack-item ke-navigable">
                     <div class="grid">
 
                         <div class="column-one">${rel.date}</div>
@@ -107,10 +112,11 @@ div.section-title {
                         <div class="column-five">${rel.healthWorkerHandedTo}</div>
 
                         <div class="column-six">${rel.remarks}</div>
-                        <div style="float: left; width: 60px">
+
+                        <div class="column-seven">
                             <button type="button"
                                     onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientContact: patientContact.id, patientId: currentPatient.patientId, traceId: rel.id,  returnUrl: ui.thisUrl() ])}')">
-                                <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Edit Trace
+                                <img src="${ui.resourceLink("hivtestingservices", "images/glyphs/edit.png")}"/> Edit
                             </button>
                         </div>
 
@@ -132,10 +138,32 @@ div.section-title {
 
     <div align="center">
 
-        <button type="button"
+        <button class="addTrace" name="addTrace" type="button"
                 onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientContact: patientContact.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
             <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Add Trace
         </button>
 
     </div>
+
 </div>
+
+<script type="text/javascript">
+
+    //On ready
+    jQuery(function () {
+
+        var result;
+        var lastTrace;
+        lastTrace = jq('#lTraceStat').val();
+        result = jq('#lTraceStat').val().localeCompare("Contacted and Linked");
+
+        if (result == 0) {
+            jq(".addTrace").hide();
+        }
+        else {
+            jq(".addTrace").show();
+        }
+
+    }); // end of jQuery initialization bloc
+
+</script>
