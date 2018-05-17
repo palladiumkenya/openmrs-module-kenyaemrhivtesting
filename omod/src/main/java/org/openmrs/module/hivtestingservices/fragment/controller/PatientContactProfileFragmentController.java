@@ -47,13 +47,13 @@ public class PatientContactProfileFragmentController {
                         "id", patientContact.getId(),
                         "fullName", fullName,
                         "sex", patientContact.getSex(),
-                        "physicalAddress", patientContact.getPhysicalAddress(),
-                        "phoneContact", patientContact.getPhoneContact(),
+                        "physicalAddress", patientContact.getPhysicalAddress() != null ? patientContact.getPhysicalAddress() : "",
+                        "phoneContact", patientContact.getPhoneContact() != null ? patientContact.getPhoneContact() : "",
                         "relationType", formatRelationshipType(patientContact.getRelationType()),
-                        "baselineHivStatus", patientContact.getBaselineHivStatus(),
-                        "appointmentDate",  kenyaUi.formatDate(patientContact.getAppointmentDate()),
-                        "birthDate", kenyaUi.formatDate(patientContact.getBirthDate()),
-                        "age", calculateContactAge(patientContact.getBirthDate(), new Date())
+                        "baselineHivStatus", patientContact.getBaselineHivStatus() != null ? patientContact.getBaselineHivStatus() : "",
+                        "appointmentDate",  patientContact.getAppointmentDate() != null ? kenyaUi.formatDate(patientContact.getAppointmentDate()) : "",
+                        "birthDate", patientContact.getBirthDate() != null ? kenyaUi.formatDate(patientContact.getBirthDate()) : "",
+                        "age", patientContact.getBirthDate() != null ? calculateContactAge(patientContact.getBirthDate(), new Date()) : ""
                 ));
 
     }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@AppPage("kenyaemrpatientcontact.home")
+
 public class ContactTraceListPageController {
 
     public void controller(@SpringBean KenyaUiUtils kenyaUi,

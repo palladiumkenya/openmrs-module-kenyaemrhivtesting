@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@AppPage("kenyaemrpatientcontact.home")
+
 public class PatientContactListPageController {
 
     protected static final Log log = LogFactory.getLog(PatientContactListPageController.class);
