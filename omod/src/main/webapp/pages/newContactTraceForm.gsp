@@ -11,5 +11,7 @@
     </div>
 </div>
 <div class="ke-page-content">
+
     ${ ui.includeFragment("hivtestingservices", "contactTracingForm", [id: contactTrace != null? contactTrace.id : null, returnUrl: ui.pageLink("hivtestingservices", "contactTraceList", [patientId: patient.patientId,patientContact:patientContact.id])]) }
-</div>
+
+ </div>
