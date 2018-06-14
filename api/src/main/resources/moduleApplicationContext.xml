@@ -58,5 +58,71 @@
 		</property>
 	</bean>
 
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.hivtestingservices.query.patientContact.service.PatientContactQueryService</value>
+				<bean
+						class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager" />
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.query.patientContact.service.PatientContactQueryServiceImpl"/>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors" />
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource" />
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.hivtestingservices.reporting.data.patientContact.service.PatientContactDataService</value>
+				<bean
+						class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager" />
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.reporting.data.patientContact.service.PatientContactDataServiceImpl"/>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors" />
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource" />
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="hrsreports.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
+		<property name="commonReports">
+			<set>
+				<ref bean="kenyaemr.hts.common.report.pnsRegister" />
+			</set>
+		</property>
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.pnsRegister" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="c9d3f1fa-6fd0-11e8-adc0-fa7ae01bbebc" />
+		<property name="name" value="Partner Notification Register" />
+		<property name="description" value="Monthly PNS Register" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:PNS_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:PNSRegister" />
+	</bean>
+
 
 </beans>
