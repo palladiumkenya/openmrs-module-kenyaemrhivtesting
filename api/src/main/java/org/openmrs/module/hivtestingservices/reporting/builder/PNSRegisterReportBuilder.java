@@ -18,6 +18,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.HIVDiagnosedZeroContactCohortDefinition;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactListCohortDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSLandmarkDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSMaritalStatusDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSPopulationTypeDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSFacilityEnrolledDataDefinition;
@@ -35,6 +36,7 @@ import org.openmrs.module.kenyacore.report.ReportUtils;
 import org.openmrs.module.kenyacore.report.builder.AbstractReportBuilder;
 import org.openmrs.module.kenyacore.report.builder.Builds;
 import org.openmrs.module.reporting.common.SortCriteria;
+import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
@@ -44,6 +46,7 @@ import org.openmrs.module.reporting.data.patient.definition.PatientIdDataDefinit
 import org.openmrs.module.reporting.data.person.definition.AgeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
@@ -163,6 +166,9 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("Visit Date", new EncounterDatetimeDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
         dsd.addColumn("Telephone No", new PersonAttributeDataDefinition(phoneNumber), "");
         dsd.addColumn("Marital Status", new HTSMaritalStatusDataDefinition(), null);
+        dsd.addColumn("Occupation", new ObsForPersonDataDefinition("Occupation", TimeQualifier.LAST, Context.getConceptService().getConcept(1542), null, null), "", null);
+        dsd.addColumn("Land Mark", new HTSLandmarkDataDefinition(), "");
+
         dsd.addColumn("Population Type", new HTSPopulationTypeDataDefinition(), null);
         dsd.addColumn("Test Strategy", new PNSTestStrategyDataDefinition(), null);
         dsd.addColumn("In Care", new PNSPatientInCareDataDefinition(), null);
