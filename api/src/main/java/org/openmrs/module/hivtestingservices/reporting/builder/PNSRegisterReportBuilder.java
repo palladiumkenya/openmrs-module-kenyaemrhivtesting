@@ -14,10 +14,16 @@
 
 package org.openmrs.module.hivtestingservices.reporting.builder;
 
-import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.HIVDiagnosedZeroContactCohortDefinition;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactListCohortDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSMaritalStatusDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSPopulationTypeDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSFacilityEnrolledDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientCCCNumberDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientInCareDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSTestStrategyDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactNameDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientDOBDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientGenderDataDefinition;
@@ -28,19 +34,14 @@ import org.openmrs.module.kenyacore.report.ReportDescriptor;
 import org.openmrs.module.kenyacore.report.ReportUtils;
 import org.openmrs.module.kenyacore.report.builder.AbstractReportBuilder;
 import org.openmrs.module.kenyacore.report.builder.Builds;
-import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.DataDefinition;
-import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.encounter.definition.EncounterDatetimeDataDefinition;
-import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdDataDefinition;
-import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.AgeDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
@@ -105,12 +106,12 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         /*dsd.addColumn("Age", new AgeDataDefinition(), "");
 
         dsd.addColumn("Telephone No", new PersonAttributeDataDefinition(phoneNumber), "");
-        dsd.addColumn("Marital Status", new KenyaEMRMaritalStatusDataDefinition(), null);
+        dsd.addColumn("Marital Status", new HTSMaritalStatusDataDefinition(), null);
         dsd.addColumn("Unique Patient Number", identifierDef, null);
 
         dsd.addColumn("Visit Date", new EncounterDatetimeDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
         // new columns
-        dsd.addColumn("Population Type", new PopulationTypeDataDefinition(), null);
+        dsd.addColumn("Population Type", new HTSPopulationTypeDataDefinition(), null);
         dsd.addColumn("everTested", new EverTestedForHIVDataDefinition(), null);
         dsd.addColumn("disability", new PatientDisabilityDataDefinition(), null);
         dsd.addColumn("consent", new PatientConsentDataDefinition(), null);
@@ -151,22 +152,23 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         /*PatientIdentifierType upn = MetadataUtils.existing(PatientIdentifierType.class, HivMetadata._PatientIdentifierType.UNIQUE_PATIENT_NUMBER);
         DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
         DataDefinition identifierDef = new ConvertedPatientDataDefinition("identifier", new PatientIdentifierDataDefinition(upn.getName(), upn), identifierFormatter);
-
-        PersonAttributeType phoneNumber = MetadataUtils.existing(PersonAttributeType.class, CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT);
 */
+        String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
+        PersonAttributeType phoneNumber = Context.getPersonService().getPersonAttributeTypeByUuid(TELEPHONE_CONTACT);;
+
         dsd.addColumn("id", new PatientIdDataDefinition(), "");
         dsd.addColumn("Name", nameDef, "");
         dsd.addColumn("Age", new AgeDataDefinition(), "");
         dsd.addColumn("Sex", new GenderDataDefinition(), "");
-        /*dsd.addColumn("Telephone No", new PersonAttributeDataDefinition(phoneNumber), "");
-        dsd.addColumn("Marital Status", new KenyaEMRMaritalStatusDataDefinition(), null);
-        dsd.addColumn("Unique Patient Number", identifierDef, null);
-
         dsd.addColumn("Visit Date", new EncounterDatetimeDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
-        // new columns
-        dsd.addColumn("Population Type", new PopulationTypeDataDefinition(), null);
-        dsd.addColumn("testingStrategy", new HTSTestStrategyDataDefinition(), null);
-*/
+        dsd.addColumn("Telephone No", new PersonAttributeDataDefinition(phoneNumber), "");
+        dsd.addColumn("Marital Status", new HTSMaritalStatusDataDefinition(), null);
+        dsd.addColumn("Population Type", new HTSPopulationTypeDataDefinition(), null);
+        dsd.addColumn("Test Strategy", new PNSTestStrategyDataDefinition(), null);
+        dsd.addColumn("In Care", new PNSPatientInCareDataDefinition(), null);
+        dsd.addColumn("Facility Enrolled", new PNSFacilityEnrolledDataDefinition(), null);
+        dsd.addColumn("CCC Number", new PNSPatientCCCNumberDataDefinition(), null);
+
 
         HIVDiagnosedZeroContactCohortDefinition cd = new HIVDiagnosedZeroContactCohortDefinition();
         cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
