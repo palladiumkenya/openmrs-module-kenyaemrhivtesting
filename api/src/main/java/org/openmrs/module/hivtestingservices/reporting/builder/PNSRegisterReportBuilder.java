@@ -14,6 +14,9 @@
 
 package org.openmrs.module.hivtestingservices.reporting.builder;
 
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAttributeType;
+import org.openmrs.module.hivtestingservices.reporting.cohort.definition.HIVDiagnosedZeroContactCohortDefinition;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactListCohortDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactNameDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientDOBDataDefinition;
@@ -25,10 +28,23 @@ import org.openmrs.module.kenyacore.report.ReportDescriptor;
 import org.openmrs.module.kenyacore.report.ReportUtils;
 import org.openmrs.module.kenyacore.report.builder.AbstractReportBuilder;
 import org.openmrs.module.kenyacore.report.builder.Builds;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.reporting.common.SortCriteria;
+import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
+import org.openmrs.module.reporting.data.converter.DataConverter;
+import org.openmrs.module.reporting.data.converter.DateConverter;
+import org.openmrs.module.reporting.data.converter.ObjectFormatter;
+import org.openmrs.module.reporting.data.encounter.definition.EncounterDatetimeDataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdDataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.AgeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.EncounterDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -57,7 +73,8 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
     @Override
     protected List<Mapped<DataSetDefinition>> buildDataSets(ReportDescriptor reportDescriptor, ReportDefinition reportDefinition) {
         return Arrays.asList(
-                ReportUtils.map(datasetColumns(), "startDate=${startDate},endDate=${endDate}")
+                ReportUtils.map(datasetColumns(), "startDate=${startDate},endDate=${endDate}"),
+                ReportUtils.map(contactlessDatasetColumns(), "startDate=${startDate},endDate=${endDate}")
         );
     }
 
@@ -81,9 +98,9 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
 
         //dsd.addColumn("Name", nameDef, "");
         dsd.addColumn("id", new RelatedPatientIdDataDefinition(), "");
-        dsd.addColumn("Index Client Name", new RelatedPatientNameDataDefinition(), "");
+        dsd.addColumn("Name", new RelatedPatientNameDataDefinition(), "");
         dsd.addColumn("Sex", new RelatedPatientGenderDataDefinition(), "");
-        dsd.addColumn("Date of Birth", new RelatedPatientDOBDataDefinition(), "");
+        dsd.addColumn("Age", new RelatedPatientDOBDataDefinition(), "");
         dsd.addColumn("partnerName", new PatientContactNameDataDefinition(), "");
         /*dsd.addColumn("Age", new AgeDataDefinition(), "");
 
@@ -111,6 +128,47 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("remarks", new HTSRemarksDataDefinition(), null);*/
 
         PatientContactListCohortDefinition cd = new PatientContactListCohortDefinition();
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        dsd.addRowFilter(cd, paramMapping);
+        return dsd;
+
+    }
+
+    protected DataSetDefinition contactlessDatasetColumns() {
+        EncounterDataSetDefinition dsd = new EncounterDataSetDefinition();
+        dsd.setName("clientsWithNoContacts");
+        dsd.setDescription("Clients tested with no contacts listed");
+        dsd.addSortCriteria("Visit Date", SortCriteria.SortDirection.ASC);
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String paramMapping = "startDate=${startDate},endDate=${endDate}";
+
+        DataConverter nameFormatter = new ObjectFormatter("{familyName}, {givenName} {middleName}");
+        DataDefinition nameDef = new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), nameFormatter);
+        /*PatientIdentifierType upn = MetadataUtils.existing(PatientIdentifierType.class, HivMetadata._PatientIdentifierType.UNIQUE_PATIENT_NUMBER);
+        DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
+        DataDefinition identifierDef = new ConvertedPatientDataDefinition("identifier", new PatientIdentifierDataDefinition(upn.getName(), upn), identifierFormatter);
+
+        PersonAttributeType phoneNumber = MetadataUtils.existing(PersonAttributeType.class, CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT);
+*/
+        dsd.addColumn("id", new PatientIdDataDefinition(), "");
+        dsd.addColumn("Name", nameDef, "");
+        dsd.addColumn("Age", new AgeDataDefinition(), "");
+        dsd.addColumn("Sex", new GenderDataDefinition(), "");
+        /*dsd.addColumn("Telephone No", new PersonAttributeDataDefinition(phoneNumber), "");
+        dsd.addColumn("Marital Status", new KenyaEMRMaritalStatusDataDefinition(), null);
+        dsd.addColumn("Unique Patient Number", identifierDef, null);
+
+        dsd.addColumn("Visit Date", new EncounterDatetimeDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
+        // new columns
+        dsd.addColumn("Population Type", new PopulationTypeDataDefinition(), null);
+        dsd.addColumn("testingStrategy", new HTSTestStrategyDataDefinition(), null);
+*/
+
+        HIVDiagnosedZeroContactCohortDefinition cd = new HIVDiagnosedZeroContactCohortDefinition();
         cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
