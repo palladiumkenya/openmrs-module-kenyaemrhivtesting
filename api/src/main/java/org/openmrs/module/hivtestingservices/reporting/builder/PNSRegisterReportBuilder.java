@@ -26,10 +26,19 @@ import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PN
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientInCareDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSTestStrategyDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactNameDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientCCCNumberDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientDOBDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientFacilityEnrolledDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientGenderDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientIdDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientInCareDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientLandMarkDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientMaritalStatusDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientNameDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientPhoneContactDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientPopulationTypeDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientTestStrategyDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientVisitDateDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.definition.PatientContactDataSetDefinition;
 import org.openmrs.module.kenyacore.report.ReportDescriptor;
 import org.openmrs.module.kenyacore.report.ReportUtils;
@@ -92,44 +101,23 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
 
         String paramMapping = "startDate=${startDate},endDate=${endDate}";
 
-       /* DataConverter nameFormatter = new ObjectFormatter("{familyName}, {givenName} {middleName}");
-        DataDefinition nameDef = new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), nameFormatter);
-        PatientIdentifierType upn = MetadataUtils.existing(PatientIdentifierType.class, HivMetadata._PatientIdentifierType.UNIQUE_PATIENT_NUMBER);
-        DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
-        DataDefinition identifierDef = new ConvertedPatientDataDefinition("identifier", new PatientIdentifierDataDefinition(upn.getName(), upn), identifierFormatter);
-*/
-       // PersonAttributeType phoneNumber = MetadataUtils.existing(PersonAttributeType.class, CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT);
-
-        //dsd.addColumn("Name", nameDef, "");
         dsd.addColumn("id", new RelatedPatientIdDataDefinition(), "");
         dsd.addColumn("Name", new RelatedPatientNameDataDefinition(), "");
         dsd.addColumn("Sex", new RelatedPatientGenderDataDefinition(), "");
         dsd.addColumn("Age", new RelatedPatientDOBDataDefinition(), "");
+        dsd.addColumn("Visit Date", new RelatedPatientVisitDateDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
+        dsd.addColumn("Telephone No", new RelatedPatientPhoneContactDataDefinition(), "");
+
+        dsd.addColumn("Marital Status", new RelatedPatientMaritalStatusDataDefinition(), null);
+        dsd.addColumn("Land Mark", new RelatedPatientLandMarkDataDefinition(), "");
+
+        dsd.addColumn("Population Type", new RelatedPatientPopulationTypeDataDefinition(), null);
+        dsd.addColumn("Test Strategy", new RelatedPatientTestStrategyDataDefinition(), null);
+        dsd.addColumn("In Care", new RelatedPatientInCareDataDefinition(), null);
+        dsd.addColumn("Facility Enrolled", new RelatedPatientFacilityEnrolledDataDefinition(), null);
+        dsd.addColumn("CCC Number", new RelatedPatientCCCNumberDataDefinition(), null);
         dsd.addColumn("partnerName", new PatientContactNameDataDefinition(), "");
-        /*dsd.addColumn("Age", new AgeDataDefinition(), "");
 
-        dsd.addColumn("Telephone No", new PersonAttributeDataDefinition(phoneNumber), "");
-        dsd.addColumn("Marital Status", new HTSMaritalStatusDataDefinition(), null);
-        dsd.addColumn("Unique Patient Number", identifierDef, null);
-
-        dsd.addColumn("Visit Date", new EncounterDatetimeDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
-        // new columns
-        dsd.addColumn("Population Type", new HTSPopulationTypeDataDefinition(), null);
-        dsd.addColumn("everTested", new EverTestedForHIVDataDefinition(), null);
-        dsd.addColumn("disability", new PatientDisabilityDataDefinition(), null);
-        dsd.addColumn("consent", new PatientConsentDataDefinition(), null);
-        dsd.addColumn("clientTestedAs", new IndividualORCoupleTestDataDefinition(), null);
-        dsd.addColumn("monthsSinceLastTest", new HTSMonthsSinceLastTestDataDefinition(), null);
-        dsd.addColumn("testingStrategy", new HTSTestStrategyDataDefinition(), null);
-        dsd.addColumn("hivTest1", new HIVTestOneDataDefinition(), null);
-        dsd.addColumn("hivTest2", new HIVTestTwoDataDefinition(), null);
-        dsd.addColumn("finalResult", new FinalResultDataDefinition(), null);
-        dsd.addColumn("finalResultGiven", new FinalResultGivenDataDefinition(), null);
-        dsd.addColumn("coupleDiscordant", new HTSDiscordanceDataDefinition(), null);
-        dsd.addColumn("tbScreening", new HTSTBScreeningDataDefinition(), null);
-        dsd.addColumn("everHadHIVSelfTest", new HTSSelfTestDataDefinition(), null);
-        dsd.addColumn("provider", new HTSProviderDataDefinition(), null);
-        dsd.addColumn("remarks", new HTSRemarksDataDefinition(), null);*/
 
         PatientContactListCohortDefinition cd = new PatientContactListCohortDefinition();
         cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
