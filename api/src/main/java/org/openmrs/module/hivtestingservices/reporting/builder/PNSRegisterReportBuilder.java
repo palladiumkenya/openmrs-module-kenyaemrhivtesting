@@ -26,10 +26,18 @@ import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PN
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientInCareDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSTestStrategyDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactAgeDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactAppointmentForTestDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactBaselineHivStatusDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDateLinkedToCareDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactFacilityLinkedDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateOutcomeDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLinkageCCCNumberDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLinkageToCareDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactNameDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactPhoneContactDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactRelationshipDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactScreenedForIpvDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactSexDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientCCCNumberDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientDOBDataDefinition;
@@ -127,6 +135,16 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("Contact Relationship", new PatientContactRelationshipDataDefinition(), "");
         dsd.addColumn("Contact Phone Number", new PatientContactPhoneContactDataDefinition(), "");
         dsd.addColumn("Contact Baseline Status", new PatientContactBaselineHivStatusDataDefinition(), "");
+        dsd.addColumn("Contact Screened for IPV", new PatientContactScreenedForIpvDataDefinition(), "");
+
+        // test columns
+        dsd.addColumn("Contact Booking Date", new PatientContactAppointmentForTestDataDefinition(), "");
+        dsd.addColumn("Contact Last Test Date", new PatientContactLastTestDateDataDefinition(), "");
+        dsd.addColumn("Contact Last Test Outcome", new PatientContactLastTestDateOutcomeDefinition(), "");
+        dsd.addColumn("Contact Linked to Care", new PatientContactLinkageToCareDataDefinition(), "");
+        dsd.addColumn("Contact Linkage Date", new PatientContactDateLinkedToCareDataDefinition(), "");
+        dsd.addColumn("Contact Linkage Facility", new PatientContactFacilityLinkedDataDefinition(), "");
+        dsd.addColumn("Contact Linkage CCC Number", new PatientContactLinkageCCCNumberDefinition(), "");
 
 
         PatientContactListCohortDefinition cd = new PatientContactListCohortDefinition();
