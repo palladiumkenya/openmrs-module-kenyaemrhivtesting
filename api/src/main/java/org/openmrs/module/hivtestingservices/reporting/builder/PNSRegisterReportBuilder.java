@@ -25,7 +25,12 @@ import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PN
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientCCCNumberDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientInCareDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSTestStrategyDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactAgeDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactBaselineHivStatusDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactNameDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactPhoneContactDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactRelationshipDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactSexDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientCCCNumberDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientDOBDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientFacilityEnrolledDataDefinition;
@@ -116,7 +121,12 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("In Care", new RelatedPatientInCareDataDefinition(), null);
         dsd.addColumn("Facility Enrolled", new RelatedPatientFacilityEnrolledDataDefinition(), null);
         dsd.addColumn("CCC Number", new RelatedPatientCCCNumberDataDefinition(), null);
-        dsd.addColumn("partnerName", new PatientContactNameDataDefinition(), "");
+        dsd.addColumn("Contact Name", new PatientContactNameDataDefinition(), "");
+        dsd.addColumn("Contact Age", new PatientContactAgeDataDefinition(), "");
+        dsd.addColumn("Contact Sex", new PatientContactSexDataDefinition(), "");
+        dsd.addColumn("Contact Relationship", new PatientContactRelationshipDataDefinition(), "");
+        dsd.addColumn("Contact Phone Number", new PatientContactPhoneContactDataDefinition(), "");
+        dsd.addColumn("Contact Baseline Status", new PatientContactBaselineHivStatusDataDefinition(), "");
 
 
         PatientContactListCohortDefinition cd = new PatientContactListCohortDefinition();
