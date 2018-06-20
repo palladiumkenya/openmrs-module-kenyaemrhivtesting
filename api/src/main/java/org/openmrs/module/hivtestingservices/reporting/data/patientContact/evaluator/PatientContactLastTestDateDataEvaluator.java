@@ -25,7 +25,7 @@ public class PatientContactLastTestDateDataEvaluator implements PatientContactDa
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "SELECT c.id, left(max(concat(t.visit_date, t.final_test_result)), 10) as last_test_result from kenyaemr_etl.etl_hts_test t inner join kenyaemr_hiv_testing_patient_contact c on t.patient_id=c.patient_id  \n" +
+        String qry = "SELECT c.id, date(left(max(concat(t.visit_date, t.final_test_result)), 10)) as last_test_date from kenyaemr_etl.etl_hts_test t inner join kenyaemr_hiv_testing_patient_contact c on t.patient_id=c.patient_id  \n" +
                 "where t.voided = 0 and t.test_type = 2 GROUP BY c.id; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();

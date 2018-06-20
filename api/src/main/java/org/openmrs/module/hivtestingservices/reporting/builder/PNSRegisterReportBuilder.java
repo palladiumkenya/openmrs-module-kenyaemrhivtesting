@@ -138,11 +138,11 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("Contact Screened for IPV", new PatientContactScreenedForIpvDataDefinition(), "");
 
         // test columns
-        dsd.addColumn("Contact Booking Date", new PatientContactAppointmentForTestDataDefinition(), "");
-        dsd.addColumn("Contact Last Test Date", new PatientContactLastTestDateDataDefinition(), "");
+        dsd.addColumn("Contact Booking Date", new PatientContactAppointmentForTestDataDefinition(), "", new DateConverter(ENC_DATE_FORMAT));
+        dsd.addColumn("Contact Last Test Date", new PatientContactLastTestDateDataDefinition(), "", new DateConverter(ENC_DATE_FORMAT));
         dsd.addColumn("Contact Last Test Outcome", new PatientContactLastTestDateOutcomeDefinition(), "");
         dsd.addColumn("Contact Linked to Care", new PatientContactLinkageToCareDataDefinition(), "");
-        dsd.addColumn("Contact Linkage Date", new PatientContactDateLinkedToCareDataDefinition(), "");
+        dsd.addColumn("Contact Linkage Date", new PatientContactDateLinkedToCareDataDefinition(), "", new DateConverter(ENC_DATE_FORMAT));
         dsd.addColumn("Contact Linkage Facility", new PatientContactFacilityLinkedDataDefinition(), "");
         dsd.addColumn("Contact Linkage CCC Number", new PatientContactLinkageCCCNumberDefinition(), "");
 

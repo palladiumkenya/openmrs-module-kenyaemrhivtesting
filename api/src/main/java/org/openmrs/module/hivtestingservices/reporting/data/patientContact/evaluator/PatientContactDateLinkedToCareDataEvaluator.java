@@ -25,7 +25,7 @@ public class PatientContactDateLinkedToCareDataEvaluator implements PatientConta
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "SELECT c.id, l.visit_date as dateLinkedToCare from kenyaemr_etl.etl_hts_referral_and_linkage l right join kenyaemr_hiv_testing_patient_contact c on l.patient_id=c.patient_id  \n" +
+        String qry = "SELECT c.id, date(l.visit_date) as dateLinkedToCare from kenyaemr_etl.etl_hts_referral_and_linkage l right join kenyaemr_hiv_testing_patient_contact c on l.patient_id=c.patient_id  \n" +
                 "where l.voided = 0 GROUP BY c.id; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
