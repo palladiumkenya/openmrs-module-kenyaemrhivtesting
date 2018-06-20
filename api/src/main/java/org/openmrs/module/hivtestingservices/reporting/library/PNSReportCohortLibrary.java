@@ -17,6 +17,137 @@ import java.util.Date;
 @Component
 public class PNSReportCohortLibrary {
 
+    // refined cohorts
+
+    /**
+     * Cohort for clients tested
+     * @return
+     */
+    public CohortDefinition htsTested(){
+        SqlCohortDefinition cd = new SqlCohortDefinition();
+        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
+                " from  kenyaemr_etl.etl_hts_test t \n" +
+                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id and d.Gender = ':Gender'\n" +
+                " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.test_type=2\n" +
+                " group by t.patient_id) t\n" +
+                " ;";
+        cd.setName("totalTested");
+        cd.setQuery(sqlQuery);
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.setDescription("Total tested");
+
+        return cd;
+    }
+
+    /**
+     * Cohort for clients newly tested
+     * @return
+     */
+    public CohortDefinition htsNewlyTested(){
+        SqlCohortDefinition cd = new SqlCohortDefinition();
+        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
+                " from  kenyaemr_etl.etl_hts_test t \n" +
+                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
+                " where t.voided=0 and t.test_type=2\n" +
+                " group by t.patient_id\n" +
+                " having initial_test_date between date(:startDate) and date(:endDate)) t\n" +
+                " ;";
+        cd.setName("totalTested");
+        cd.setQuery(sqlQuery);
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.setDescription("Total tested");
+
+        return cd;
+    }
+
+    /**
+     * Cohort for clients newly tested and received results
+     * @return
+     */
+    public CohortDefinition htsTestedAndReceivedResults(){
+        SqlCohortDefinition cd = new SqlCohortDefinition();
+        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
+                " from  kenyaemr_etl.etl_hts_test t \n" +
+                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
+                " where t.voided=0 and t.patient_given_result='Yes' and t.test_type=2\n" +
+                " group by t.patient_id\n" +
+                " having initial_test_date between date(:startDate) and date(:endDate)) t\n" +
+                " ;";
+        cd.setName("totalTested");
+        cd.setQuery(sqlQuery);
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.setDescription("Total tested");
+
+        return cd;
+    }
+
+    /**
+     * Cohort for clients total tested and received results
+     * @return
+     */
+    public CohortDefinition htsTotalTestedAndReceivedResults(){
+        SqlCohortDefinition cd = new SqlCohortDefinition();
+        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
+                " from  kenyaemr_etl.etl_hts_test t \n" +
+                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
+                " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.patient_given_result='Yes' and t.test_type=2\n" +
+                " group by t.patient_id) t\n" +
+                " ;";
+        cd.setName("totalTested");
+        cd.setQuery(sqlQuery);
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.setDescription("Total tested");
+
+        return cd;
+    }
+
+    /**
+     * Cohort for clients total positive and received results
+     * @return
+     */
+    public CohortDefinition htsTotalPositiveResult(){
+        SqlCohortDefinition cd = new SqlCohortDefinition();
+        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
+                " from  kenyaemr_etl.etl_hts_test t \n" +
+                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
+                " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.test_type=2 and t.final_test_result='Positive'\n" +
+                " group by t.patient_id) t\n" +
+                " ;";
+        cd.setName("totalTested");
+        cd.setQuery(sqlQuery);
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.setDescription("Total tested");
+
+        return cd;
+    }
+
+    /**
+     * Cohort for clients newly tested and positive results
+     * @return
+     */
+    public CohortDefinition htsNewlyTestedPositiveResult(){
+        SqlCohortDefinition cd = new SqlCohortDefinition();
+        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
+                " from  kenyaemr_etl.etl_hts_test t \n" +
+                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
+                " where t.voided=0 and t.patient_given_result='Yes' and t.test_type=2 and t.final_test_result='Positive'\n" +
+                " group by t.patient_id\n" +
+                " having initial_test_date between date(:startDate) and date(:endDate)) t\n" +
+                " ;";
+        cd.setName("totalTested");
+        cd.setQuery(sqlQuery);
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.setDescription("Total tested");
+
+        return cd;
+    }
+    // ----------------------------------------------------------------------------------------------------------
     /**
      * Cohort for clients tested
      * @return
