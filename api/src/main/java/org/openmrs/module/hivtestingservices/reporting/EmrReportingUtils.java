@@ -29,6 +29,7 @@ public class EmrReportingUtils {
 		ind.addParameter(new Parameter("startDate", "Start Date", Date.class));
 		ind.addParameter(new Parameter("endDate", "End Date", Date.class));
 		ind.setCohortDefinition(cohort);
+		ind.setType(CohortIndicator.IndicatorType.COUNT);
 		return ind;
 	}
 

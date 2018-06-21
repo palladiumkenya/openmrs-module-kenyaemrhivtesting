@@ -216,7 +216,7 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
 
     protected DataSetDefinition htsDataSet() {
         CohortIndicatorDataSetDefinition cohortDsd = new CohortIndicatorDataSetDefinition();
-        cohortDsd.setName("HTS");
+        cohortDsd.setName("htsSummary");
         cohortDsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDsd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDsd.addDimension("age", ReportUtils.map(commonDimensions.htsFineAgeGroups(), "onDate=${endDate}"));
@@ -257,8 +257,11 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         ColumnParameters m_35_to_39 = new ColumnParameters(null, "35-39, Male", "gender=M|age=35-39");
         ColumnParameters f_35_to_39 = new ColumnParameters(null, "35-39, Female", "gender=F|age=35-39");
 
-        ColumnParameters m_40_to_49 = new ColumnParameters(null, "40-49, Male", "gender=M|age=40-49");
-        ColumnParameters f_40_to_49 = new ColumnParameters(null, "40-49, Female", "gender=F|age=40-49");
+        ColumnParameters m_40_to_44 = new ColumnParameters(null, "40-44, Male", "gender=M|age=40-44");
+        ColumnParameters f_40_to_44 = new ColumnParameters(null, "40-44, Female", "gender=F|age=40-44");
+
+        ColumnParameters m_45_to_49 = new ColumnParameters(null, "45-49, Male", "gender=M|age=45-49");
+        ColumnParameters f_45_to_49 = new ColumnParameters(null, "45-49, Female", "gender=F|age=45-49");
 
         ColumnParameters m_50_and_above = new ColumnParameters(null, "50+, Male", "gender=M|age=50+");
         ColumnParameters f_50_and_above = new ColumnParameters(null, "50+, Female", "gender=F|age=50+");
@@ -267,12 +270,12 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
 
         List<ColumnParameters> allAgeDisaggregation = Arrays.asList(
                 colInfants, children_1_to_9,  f_10_to_14, m_10_to_14,f_15_to_19, m_15_to_19,
-                f_20_to_24,m_20_to_24,f_25_to_29, m_25_to_29, f_30_to_34, m_30_to_34, f_35_to_39, m_35_to_39, f_40_to_49, m_40_to_49 ,f_50_and_above,m_50_and_above , colTotal);
+                f_20_to_24,m_20_to_24,f_25_to_29, m_25_to_29, f_30_to_34, m_30_to_34, f_35_to_39, m_35_to_39, f_40_to_44, m_40_to_44, f_45_to_49, m_45_to_49 ,f_50_and_above,m_50_and_above , colTotal);
 
 
         String indParams = "startDate=${startDate},endDate=${endDate}";
 
-        EmrReportingUtils.addRow(cohortDsd, "PNS01", "Tested", ReportUtils.map(htsIndicators.testedTotal(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS01", "Tested", ReportUtils.map(htsIndicators.testedTotal(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
 
         return cohortDsd;
 

@@ -25,9 +25,9 @@ public class PNSReportCohortLibrary {
      */
     public CohortDefinition htsTested(){
         SqlCohortDefinition cd = new SqlCohortDefinition();
-        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
+        String sqlQuery = "select patient_id from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
                 " from  kenyaemr_etl.etl_hts_test t \n" +
-                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id and d.Gender = ':Gender'\n" +
+                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
                 " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.test_type=2\n" +
                 " group by t.patient_id) t\n" +
                 " ;";
@@ -46,7 +46,7 @@ public class PNSReportCohortLibrary {
      */
     public CohortDefinition htsNewlyTested(){
         SqlCohortDefinition cd = new SqlCohortDefinition();
-        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
+        String sqlQuery = "select patient_id from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
                 " from  kenyaemr_etl.etl_hts_test t \n" +
                 " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
                 " where t.voided=0 and t.test_type=2\n" +
@@ -68,7 +68,7 @@ public class PNSReportCohortLibrary {
      */
     public CohortDefinition htsTestedAndReceivedResults(){
         SqlCohortDefinition cd = new SqlCohortDefinition();
-        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
+        String sqlQuery = "select patient_id from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
                 " from  kenyaemr_etl.etl_hts_test t \n" +
                 " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
                 " where t.voided=0 and t.patient_given_result='Yes' and t.test_type=2\n" +
@@ -90,7 +90,7 @@ public class PNSReportCohortLibrary {
      */
     public CohortDefinition htsTotalTestedAndReceivedResults(){
         SqlCohortDefinition cd = new SqlCohortDefinition();
-        String sqlQuery = "select count(distinct patient_id) from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
+        String sqlQuery = "select patient_id from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
                 " from  kenyaemr_etl.etl_hts_test t \n" +
                 " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
                 " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.patient_given_result='Yes' and t.test_type=2\n" +

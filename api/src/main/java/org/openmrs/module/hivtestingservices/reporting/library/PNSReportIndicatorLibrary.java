@@ -27,7 +27,7 @@ public class PNSReportIndicatorLibrary {
 
      */
     public CohortIndicator testedTotal() {
-        return cohortIndicator("Total tested clients", ReportUtils.map(pnsReportCohorts.testedTotal(), "startDate=${startDate},endDate=${endDate}"));
+        return cohortIndicator("Total tested clients", ReportUtils.map(pnsReportCohorts.htsTested(), "startDate=${startDate},endDate=${endDate}"));
     }
 
     public  CohortIndicator testedUnder1() {
