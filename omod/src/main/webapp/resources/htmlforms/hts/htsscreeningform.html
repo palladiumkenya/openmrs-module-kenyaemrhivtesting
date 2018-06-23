@@ -1,0 +1,162 @@
+<!--
+  ~ The contents of this file are subject to the OpenMRS Public License
+  ~ Version 1.0 (the "License"); you may not use this file except in
+  ~ compliance with the License. You may obtain a copy of the License at
+  ~ http://license.openmrs.org
+  ~
+  ~ Software distributed under the License is distributed on an "AS IS"
+  ~ basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing rights and limitations
+  ~ under the License.
+  ~
+  ~ Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+
+-->
+<htmlform>
+
+    <script type="text/javascript" src="../moduleResources/kenyaemr/scripts/moment.js"></script>
+    <script type="text/javascript">
+        var populationTypeSelected = function () {
+            var val = jq(this).val();
+            var keypop = jq('#key-population');
+            if (val == 164929 ){
+                jq("#key-population").show();
+            }
+            if(val == 164928){
+                jq("#key-population").hide();
+                clearHiddenSections(keypop);
+            }
+        }
+
+        //Clear hidden sections
+        clearHiddenSections = function(parentObj) {
+            parentObj.find('input[type=radio]').each(function() {
+                this.checked = false;
+            });
+            parentObj.find('input[type=checkbox]').each(function() {
+                this.checked = false;
+            });
+            parentObj.find('input[type=text]').each(function() {
+                jq(this).val("");
+            });
+            parentObj.find('select').each(function() {
+                this.selectedIndex =0;
+            });
+        }
+
+        //On Ready
+        $(document).ready(function () {
+            //pop type
+            jq("#key-population").hide();
+            jq('#population-type :input[type=radio]').change(populationTypeSelected);
+           /*
+            if(everTested == 1066 ){
+                jq('#prev-test-location input').prop("disabled", true);
+                jq('#prev-test-date input').prop("disabled", true);
+                clearHiddenSections(jq('#prev-test-location'));
+                clearHiddenSections(jq('#prev-test-date'));
+            }
+
+            //First test
+            var firstTest = getField("hiv-test1-result.value").val();
+            //Negative
+            if(firstTest ==664) {
+
+                jq("#hiv-test2-result select").prop("disabled", true);
+                jq(".kit-name2 select").prop("disabled", true);
+                jq(".lot-number2 input").prop("disabled", true);
+                jq("#expiry-date2 input").prop("disabled", true);
+                getField('hiv-final-result.value').val(664);
+                jq('#ccc-no input').prop("disabled", true);
+            }
+*/
+        });
+        //Before Submit
+        beforeSubmit.push(function() {
+
+        });
+           </script>
+
+    <div class="ke-form-header">
+        <table style="width: 100%">
+            <tr>
+                <td>
+                    Screening date: <encounterDate id="encounter-date" showTime="true" required="true"/>
+                </td>
+                <td>HTS Provider : <encounterProvider default="currentUser" /></td>
+                <td>Location: <encounterLocation default="GlobalProperty:kenyaemr.defaultLocation" /></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="ke-form-content">
+        <!-- Population Type  -->
+        <fieldset>
+            <legend>Patient Type</legend>
+            <div>
+                Population type : &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                <obs conceptId="160112"
+                     answerConceptIds="1066,1065"
+                     answerLabels="HP,NP"
+                     style="radio" />
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Department/Coverage</legend>
+            <div>
+                Department : &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                <obs conceptId="159936"
+                     answerConceptIds="160542,5485"
+                     answerLabels="OPD,IPD"
+                     style="radio" />
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>History of HIV Testing</legend>
+            <div>
+                Tested for HIV before : &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                <obs conceptId="164401"
+                     answerConceptIds="1065,1066"
+                     answerLabels="Yes,No"
+                     style="radio" />
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Test Result</legend>
+            <table id="testResult">
+                <tr>
+                    <td>
+                        Test Result &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                        <obs id="ever-tested" conceptId="159427"
+                             answerConceptIds="703,664"
+                             answerLabel="Positive,Negative"
+                             style="radio" />
+                        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                    </td>
+                    <td> Date Tested:
+                        <obs id="duration_months" conceptId="164400"
+                        />
+                        &#160;&#160;&#160;
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>Eligible for Testing</legend>
+            <div>
+                Client eligible? : &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                <obs conceptId="162699"
+                     answerConceptIds="1065,1066"
+                     answerLabels="Yes,No"
+                     style="radio" />
+            </div>
+        </fieldset>
+
+    </div>
+    <div class="ke-form-footer">
+        <submit/>
+    </div>
+
+</htmlform>

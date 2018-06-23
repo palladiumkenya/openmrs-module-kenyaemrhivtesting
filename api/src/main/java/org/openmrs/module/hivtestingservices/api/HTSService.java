@@ -13,11 +13,14 @@
  */
 package org.openmrs.module.hivtestingservices.api;
 
+import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
+import org.openmrs.module.reporting.common.DurationUnit;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,5 +49,8 @@ public interface HTSService extends OpenmrsService {
     public AOPEncounterEntry getAopEncounterEntry(Integer entryId);
     public List<AOPEncounterEntry> getAopEncounterEntryList();
     public PatientContact getPatientContactEntryForPatient(Patient patient);
+    public Cohort getPatientsWithGender(boolean includeMales, boolean includeFemales, boolean includeUnknownGender);
+    public Cohort getPatientsWithAgeRange(Integer minAge, DurationUnit minAgeUnit, Integer maxAge, DurationUnit maxAgeUnit, boolean unknownAgeIncluded, Date effectiveDate);
+
 
 }

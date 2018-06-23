@@ -17,6 +17,8 @@ package org.openmrs.module.hivtestingservices.reporting.library.shared;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.api.PatientSetService;
+import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactAgeCohortDefinition;
+import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactGenderCohortDefinition;
 import org.openmrs.module.kenyacore.report.ReportUtils;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -61,6 +63,28 @@ public class CommonHtsCohortLibrary {
 	}
 
 	/**
+	 * Patients who are female
+	 * @return the cohort definition
+	 */
+	public CohortDefinition femalePatientContacts() {
+		PatientContactGenderCohortDefinition cd = new PatientContactGenderCohortDefinition();
+		cd.setName("females");
+		cd.setFemaleIncluded(true);
+		return cd;
+	}
+
+	/**
+	 * Patients who are male
+	 * @return the cohort definition
+	 */
+	public CohortDefinition malePatientContacts() {
+		PatientContactGenderCohortDefinition cd = new PatientContactGenderCohortDefinition();
+		cd.setName("males");
+		cd.setMaleIncluded(true);
+		return cd;
+	}
+
+	/**
 	 * Patients who at most maxAge years old on ${effectiveDate}
 	 * @return the cohort definition
 	 */
@@ -96,6 +120,47 @@ public class CommonHtsCohortLibrary {
 		cd.setMaxAge(maxAge);
 		return cd;
 	}
+
+	//----------------------------- definitions for patient contact
+
+	/**
+	 * Patients who at most maxAge years old on ${effectiveDate}
+	 * @return the cohort definition
+	 */
+	public CohortDefinition contactAgedAtMost(int maxAge) {
+		PatientContactAgeCohortDefinition cd = new PatientContactAgeCohortDefinition();
+		cd.setName("aged at most " + maxAge);
+		cd.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+		cd.setMaxAge(maxAge);
+		return cd;
+	}
+
+	/**
+	 * Patients who are at least minAge years old on ${effectiveDate}
+	 * @return the cohort definition
+	 */
+	public CohortDefinition contactAgedAtLeast(int minAge) {
+		PatientContactAgeCohortDefinition cd = new PatientContactAgeCohortDefinition();
+		cd.setName("aged at least " + minAge);
+		cd.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+		cd.setMinAge(minAge);
+		return cd;
+	}
+
+	/**
+	 * patients who are at least minAge years old and at most years old on ${effectiveDate}
+	 * @return CohortDefinition
+	 */
+	public CohortDefinition contactAgedAtLeastAgedAtMost(int minAge, int maxAge) {
+		PatientContactAgeCohortDefinition cd = new PatientContactAgeCohortDefinition();
+		cd.setName("aged between "+minAge+" and "+maxAge+" years");
+		cd.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+		cd.setMinAge(minAge);
+		cd.setMaxAge(maxAge);
+		return cd;
+	}
+
+	// -------------------------------- end of patient contact definitions ------------------
 
 	/**
 	 * Patients who are female and at least 18 years old on ${effectiveDate}

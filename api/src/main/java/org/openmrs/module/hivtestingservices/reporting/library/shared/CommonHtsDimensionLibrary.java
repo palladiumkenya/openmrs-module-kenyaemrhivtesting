@@ -45,6 +45,18 @@ public class CommonHtsDimensionLibrary {
 	}
 
 	/**
+	 * Gender dimension for patient contact
+	 * @return the dimension
+	 */
+	public CohortDefinitionDimension contactGender() {
+		CohortDefinitionDimension dim = new CohortDefinitionDimension();
+		dim.setName("gender");
+		dim.addCohortDefinition("M", map(commonCohortLibrary.malePatientContacts()));
+		dim.addCohortDefinition("F", map(commonCohortLibrary.femalePatientContacts()));
+		return dim;
+	}
+
+	/**
 	 * Dimension of age using the 3 standard age groups
 	 * @return the dimension
 	 */
@@ -104,6 +116,38 @@ public class CommonHtsDimensionLibrary {
 
 		return dim;
 	}
+
+	/**
+	 * Dimension of age between for PNS Report
+	 * @return Dimension
+	 */
+	public CohortDefinitionDimension pnsReportAgeGroups() {
+		CohortDefinitionDimension dim = new CohortDefinitionDimension();
+		dim.setName("fine age between(<1, btw 1 and 9, btw 10 and 14, btw 15 and 19, btw 20 and 24, 25 to 29, btw 25 and 49, 50+");
+		dim.addParameter(new Parameter("onDate", "Date", Date.class));
+		dim.addCohortDefinition("<1", map(commonCohortLibrary.contactAgedAtMost(0), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("1-9", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(1, 9), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("10-14", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(10, 14), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("15-19", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(15, 19), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("20-24", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(20, 24), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("25-29", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(25, 29), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("30-49", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(30, 49), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("50+", map(commonCohortLibrary.contactAgedAtLeast(50), "effectiveDate=${onDate}"));
+
+		return dim;
+	}
+
+	public CohortDefinitionDimension familyTestingReportAgeGroups() {
+		CohortDefinitionDimension dim = new CohortDefinitionDimension();
+		dim.setName("fine age <=14 Yrs, 15-19 Yrs, >=20 Yrs");
+		dim.addParameter(new Parameter("onDate", "Date", Date.class));
+		dim.addCohortDefinition("0-14", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(0, 14), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("15-19", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(15, 19), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("20+", map(commonCohortLibrary.contactAgedAtLeast(20), "effectiveDate=${onDate}"));
+
+		return dim;
+	}
+
 
 	/**
 	 * Dimension of age between

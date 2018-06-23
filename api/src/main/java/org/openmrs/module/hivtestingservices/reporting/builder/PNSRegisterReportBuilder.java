@@ -104,7 +104,8 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
     protected List<Parameter> getParameters(ReportDescriptor reportDescriptor) {
         return Arrays.asList(
                 new Parameter("startDate", "Start Date", Date.class),
-                new Parameter("endDate", "End Date", Date.class)
+                new Parameter("endDate", "End Date", Date.class),
+                new Parameter("dateBasedReporting", "", String.class)
         );
     }
 
@@ -112,8 +113,10 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
     protected List<Mapped<DataSetDefinition>> buildDataSets(ReportDescriptor reportDescriptor, ReportDefinition reportDefinition) {
         return Arrays.asList(
                 ReportUtils.map(datasetColumns(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(contactlessDatasetColumns(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(htsDataSet(), "startDate=${startDate},endDate=${endDate}")
+                //ReportUtils.map(contactlessDatasetColumns(), "startDate=${startDate},endDate=${endDate}"),
+                ReportUtils.map(htsDataSet(), "startDate=${startDate},endDate=${endDate}"),
+                ReportUtils.map(pnsDataSet(), "startDate=${startDate},endDate=${endDate}")
+
         );
     }
 
@@ -275,7 +278,62 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
 
         String indParams = "startDate=${startDate},endDate=${endDate}";
 
-        EmrReportingUtils.addRow(cohortDsd, "PNS01", "Tested", ReportUtils.map(htsIndicators.testedTotal(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS01", "Tested", ReportUtils.map(htsIndicators.htsTested(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS02", "Newly Tested", ReportUtils.map(htsIndicators.htsNewlyTested(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS03", "Newly Tested who received results", ReportUtils.map(htsIndicators.htsNewlyTestedWhoReceivedResults(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS04", "Total Tested who received results", ReportUtils.map(htsIndicators.htsTotaltestedWhoReceivedResults(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS05", "Positives", ReportUtils.map(htsIndicators.htsTotalPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS06", "Newly Positive", ReportUtils.map(htsIndicators.htsNewlyPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"));
+
+        return cohortDsd;
+
+    }
+
+    protected DataSetDefinition pnsDataSet() {
+        CohortIndicatorDataSetDefinition cohortDsd = new CohortIndicatorDataSetDefinition();
+        cohortDsd.setName("pnsSummary");
+        cohortDsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDsd.addDimension("age", ReportUtils.map(commonDimensions.pnsReportAgeGroups(), "onDate=${endDate}"));
+        cohortDsd.addDimension("gender", ReportUtils.map(commonDimensions.contactGender()));
+
+
+        ColumnParameters colInfants = new ColumnParameters(null, "<1", "age=<1");
+        ColumnParameters children_1_to_9 = new ColumnParameters(null, "1-9", "age=1-9");
+
+        ColumnParameters m_10_to_14 = new ColumnParameters(null, "10-14, Male", "gender=M|age=10-14");
+        ColumnParameters f_10_to_14 = new ColumnParameters(null, "10-14, Female", "gender=F|age=10-14");
+
+        ColumnParameters m_15_to_19 = new ColumnParameters(null, "15-19, Male", "gender=M|age=15-19");
+        ColumnParameters f_15_to_19 = new ColumnParameters(null, "15-19, Female", "gender=F|age=15-19");
+
+        ColumnParameters m_20_to_24 = new ColumnParameters(null, "20-24, Male", "gender=M|age=20-24");
+        ColumnParameters f_20_to_24 = new ColumnParameters(null, "20-24, Female", "gender=F|age=20-24");
+
+        // incorporating new age groups
+        ColumnParameters m_25_to_29 = new ColumnParameters(null, "25-29, Male", "gender=M|age=25-29");
+        ColumnParameters f_25_to_29 = new ColumnParameters(null, "25-29, Female", "gender=F|age=25-29");
+
+        ColumnParameters m_30_to_49 = new ColumnParameters(null, "30-49, Male", "gender=M|age=30-49");
+        ColumnParameters f_30_to_49 = new ColumnParameters(null, "30-49, Female", "gender=F|age=30-49");
+
+        ColumnParameters m_50_and_above = new ColumnParameters(null, "50+, Male", "gender=M|age=50+");
+        ColumnParameters f_50_and_above = new ColumnParameters(null, "50+, Female", "gender=F|age=50+");
+
+        ColumnParameters colTotal = new ColumnParameters(null, "Total", "");
+
+        List<ColumnParameters> allAgeDisaggregation = Arrays.asList(
+                colInfants, children_1_to_9,  f_10_to_14, m_10_to_14,f_15_to_19, m_15_to_19,
+                f_20_to_24,m_20_to_24,f_25_to_29, m_25_to_29, f_30_to_49, m_30_to_49, f_50_and_above,m_50_and_above , colTotal);
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+
+        EmrReportingUtils.addRow(cohortDsd, "PNS01", "Contacts Identified", ReportUtils.map(htsIndicators.pnsContactsIdentified(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS02", "Contacts Known Positive", ReportUtils.map(htsIndicators.pnsContactsKnownPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS03", "Contacts Eligible", ReportUtils.map(htsIndicators.pnsContactsEligibleForTesting(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS04", "Contacts Tested", ReportUtils.map(htsIndicators.pnsContactsTested(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS05", "Contacts who turned positive", ReportUtils.map(htsIndicators.pnsContactsNewlyPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
+        EmrReportingUtils.addRow(cohortDsd, "PNS06", "Contacts Linked to HAART", ReportUtils.map(htsIndicators.pnsContactsLinkedToHaart(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
 
         return cohortDsd;
 

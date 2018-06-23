@@ -14,9 +14,11 @@
 package org.openmrs.module.hivtestingservices.api.db.hibernate;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
@@ -26,10 +28,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.reporting.common.DurationUnit;
 
 import javax.persistence.criteria.CriteriaBuilder;
 
@@ -169,6 +176,87 @@ public class HibernateHTSDAO implements HTSDAO {
         }
         return null;
     }
+
+    @Override
+    public Cohort getPatientsWithGender(boolean includeMales, boolean includeFemales, boolean includeUnknownGender) {
+
+        if (!includeMales && !includeFemales && !includeUnknownGender) {
+            return new Cohort();
+        }
+
+        String prefixTerm = "";
+        StringBuilder query = new StringBuilder("select id from PatientContact contact where contact.voided = false and ( ");
+        if (includeMales) {
+            query.append(" contact.sex = 'M' ");
+            prefixTerm = " or";
+        }
+        if (includeFemales) {
+            query.append(prefixTerm + " contact.sex = 'F'");
+            prefixTerm = " or";
+        }
+        if (includeUnknownGender) {
+            query.append(prefixTerm + " contact.sex is null or (contact.sex != 'M' and contact.sex != 'F')");
+        }
+        query.append(")");
+        Query q = sessionFactory.getCurrentSession().createQuery(query.toString());
+        q.setCacheMode(CacheMode.IGNORE);
+        return new Cohort(q.list());
+    }
+
+    @Override
+    public Cohort getPatientsWithAgeRange(Integer minAge, DurationUnit minAgeUnit, Integer maxAge, DurationUnit maxAgeUnit, boolean unknownAgeIncluded, Date effectiveDate) {
+
+        if (effectiveDate == null) {
+            effectiveDate = new Date();
+        }
+        if (minAgeUnit == null) {
+            minAgeUnit = DurationUnit.YEARS;
+        }
+        if (maxAgeUnit == null) {
+            maxAgeUnit = DurationUnit.YEARS;
+        }
+
+        String sql = "select c.id from kenyaemr_hiv_testing_patient_contact c where c.voided = false and ";
+        Map<String, Date> paramsToSet = new HashMap<String, Date>();
+
+        Date maxBirthFromAge = effectiveDate;
+        if (minAge != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(effectiveDate);
+            cal.add(minAgeUnit.getCalendarField(), -minAgeUnit.getFieldQuantity()*minAge);
+            maxBirthFromAge = cal.getTime();
+        }
+
+        String c = "c.birth_date <= :maxBirthFromAge";
+        paramsToSet.put("maxBirthFromAge", maxBirthFromAge);
+
+        Date minBirthFromAge = null;
+        if (maxAge != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(effectiveDate);
+            cal.add(maxAgeUnit.getCalendarField(), -(maxAgeUnit.getFieldQuantity()*maxAge + 1));
+            minBirthFromAge = cal.getTime();
+            c = "(" + c + " and c.birth_date >= :minBirthFromAge)";
+            paramsToSet.put("minBirthFromAge", minBirthFromAge);
+        }
+
+        if (unknownAgeIncluded) {
+            c = "(c.birth_date is null or " + c + ")";
+        }
+
+        sql += c;
+
+        log.debug("Executing: " + sql + " with params: " + paramsToSet);
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        for (Map.Entry<String, Date> entry : paramsToSet.entrySet()) {
+            query.setDate(entry.getKey(), entry.getValue());
+        }
+
+        return new Cohort(query.list());
+    }
+
+
 
 
 }
