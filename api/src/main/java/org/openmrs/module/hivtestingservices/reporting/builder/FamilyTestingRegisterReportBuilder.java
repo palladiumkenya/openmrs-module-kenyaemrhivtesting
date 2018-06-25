@@ -169,11 +169,11 @@ public class FamilyTestingRegisterReportBuilder extends AbstractReportBuilder {
 
         String indParams = "startDate=${startDate},endDate=${endDate}";
 
-        EmrReportingUtils.addRow(cohortDsd, "FT01", "Family Testing", ReportUtils.map(htsIndicators.familyTestingContactsIdentified(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
-        EmrReportingUtils.addRow(cohortDsd, "FT02", "Family Testing", ReportUtils.map(htsIndicators.familyTestingContactsKnownPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
-        EmrReportingUtils.addRow(cohortDsd, "FT03", "Family Testing", ReportUtils.map(htsIndicators.familyTestingContactsEligibleForTesting(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
-        EmrReportingUtils.addRow(cohortDsd, "FT04", "Family Testing", ReportUtils.map(htsIndicators.familyTestingContactsNewlyPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
-        EmrReportingUtils.addRow(cohortDsd, "FT05", "Family Testing", ReportUtils.map(htsIndicators.familyTestingContactsLinkedToHaart(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
+        EmrReportingUtils.addRow(cohortDsd, "FT01", "Family Testing - Contacts identified", ReportUtils.map(htsIndicators.familyTestingContactsIdentified(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
+        EmrReportingUtils.addRow(cohortDsd, "FT02", "Family Testing - contacts eligible", ReportUtils.map(htsIndicators.familyTestingContactsEligibleForTesting(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
+        EmrReportingUtils.addRow(cohortDsd, "FT03", "Family Testing - contacts tested", ReportUtils.map(htsIndicators.familyTestingContactsTested(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
+        EmrReportingUtils.addRow(cohortDsd, "FT04", "Family Testing - contacts newly +ve", ReportUtils.map(htsIndicators.familyTestingContactsNewlyPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
+        EmrReportingUtils.addRow(cohortDsd, "FT05", "Family Testing - contacts linked", ReportUtils.map(htsIndicators.familyTestingContactsLinkedToHaart(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04"));
 
         return cohortDsd;
 

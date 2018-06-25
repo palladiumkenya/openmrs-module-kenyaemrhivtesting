@@ -185,20 +185,20 @@ public class HibernateHTSDAO implements HTSDAO {
         }
 
         String prefixTerm = "";
-        StringBuilder query = new StringBuilder("select id from PatientContact contact where contact.voided = false and ( ");
+        StringBuilder query = new StringBuilder("select id from kenyaemr_hiv_testing_patient_contact where voided = 0 and ( ");
         if (includeMales) {
-            query.append(" contact.sex = 'M' ");
+            query.append(" sex = 'M' ");
             prefixTerm = " or";
         }
         if (includeFemales) {
-            query.append(prefixTerm + " contact.sex = 'F'");
+            query.append(prefixTerm + " sex = 'F'");
             prefixTerm = " or";
         }
         if (includeUnknownGender) {
-            query.append(prefixTerm + " contact.sex is null or (contact.sex != 'M' and contact.sex != 'F')");
+            query.append(prefixTerm + " sex is null or (sex != 'M' and sex != 'F')");
         }
         query.append(")");
-        Query q = sessionFactory.getCurrentSession().createQuery(query.toString());
+        Query q = sessionFactory.getCurrentSession().createSQLQuery(query.toString());
         q.setCacheMode(CacheMode.IGNORE);
         return new Cohort(q.list());
     }
@@ -216,7 +216,7 @@ public class HibernateHTSDAO implements HTSDAO {
             maxAgeUnit = DurationUnit.YEARS;
         }
 
-        String sql = "select c.id from kenyaemr_hiv_testing_patient_contact c where c.voided = false and ";
+        String sql = "select c.id from kenyaemr_hiv_testing_patient_contact c where c.voided = 0 and ";
         Map<String, Date> paramsToSet = new HashMap<String, Date>();
 
         Date maxBirthFromAge = effectiveDate;

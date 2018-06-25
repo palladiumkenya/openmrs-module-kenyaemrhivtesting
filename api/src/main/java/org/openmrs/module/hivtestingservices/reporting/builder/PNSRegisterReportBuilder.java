@@ -113,7 +113,6 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
     protected List<Mapped<DataSetDefinition>> buildDataSets(ReportDescriptor reportDescriptor, ReportDefinition reportDefinition) {
         return Arrays.asList(
                 ReportUtils.map(datasetColumns(), "startDate=${startDate},endDate=${endDate}"),
-                //ReportUtils.map(contactlessDatasetColumns(), "startDate=${startDate},endDate=${endDate}"),
                 ReportUtils.map(htsDataSet(), "startDate=${startDate},endDate=${endDate}"),
                 ReportUtils.map(pnsDataSet(), "startDate=${startDate},endDate=${endDate}")
 
@@ -310,7 +309,6 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         ColumnParameters m_20_to_24 = new ColumnParameters(null, "20-24, Male", "gender=M|age=20-24");
         ColumnParameters f_20_to_24 = new ColumnParameters(null, "20-24, Female", "gender=F|age=20-24");
 
-        // incorporating new age groups
         ColumnParameters m_25_to_29 = new ColumnParameters(null, "25-29, Male", "gender=M|age=25-29");
         ColumnParameters f_25_to_29 = new ColumnParameters(null, "25-29, Female", "gender=F|age=25-29");
 
@@ -334,7 +332,6 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         EmrReportingUtils.addRow(cohortDsd, "PNS04", "Contacts Tested", ReportUtils.map(htsIndicators.pnsContactsTested(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
         EmrReportingUtils.addRow(cohortDsd, "PNS05", "Contacts who turned positive", ReportUtils.map(htsIndicators.pnsContactsNewlyPositive(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
         EmrReportingUtils.addRow(cohortDsd, "PNS06", "Contacts Linked to HAART", ReportUtils.map(htsIndicators.pnsContactsLinkedToHaart(), indParams), allAgeDisaggregation, Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15"));
-
         return cohortDsd;
 
     }

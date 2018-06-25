@@ -107,6 +107,7 @@
 	<bean id="hrsreports.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
 		<property name="commonReports">
 			<set>
+				<ref bean="kenyaemr.hts.common.report.htsIndicatorReport" />
 				<ref bean="kenyaemr.hts.common.report.pnsRegister" />
 				<ref bean="kenyaemr.hts.common.report.familyTestingRegister"/>
 			</set>
@@ -123,6 +124,17 @@
 			</set></property>
 		<property name="template" value="hivtestingservices:PNS_Register_Template.xls" />
 		<property name="repeatingSection" value="sheet:1,row:7,dataset:PNSRegister" />
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.htsIndicatorReport" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="28a9006e-7826-11e8-adc0-fa7ae01bbebc" />
+		<property name="name" value="HTS Monthly Report" />
+		<property name="description" value="Monthly HTS Report" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:HTS_Report_Template.xls" />
 	</bean>
 
 	<bean id="kenyaemr.hts.common.report.familyTestingRegister" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">

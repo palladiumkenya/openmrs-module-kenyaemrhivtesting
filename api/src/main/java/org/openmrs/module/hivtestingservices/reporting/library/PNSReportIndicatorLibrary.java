@@ -79,7 +79,7 @@ public class PNSReportIndicatorLibrary {
     // ---------------------------------- PNS report ------------------------------
 
     public CohortIndicator familyTestingContactsIdentified() {
-        return cohortIndicator("Total Contacts identified", ReportUtils.map(pnsReportCohorts.pnsContactsIdentified(), "startDate=${startDate},endDate=${endDate}"));
+        return cohortIndicator("Total Contacts identified", ReportUtils.map(pnsReportCohorts.familyTestingContactsIdentified(), "startDate=${startDate},endDate=${endDate}"));
     }
 
     public CohortIndicator familyTestingContactsKnownPositive() {
