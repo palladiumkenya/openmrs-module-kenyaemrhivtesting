@@ -15,6 +15,7 @@ package org.openmrs.module.hivtestingservices.api.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
@@ -22,7 +23,9 @@ import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
+import org.openmrs.module.reporting.common.DurationUnit;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -118,6 +121,16 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact) {
 
         return patientContactDAO.getContactTraceByPatientContact(patientContact);
+    }
+
+    @Override
+    public Cohort getPatientsWithGender(boolean includeMales, boolean includeFemales, boolean includeUnknownGender) {
+        return patientContactDAO.getPatientsWithGender(includeMales, includeFemales, includeUnknownGender);
+    }
+
+    @Override
+    public Cohort getPatientsWithAgeRange(Integer minAge, DurationUnit minAgeUnit, Integer maxAge, DurationUnit maxAgeUnit, boolean unknownAgeIncluded, Date effectiveDate) {
+        return patientContactDAO.getPatientsWithAgeRange(minAge, minAgeUnit, maxAge, maxAgeUnit, unknownAgeIncluded, effectiveDate);
     }
 
     @Override
