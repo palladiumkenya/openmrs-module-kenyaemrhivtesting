@@ -33,6 +33,12 @@
 		<many-to-one name="voidedBy" class ="org.openmrs.User" column="voided_by"/>
 		<property name="dateVoided" type ="java.util.Date" column ="date_voided" length="19"/>
 		<property name="voidReason" type="java.lang.String" column="voided_reason" length="255"/>
+		<property name="maritalStatus" type="java.lang.String" column="marital_status" length="50"/>
+		<property name="landmark" type="java.lang.String" column="landmark" length="255"/>
+		<property name="livingWithPatient" type="java.lang.String" column="living_with_patient" length="50"/>
+		<property name="pnsApproach" type="java.lang.String" column="pns_approach" length="50"/>
+		<property name="contactListingDeclineReason" type="java.lang.String" column="contact_listing_decline_reason" length="255"/>
+		<property name="consentedContactListing" type="java.lang.String" column="consented_contact_listing" length="50"/>
 
 
 	</class>

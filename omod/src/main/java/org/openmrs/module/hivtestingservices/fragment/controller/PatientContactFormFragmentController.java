@@ -14,6 +14,7 @@ import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -25,7 +26,7 @@ import java.util.Map;
 /**
  * Controller for adding and editing Patient Contacts
  */
-public class PatientContactFormFragmentController{
+public class PatientContactFormFragmentController {
 
     public void controller(@FragmentParam(value = "patientContact", required = false) PatientContact patientContact,
                            @RequestParam(value = "patientId", required = true) Patient patient,
@@ -37,24 +38,32 @@ public class PatientContactFormFragmentController{
         model.addAttribute("relationshipTypeOptions", getRelationshipTypeOptions());
         model.addAttribute("hivStatusOptions", hivStatusOptions());
         model.addAttribute("ipvOutcomeOptions", ipvOutcomeOptions());
-        model.addAttribute("maritalStatusOptions",maritalStatusOptions());
+        model.addAttribute("maritalStatusOptions", maritalStatusOptions());
         model.addAttribute("livingWithPatientOptions", livingWithPatientOptions());
-        model.addAttribute("preferredPNSApproachOptions",preferredPNSApproachOptions());
+        model.addAttribute("preferredPNSApproachOptions", preferredPNSApproachOptions());
     }
 
     private List<String> hivStatusOptions() {
-        return Arrays.asList("Unknown", "Positive", "Negative","Exposed Infant");
+        return Arrays.asList("Unknown", "Positive", "Negative", "Exposed Infant");
     }
 
     private List<String> ipvOutcomeOptions() {
         return Arrays.asList("True", "False");
     }
 
-    private List<String> maritalStatusOptions(){return Arrays.asList("Married Polygamous","Married Monogamous","Divorced","Windowed","Living With Partner","Never Married");}
+    private List<String> maritalStatusOptions() {
+        return Arrays.asList(new String("Married Polygamous"), new String("Married Monogamous"), new String("Divorced"), new String("Widowed"), new String ("Living With Partner"), new String("Never Married"));
+    }
 
-    private List<String> livingWithPatientOptions(){return Arrays.asList("Declined To answer", "Yes", "No");}
+    private List<String> livingWithPatientOptions() {
+        return Arrays.asList(new String("Declined To answer"),
+                new String("Yes"),
+                new String("No"));
+    }
 
-    private List<String> preferredPNSApproachOptions(){return Arrays.asList("Dual referral","Preferred Referral","Passive Referral");}
+    private List<String> preferredPNSApproachOptions() {
+        return Arrays.asList(new String("Dual referral"), new String("Preferred Referral"), new String("Passive Referral"));
+    }
 
     protected List<SimpleObject> getRelationshipTypeOptions() {
         List<SimpleObject> options = new ArrayList<SimpleObject>();
@@ -82,11 +91,11 @@ public class PatientContactFormFragmentController{
         options.put(5617, "Spouse");
         options.put(163565, "Partner");
         options.put(162221, "Co-wife");
-        options.put(157351,"Injectable drug user");
+        options.put(157351, "Injectable drug user");
         return options;
     }
 
-        public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {
+    public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {
         ui.validate(form, form, null);
 
         PatientContact patientContact = form.save();

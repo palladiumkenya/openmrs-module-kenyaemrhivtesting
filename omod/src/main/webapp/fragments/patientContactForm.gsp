@@ -14,8 +14,8 @@
     def addressRows = [
             [
                     [object: command, property: "physicalAddress", label: "Physical Address"],
-                    [object: command, property: "phoneContact", label: "Phone No."]
-
+                    [object: command, property: "phoneContact", label: "Phone No."],
+                    [object: command, property: "landmark", label: "Landmark"]
 
             ]
     ]
@@ -84,8 +84,9 @@
                             <option></option>
                             <% maritalStatusOptions.each { %>
                             <option ${
-                                    (command.maritalStatus == null) ? "" : it == command.maritalStatus ? "selected" : ""}
+                                (command.maritalStatus == null) ? "" : it == command.maritalStatus ? "selected" : ""}
                                     value="${it}">${it}
+
                             </option>
                             <% } %>
                         </select>
@@ -223,7 +224,7 @@
                             <option></option>
                             <% preferredPNSApproachOptions.each { %>
                             <option ${
-                                    (command.pnsApproach == null) ? "" : it.value == command.pnsApproach ? "selected" : ""}
+                                    (command.pnsApproach == null) ? "" : it == command.pnsApproach ? "selected" : ""}
                                     value="${it}">${it}</option>
                             <% } %>
                         </select>
