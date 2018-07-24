@@ -37,17 +37,24 @@ public class PatientContactFormFragmentController{
         model.addAttribute("relationshipTypeOptions", getRelationshipTypeOptions());
         model.addAttribute("hivStatusOptions", hivStatusOptions());
         model.addAttribute("ipvOutcomeOptions", ipvOutcomeOptions());
-
-
+        model.addAttribute("maritalStatusOptions",maritalStatusOptions());
+        model.addAttribute("livingWithPatientOptions", livingWithPatientOptions());
+        model.addAttribute("preferredPNSApproachOptions",preferredPNSApproachOptions());
     }
 
     private List<String> hivStatusOptions() {
-        return Arrays.asList("Unknown", "Positive", "Negative");
+        return Arrays.asList("Unknown", "Positive", "Negative","Exposed Infant");
     }
 
     private List<String> ipvOutcomeOptions() {
         return Arrays.asList("True", "False");
     }
+
+    private List<String> maritalStatusOptions(){return Arrays.asList("Married Polygamous","Married Monogamous","Divorced","Windowed","Living With Partner","Never Married");}
+
+    private List<String> livingWithPatientOptions(){return Arrays.asList("Declined To answer", "Yes", "No");}
+
+    private List<String> preferredPNSApproachOptions(){return Arrays.asList("Dual referral","Preferred Referral","Passive Referral");}
 
     protected List<SimpleObject> getRelationshipTypeOptions() {
         List<SimpleObject> options = new ArrayList<SimpleObject>();
@@ -75,9 +82,11 @@ public class PatientContactFormFragmentController{
         options.put(5617, "Spouse");
         options.put(163565, "Partner");
         options.put(162221, "Co-wife");
+        options.put(157351,"Injectable drug user");
         return options;
     }
-    public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {
+
+        public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {
         ui.validate(form, form, null);
 
         PatientContact patientContact = form.save();
@@ -108,6 +117,13 @@ public class PatientContactFormFragmentController{
         private Date appointmentDate;
         private String baselineHivStatus;
         private String ipvOutcome;
+        private String maritalStatus;
+        private String landmark;
+        private String livingWithPatient;
+        private String pnsApproach;
+        private String contactListingDeclineReason;
+        private String consentedContactListing;
+
 
         public EditPatientContactForm() {
         }
@@ -131,6 +147,12 @@ public class PatientContactFormFragmentController{
             this.appointmentDate = patientContact.getAppointmentDate();
             this.baselineHivStatus = patientContact.getBaselineHivStatus();
             this.ipvOutcome = patientContact.getIpvOutcome();
+            this.maritalStatus = patientContact.getMaritalStatus();
+            this.landmark = patientContact.getLandmark();
+            this.livingWithPatient = patientContact.getLivingWithPatient();
+            this.pnsApproach = patientContact.getPnsApproach();
+            this.contactListingDeclineReason = patientContact.getContactListingDeclineReason();
+
 
         }
 
@@ -154,6 +176,12 @@ public class PatientContactFormFragmentController{
             toSave.setAppointmentDate(appointmentDate);
             toSave.setBaselineHivStatus(baselineHivStatus);
             toSave.setIpvOutcome(ipvOutcome);
+            toSave.setMaritalStatus(maritalStatus);
+            toSave.setLandmark(landmark);
+            toSave.setLivingWithPatient(livingWithPatient);
+            toSave.setPnsApproach(pnsApproach);
+            toSave.setConsentedContactListing(consentedContactListing);
+            toSave.setContactListingDeclineReason(contactListingDeclineReason);
             PatientContact pc = Context.getService(HTSService.class).savePatientContact(toSave);
             return pc;
         }
@@ -293,6 +321,53 @@ public class PatientContactFormFragmentController{
             this.ipvOutcome = ipvOutcome;
         }
 
+        public String getMaritalStatus() {
+            return maritalStatus;
+        }
+
+        public void setMaritalStatus(String maritalStatus) {
+            this.maritalStatus = maritalStatus;
+        }
+
+        public String getLandmark() {
+            return landmark;
+        }
+
+        public void setLandmark(String landmark) {
+            this.landmark = landmark;
+        }
+
+        public String getLivingWithPatient() {
+            return livingWithPatient;
+        }
+
+        public void setLivingWithPatient(String livingWithPatient) {
+            this.livingWithPatient = livingWithPatient;
+        }
+
+        public String getPnsApproach() {
+            return pnsApproach;
+        }
+
+        public void setPnsApproach(String pnsApproach) {
+            this.pnsApproach = pnsApproach;
+        }
+
+        public String getContactListingDeclineReason() {
+            return contactListingDeclineReason;
+        }
+
+        public void setContactListingDeclineReason(String contactListingDeclineReason) {
+            this.contactListingDeclineReason = contactListingDeclineReason;
+        }
+
+        public String getConsentedContactListing() {
+            return consentedContactListing;
+        }
+
+        public void setConsentedContactListing(String consentedContactListing) {
+            this.consentedContactListing = consentedContactListing;
+        }
     }
 
 }

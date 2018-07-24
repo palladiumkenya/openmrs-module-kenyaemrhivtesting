@@ -118,6 +118,12 @@ public class HTSContactListingFormProcessor {
         String sex = null;
         String phoneNumber = null;
 
+        String maritalStatus = null;
+        String landmark = null;
+        String livingWithPatient = null;
+        String pnsApproach = null;
+        String contactListingDeclineReason = null;
+        String consentedContactListing = null;
 
         for(Obs obs:obsList) {
 
@@ -148,7 +154,12 @@ public class HTSContactListingFormProcessor {
             contact.setSex(sex != null? sex :"Undefined");
             if (phoneNumber != null)
                 contact.setPhoneContact(phoneNumber);
-
+            contact.setMaritalStatus(maritalStatus);
+            contact.setLandmark(landmark);
+            contact.setLivingWithPatient(livingWithPatient);
+            contact.setPnsApproach(pnsApproach);
+            contact.setContactListingDeclineReason(contactListingDeclineReason);
+            contact.setConsentedContactListing(consentedContactListing);
             return contact;
         }
         return null;

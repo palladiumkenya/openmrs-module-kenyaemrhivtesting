@@ -6,6 +6,7 @@
                     [object: command, property: "firstName", label: "First Name"],
                     [object: command, property: "middleName", label: "Middle Name"],
                     [object: command, property: "lastName", label: "Last Name"]
+
             ],
     ]
 
@@ -15,6 +16,7 @@
                     [object: command, property: "physicalAddress", label: "Physical Address"],
                     [object: command, property: "phoneContact", label: "Phone No."]
 
+
             ]
     ]
 
@@ -23,7 +25,7 @@
 
 
                     [object: command, property: "baselineHivStatus", label: "Baseline HIV status"],
-                    [object: command, property: "appointmentDate", label: "Appointment date"]
+                    [object: command, property: "appointmentDate", label: "Booking date"]
 
 
             ]
@@ -33,177 +35,216 @@
 
 <form id="edit-patient-contact-form" method="post"
       action="${ui.actionLink("hivtestingservices", "patientContactForm", "savePatientContact")}">
-<% if (command.original) { %>
-<input type="hidden" name="id" value="${command.original.id}"/>
-<% } %>
-
-<div class="ke-panel-content">
-
-    <div class="ke-form-globalerrors" style="display: none"></div>
-
-    <div class="ke-form-instructions">
-        <strong>*</strong> indicates a required field
-    </div>
-
-    <fieldset>
-        <legend>Demographics</legend>
-        <input type="hidden" name="patientRelatedTo" value="${currentPatient.id}"/>
-        <% nameFields.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
-
-        <table>
-            <tr>
-                <td valign="top">
-                    <label class="ke-field-label">Sex *</label>
-                    <span class="ke-field-content">
-                        <input type="radio" name="sex" value="F"
-                               id="gender-F" ${command.sex == 'F' ? 'checked="checked"' : ''}/> Female
-                        <input type="radio" name="sex" value="M"
-                               id="gender-M" ${command.sex == 'M' ? 'checked="checked"' : ''}/> Male
-                        <span id="gender-F-error" class="error" style="display: none"></span>
-                        <span id="gender-M-error" class="error" style="display: none"></span>
-                    </span>
-                </td>
-                <td valign="top"></td>
-                <td valign="top">
-                    <label class="ke-field-label">Date of Birth *</label>
-                    <span class="ke-field-content">
-                        ${ui.includeFragment("kenyaui", "widget/field", [id: "patient-birthdate", object: command, property: "birthDate"])}
-
-                        <span id="from-age-button-placeholder"></span>
-                    </span>
-                </td>
-            </tr>
-        </table>
-
-    </fieldset>
-
-    <fieldset>
-        <legend>Contact</legend>
-
-        <% addressRows.each { %>
-        ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
-        <% } %>
-
-    </fieldset>
-
-    <fieldset>
-        <legend>Relationship</legend>
-        <table>
-            <tr>
-                <td class="ke-field-label">Relationship to Patient</td>
-            </tr>
-            <tr>
-                <td style="width: 260px">
-                    <select name="relationType" id="relationType">
-                        <option></option>
-                        <% relationshipTypeOptions.each { %>
-                        <option ${(command.relationType == null)? "" : it.value == command.relationType ? "selected" : ""} value="${it.value}">${it.label}</option>
-                        <% } %>
-                    </select>
-                </td>
-            </tr>
-        </table>
-    </fieldset>
-
-    <fieldset class="ipvQuestions">
-        <legend>IPV Questions</legend>
-        <table>
-            <tr>
-                <td>
-                    <label class="ke-field-label">1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?</label>
-                </td><td>
-                <span class="ke-field-content">
-                    <input type="radio" name="physicalAssault" class="ipv" value="1065"/> Yes
-                    <input type="radio" name="physicalAssault" class="ipv" value="1066"/> No
-                </span>
-            </td>
-            </tr>
-            <tr>
-                <td>
-                    <label class="ke-field-label">2. Has he/she ever threatened to hurt you?</label>
-                </td><td>
-                <span class="ke-field-content">
-                    <input type="radio" name="threatened" class="ipv" value="1065"/> Yes
-                    <input type="radio" name="threatened" class="ipv" value="1066"/> No
-                </span>
-            </td>
-            </tr>
-            <tr>
-                <td>
-                    <label class="ke-field-label">3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?</label>
-                </td><td>
-                <span class="ke-field-content">
-                    <input type="radio" name="sexualAssault" class="ipv" value="1065"/> Yes
-                    <input type="radio" name="sexualAssault" class="ipv" value="1066"/> No
-                </span>
-            </td>
-            </tr>
-        </table>
-    </fieldset>
-    <fieldset class="ipvOutcome">
-        <legend>IPV Outcome</legend>
-        <table>
-            <tr>
-                <td class="ke-field-label">IPV Outcome</td>
-            </tr>
-            <tr>
-                <td>
-                    <select name="ipvOutcome" id="ipvOutcome">
-                        <option></option>
-                        <% ipvOutcomeOptions.each { %>
-                        <option ${(command.ipvOutcome == null) ? "" : it == command.ipvOutcome ? "selected" : ""}
-                                value="${it}">${it}</option>
-                        <% } %>
-                    </select>
-                </td>
-            </tr>
-        </table>
-
-    </fieldset>
-
-    <fieldset>
-        <legend>Baseline Information</legend>
-        <table>
-            <tr>
-                <td class="ke-field-label">HIV Status</td>
-                <td class="ke-field-label">Appointment</td>
-            </tr>
-            <tr>
-                <td style="width: 270px">
-                    <select name="baselineHivStatus" id="baselineHivStatus">
-                        <option></option>
-                        <% hivStatusOptions.each { %>
-                        <option ${
-                                (command.baselineHivStatus == null) ? "" : it == command.baselineHivStatus ? "selected" : ""}
-                                value="${it}">${it}
-                        </option>
-                        <% } %>
-                    </select>
-                </td>
-                <td style="width: 270px">
-                    ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
-                </td>
-            </tr>
-        </table>
-    </fieldset>
-
-
-
-
-<div class="ke-panel-footer">
-    <button type="submit">
-        <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Save Patient Contact"}
-    </button>
-    <% if (config.returnUrl) { %>
-    <button type="button" class="cancel-button"><img
-            src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
+    <% if (command.original) { %>
+    <input type="hidden" name="id" value="${command.original.id}"/>
     <% } %>
 
-</div>
+    <div class="ke-panel-content">
 
-</div>
+        <div class="ke-form-globalerrors" style="display: none"></div>
+
+        <div class="ke-form-instructions">
+            <strong>*</strong> indicates a required field
+        </div>
+
+        <fieldset>
+            <legend>Demographics</legend>
+            <input type="hidden" name="patientRelatedTo" value="${currentPatient.id}"/>
+            <% nameFields.each { %>
+            ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
+            <% } %>
+
+            <table>
+                <tr>
+                    <td valign="top">
+                        <label class="ke-field-label">Sex *</label>
+                        <span class="ke-field-content">
+                            <input type="radio" name="sex" value="F"
+                                   id="gender-F" ${command.sex == 'F' ? 'checked="checked"' : ''}/> Female
+                            <input type="radio" name="sex" value="M"
+                                   id="gender-M" ${command.sex == 'M' ? 'checked="checked"' : ''}/> Male
+                            <span id="gender-F-error" class="error" style="display: none"></span>
+                            <span id="gender-M-error" class="error" style="display: none"></span>
+                        </span>
+                    </td>
+                    <td valign="top"></td>
+                    <td valign="top">
+                        <label class="ke-field-label">Date of Birth *</label>                        <span class="ke-field-content">
+                            ${ui.includeFragment("kenyaui", "widget/field", [id: "patient-birthdate", object: command, property: "birthDate"])}
+
+                            <span id="from-age-button-placeholder"></span>
+                        </span>
+                    </td>
+                    <td valign="top"></td>
+                    <td valign="top">
+                    <td style="width: 140px">
+                        <label class="ke-field-label">Marital Status</label>
+                    <span class="ke-field-content">
+                        <select name="maritalStatus" id="maritalStatus">
+                            <option></option>
+                            <% maritalStatusOptions.each { %>
+                            <option ${
+                                    (command.maritalStatus == null) ? "" : it == command.maritalStatus ? "selected" : ""}
+                                    value="${it}">${it}
+                            </option>
+                            <% } %>
+                        </select>
+                    </span>
+                    </td>
+                </tr>
+            </table>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Contact</legend>
+
+            <% addressRows.each { %>
+            ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
+            <% } %>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Relationship</legend>
+            <table>
+                <tr>
+                    <td class="ke-field-label">Relationship to Patient</td>
+                    <td class="ke-field-label">Living with Client?</td>
+                </tr>
+                <tr>
+                    <td style="width: 260px">
+                        <select name="relationType" id="relationType">
+                            <option></option>
+                            <% relationshipTypeOptions.each { %>
+                            <option ${
+                                    (command.relationType == null) ? "" : it.value == command.relationType ? "selected" : ""}
+                                    value="${it.value}">${it.label}</option>
+                            <% } %>
+                        </select>
+                    </td>
+                    <td style="width: 260px">
+                        <select name="livingWithPatient" id="livingWithPatient">
+                            <option></option>
+                            <% livingWithPatientOptions.each { %>
+                            <option ${
+                                    (command.livingWithPatient == null) ? "" : it == command.livingWithPatient ? "selected" : ""}
+                                    value="${it}">${it}</option>
+                            <% } %>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset class="ipvQuestions">
+            <legend>IPV Questions</legend>
+            <table>
+                <tr>
+                    <td>
+                        <label class="ke-field-label">1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?</label>
+                    </td><td>
+                    <span class="ke-field-content">
+                        <input type="radio" name="physicalAssault" class="ipv" value="1065"/> Yes
+                        <input type="radio" name="physicalAssault" class="ipv" value="1066"/> No
+                    </span>
+                </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ke-field-label">2. Has he/she ever threatened to hurt you?</label>
+                    </td><td>
+                    <span class="ke-field-content">
+                        <input type="radio" name="threatened" class="ipv" value="1065"/> Yes
+                        <input type="radio" name="threatened" class="ipv" value="1066"/> No
+                    </span>
+                </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ke-field-label">3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?</label>
+                    </td><td>
+                    <span class="ke-field-content">
+                        <input type="radio" name="sexualAssault" class="ipv" value="1065"/> Yes
+                        <input type="radio" name="sexualAssault" class="ipv" value="1066"/> No
+                    </span>
+                </td>
+                </tr>
+            </table>
+        </fieldset>
+        <fieldset class="ipvOutcome">
+            <legend>IPV Outcome</legend>
+            <table>
+                <tr>
+                    <td class="ke-field-label">IPV Outcome</td>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="ipvOutcome" id="ipvOutcome">
+                            <option></option>
+                            <% ipvOutcomeOptions.each { %>
+                            <option ${(command.ipvOutcome == null) ? "" : it == command.ipvOutcome ? "selected" : ""}
+                                    value="${it}">${it}</option>
+                            <% } %>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Baseline Information</legend>
+            <table>
+                <tr>
+                    <td class="ke-field-label">HIV Status</td>
+                     <td class="ke-field-label">Booking Date</td>
+                    <td class="ke-field-label">Preferred PNS Approach</td>
+                </tr>
+                <tr>
+                    <td style="width: 140px">
+                        <select name="baselineHivStatus" id="baselineHivStatus">
+                            <option></option>
+                            <% hivStatusOptions.each { %>
+                            <option ${
+                                    (command.baselineHivStatus == null) ? "" : it == command.baselineHivStatus ? "selected" : ""}
+                                    value="${it}">${it}
+                            </option>
+                            <% } %>
+                        </select>
+                    </td>
+
+                    <td style="width: 270px">
+                        ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
+                    </td>
+
+                    <td style="width: 260px">
+                        <select name="pnsApproach" id="pnsApproach">
+                            <option></option>
+                            <% preferredPNSApproachOptions.each { %>
+                            <option ${
+                                    (command.pnsApproach == null) ? "" : it.value == command.pnsApproach ? "selected" : ""}
+                                    value="${it}">${it}</option>
+                            <% } %>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+
+        <div class="ke-panel-footer">
+            <button type="submit">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Save Patient Contact"}
+            </button>
+            <% if (config.returnUrl) { %>
+            <button type="button" class="cancel-button"><img
+                    src="${ui.resourceLink("kenyaui", "images/glyphs/cancel.png")}"/> Cancel</button>
+            <% } %>
+
+        </div>
+
+    </div>
 
 </form>
 
@@ -236,22 +277,22 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         const NO_CONCEPT_ID = 1066;
         var assessmentYesResponses = [];
         var assessmentNoResponses = [];
-        const TOTAL_RESPONSES = 3 ;
+        const TOTAL_RESPONSES = 3;
 
         // Add event listener for opening and closing details
         jQuery('.ipv').on('click', function () {
             var radio = jQuery(this).closest('input[type=radio]');
             var value = radio.val();
-            if (value == YES_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES ) {
+            if (value == YES_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES) {
 
                 assessmentYesResponses.push(value);
             }
             if (value == NO_CONCEPT_ID && assessmentNoResponses.length <= TOTAL_RESPONSES) {
 
                 assessmentNoResponses.push(value);
-                 }
+            }
 
-            if (value == NO_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES ) {
+            if (value == NO_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES) {
 
                 assessmentYesResponses.pop();
             }
