@@ -293,18 +293,6 @@
     <changeSet author="schege" id="kenyaemr_hiv_testing_012">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="landmark"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
-            <column name="landmark" type="varchar(255)"/>
-        </addColumn>
-    </changeSet>
-
-
-    <changeSet author="schege" id="kenyaemr_hiv_testing_013">
-        <preConditions onFail="MARK_RAN">
-            <not>
                 <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="living_with_patient"/>
             </not>
         </preConditions>
@@ -314,7 +302,7 @@
     </changeSet>
 
 
-    <changeSet author="schege" id="kenyaemr_hiv_testing_014">
+    <changeSet author="schege" id="kenyaemr_hiv_testing_013">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="pns_approach"/>
@@ -325,7 +313,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="schege" id="kenyaemr_hiv_testing_015">
+    <changeSet author="schege" id="kenyaemr_hiv_testing_014">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="kenyaemr_hiv_testing_patient_contact"
@@ -337,7 +325,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="schege" id="kenyaemr_hiv_testing_016">
+    <changeSet author="schege" id="kenyaemr_hiv_testing_015">
         <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="consented_contact_listing"/>
@@ -345,6 +333,17 @@
         </preConditions>
         <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
             <column name="consented_contact_listing" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="schege" id="kenyaemr_hiv_testing_016">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_client_trace" columnName="appointment_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_client_trace">
+            <column name="appointment_date" type="datetime"/>
         </addColumn>
     </changeSet>
 

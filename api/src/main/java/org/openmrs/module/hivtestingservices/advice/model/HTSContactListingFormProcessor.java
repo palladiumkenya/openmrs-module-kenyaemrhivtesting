@@ -119,7 +119,6 @@ public class HTSContactListingFormProcessor {
         String phoneNumber = null;
 
         String maritalStatus = null;
-        String landmark = null;
         String livingWithPatient = null;
         String pnsApproach = null;
         String contactListingDeclineReason = null;
@@ -155,7 +154,6 @@ public class HTSContactListingFormProcessor {
             if (phoneNumber != null)
                 contact.setPhoneContact(phoneNumber);
             contact.setMaritalStatus(maritalStatus);
-            contact.setLandmark(landmark);
             contact.setLivingWithPatient(livingWithPatient);
             contact.setPnsApproach(pnsApproach);
             contact.setContactListingDeclineReason(contactListingDeclineReason);

@@ -27,7 +27,6 @@ public class PatientContact extends BaseOpenmrsData {
     private String ipvOutcome;
     private Patient patient;
     private String maritalStatus;
-    private String landmark;
     private String livingWithPatient;
     private String pnsApproach;
     private String contactListingDeclineReason;
@@ -40,7 +39,7 @@ public class PatientContact extends BaseOpenmrsData {
     public PatientContact(String uuid, String firstName, String middleName,
                           String lastName, String sex, Date birthDate, String physicalAddress,
                           String phoneContact, Integer relationType, Date appointmentDate,
-                          String baselineHivStatus, String ipvOutcome, String maritalStatus, String landmark, String livingWithPatient, String pnsApproach,
+                          String baselineHivStatus, String ipvOutcome, String maritalStatus,  String livingWithPatient, String pnsApproach,
                           String contactListingDeclineReason, Date dateCreated, String consentedContactListing,
                           Integer changedBy, Date dateChanged, boolean voided, Integer voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
@@ -58,7 +57,6 @@ public class PatientContact extends BaseOpenmrsData {
         this.baselineHivStatus = baselineHivStatus;
         this.ipvOutcome = ipvOutcome;
         this.maritalStatus = maritalStatus;
-        this.landmark = landmark;
         this.livingWithPatient = livingWithPatient;
         this.pnsApproach = pnsApproach;
         this.contactListingDeclineReason = contactListingDeclineReason;
@@ -209,14 +207,6 @@ public class PatientContact extends BaseOpenmrsData {
 
     public void setMaritalStatus(String maritalStatus) {
         this.maritalStatus = maritalStatus;
-    }
-
-    public String getLandmark() {
-        return landmark;
-    }
-
-    public void setLandmark(String landmark) {
-        this.landmark = landmark;
     }
 
     public String getLivingWithPatient() {

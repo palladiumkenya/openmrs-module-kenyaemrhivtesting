@@ -52,13 +52,14 @@ public class PatientContactFormFragmentController {
     }
 
     private List<String> maritalStatusOptions() {
-        return Arrays.asList(new String("Married Polygamous"), new String("Married Monogamous"), new String("Divorced"), new String("Widowed"), new String ("Living With Partner"), new String("Never Married"));
+        return Arrays.asList(new String("Married Polygamous"), new String("Married Monogamous"), new String("Divorced"), new String("Widowed"), new String("Single"));
     }
 
     private List<String> livingWithPatientOptions() {
-        return Arrays.asList(new String("Declined To answer"),
+        return Arrays.asList(
                 new String("Yes"),
-                new String("No"));
+                new String("No"),
+                new String("Declined To answer"));
     }
 
     private List<String> preferredPNSApproachOptions() {
@@ -157,7 +158,6 @@ public class PatientContactFormFragmentController {
             this.baselineHivStatus = patientContact.getBaselineHivStatus();
             this.ipvOutcome = patientContact.getIpvOutcome();
             this.maritalStatus = patientContact.getMaritalStatus();
-            this.landmark = patientContact.getLandmark();
             this.livingWithPatient = patientContact.getLivingWithPatient();
             this.pnsApproach = patientContact.getPnsApproach();
             this.contactListingDeclineReason = patientContact.getContactListingDeclineReason();
@@ -186,7 +186,6 @@ public class PatientContactFormFragmentController {
             toSave.setBaselineHivStatus(baselineHivStatus);
             toSave.setIpvOutcome(ipvOutcome);
             toSave.setMaritalStatus(maritalStatus);
-            toSave.setLandmark(landmark);
             toSave.setLivingWithPatient(livingWithPatient);
             toSave.setPnsApproach(pnsApproach);
             toSave.setConsentedContactListing(consentedContactListing);

@@ -13,9 +13,8 @@
 
     def addressRows = [
             [
-                    [object: command, property: "physicalAddress", label: "Physical Address"],
-                    [object: command, property: "phoneContact", label: "Phone No."],
-                    [object: command, property: "landmark", label: "Landmark"]
+                    [object: command, property: "physicalAddress", label: "Physical Address/Landmark"],
+                    [object: command, property: "phoneContact", label: "Phone No."]
 
             ]
     ]
@@ -199,7 +198,7 @@
             <table>
                 <tr>
                     <td class="ke-field-label">HIV Status</td>
-                     <td class="ke-field-label">Booking Date</td>
+                     <td class="ke-field-label">Appointment Date</td>
                     <td class="ke-field-label">Preferred PNS Approach</td>
                 </tr>
                 <tr>

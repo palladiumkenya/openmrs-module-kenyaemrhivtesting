@@ -121,7 +121,7 @@ div.section-title {
 
                         <div class="column-two col-header">Gender</div>
 
-                        <div class="column-three col-header">Physical Address</div>
+                        <div class="column-three col-header">Physical Address/Landmark</div>
 
                         <div class="column-four col-header">Phone</div>
 
@@ -129,7 +129,7 @@ div.section-title {
 
                         <div class="column-six col-header">Baseline HIV Test</div>
 
-                        <div class="column-seven col-header">Booking Date</div>
+                        <div class="column-seven col-header">Appointment Date</div>
 
                         <div class="column-eight col-header"></div>
 

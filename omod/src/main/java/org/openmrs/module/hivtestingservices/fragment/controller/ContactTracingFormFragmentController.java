@@ -81,6 +81,7 @@ public class ContactTracingFormFragmentController {
         private String healthWorkerHandedTo;
         private String remarks;
         private Date date;
+        private  Date appointmentDate;
 
         public ContactTraceForm() {
         }
@@ -99,6 +100,7 @@ public class ContactTracingFormFragmentController {
             this.healthWorkerHandedTo = contactTrace.getHealthWorkerHandedTo();
             this.remarks = contactTrace.getRemarks();
             this.date = contactTrace.getDate();
+            this.appointmentDate = patientContact.getAppointmentDate();
 
         }
         public ContactTrace save(){
@@ -118,6 +120,7 @@ public class ContactTracingFormFragmentController {
             toSave.setFacilityLinkedTo(facilityLinkedTo);
             toSave.setHealthWorkerHandedTo(healthWorkerHandedTo);
             toSave.setRemarks(remarks);
+            toSave.setAppointmentDate(appointmentDate);
             ContactTrace cTrace = Context.getService(HTSService.class).saveClientTrace(toSave);
             return cTrace;
 
@@ -140,7 +143,18 @@ public class ContactTracingFormFragmentController {
                     }
                 }
             }
-
+            if (appointmentDate != null) {
+                if (appointmentDate.before(new Date())) {
+                    errors.rejectValue("appointmentDate", "Cannot be in the past");
+                } else {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.YEAR, -120);
+                    if (appointmentDate.before(calendar.getTime())) {
+                        errors.rejectValue("appointmentDate", " error.date.invalid");
+                    }
+                }
+            }
         }
 
         public ContactTrace getOriginal() {
@@ -214,7 +228,17 @@ public class ContactTracingFormFragmentController {
         public void setDate(Date date) {
             this.date = date;
         }
+
+        public Date getAppointmentDate() {
+            return appointmentDate;
+        }
+
+        public void setAppointmentDate(Date appointmentDate) {
+            this.appointmentDate = appointmentDate;
+        }
     }
+
+
 }
 
 

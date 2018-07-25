@@ -22,7 +22,8 @@
             [
                     [object: command, property: "facilityLinkedTo", label: "Facility Linked To"],
                     [object: command, property: "uniquePatientNo", label: "Unique Patient No."],
-                    [object: command, property: "healthWorkerHandedTo", label: "Health Worker Linked To"]
+                    [object: command, property: "healthWorkerHandedTo", label: "Health Worker Linked To"],
+                    [object: command, property: "appointmentDate", label: "Booking date"]
 
             ]
     ]
@@ -62,6 +63,7 @@
                 <tr>
                     <td class="ke-field-label">Contact Type</td>
                     <td class="ke-field-label">Outcome</td>
+                    <td class="ke-field-label">Booking Date</td>
                 </tr>
                 <tr>
                     <td style="width: 270px">
@@ -80,6 +82,11 @@
                             <% } %>
                         </select>
                     </td>
+
+                    <td style="width: 270px">
+                        ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
+                    </td>
+
                 </tr>
             </table>
 
