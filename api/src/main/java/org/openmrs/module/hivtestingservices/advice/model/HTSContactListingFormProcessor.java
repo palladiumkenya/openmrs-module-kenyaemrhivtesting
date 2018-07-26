@@ -108,6 +108,10 @@ public class HTSContactListingFormProcessor {
         Integer ageUnitConcept = 163541;
         Integer sexConcept = 1533;
         Integer phoneNumberConcept = 159635;
+        Integer maritalStatusConcept = 1054;
+        Integer livingWithPatientConcept = 163607;
+        Integer pnsApproachConcept = 164408;
+        Integer consentedContactListingConcept = 163089;
 
         Integer relType = null;
         Integer age = 0;
@@ -121,7 +125,7 @@ public class HTSContactListingFormProcessor {
         String maritalStatus = null;
         String livingWithPatient = null;
         String pnsApproach = null;
-        String contactListingDeclineReason = null;
+       /* String contactListingDeclineReason = null;*/
         String consentedContactListing = null;
 
         for(Obs obs:obsList) {
@@ -143,6 +147,19 @@ public class HTSContactListingFormProcessor {
             } else if (obs.getConcept().getConceptId().equals(phoneNumberConcept) ) {
                 phoneNumber = obs.getValueText();
             }
+            else if (obs.getConcept().getConceptId().equals(maritalStatusConcept)){
+                maritalStatus = obs.getValueText();
+            }
+            else if (obs.getConcept().getConceptId().equals(livingWithPatientConcept)){
+                livingWithPatient = obs.getValueText();
+            }
+            else if (obs.getConcept().getConceptId().equals(pnsApproachConcept)){
+                pnsApproach = obs.getValueText();
+            }
+            else if (obs.getConcept().getConceptId().equals(consentedContactListingConcept)){
+                consentedContactListing = obs.getValueText();
+            }
+
         }
         if(contactName != null) {
             PatientContact contact = fillContactName(contactName);
@@ -156,7 +173,7 @@ public class HTSContactListingFormProcessor {
             contact.setMaritalStatus(maritalStatus);
             contact.setLivingWithPatient(livingWithPatient);
             contact.setPnsApproach(pnsApproach);
-            contact.setContactListingDeclineReason(contactListingDeclineReason);
+           /* contact.setContactListingDeclineReason(contactListingDeclineReason);*/
             contact.setConsentedContactListing(consentedContactListing);
             return contact;
         }

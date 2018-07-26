@@ -23,7 +23,7 @@ div.column-two {
 }
 
 div.column-three {
-    width: 160px;
+    width: 200px;
 }
 
 div.column-four {

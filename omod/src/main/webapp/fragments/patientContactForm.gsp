@@ -214,7 +214,7 @@
                         </select>
                     </td>
 
-                    <td style="width: 270px">
+                    <td style="width: 200px">
                         ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
                     </td>
 
