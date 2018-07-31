@@ -1,9 +1,6 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
 
-import org.openmrs.Concept;
 import org.openmrs.Patient;
-import org.openmrs.RelationshipType;
-import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -34,55 +31,36 @@ public class PatientContactFormFragmentController {
         model.addAttribute("relationshipTypeOptions", getRelationshipTypeOptions());
         model.addAttribute("hivStatusOptions", hivStatusOptions());
         model.addAttribute("ipvOutcomeOptions", ipvOutcomeOptions());
-        model.addAttribute("livingWithPatientOptions",getLivingWithPatientOptions());
-        model.addAttribute("preferredPNSApproachOptions",getPreferredPNSApproachOptions());
-        model.addAttribute("maritalStatusOptions",getMaritalStatusOptions());
+        model.addAttribute("livingWithPatientOptions", getLivingWithPatientOptions());
+        model.addAttribute("preferredPNSApproachOptions", getPreferredPNSApproachOptions());
+        model.addAttribute("maritalStatusOptions", getMaritalStatusOptions());
 
-       /* List<Concept> maritalStatusOptions = new ArrayList<Concept>();
-        List<Concept> livingWithPatientOptions = new ArrayList<Concept>();
-        List<Concept> preferredPNSApproachOptions = new ArrayList<Concept>();
+    }
 
-        ConceptService conceptService = Context.getConceptService();
-        maritalStatusOptions.add(conceptService.getConcept(1057));
-        maritalStatusOptions.add(conceptService.getConcept(5555));
-        maritalStatusOptions.add(conceptService.getConcept(159715));
-        maritalStatusOptions.add(conceptService.getConcept(1058));
-        maritalStatusOptions.add(conceptService.getConcept(1059));
-
-
-        livingWithPatientOptions.add(conceptService.getConcept(1065));
-        livingWithPatientOptions.add(conceptService.getConcept(1066));
-        livingWithPatientOptions.add(conceptService.getConcept(162570));
-
-
-
-        preferredPNSApproachOptions.add(conceptService.getConcept(162284));
-        preferredPNSApproachOptions.add(conceptService.getConcept(160551));
-        preferredPNSApproachOptions.add(conceptService.getConcept(163096));*/
-
-        }
-private Map<Integer, String> createLivingWithPatientOptionsFromConcepts(){
-        Map<Integer,String > options = new HashMap<Integer, String>();
-        options.put(1065,"Yes");
-        options.put(1066,"No");
-        options.put(162570,"Declined to Answer");
+    private Map<Integer, String> createLivingWithPatientOptionsFromConcepts() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1065, "Yes");
+        options.put(1066, "No");
+        options.put(162570, "Declined to Answer");
         return options;
-}
+    }
+
     private Map<Integer, String> createPreferredPNSApproachOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(162284,"Dual referral");
-        options.put(160551,"Passive referral");
-        options.put(163096,"Provider referral");
+        options.put(162284, "Dual referral");
+        options.put(160551, "Passive referral");
+        options.put(163096, "Provider referral");
         return options;
 
     }
-    private Map<Integer, String> createMaritalStatusOptionsFromConcepts(){
+
+    private Map<Integer, String> createMaritalStatusOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(1057,"Single");
-        options.put(5555,"Married Monogamous");
-        options.put(159715,"Married Polygamous");
-        options.put(1058,"Divorced");
-        options.put(1059,"Widowed");
+        options.put(1057, "Single");
+        options.put(5555, "Married Monogamous");
+        options.put(159715, "Married Polygamous");
+        options.put(1058, "Divorced");
+        options.put(1059, "Widowed");
         return options;
     }
 
@@ -93,17 +71,6 @@ private Map<Integer, String> createLivingWithPatientOptionsFromConcepts(){
     private List<String> ipvOutcomeOptions() {
         return Arrays.asList("True", "False");
     }
-
-/*    private List<String> livingWithPatientOptions() {
-        return Arrays.asList(
-                new String("Yes"),
-                new String("No"),
-                new String("Declined To answer"));
-    }*/
-
-/*    private List<String> preferredPNSApproachOptions() {
-        return Arrays.asList(new String("Dual referral"), new String("Preferred Referral"), new String("Passive Referral"));
-    }*/
 
     protected List<SimpleObject> getRelationshipTypeOptions() {
         List<SimpleObject> options = new ArrayList<SimpleObject>();
@@ -159,7 +126,6 @@ private Map<Integer, String> createLivingWithPatientOptionsFromConcepts(){
         options.put(157351, "Injectable drug user");
         return options;
     }
-
 
 
     public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {

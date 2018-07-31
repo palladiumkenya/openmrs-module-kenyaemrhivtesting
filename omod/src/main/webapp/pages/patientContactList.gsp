@@ -121,15 +121,17 @@ div.section-title {
 
                         <div class="column-two col-header">Gender</div>
 
-                        <div class="column-three col-header">Physical Address/Landmark</div>
+                        <div class="column-three col-header">Physical Address</div>
 
                         <div class="column-four col-header">Phone</div>
 
                         <div class="column-five col-header">Relationship</div>
 
-                        <div class="column-six col-header">Baseline HIV Test</div>
+                        <div class="column-six col-header">Baseline HIV Status</div>
 
                         <div class="column-seven col-header">Appointment Date</div>
+
+                        <div class="column-seven col-header">PNS Approach</div>
 
                         <div class="column-eight col-header"></div>
 
@@ -155,6 +157,8 @@ div.section-title {
                             <div class="column-six">${rel.baselineHivStatus ?: ''}</div>
 
                             <div class="column-seven">${rel.appointmentDate ?: ''}</div>
+
+                            <div class="column-seven">${rel.pnsApproach ?: ''}</div>
 
                             <div class="column-eight">
                                 <button type="button"
