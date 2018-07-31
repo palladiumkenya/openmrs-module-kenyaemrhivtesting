@@ -121,12 +121,10 @@ public class HTSContactListingFormProcessor {
         Integer ageUnit = null;
         String sex = null;
         String phoneNumber = null;
-
-        String maritalStatus = null;
-        String livingWithPatient = null;
-        String pnsApproach = null;
-       /* String contactListingDeclineReason = null;*/
-        String consentedContactListing = null;
+        Integer maritalStatus = null;
+        Integer livingWithPatient = null;
+        Integer pnsApproach = null;
+        Integer consentedContactListing = null;
 
         for(Obs obs:obsList) {
 
@@ -148,16 +146,17 @@ public class HTSContactListingFormProcessor {
                 phoneNumber = obs.getValueText();
             }
             else if (obs.getConcept().getConceptId().equals(maritalStatusConcept)){
-                maritalStatus = obs.getValueText();
+                maritalStatus = obs.getValueCoded().getConceptId();
             }
             else if (obs.getConcept().getConceptId().equals(livingWithPatientConcept)){
-                livingWithPatient = obs.getValueText();
+                livingWithPatient = obs.getValueCoded().getConceptId();
             }
             else if (obs.getConcept().getConceptId().equals(pnsApproachConcept)){
-                pnsApproach = obs.getValueText();
+                pnsApproach = obs.getValueCoded().getConceptId();
             }
             else if (obs.getConcept().getConceptId().equals(consentedContactListingConcept)){
-                consentedContactListing = obs.getValueText();
+                consentedContactListing = obs.getValueCoded().getConceptId();
+
             }
 
         }
@@ -209,6 +208,22 @@ public class HTSContactListingFormProcessor {
         return relationshipList.get(key);
     }
 
+    String consentedContactListingConverter (Concept key){
+        Map<Concept, String> consentList = new HashMap<Concept, String>();
+        consentList.put(conceptService.getConcept(1065),"Yes");
+        consentList.put(conceptService.getConcept(1066),"No");
+        consentList.put(conceptService.getConcept(1067),"Unknown");
+        return consentList.get(key);
+    }
+
+    String pnsApproachConverter (Concept key){
+        Map<Concept, String> pnsApproachList = new HashMap<Concept, String>();
+        pnsApproachList.put(conceptService.getConcept(162284),"Dual referral");
+        pnsApproachList.put(conceptService.getConcept(163096),"Provider referral");
+        pnsApproachList.put(conceptService.getConcept(160551),"Passive referral");
+        return pnsApproachList.get(key);
+    }
+
     String hivStatusConverter (Concept key) {
         Map<Concept, String> hivStatusList = new HashMap<Concept, String>();
         hivStatusList.put(conceptService.getConcept(703), "Positive");
@@ -216,6 +231,28 @@ public class HTSContactListingFormProcessor {
         hivStatusList.put(conceptService.getConcept(1405), "Exposed");
         hivStatusList.put(conceptService.getConcept(1067), "Unknown");
         return hivStatusList.get(key);
+    }
+
+    String maritalStatusConverter (Concept key){
+        Map<Concept, String> maritalStatusList = new HashMap<Concept, String>();
+
+        maritalStatusList.put(conceptService.getConcept(1057),"Single");
+        maritalStatusList.put(conceptService.getConcept(1058),"Divorced");
+        maritalStatusList.put(conceptService.getConcept(1059),"Widowed");
+        maritalStatusList.put(conceptService.getConcept(5555), "Married Monogamous");
+        maritalStatusList.put(conceptService.getConcept(159715),"Married Polygamous");
+        return maritalStatusList.get(key);
+
+    }
+
+    String livingWithIndexConverter (Concept key){
+        Map<Concept, String> livingWithIndexList = new HashMap<Concept, String>();
+
+        livingWithIndexList.put(conceptService.getConcept(1065),"Yes");
+        livingWithIndexList.put(conceptService.getConcept(1066),"No");
+        livingWithIndexList.put(conceptService.getConcept(162570),"Declined to answer");
+        return livingWithIndexList.get(key);
+
     }
 
     String sexConverter (Concept key) {

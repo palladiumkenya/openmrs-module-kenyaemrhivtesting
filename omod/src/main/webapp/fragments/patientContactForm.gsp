@@ -68,7 +68,8 @@
                     </td>
                     <td valign="top"></td>
                     <td valign="top">
-                        <label class="ke-field-label">Date of Birth *</label>                        <span class="ke-field-content">
+                        <label class="ke-field-label">Date of Birth *</label>
+                        <span class="ke-field-content">
                             ${ui.includeFragment("kenyaui", "widget/field", [id: "patient-birthdate", object: command, property: "birthDate"])}
 
                             <span id="from-age-button-placeholder"></span>
@@ -77,19 +78,16 @@
                     <td valign="top"></td>
                     <td valign="top">
                     <td style="width: 140px">
-                        <label class="ke-field-label">Marital Status</label>
-                    <span class="ke-field-content">
-                        <select name="maritalStatus" id="maritalStatus">
-                            <option></option>
-                            <% maritalStatusOptions.each { %>
-                            <option ${
-                                (command.maritalStatus == null) ? "" : it == command.maritalStatus ? "selected" : ""}
-                                    value="${it}">${it}
+                    <label class="ke-field-label">Marital Status</label>
+                    <select name="maritalStatus" id="maritalStatus">
+                        <option></option>
+                        <% maritalStatusOptions.each { %>
+                        <option ${
+                                (command.maritalStatus == null) ? "" : it.value == command.maritalStatus ? "selected" : ""}
+                                value="${it.value}">${it.label}</option>
+                        <% } %>
+                    </select>
 
-                            </option>
-                            <% } %>
-                        </select>
-                    </span>
                     </td>
                 </tr>
             </table>
@@ -128,8 +126,8 @@
                             <option></option>
                             <% livingWithPatientOptions.each { %>
                             <option ${
-                                    (command.livingWithPatient == null) ? "" : it == command.livingWithPatient ? "selected" : ""}
-                                    value="${it}">${it}</option>
+                                    (command.livingWithPatient == null) ? "" : it.value == command.livingWithPatient ? "selected" : ""}
+                                    value="${it.value}">${it.label}</option>
                             <% } %>
                         </select>
                     </td>
@@ -223,8 +221,8 @@
                             <option></option>
                             <% preferredPNSApproachOptions.each { %>
                             <option ${
-                                    (command.pnsApproach == null) ? "" : it == command.pnsApproach ? "selected" : ""}
-                                    value="${it}">${it}</option>
+                                    (command.pnsApproach == null) ? "" : it.value == command.pnsApproach ? "selected" : ""}
+                                    value="${it.value}">${it.label}</option>
                             <% } %>
                         </select>
                     </td>

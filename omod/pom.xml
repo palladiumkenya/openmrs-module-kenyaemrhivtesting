@@ -22,7 +22,7 @@
 			<artifactId>library-name</artifactId> 
 		</dependency> 
 		-->
-		
+
 		<!-- Begin OpenMRS modules -->
 		
 		<dependency>
