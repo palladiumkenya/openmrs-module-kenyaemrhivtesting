@@ -196,7 +196,7 @@
             <table>
                 <tr>
                     <td class="ke-field-label">HIV Status</td>
-                     <td class="ke-field-label">Appointment Date</td>
+                     <td class="ke-field-label">Booking Date</td>
                     <td class="ke-field-label">Preferred PNS Approach</td>
                 </tr>
                 <tr>
