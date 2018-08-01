@@ -14,15 +14,13 @@
                     [object: command, property: "contactType", label: "Contact Type"],
                     [object: command, property: "status", label: "Status"]
 
-            ],
+            ]
     ]
 
 
-    def linkageToCare = [
+    def appointment = [
             [
-                    [object: command, property: "facilityLinkedTo", label: "Facility Linked To"],
-                    [object: command, property: "uniquePatientNo", label: "Unique Patient No."],
-                    [object: command, property: "healthWorkerHandedTo", label: "Health Worker Linked To"],
+
                     [object: command, property: "appointmentDate", label: "Booking date"]
 
             ]
@@ -87,8 +85,8 @@
         </fieldset>
 
         <fieldset id="linkageSection">
-            <legend>Linkage Details</legend>
-            <% linkageToCare.each { %>
+            <legend>Appointment Details</legend>
+            <% appointment.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
             <% } %>
         </fieldset>
@@ -155,7 +153,7 @@
             var contactType = jQuery("#contactType").val();
 
             if(contactType != "") {
-                if (selectedOutcome == "Contacted and Linked") {
+                if (selectedOutcome == "Contacted and Reached") {
                     jQuery("#linkageSection").show();
                 } else {
                     jQuery("#linkageSection input").val("");

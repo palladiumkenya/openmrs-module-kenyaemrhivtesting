@@ -36,8 +36,8 @@ public class ContactTracingFormFragmentController {
 
     private List<String> tracingOutcomeList() {
         return Arrays.asList(
-                new String("Contacted and Linked"),
-                new String("Contacted and not Linked"),
+                new String("Contacted and Reached"),
+                new String("Contacted and not Reached"),
                 new String("Not Contacted")
         );
     }
