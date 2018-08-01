@@ -129,7 +129,7 @@ div.section-title {
 
                         <div class="column-six col-header">Baseline HIV Status</div>
 
-                        <div class="column-seven col-header">Appointment Date</div>
+                        <div class="column-seven col-header">Booking Date</div>
 
                         <div class="column-seven col-header">PNS Approach</div>
 

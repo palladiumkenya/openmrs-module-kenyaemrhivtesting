@@ -112,6 +112,8 @@ public class HTSContactListingFormProcessor {
         Integer livingWithPatientConcept = 163607;
         Integer pnsApproachConcept = 164408;
         Integer consentedContactListingConcept = 163089;
+        Integer physicalAddressConcept = 159942;
+
 
         Integer relType = null;
         Integer age = 0;
@@ -125,6 +127,7 @@ public class HTSContactListingFormProcessor {
         Integer livingWithPatient = null;
         Integer pnsApproach = null;
         Integer consentedContactListing = null;
+        String physicalAddress = null;
 
         for(Obs obs:obsList) {
 
@@ -158,6 +161,9 @@ public class HTSContactListingFormProcessor {
                 consentedContactListing = obs.getValueCoded().getConceptId();
 
             }
+            else if (obs.getConcept().getConceptId().equals(physicalAddressConcept)){
+                physicalAddress = obs.getValueText();
+            }
 
         }
         if(contactName != null) {
@@ -174,6 +180,7 @@ public class HTSContactListingFormProcessor {
             contact.setPnsApproach(pnsApproach);
            /* contact.setContactListingDeclineReason(contactListingDeclineReason);*/
             contact.setConsentedContactListing(consentedContactListing);
+            contact.setPhysicalAddress(physicalAddress);
             return contact;
         }
         return null;

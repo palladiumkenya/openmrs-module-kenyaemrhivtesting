@@ -63,7 +63,6 @@
                 <tr>
                     <td class="ke-field-label">Contact Type</td>
                     <td class="ke-field-label">Outcome</td>
-                    <td class="ke-field-label">Booking Date</td>
                 </tr>
                 <tr>
                     <td style="width: 270px">
@@ -82,11 +81,6 @@
                             <% } %>
                         </select>
                     </td>
-
-                    <td style="width: 270px">
-                        ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
-                    </td>
-
                 </tr>
             </table>
 
