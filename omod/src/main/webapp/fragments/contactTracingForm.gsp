@@ -18,9 +18,10 @@
     ]
 
 
-    def appointment = [
+    def linkageToCare = [
             [
-
+                    [object: command, property: "facilityLinkedTo", label: "Facility Linked To"],
+                    [object: command, property: "uniquePatientNo", label: "Unique Patient No."],
                     [object: command, property: "appointmentDate", label: "Booking date"]
 
             ]
@@ -79,14 +80,15 @@
                             <% } %>
                         </select>
                     </td>
+
                 </tr>
             </table>
 
         </fieldset>
 
         <fieldset id="linkageSection">
-            <legend>Appointment Details</legend>
-            <% appointment.each { %>
+            <legend>Linkage Details</legend>
+            <% linkageToCare.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
             <% } %>
         </fieldset>

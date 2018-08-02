@@ -130,6 +130,7 @@ public class ContactTracingFormFragmentController {
         public void validate(Object o, Errors errors) {
             require(errors, "contactType");
             require(errors, "status");
+            require(errors, "date");
 
             if (date != null) {
                 if (date.after(new Date())) {

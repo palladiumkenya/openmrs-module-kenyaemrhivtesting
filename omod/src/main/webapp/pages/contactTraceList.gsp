@@ -84,6 +84,8 @@ div.section-title {
 
                     <div class="column-three col-header">Status</div>
 
+                    <div class="column-four col-header">Facility Linked To</div>
+
                     <div class="column-six col-header">Remarks</div>
 
                     <div class="column-seven col-header"></div>
@@ -103,7 +105,9 @@ div.section-title {
 
                         <div class="column-three">${rel.status}</div>
 
-                          <div class="column-six">${rel.remarks}</div>
+                        <div class="column-four">${rel.facilityLinkedTo}</div>
+
+                        <div class="column-six">${rel.remarks}</div>
 
                         <div class="column-seven">
                             <button type="button"
