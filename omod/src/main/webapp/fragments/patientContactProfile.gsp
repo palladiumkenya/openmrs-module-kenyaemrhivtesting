@@ -59,7 +59,7 @@
             </div>
 
             <div>
-                <span class="ke-identifier-type">Appointment Date:</span>
+                <span class="ke-identifier-type">Booking Date:</span>
                 <span class="ke-identifier-value">${patientContact.appointmentDate}</span>
             </div>
 

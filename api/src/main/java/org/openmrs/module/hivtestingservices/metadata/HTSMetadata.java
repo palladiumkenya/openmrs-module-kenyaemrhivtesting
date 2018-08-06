@@ -41,7 +41,7 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		// doing this in the scheduled task so that previous value set is preserved
 		//install(globalProperty(MODULE_ID +".contactListingMigrationChore", "Migrates contact previously listed using family history form", "false"));
 		install(form("HTS Screening Form", "Form used to screen clients prior to HIV testing", _EncounterType.HTS, "1", _Form.HTS_SCREENING_FORM));
-		install(form("HTS Provider Reports", "Form used to develop provider reports", _EncounterType.HTS, "1", _Form.HTS_PROVIDER_REPORTS));
+		install(form("HTS Provider Reports form", "Form used to develop provider reports", _EncounterType.HTS, "1", _Form.HTS_PROVIDER_REPORTS));
 
 	}
 }
