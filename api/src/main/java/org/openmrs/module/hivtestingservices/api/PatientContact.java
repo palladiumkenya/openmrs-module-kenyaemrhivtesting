@@ -26,7 +26,11 @@ public class PatientContact extends BaseOpenmrsData {
     private String baselineHivStatus;
     private String ipvOutcome;
     private Patient patient;
-
+    private Integer maritalStatus;
+    private Integer livingWithPatient;
+    private Integer pnsApproach;
+    private String contactListingDeclineReason;
+    private Integer consentedContactListing;
 
     public PatientContact() {
         prePersist();
@@ -35,7 +39,8 @@ public class PatientContact extends BaseOpenmrsData {
     public PatientContact(String uuid, String firstName, String middleName,
                           String lastName, String sex, Date birthDate, String physicalAddress,
                           String phoneContact, Integer relationType, Date appointmentDate,
-                          String baselineHivStatus, String ipvOutcome, Date dateCreated,
+                          String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,
+                          String contactListingDeclineReason, Date dateCreated, Integer consentedContactListing,
                           Integer changedBy, Date dateChanged, boolean voided, Integer voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
         // this.obsGroupId = obsGroupId;
@@ -51,6 +56,12 @@ public class PatientContact extends BaseOpenmrsData {
         this.appointmentDate = appointmentDate;
         this.baselineHivStatus = baselineHivStatus;
         this.ipvOutcome = ipvOutcome;
+        this.maritalStatus = maritalStatus;
+        this.livingWithPatient = livingWithPatient;
+        this.pnsApproach = pnsApproach;
+        this.contactListingDeclineReason = contactListingDeclineReason;
+        this.consentedContactListing = consentedContactListing;
+
 
     }
 
@@ -188,6 +199,46 @@ public class PatientContact extends BaseOpenmrsData {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public Integer getMaritalStatus() {
+        return maritalStatus;
+    }
+
+    public void setMaritalStatus(Integer maritalStatus) {
+        this.maritalStatus = maritalStatus;
+    }
+
+    public Integer getLivingWithPatient() {
+        return livingWithPatient;
+    }
+
+    public void setLivingWithPatient(Integer livingWithPatient) {
+        this.livingWithPatient = livingWithPatient;
+    }
+
+    public Integer getPnsApproach() {
+        return pnsApproach;
+    }
+
+    public void setPnsApproach(Integer pnsApproach) {
+        this.pnsApproach = pnsApproach;
+    }
+
+    public String getContactListingDeclineReason() {
+        return contactListingDeclineReason;
+    }
+
+    public void setContactListingDeclineReason(String contactListingDeclineReason) {
+        this.contactListingDeclineReason = contactListingDeclineReason;
+    }
+
+    public Integer getConsentedContactListing() {
+        return consentedContactListing;
+    }
+
+    public void setConsentedContactListing(Integer consentedContactListing) {
+        this.consentedContactListing = consentedContactListing;
     }
 }
 
