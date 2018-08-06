@@ -45,8 +45,7 @@ public class ContactTracingFormFragmentController {
     private List<String> contactTypeList() {
         return Arrays.asList(
                 new String("Physical"),
-                new String("Phone"),
-                new String("Escorted")
+                new String("Phone")
         );
     }
 
