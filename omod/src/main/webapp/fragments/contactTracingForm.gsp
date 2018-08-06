@@ -21,8 +21,7 @@
     def linkageToCare = [
             [
                     [object: command, property: "facilityLinkedTo", label: "Facility Linked To"],
-                    [object: command, property: "uniquePatientNo", label: "Unique Patient No."],
-                    [object: command, property: "appointmentDate", label: "Booking date"]
+                    [object: command, property: "uniquePatientNo", label: "Unique Patient No."]
 
             ]
     ]

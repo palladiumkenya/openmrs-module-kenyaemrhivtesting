@@ -104,7 +104,7 @@
 		</property>
 	</bean>
 
-	<bean id="hrsreports.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
+	<bean id="hivtesting.hts.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
 		<property name="commonReports">
 			<set>
 				<ref bean="kenyaemr.hts.common.report.htsIndicatorReport" />

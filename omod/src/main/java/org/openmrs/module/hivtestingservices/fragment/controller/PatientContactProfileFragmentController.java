@@ -70,7 +70,7 @@ public class PatientContactProfileFragmentController {
         }
     } private String formatpnsApproach(Integer typeId) {
         if (typeId == null) {
-            return null;
+            return "";
         } else {
             return pnsApproachOptions().get(typeId);
         }
@@ -78,7 +78,7 @@ public class PatientContactProfileFragmentController {
 
     private String formatMaritalStatus(Integer typeId) {
         if (typeId == null) {
-            return null;
+            return "";
         } else {
             return maritalStatusOptions().get(typeId);
         }
@@ -86,7 +86,7 @@ public class PatientContactProfileFragmentController {
 
     private String formatLivingWithPatient(Integer typeId){
         if (typeId == null) {
-            return null;
+            return "";
         } else {
             return livingWithPatientOptions().get(typeId);
         }

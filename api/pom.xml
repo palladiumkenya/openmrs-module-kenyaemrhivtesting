@@ -69,12 +69,12 @@
 
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
-			<artifactId>kenyacore-test</artifactId>
+			<artifactId>kenyacore-api</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
-			<artifactId>kenyacore-api</artifactId>
+			<artifactId>kenyacore-test</artifactId>
 		</dependency>
 
 		<dependency>
