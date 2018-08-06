@@ -23,7 +23,7 @@ div.column-two {
 }
 
 div.column-three {
-    width: 160px;
+    width: 200px;
 }
 
 div.column-four {
@@ -127,9 +127,11 @@ div.section-title {
 
                         <div class="column-five col-header">Relationship</div>
 
-                        <div class="column-six col-header">Baseline HIV Test</div>
+                        <div class="column-six col-header">Baseline HIV Status</div>
 
-                        <div class="column-seven col-header">Appointment Date</div>
+                        <div class="column-seven col-header">Booking Date</div>
+
+                        <div class="column-seven col-header">PNS Approach</div>
 
                         <div class="column-eight col-header"></div>
 
@@ -155,6 +157,8 @@ div.section-title {
                             <div class="column-six">${rel.baselineHivStatus ?: ''}</div>
 
                             <div class="column-seven">${rel.appointmentDate ?: ''}</div>
+
+                            <div class="column-seven">${rel.pnsApproach ?: ''}</div>
 
                             <div class="column-eight">
                                 <button type="button"
@@ -195,9 +199,9 @@ div.section-title {
 
             <div align="center">
 
-                <button type="button"
+                <button type="button" class ="addContact"
                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientId: patient.id,  returnUrl: ui.thisUrl() ])}')">
-                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/person_m.png")}"/>Add Contact
+                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/person_m.png")}" style="display:none;"/>Add Contact
                 </button>
 
             </div>
@@ -235,7 +239,6 @@ div.section-title {
                         </div>
 
                     </div>
-
                     <div class="clear"></div>
 
                     <% traces.each { rel -> %>
