@@ -203,6 +203,16 @@
                 tableName="kenyaemr_hiv_testing_patient_contact"/>
     </changeSet>
 
+    <changeSet id="kenyaemr_hiv_testing_017" author="aojwang">
+        <comment>
+            Clears scheduler_task_config table for fresh creation
+        </comment>
+        <sql>
+            DELETE FROM scheduler_task_config WHERE schedulable_class like 'org.openmrs.module.hivtestingservices.task.%'
+            DELETE from liquibasechangelog where id in ('kenyaemr_hiv_testing_007', 'kenyaemr_hiv_testing_010');
+        </sql>
+    </changeSet>
+
     <!--Adding scheduled task to periodically fetch contact listing info from EAV model to PatientContact model -->
     <changeSet id="kenyaemr_hiv_testing_007" author="aojwang">
         <preConditions onFail="MARK_RAN">
@@ -340,5 +350,6 @@
             <column name="appointment_date" type="datetime"/>
         </addColumn>
     </changeSet>
+    <!--kenyaemr_hiv_testing_017 has been used. Additional changesets should begin from 18-->
 
 </databaseChangeLog>
