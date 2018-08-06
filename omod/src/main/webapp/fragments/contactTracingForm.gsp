@@ -155,7 +155,7 @@
             var contactType = jQuery("#contactType").val();
 
             if(contactType != "") {
-                if (selectedOutcome == "Contacted and Reached") {
+                if (selectedOutcome == "Contacted and Linked") {
                     jQuery("#linkageSection").show();
                 } else {
                     jQuery("#linkageSection input").val("");
