@@ -189,7 +189,7 @@
                 tableName="kenyaemr_hiv_testing_patient_contact"/>
     </changeSet>
 
-    <!--Adding scheduled task to periodically refresh ETL tables-->
+    <!--Adding scheduled task to periodically fetch contact listing info from EAV model to PatientContact model -->
     <changeSet id="kenyaemr_hiv_testing_007" author="aojwang">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
@@ -205,7 +205,7 @@
             <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ContactListingFormProcessorTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2017-11-28T23:59:59" />
-            <column name="repeat_interval" value="7200" />
+            <column name="repeat_interval" value="3600" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
             <column name="start_on_startup" value="1" />
@@ -244,7 +244,7 @@
             <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ContactListingOneTImeMigrationTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2017-11-28T23:59:59" />
-            <column name="repeat_interval" value="7200" />
+            <column name="repeat_interval" value="1800" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
             <column name="start_on_startup" value="1" />
