@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>hivtestingservices</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0</version>
 	</parent>
 
 	<artifactId>hivtestingservices-omod</artifactId>
@@ -22,7 +22,7 @@
 			<artifactId>library-name</artifactId> 
 		</dependency> 
 		-->
-		
+
 		<!-- Begin OpenMRS modules -->
 		
 		<dependency>

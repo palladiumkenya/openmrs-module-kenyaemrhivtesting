@@ -18,6 +18,7 @@
 		<property name="uniquePatientNo" type="java.lang.String" column="unique_patient_no" length="50"/>
 		<property name="facilityLinkedTo" type="java.lang.String" column ="facility_linked_to" length="255"/>
 		<property name="healthWorkerHandedTo" type="java.lang.String" column="health_worker_handed_to"/>
+		<property name="appointmentDate" type = "java.util.Date" column ="appointment_date"/>
 		<property name="remarks" type ="java.lang.String" column ="remarks" length="255"/>
 		<property name="date" type="java.util.Date" column ="encounter_date" length="19"/>
 		<property name="dateCreated" type="java.util.Date" column="date_created" length="19"/>
@@ -27,7 +28,6 @@
 		<many-to-one name="voidedBy" class ="org.openmrs.User" column="voided_by"/>
 		<property name="dateVoided" type ="java.util.Date" column ="date_voided" length="19"/>
 		<property name="voidReason" type="java.lang.String" column="voided_reason" length="255"/>
-
 
 	</class>
 

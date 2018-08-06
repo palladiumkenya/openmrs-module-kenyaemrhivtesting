@@ -17,12 +17,13 @@ public class ContactTrace extends BaseOpenmrsData {
     private String healthWorkerHandedTo;
     private String remarks;
     private Date date;
+    private Date appointmentDate;
 
     public ContactTrace() {
         prePersist();
     }
 
-    public ContactTrace(String uuid, String contactType, String status, String uniquePatientNo, String facilityLinkedTo, String healthWorkerHandedTo, String remarks, Date traceDate) {
+    public ContactTrace(String uuid, String contactType, String status, String uniquePatientNo, String facilityLinkedTo, String healthWorkerHandedTo, String remarks, Date traceDate, Date appointmentDate) {
         this.uuid = uuid;
         this.contactType = contactType;
         this.status = status;
@@ -30,8 +31,8 @@ public class ContactTrace extends BaseOpenmrsData {
         this.facilityLinkedTo = facilityLinkedTo;
         this.healthWorkerHandedTo = healthWorkerHandedTo;
         this.remarks = remarks;
-
         this.date = traceDate;
+        this.appointmentDate = appointmentDate;
     }
 
     public void prePersist() {
@@ -117,5 +118,14 @@ public class ContactTrace extends BaseOpenmrsData {
     public void setDate(Date date) {
         this.date = date;
     }
+
+    public Date getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(Date appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
 }
+
 

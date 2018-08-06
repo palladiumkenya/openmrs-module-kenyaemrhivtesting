@@ -58,5 +58,118 @@
 		</property>
 	</bean>
 
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.hivtestingservices.query.patientContact.service.PatientContactQueryService</value>
+				<bean
+						class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager" />
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.query.patientContact.service.PatientContactQueryServiceImpl"/>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors" />
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource" />
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.hivtestingservices.reporting.data.patientContact.service.PatientContactDataService</value>
+				<bean
+						class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager" />
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.reporting.data.patientContact.service.PatientContactDataServiceImpl"/>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors" />
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource" />
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="hrsreports.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
+		<property name="commonReports">
+			<set>
+				<ref bean="kenyaemr.hts.common.report.htsIndicatorReport" />
+				<ref bean="kenyaemr.hts.common.report.pnsRegister" />
+				<ref bean="kenyaemr.hts.common.report.familyTestingRegister"/>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.pnsRegister" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="c9d3f1fa-6fd0-11e8-adc0-fa7ae01bbebc" />
+		<property name="name" value="Partner Notification Register" />
+		<property name="description" value="Monthly PNS Register" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:PNS_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:PNSRegister" />
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.htsIndicatorReport" class="org.openmrs.module.kenyacore.report.IndicatorReportDescriptor">
+		<property name="targetUuid" value="28a9006e-7826-11e8-adc0-fa7ae01bbebc" />
+		<property name="name" value="HTS Monthly Report" />
+		<property name="description" value="Monthly HTS Report" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:HTS_Report_Template.xls" />
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.familyTestingRegister" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="4c14c76e-760e-11e8-adc0-fa7ae01bbebc" />
+		<property name="name" value="Family Testing Register" />
+		<property name="description" value="Monthly Family Testing Register" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:Family_Testing_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:PNSRegister" />
+	</bean>
+
+	<bean id="hivtesting.config.form" class="org.openmrs.module.kenyacore.form.FormConfiguration">
+		<property name="commonVisitForms">
+			<set>
+				<ref bean="kenyaemr_hiv_testing.common.form.htsScreeningForm" />
+			</set>
+		</property>
+	</bean>
+	<!-- HTS screening form -->
+	<bean id="kenyaemr_hiv_testing.common.form.htsScreeningForm" class="org.openmrs.module.kenyacore.form.FormDescriptor">
+		<property name="targetUuid" value="04295648-7606-11e8-adc0-fa7ae01bbebc" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.registration" />
+				<ref bean="kenyaemr.app.clinician" />
+				<ref bean="kenyaemr.app.chart" />
+			</set>
+		</property>
+		<property name="showIfCalculation" value="org.openmrs.module.kenyaemr.calculation.library.hiv.HIVNegativePatientsCalculation" />
+		<property name="icon" value="kenyaui:forms/generic.png" />
+		<property name="htmlform" value="hivtestingservices:hts/htsscreeningform.html" />
+		<property name="order" value="200999" />
+	</bean>
 
 </beans>
