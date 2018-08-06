@@ -1,7 +1,9 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
 
+import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.RelationshipType;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -14,18 +16,13 @@ import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  * Controller for adding and editing Patient Contacts
  */
-public class PatientContactFormFragmentController{
+public class PatientContactFormFragmentController {
 
     public void controller(@FragmentParam(value = "patientContact", required = false) PatientContact patientContact,
                            @RequestParam(value = "patientId", required = true) Patient patient,
@@ -37,17 +34,76 @@ public class PatientContactFormFragmentController{
         model.addAttribute("relationshipTypeOptions", getRelationshipTypeOptions());
         model.addAttribute("hivStatusOptions", hivStatusOptions());
         model.addAttribute("ipvOutcomeOptions", ipvOutcomeOptions());
+        model.addAttribute("livingWithPatientOptions",getLivingWithPatientOptions());
+        model.addAttribute("preferredPNSApproachOptions",getPreferredPNSApproachOptions());
+        model.addAttribute("maritalStatusOptions",getMaritalStatusOptions());
+
+       /* List<Concept> maritalStatusOptions = new ArrayList<Concept>();
+        List<Concept> livingWithPatientOptions = new ArrayList<Concept>();
+        List<Concept> preferredPNSApproachOptions = new ArrayList<Concept>();
+
+        ConceptService conceptService = Context.getConceptService();
+        maritalStatusOptions.add(conceptService.getConcept(1057));
+        maritalStatusOptions.add(conceptService.getConcept(5555));
+        maritalStatusOptions.add(conceptService.getConcept(159715));
+        maritalStatusOptions.add(conceptService.getConcept(1058));
+        maritalStatusOptions.add(conceptService.getConcept(1059));
 
 
+        livingWithPatientOptions.add(conceptService.getConcept(1065));
+        livingWithPatientOptions.add(conceptService.getConcept(1066));
+        livingWithPatientOptions.add(conceptService.getConcept(162570));
+
+
+
+        preferredPNSApproachOptions.add(conceptService.getConcept(162284));
+        preferredPNSApproachOptions.add(conceptService.getConcept(160551));
+        preferredPNSApproachOptions.add(conceptService.getConcept(163096));*/
+
+        }
+private Map<Integer, String> createLivingWithPatientOptionsFromConcepts(){
+        Map<Integer,String > options = new HashMap<Integer, String>();
+        options.put(1065,"Yes");
+        options.put(1066,"No");
+        options.put(162570,"Declined to Answer");
+        return options;
+}
+    private Map<Integer, String> createPreferredPNSApproachOptionsFromConcepts() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(162284,"Dual referral");
+        options.put(160551,"Passive referral");
+        options.put(163096,"Provider referral");
+        return options;
+
+    }
+    private Map<Integer, String> createMaritalStatusOptionsFromConcepts(){
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1057,"Single");
+        options.put(5555,"Married Monogamous");
+        options.put(159715,"Married Polygamous");
+        options.put(1058,"Divorced");
+        options.put(1059,"Widowed");
+        return options;
     }
 
     private List<String> hivStatusOptions() {
-        return Arrays.asList("Unknown", "Positive", "Negative");
+        return Arrays.asList("Unknown", "Positive", "Negative", "Exposed Infant");
     }
 
     private List<String> ipvOutcomeOptions() {
         return Arrays.asList("True", "False");
     }
+
+/*    private List<String> livingWithPatientOptions() {
+        return Arrays.asList(
+                new String("Yes"),
+                new String("No"),
+                new String("Declined To answer"));
+    }*/
+
+/*    private List<String> preferredPNSApproachOptions() {
+        return Arrays.asList(new String("Dual referral"), new String("Preferred Referral"), new String("Passive Referral"));
+    }*/
 
     protected List<SimpleObject> getRelationshipTypeOptions() {
         List<SimpleObject> options = new ArrayList<SimpleObject>();
@@ -66,6 +122,31 @@ public class PatientContactFormFragmentController{
         return options;
     }
 
+    protected List<SimpleObject> getMaritalStatusOptions() {
+        List<SimpleObject> options = new ArrayList<SimpleObject>();
+        for (Map.Entry<Integer, String> option : createMaritalStatusOptionsFromConcepts().entrySet())
+            options.add(SimpleObject.create("value", option.getKey(), "label", option.getValue()));
+
+        return options;
+    }
+
+    protected List<SimpleObject> getLivingWithPatientOptions() {
+        List<SimpleObject> options = new ArrayList<SimpleObject>();
+        for (Map.Entry<Integer, String> option : createLivingWithPatientOptionsFromConcepts().entrySet())
+            options.add(SimpleObject.create("value", option.getKey(), "label", option.getValue()));
+
+        return options;
+    }
+
+
+    protected List<SimpleObject> getPreferredPNSApproachOptions() {
+        List<SimpleObject> options = new ArrayList<SimpleObject>();
+        for (Map.Entry<Integer, String> option : createPreferredPNSApproachOptionsFromConcepts().entrySet())
+            options.add(SimpleObject.create("value", option.getKey(), "label", option.getValue()));
+
+        return options;
+    }
+
     private Map<Integer, String> createRelationshipOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(970, "Mother");
@@ -75,8 +156,12 @@ public class PatientContactFormFragmentController{
         options.put(5617, "Spouse");
         options.put(163565, "Partner");
         options.put(162221, "Co-wife");
+        options.put(157351, "Injectable drug user");
         return options;
     }
+
+
+
     public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {
         ui.validate(form, form, null);
 
@@ -108,6 +193,13 @@ public class PatientContactFormFragmentController{
         private Date appointmentDate;
         private String baselineHivStatus;
         private String ipvOutcome;
+        private Integer maritalStatus;
+        private String landmark;
+        private Integer livingWithPatient;
+        private Integer pnsApproach;
+        private String contactListingDeclineReason;
+        private Integer consentedContactListing;
+
 
         public EditPatientContactForm() {
         }
@@ -131,6 +223,10 @@ public class PatientContactFormFragmentController{
             this.appointmentDate = patientContact.getAppointmentDate();
             this.baselineHivStatus = patientContact.getBaselineHivStatus();
             this.ipvOutcome = patientContact.getIpvOutcome();
+            this.maritalStatus = patientContact.getMaritalStatus();
+            this.livingWithPatient = patientContact.getLivingWithPatient();
+            this.pnsApproach = patientContact.getPnsApproach();
+            this.contactListingDeclineReason = patientContact.getContactListingDeclineReason();
 
         }
 
@@ -154,6 +250,11 @@ public class PatientContactFormFragmentController{
             toSave.setAppointmentDate(appointmentDate);
             toSave.setBaselineHivStatus(baselineHivStatus);
             toSave.setIpvOutcome(ipvOutcome);
+            toSave.setMaritalStatus(maritalStatus);
+            toSave.setLivingWithPatient(livingWithPatient);
+            toSave.setPnsApproach(pnsApproach);
+            toSave.setConsentedContactListing(consentedContactListing);
+            toSave.setContactListingDeclineReason(contactListingDeclineReason);
             PatientContact pc = Context.getService(HTSService.class).savePatientContact(toSave);
             return pc;
         }
@@ -293,6 +394,53 @@ public class PatientContactFormFragmentController{
             this.ipvOutcome = ipvOutcome;
         }
 
+        public Integer getMaritalStatus() {
+            return maritalStatus;
+        }
+
+        public void setMaritalStatus(Integer maritalStatus) {
+            this.maritalStatus = maritalStatus;
+        }
+
+        public String getLandmark() {
+            return landmark;
+        }
+
+        public void setLandmark(String landmark) {
+            this.landmark = landmark;
+        }
+
+        public Integer getLivingWithPatient() {
+            return livingWithPatient;
+        }
+
+        public void setLivingWithPatient(Integer livingWithPatient) {
+            this.livingWithPatient = livingWithPatient;
+        }
+
+        public Integer getPnsApproach() {
+            return pnsApproach;
+        }
+
+        public void setPnsApproach(Integer pnsApproach) {
+            this.pnsApproach = pnsApproach;
+        }
+
+        public String getContactListingDeclineReason() {
+            return contactListingDeclineReason;
+        }
+
+        public void setContactListingDeclineReason(String contactListingDeclineReason) {
+            this.contactListingDeclineReason = contactListingDeclineReason;
+        }
+
+        public Integer getConsentedContactListing() {
+            return consentedContactListing;
+        }
+
+        public void setConsentedContactListing(Integer consentedContactListing) {
+            this.consentedContactListing = consentedContactListing;
+        }
     }
 
 }
