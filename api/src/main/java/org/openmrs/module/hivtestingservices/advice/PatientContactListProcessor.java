@@ -19,7 +19,7 @@ public class PatientContactListProcessor implements AfterReturningAdvice {
 
         if (method.getName().equals("saveEncounter")) {
             Encounter encounter = (Encounter) args[0];
-            if(encounter != null && encounter.getForm().getUuid().equals(CONTACT_LISTING_FORM)) {
+            if(encounter != null && encounter.getForm() != null && encounter.getForm().getUuid().equals(CONTACT_LISTING_FORM)) {
                 AOPEncounterEntry entry = new AOPEncounterEntry();
                 entry.setDateCreated(new Date());
                 entry.setEncounterUUID(encounter.getUuid());
