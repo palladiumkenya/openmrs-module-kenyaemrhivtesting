@@ -31,11 +31,11 @@ div.column-four {
 }
 
 div.column-five {
-    width: 120px;
+    width: 160px;
 }
 
 div.column-six {
-    width: 140px;
+    width: 180px;
 }
 
 div.column-seven {

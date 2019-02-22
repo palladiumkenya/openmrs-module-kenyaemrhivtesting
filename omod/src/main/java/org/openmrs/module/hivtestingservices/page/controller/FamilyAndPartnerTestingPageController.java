@@ -108,7 +108,8 @@ public class FamilyAndPartnerTestingPageController {
                 Context.getPersonService().getRelationshipTypeByUuid("8d91a210-c2cc-11de-8d13-0010c6dffd0f"), // parent-child
                 Context.getPersonService().getRelationshipTypeByUuid("d6895098-5d8d-11e3-94ee-b35a4132a5e3"), // spouse
                 Context.getPersonService().getRelationshipTypeByUuid("007b765f-6725-4ae9-afee-9966302bace4"), // partner
-                Context.getPersonService().getRelationshipTypeByUuid("2ac0d501-eadc-4624-b982-563c70035d46") // co-wife
+                Context.getPersonService().getRelationshipTypeByUuid("2ac0d501-eadc-4624-b982-563c70035d46"), // co-wife
+                Context.getPersonService().getRelationshipTypeByUuid("58da0d1e-9c89-42e9-9412-275cef1e0429") // Injectable Drug User
         );
 
         for (Relationship relationship : Context.getPersonService().getRelationshipsByPerson(patient)) {
