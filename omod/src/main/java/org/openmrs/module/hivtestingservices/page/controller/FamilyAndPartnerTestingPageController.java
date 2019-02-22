@@ -85,8 +85,6 @@ public class FamilyAndPartnerTestingPageController {
 
         // Get all relationships as simple objects
         // patient id, name, sex, age, relation, test date, test result, enrolled, art number, initiated, status
-
-
         // list of direct relations
         /*	Mother, Father, Sibling, Child, Spouse, Partner, Co-Wife */
         List<SimpleObject> enrolledRelationships = new ArrayList<SimpleObject>();
