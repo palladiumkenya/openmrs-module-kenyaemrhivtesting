@@ -53,8 +53,12 @@ public class PatientContactProfileFragmentController {
                         "baselineHivStatus", patientContact.getBaselineHivStatus() != null ? patientContact.getBaselineHivStatus() : "",
                         "appointmentDate",  patientContact.getAppointmentDate() != null ? kenyaUi.formatDate(patientContact.getAppointmentDate()) : "",
                         "birthDate", patientContact.getBirthDate() != null ? kenyaUi.formatDate(patientContact.getBirthDate()) : "",
-                        "age", patientContact.getBirthDate() != null ? calculateContactAge(patientContact.getBirthDate(), new Date()) : ""
-                ));
+                        "age", patientContact.getBirthDate() != null ? calculateContactAge(patientContact.getBirthDate(), new Date()) : "",
+                        "maritalStatus", formatMaritalStatus(patientContact.getMaritalStatus()),
+                        "livingWithPatient",formatLivingWithPatient(patientContact.getLivingWithPatient()),
+                        "pnsApproach",formatpnsApproach(patientContact.getPnsApproach())
+
+                        ));
 
     }
 
@@ -64,6 +68,56 @@ public class PatientContactProfileFragmentController {
         } else {
             return relationshipOptions().get(typeId);
         }
+    } private String formatpnsApproach(Integer typeId) {
+        if (typeId == null) {
+            return "";
+        } else {
+            return pnsApproachOptions().get(typeId);
+        }
+    }
+
+    private String formatMaritalStatus(Integer typeId) {
+        if (typeId == null) {
+            return "";
+        } else {
+            return maritalStatusOptions().get(typeId);
+        }
+    }
+
+    private String formatLivingWithPatient(Integer typeId){
+        if (typeId == null) {
+            return "";
+        } else {
+            return livingWithPatientOptions().get(typeId);
+        }
+
+    }
+
+    private Map<Integer, String> pnsApproachOptions() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(162284,"Dual referral");
+        options.put(160551,"Passive referral");
+        options.put(163096,"Provider referral");
+        return options;
+
+    }
+
+    private Map<Integer, String> livingWithPatientOptions() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1065, "Yes");
+        options.put(1066, "No");
+        options.put(162570, "Declined to Answer");
+        return options;
+    }
+
+    private Map<Integer, String> maritalStatusOptions() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1057, "Single");
+        options.put(5555, "Married Monogamous");
+        options.put(159715, "Married Polygamous");
+        options.put(1058, "Divorced");
+        options.put(1059, "Widowed");
+        return options;
     }
 
     private Map<Integer, String> relationshipOptions () {
@@ -75,6 +129,7 @@ public class PatientContactProfileFragmentController {
         options.put(5617, "Spouse");
         options.put(163565, "Partner");
         options.put(162221, "Co-wife");
+        options.put(157351, "Injectable drug user");
         return options;
     }
 

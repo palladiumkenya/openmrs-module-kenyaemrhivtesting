@@ -3,25 +3,19 @@ package org.openmrs.module.hivtestingservices.page.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
-import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.hivtestingservices.fragment.controller.PatientContactFormFragmentController;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
-import org.openmrs.module.kenyaui.annotation.AppPage;
 import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.annotation.SpringBean;
-import org.openmrs.ui.framework.converter.util.ConversionUtil;
 import org.openmrs.ui.framework.page.PageModel;
-import org.openmrs.ui.framework.page.PageRequest;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +31,7 @@ public class PatientContactListPageController {
 
         HTSService htsService = Context.getService(HTSService.class);
         List<PatientContact> patientContacts = htsService.getPatientContactByPatient(patient);
-
+        PatientContactFormFragmentController pc = new PatientContactFormFragmentController();
         PatientContact contactEntry = htsService.getPatientContactEntryForPatient(patient);
         List<ContactTrace> contactTrace = htsService.getContactTraceByPatientContact(contactEntry);
 
@@ -86,7 +80,11 @@ public class PatientContactListPageController {
                     "relationType", formatRelationshipType(contact.getRelationType()),
                     "baselineHivStatus", contact.getBaselineHivStatus(),
                     "appointmentDate",  kenyaUi.formatDate(contact.getAppointmentDate()),
-                    "birthDate", kenyaUi.formatDate(contact.getBirthDate())
+                    "birthDate", kenyaUi.formatDate(contact.getBirthDate()),
+                    "maritalStatus", formatMaritalStatusOptions(contact.getMaritalStatus()),
+                    "pnsApproach", formatpnsApproachOptions(contact.getPnsApproach()),
+                    "contactListingDeclineReason",contact.getContactListingDeclineReason(),
+                    "consentedContactListing",contact.getConsentedContactListing()
             );
             objects.add(contactObject);
 
@@ -103,6 +101,22 @@ public class PatientContactListPageController {
         }
     }
 
+    private String formatpnsApproachOptions(Integer typeId) {
+        if (typeId == null) {
+            return null;
+        } else {
+            return pnsApproachOptions().get(typeId);
+        }
+    }
+
+    private String formatMaritalStatusOptions(Integer typeId) {
+        if (typeId == null) {
+            return null;
+        } else {
+            return maritalStatusOptions().get(typeId);
+        }
+    }
+
     private Map<Integer, String> relationshipOptions () {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(970, "Mother");
@@ -112,6 +126,26 @@ public class PatientContactListPageController {
         options.put(5617, "Spouse");
         options.put(163565, "Partner");
         options.put(162221, "Co-wife");
+        options.put(157351, "Injectable drug user");
+        return options;
+    }
+
+    private Map<Integer, String> pnsApproachOptions() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(162284,"Dual referral");
+        options.put(160551,"Passive referral");
+        options.put(163096,"Provider referral");
+        return options;
+
+    }
+
+    private Map<Integer, String> maritalStatusOptions() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1057, "Single");
+        options.put(5555, "Married Monogamous");
+        options.put(159715, "Married Polygamous");
+        options.put(1058, "Divorced");
+        options.put(1059, "Widowed");
         return options;
     }
 

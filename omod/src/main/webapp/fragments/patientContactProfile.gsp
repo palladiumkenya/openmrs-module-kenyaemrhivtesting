@@ -25,6 +25,19 @@
                 </span>
             </div>
 
+            <div>
+                <span class="ke-identifier-type">Marital Status:</span>
+                <span class="ke-identifier-value">${patientContact.maritalStatus}
+                </span>
+            </div>
+
+            <div>
+                <span class="ke-identifier-type">Living with Index:</span>
+                <span class="ke-identifier-value">${patientContact.livingWithPatient}
+                </span>
+            </div>
+
+
         </div>
 
         <div style="float: left; width: 30%; text-align: left">
@@ -46,9 +59,15 @@
             </div>
 
             <div>
-                <span class="ke-identifier-type">Appointment Date:</span>
+                <span class="ke-identifier-type">Booking Date:</span>
                 <span class="ke-identifier-value">${patientContact.appointmentDate}</span>
             </div>
+
+            <div>
+                <span class="ke-identifier-type">PNS Approach:</span>
+                <span class="ke-identifier-value">${patientContact.pnsApproach}</span>
+            </div>
+
         </div>
     </div>
 </fieldset>

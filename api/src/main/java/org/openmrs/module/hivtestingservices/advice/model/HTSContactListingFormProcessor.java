@@ -108,6 +108,12 @@ public class HTSContactListingFormProcessor {
         Integer ageUnitConcept = 163541;
         Integer sexConcept = 1533;
         Integer phoneNumberConcept = 159635;
+        Integer maritalStatusConcept = 1054;
+        Integer livingWithPatientConcept = 163607;
+        Integer pnsApproachConcept = 164408;
+        Integer consentedContactListingConcept = 163089;
+        Integer physicalAddressConcept = 159942;
+
 
         Integer relType = null;
         Integer age = 0;
@@ -117,7 +123,11 @@ public class HTSContactListingFormProcessor {
         Integer ageUnit = null;
         String sex = null;
         String phoneNumber = null;
-
+        Integer maritalStatus = null;
+        Integer livingWithPatient = null;
+        Integer pnsApproach = null;
+        Integer consentedContactListing = null;
+        String physicalAddress = null;
 
         for(Obs obs:obsList) {
 
@@ -138,6 +148,23 @@ public class HTSContactListingFormProcessor {
             } else if (obs.getConcept().getConceptId().equals(phoneNumberConcept) ) {
                 phoneNumber = obs.getValueText();
             }
+            else if (obs.getConcept().getConceptId().equals(maritalStatusConcept)){
+                maritalStatus = obs.getValueCoded().getConceptId();
+            }
+            else if (obs.getConcept().getConceptId().equals(livingWithPatientConcept)){
+                livingWithPatient = obs.getValueCoded().getConceptId();
+            }
+            else if (obs.getConcept().getConceptId().equals(pnsApproachConcept)){
+                pnsApproach = obs.getValueCoded().getConceptId();
+            }
+            else if (obs.getConcept().getConceptId().equals(consentedContactListingConcept)){
+                consentedContactListing = obs.getValueCoded().getConceptId();
+
+            }
+            else if (obs.getConcept().getConceptId().equals(physicalAddressConcept)){
+                physicalAddress = obs.getValueText();
+            }
+
         }
         if(contactName != null) {
             PatientContact contact = fillContactName(contactName);
@@ -148,7 +175,12 @@ public class HTSContactListingFormProcessor {
             contact.setSex(sex != null? sex :"Undefined");
             if (phoneNumber != null)
                 contact.setPhoneContact(phoneNumber);
-
+            contact.setMaritalStatus(maritalStatus);
+            contact.setLivingWithPatient(livingWithPatient);
+            contact.setPnsApproach(pnsApproach);
+           /* contact.setContactListingDeclineReason(contactListingDeclineReason);*/
+            contact.setConsentedContactListing(consentedContactListing);
+            contact.setPhysicalAddress(physicalAddress);
             return contact;
         }
         return null;
@@ -179,8 +211,25 @@ public class HTSContactListingFormProcessor {
         relationshipList.put(conceptService.getConcept(5617), 6); // spouse
         relationshipList.put(conceptService.getConcept(163565), 7); // partner
         relationshipList.put(conceptService.getConcept(162221), 8); // co-wife
+        relationshipList.put(conceptService.getConcept(157351), 9); // Injectable drug user
 
         return relationshipList.get(key);
+    }
+
+    String consentedContactListingConverter (Concept key){
+        Map<Concept, String> consentList = new HashMap<Concept, String>();
+        consentList.put(conceptService.getConcept(1065),"Yes");
+        consentList.put(conceptService.getConcept(1066),"No");
+        consentList.put(conceptService.getConcept(1067),"Unknown");
+        return consentList.get(key);
+    }
+
+    String pnsApproachConverter (Concept key){
+        Map<Concept, String> pnsApproachList = new HashMap<Concept, String>();
+        pnsApproachList.put(conceptService.getConcept(162284),"Dual referral");
+        pnsApproachList.put(conceptService.getConcept(163096),"Provider referral");
+        pnsApproachList.put(conceptService.getConcept(160551),"Passive referral");
+        return pnsApproachList.get(key);
     }
 
     String hivStatusConverter (Concept key) {
@@ -190,6 +239,28 @@ public class HTSContactListingFormProcessor {
         hivStatusList.put(conceptService.getConcept(1405), "Exposed");
         hivStatusList.put(conceptService.getConcept(1067), "Unknown");
         return hivStatusList.get(key);
+    }
+
+    String maritalStatusConverter (Concept key){
+        Map<Concept, String> maritalStatusList = new HashMap<Concept, String>();
+
+        maritalStatusList.put(conceptService.getConcept(1057),"Single");
+        maritalStatusList.put(conceptService.getConcept(1058),"Divorced");
+        maritalStatusList.put(conceptService.getConcept(1059),"Widowed");
+        maritalStatusList.put(conceptService.getConcept(5555), "Married Monogamous");
+        maritalStatusList.put(conceptService.getConcept(159715),"Married Polygamous");
+        return maritalStatusList.get(key);
+
+    }
+
+    String livingWithIndexConverter (Concept key){
+        Map<Concept, String> livingWithIndexList = new HashMap<Concept, String>();
+
+        livingWithIndexList.put(conceptService.getConcept(1065),"Yes");
+        livingWithIndexList.put(conceptService.getConcept(1066),"No");
+        livingWithIndexList.put(conceptService.getConcept(162570),"Declined to answer");
+        return livingWithIndexList.get(key);
+
     }
 
     String sexConverter (Concept key) {

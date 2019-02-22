@@ -99,6 +99,7 @@ public class RegisterContactFragmentController {
 	String spouseRelType = "d6895098-5d8d-11e3-94ee-b35a4132a5e3";
 	String partnerRelType = "007b765f-6725-4ae9-afee-9966302bace4";
 	String cowifeRelType = "2ac0d501-eadc-4624-b982-563c70035d46";
+	String injectableDrugUserRelType = "58da0d1e-9c89-42e9-9412-275cef1e0429";
 
 	/**
 	 * Main controller method
@@ -569,6 +570,7 @@ public class RegisterContactFragmentController {
 |                    6 | d6895098-5d8d-11e3-94ee-b35a4132a5e3 | Spouse     | Spouse       |
 |                    7 | 007b765f-6725-4ae9-afee-9966302bace4 | Partner    | Partner      |
 |                    8 | 2ac0d501-eadc-4624-b982-563c70035d46 | Co-wife    | Co-wife      |
+|                    9 | 58da0d1e-9c89-42e9-9412-275cef1e0429 | Injectable Drug User| Injectable Drug User|
 +----------------------+--------------------------------------+------------+--------------+
 */
 
@@ -590,6 +592,7 @@ public class RegisterContactFragmentController {
 			options.put(5617, spouseRelType);
 			options.put(163565, partnerRelType);
 			options.put(162221, cowifeRelType);
+			options.put(157351, injectableDrugUserRelType);
 			return options.get(relType);
 		}
 		/**

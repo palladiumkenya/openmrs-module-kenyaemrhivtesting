@@ -17,52 +17,52 @@
         </comment>
         <createTable tableName="kenyaemr_hiv_testing_patient_contact">
             <column name="id" autoIncrement="true" type="int">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="uuid" type="char(38)">
-                <constraints nullable="false" unique="true" />
+                <constraints nullable="false" unique="true"/>
             </column>
-            <column name="obs_group_id" type="int" >
-                <constraints nullable="true" unique="false" />
+            <column name="obs_group_id" type="int">
+                <constraints nullable="true" unique="false"/>
             </column>
             <column name="first_name" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="middle_name" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="last_name" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="sex" type="varchar(10)">
-                <constraints nullable="false" unique="false" />
+                <constraints nullable="false" unique="false"/>
             </column>
             <column name="birth_date" type="datetime">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="physical_address" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="phone_contact" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="patient_related_to" type="int">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="relationship_type" type="varchar(255)">
-                <constraints nullable="false"  />
+                <constraints nullable="false"/>
             </column>
             <column name="appointment_date" type="datetime">
-                <constraints nullable="true"  />
+                <constraints nullable="true"/>
             </column>
             <column name="baseline_hiv_status" type="varchar(255)">
-                <constraints nullable="true"  />
+                <constraints nullable="true"/>
             </column>
             <column name="ipv_outcome" type="varchar(255)">
-                <constraints nullable="true"  />
+                <constraints nullable="true"/>
             </column>
             <column name="patient_id" type="int">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="date_created" type="datetime">
                 <constraints nullable="false"/>
@@ -76,44 +76,51 @@
             <column name="date_voided" type="datetime"/>
             <column name="voided_reason" type="varchar(255)"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="patient_related_to" constraintName="kemr_patient_contact_related_patient" referencedTableName="patient" referencedColumnNames="patient_id" />
-        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id" constraintName="kemr_patient_contact_obs_group"	referencedTableName="obs" referencedColumnNames="concept_id" />
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact"
+                                 baseColumnNames="patient_related_to"
+                                 constraintName="kemr_patient_contact_related_patient" referencedTableName="patient"
+                                 referencedColumnNames="patient_id"/>
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id"
+                                 constraintName="kemr_patient_contact_obs_group" referencedTableName="obs"
+                                 referencedColumnNames="concept_id"/>
     </changeSet>
     <changeSet id="kenyaemr_hiv_testing_002" author="schege">
 
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="kenyaemr_hiv_testing_client_trace" /></not>
+            <not>
+                <tableExists tableName="kenyaemr_hiv_testing_client_trace"/>
+            </not>
         </preConditions>
         <comment>
             Create table to hold traces to a client
         </comment>
         <createTable tableName="kenyaemr_hiv_testing_client_trace">
             <column name="id" autoIncrement="true" type="int">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="client_id" type="int">
-                <constraints nullable="false" unique="false" />
+                <constraints nullable="false" unique="false"/>
             </column>
             <column name="uuid" type="char(38)">
-                <constraints nullable="false" unique="true" />
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="contact_type" type="varchar(50)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="status" type="varchar(50)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="unique_patient_no" type="varchar(50)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="facility_linked_to" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="health_worker_handed_to" type="int">
-                <constraints nullable="false" unique="false" />
+                <constraints nullable="false" unique="false"/>
             </column>
             <column name="remarks" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="date_created" type="datetime">
                 <constraints nullable="false"/>
@@ -127,12 +134,17 @@
             <column name="date_voided" type="datetime"/>
             <column name="voided_reason" type="varchar(255)"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_client_trace" baseColumnNames="client_id" constraintName="tracing_related_patient_contact" referencedTableName="kenyaemr_hiv_testing_patient_contact" referencedColumnNames="id" deferrable="false" initiallyDeferred="false" />
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_client_trace" baseColumnNames="client_id"
+                                 constraintName="tracing_related_patient_contact"
+                                 referencedTableName="kenyaemr_hiv_testing_patient_contact" referencedColumnNames="id"
+                                 deferrable="false" initiallyDeferred="false"/>
     </changeSet>
 
     <changeSet author="aojwang" id="kenyaemr_hiv_testing_003">
         <preConditions onFail="MARK_RAN">
-            <not><columnExists tableName="kenyaemr_hiv_testing_client_trace"  columnName="encounter_date"/></not>
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_client_trace" columnName="encounter_date"/>
+            </not>
         </preConditions>
         <addColumn tableName="kenyaemr_hiv_testing_client_trace">
             <column name="encounter_date" type="datetime"/>
@@ -141,47 +153,49 @@
 
     <changeSet author="aojwang" id="kenyaemr_hiv_testing_004">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="kenyaemr_hiv_testing_client_trace"  columnName="health_worker_handed_to"/>
+            <columnExists tableName="kenyaemr_hiv_testing_client_trace" columnName="health_worker_handed_to"/>
         </preConditions>
         <modifyDataType
-                        columnName="health_worker_handed_to"
-                        newDataType="varchar(255)"
-                        tableName="kenyaemr_hiv_testing_client_trace"/>
+                columnName="health_worker_handed_to"
+                newDataType="varchar(255)"
+                tableName="kenyaemr_hiv_testing_client_trace"/>
     </changeSet>
 
     <changeSet id="kenyaemr_hiv_testing_005" author="aojwang">
 
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="kenyaemr_aop_encounter_entry" /></not>
+            <not>
+                <tableExists tableName="kenyaemr_aop_encounter_entry"/>
+            </not>
         </preConditions>
         <comment>
             Create table to hold aop encounter entries
         </comment>
         <createTable tableName="kenyaemr_aop_encounter_entry">
             <column name="id" autoIncrement="true" type="int">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="encounter_uuid" type="varchar(50)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="form_uuid" type="varchar(50)">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="target_module" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="status" type="int">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="date_created" type="datetime">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
 
     <changeSet author="aojwang" id="kenyaemr_hiv_testing_006">
         <preConditions onFail="MARK_RAN">
-            <columnExists tableName="kenyaemr_hiv_testing_patient_contact"  columnName="relationship_type"/>
+            <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="relationship_type"/>
         </preConditions>
         <modifyDataType
                 columnName="relationship_type"
@@ -189,7 +203,17 @@
                 tableName="kenyaemr_hiv_testing_patient_contact"/>
     </changeSet>
 
-    <!--Adding scheduled task to periodically refresh ETL tables-->
+    <changeSet id="kenyaemr_hiv_testing_017" author="aojwang">
+        <comment>
+            Clears scheduler_task_config table for fresh creation
+        </comment>
+        <sql>
+            DELETE FROM scheduler_task_config WHERE schedulable_class like 'org.openmrs.module.hivtestingservices.task.%';
+            DELETE from liquibasechangelog where id in ('kenyaemr_hiv_testing_007', 'kenyaemr_hiv_testing_010');
+        </sql>
+    </changeSet>
+
+    <!--Adding scheduled task to periodically fetch contact listing info from EAV model to PatientContact model -->
     <changeSet id="kenyaemr_hiv_testing_007" author="aojwang">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
@@ -205,7 +229,7 @@
             <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ContactListingFormProcessorTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2017-11-28T23:59:59" />
-            <column name="repeat_interval" value="7200" />
+            <column name="repeat_interval" value="3600" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
             <column name="start_on_startup" value="1" />
@@ -216,16 +240,21 @@
 
     <changeSet author="aojwang" id="kenyaemr_hiv_testing_008">
         <preConditions onFail="MARK_RAN">
-            <foreignKeyConstraintExists foreignKeyName="kemr_patient_contact_obs_group" />
+            <foreignKeyConstraintExists foreignKeyName="kemr_patient_contact_obs_group"/>
         </preConditions>
-        <dropForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" constraintName="kemr_patient_contact_obs_group"/>
+        <dropForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact"
+                                  constraintName="kemr_patient_contact_obs_group"/>
     </changeSet>
 
     <changeSet author="aojwang" id="kenyaemr_hiv_testing_009">
         <preConditions onFail="MARK_RAN">
-            <not><foreignKeyConstraintExists foreignKeyName="kemr_list_group_id" /></not>
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="kemr_list_group_id"/>
+            </not>
         </preConditions>
-        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id" constraintName="kemr_list_group_id"	referencedTableName="obs" referencedColumnNames="obs_id" />
+        <addForeignKeyConstraint baseTableName="kenyaemr_hiv_testing_patient_contact" baseColumnNames="obs_group_id"
+                                 constraintName="kemr_list_group_id" referencedTableName="obs"
+                                 referencedColumnNames="obs_id"/>
     </changeSet>
 
     <!--Adding scheduled task to process migration of contact lists from family history form-->
@@ -244,7 +273,7 @@
             <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ContactListingOneTImeMigrationTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2017-11-28T23:59:59" />
-            <column name="repeat_interval" value="7200" />
+            <column name="repeat_interval" value="1800" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
             <column name="start_on_startup" value="1" />
@@ -253,4 +282,88 @@
         </insert>
     </changeSet>
 
+    <changeSet author="schege" id="kenyaemr_hiv_testing_011">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="marital_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
+            <column name="marital_status" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="schege" id="kenyaemr_hiv_testing_012">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="living_with_patient"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
+            <column name="living_with_patient" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="schege" id="kenyaemr_hiv_testing_013">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="pns_approach"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
+            <column name="pns_approach" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="schege" id="kenyaemr_hiv_testing_014">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_patient_contact"
+                              columnName="contact_listing_decline_reason"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
+            <column name="contact_listing_decline_reason" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="schege" id="kenyaemr_hiv_testing_015">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="consented_contact_listing"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
+            <column name="consented_contact_listing" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="schege" id="kenyaemr_hiv_testing_016">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_client_trace" columnName="appointment_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_client_trace">
+            <column name="appointment_date" type="datetime"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="relationship_type_018" author="schege">
+        <comment>
+            Adding Injectable drug user relationship type
+        </comment>
+        <insert tableName="Relationship_Type">
+            <column name="a_is_to_b" value="Injectable Drug User"/>
+            <column name="b_is_to_a" value="Injectable Drug User"/>
+            <column name="preferred" value="0"/>
+            <column name="weight" value="0"/>
+            <column name="description" value="People who share drug Syringes"/>
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="creator" value="1" />
+            <column name="uuid" value="58da0d1e-9c89-42e9-9412-275cef1e0429"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

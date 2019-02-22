@@ -14,15 +14,14 @@
                     [object: command, property: "contactType", label: "Contact Type"],
                     [object: command, property: "status", label: "Status"]
 
-            ],
+            ]
     ]
 
 
     def linkageToCare = [
             [
                     [object: command, property: "facilityLinkedTo", label: "Facility Linked To"],
-                    [object: command, property: "uniquePatientNo", label: "Unique Patient No."],
-                    [object: command, property: "healthWorkerHandedTo", label: "Health Worker Linked To"]
+                    [object: command, property: "uniquePatientNo", label: "Unique Patient No."]
 
             ]
     ]
@@ -80,6 +79,7 @@
                             <% } %>
                         </select>
                     </td>
+
                 </tr>
             </table>
 
