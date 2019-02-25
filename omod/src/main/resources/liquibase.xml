@@ -350,6 +350,20 @@
             <column name="appointment_date" type="datetime"/>
         </addColumn>
     </changeSet>
-    <!--kenyaemr_hiv_testing_017 has been used. Additional changesets should begin from 18-->
 
+    <changeSet id="relationship_type_018" author="schege">
+        <comment>
+            Adding Injectable drug user relationship type
+        </comment>
+        <insert tableName="Relationship_Type">
+            <column name="a_is_to_b" value="Injectable Drug User"/>
+            <column name="b_is_to_a" value="Injectable Drug User"/>
+            <column name="preferred" value="0"/>
+            <column name="weight" value="0"/>
+            <column name="description" value="People who share drug Syringes"/>
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="creator" value="1" />
+            <column name="uuid" value="58da0d1e-9c89-42e9-9412-275cef1e0429"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
