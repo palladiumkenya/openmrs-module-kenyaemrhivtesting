@@ -68,7 +68,9 @@ public class PatientContactProfileFragmentController {
         } else {
             return relationshipOptions().get(typeId);
         }
-    } private String formatpnsApproach(Integer typeId) {
+    }
+
+    private String formatpnsApproach(Integer typeId) {
         if (typeId == null) {
             return "";
         } else {
