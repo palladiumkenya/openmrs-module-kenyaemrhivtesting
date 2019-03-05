@@ -189,7 +189,7 @@ div.section-title {
                                 </button>
                             </div>
 
-                            <% if(rel.patient) { %>
+                            <% if(rel.patient == null) { %>
                             <div class="column-ten">
                                 <button type="button"
                                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: rel.id, returnUrl: ui.thisUrl() ])}')">

@@ -49,7 +49,17 @@ public class ContactTreeViewFragmentController {
         ArrayNode patientContacts = getJsonNodeFactory().arrayNode();
         String patientName = patient.getPersonName().toString();
         String patientGender = patient.getGender();
-        String plinkIcon = ui.resourceLink("hivtestingservices", "images/large_person_" + patientGender.toLowerCase() + ".png");
+        String iconPathStr = null;
+
+        if (patient.getAge().intValue() <= 5) {
+            iconPathStr =  "images/baby_grey_person_" ;
+        } else {
+            iconPathStr =  "images/grey_person_";
+        }
+
+
+
+        String plinkIcon = ui.resourceLink("hivtestingservices", iconPathStr + patientGender.toLowerCase() + ".png");
 
         patientNode.put("image", plinkIcon);
         ObjectNode pTextNode = getJsonNodeFactory().objectNode();
@@ -95,17 +105,30 @@ public class ContactTreeViewFragmentController {
             }
 
             alive = person.isDead();
+            String relIconPathString = null;
 
 
             if (person.isPatient()) {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("patientId", person.getId());
-                linkIcon = ui.resourceLink("hivtestingservices", "images/large_person_" + genderCode + ".png");
+
+                if (patient.getAge().intValue() <= 5) {
+                    relIconPathString =  "images/baby_grey_person_" ;
+                } else {
+                    relIconPathString =  "images/grey_person_";
+                }
+                linkIcon = ui.resourceLink("hivtestingservices", relIconPathString + genderCode + ".png");
             }
             else {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("personId", person.getId());
-                linkIcon = ui.resourceLink("hivtestingservices", "images/large_person_" + genderCode + ".png");
+
+                if (patient.getAge().intValue() <= 5) {
+                    relIconPathString =  "images/baby_grey_person_" ;
+                } else {
+                    relIconPathString =  "images/grey_person_";
+                }
+                linkIcon = ui.resourceLink("hivtestingservices", relIconPathString + genderCode + ".png");
             }
 
 
@@ -123,7 +146,6 @@ public class ContactTreeViewFragmentController {
             // person - relationship person, patient - index client
             Set<Integer> indexClient = new HashSet<Integer>();
             indexClient.add(patient.getPatientId());
-            //indexClient.addAll(exludes);
             ArrayNode relChildren = getRelationshipContacts(patientService.getPatient(person.getPersonId()), indexClient, ui);
             ArrayNode relContacts = getListedContactsContacts(patientService.getPatient(person.getPersonId()), getAllRelationshipsForPatient(patientService.getPatient(person.getPersonId())), ui);
             if (relContacts.size() > 0) {
@@ -193,15 +215,15 @@ public class ContactTreeViewFragmentController {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("patientId", person.getId());
                 if (contactEnrolledInHivProgram(personPatient)) {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(true) + personPatient.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(true, personPatient.getAge().intValue()) + personPatient.getGender().toLowerCase() + ".png");
                 } else {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(false) + personPatient.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(false, personPatient.getAge().intValue()) + personPatient.getGender().toLowerCase() + ".png");
                 }
             }
             else {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("personId", person.getId());
-                linkIcon = ui.resourceLink("hivtestingservices", "images/large_person_" + genderCode + ".png");
+                linkIcon = ui.resourceLink("hivtestingservices", "images/grey_person_" + genderCode + ".png");
             }
 
 
@@ -236,7 +258,6 @@ public class ContactTreeViewFragmentController {
 
             Patient patientFromContact = patientContact.getPatient();
             if (excludes.size() > 0 && patientFromContact != null && excludes.contains(patientFromContact.getPatientId())) {
-                System.out.println("Skipping this patient ==============> " + patientFromContact);
                 continue;
             }
             String fullName = "";
@@ -256,9 +277,9 @@ public class ContactTreeViewFragmentController {
                 fullName = patientFromContact.getPersonName().toString();
                 age = new StringBuilder().append(type).append(", ").append(patientFromContact.getAge()).append(" Yrs").toString();
                 if (contactEnrolledInHivProgram(patient)) {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(true) + patientFromContact.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(true, patientFromContact.getAge().intValue()) + patientFromContact.getGender().toLowerCase() + ".png");
                 } else {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(false) + patientFromContact.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(false, patientFromContact.getAge().intValue()) + patientFromContact.getGender().toLowerCase() + ".png");
                 }
 
                 ArrayNode relChildren = getRelationshipContacts(patientFromContact, new HashSet<Integer>(), ui);
@@ -277,11 +298,11 @@ public class ContactTreeViewFragmentController {
                 String baselineHivStatus = patientContact.getBaselineHivStatus();
 
 
-                if (baselineHivStatus != null && getGenderIconForContacts(baselineHivStatus) != null) {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForContacts(baselineHivStatus) + patientContact.getSex().toLowerCase() + ".png");
+                if (baselineHivStatus != null && getGenderIconForContacts(baselineHivStatus, calculateContactAge(patientContact.getBirthDate(), new Date()).intValue()) != null) {
+                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForContacts(baselineHivStatus, calculateContactAge(patientContact.getBirthDate(), new Date()).intValue()) + patientContact.getSex().toLowerCase() + ".png");
 
                 } else {
-                    linkIcon = ui.resourceLink("hivtestingservices", "images/large_person_" + patientContact.getSex().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", "images/grey_person_" + patientContact.getSex().toLowerCase() + ".png");
 
                 }
                 if(patientContact.getFirstName() != null) {
@@ -339,20 +360,41 @@ public class ContactTreeViewFragmentController {
 
     }
 
-    protected String getGenderIconForRelationships(boolean status) {
+    protected String getGenderIconForRelationships(boolean status, int age) {
 
+        if (age <= 5) {
+            if (status) {
+                return "images/baby_green_person_" ;
+            } else {
+                return "images/baby_grey_person_";
+            }
+
+        }
         if (status) {
-            return "images/green_large_person_" ;
+            return "images/green_person_" ;
         } else {
-            return "images/large_person_";
+            return "images/grey_person_";
         }
     }
 
-    protected String getGenderIconForContacts(String status) {
-        if (status.equals("Uknown")) {
-            return "images/red_large_person_" ;
+    protected String getGenderIconForContacts(String status, int age) {
+        if (age <= 5) {
+            if (status.equals("Uknown") || status.equals("Positive")) {
+                return "images/baby_red_person_" ;
+            } else if (status.equals("Negative")){
+                return "images/baby_green_person_";
+            } else {
+                return "images/baby_grey_person_";
+            }
+
+        }
+
+        if (status.equals("Uknown") || status.equals("Positive")) {
+            return "images/red_person_" ;
+        } else if (status.equals("Negative")){
+            return "images/green_person_";
         } else {
-            return "images/large_person_";
+            return "images/grey_person_";
         }
     }
 
