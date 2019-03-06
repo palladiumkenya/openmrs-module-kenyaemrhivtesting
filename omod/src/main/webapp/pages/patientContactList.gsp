@@ -1,9 +1,22 @@
 <%
     ui.decorateWith("kenyaemr", "standardPage", [patient: currentPatient, layout: "sidebar"])
     def menuItems = [
-            [label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to Client home", href: ui.pageLink("kenyaemr", "clinician/clinicianViewPatient", [patient: currentPatient, patientId: currentPatient.patientId])]
+            [label: "Back to home", iconProvider: "kenyaui", icon: "buttons/back.png", label: "Back to Client home", href: ui.pageLink("kenyaemr", "clinician/clinicianViewPatient", [patient: currentPatient, patientId: currentPatient.patientId])],
+            [label: "View Tree", iconProvider: "kenyaui", icon: "buttons/back.png", label: "View Tree", href: ui.pageLink("hivtestingservices", "contactTreeView", [patient: currentPatient, patientId: currentPatient.patientId])]
     ]
+
+    ui.includeCss("hivtestingservices", "TreantJs/Treant.css")
+    ui.includeCss("hivtestingservices", "TreantJs/collapsable.css")
+    ui.includeCss("hivtestingservices", "TreantJs/vendor/perfect-scrollbar/perfect-scrollbar.css")
+
+    ui.includeJavascript("hivtestingservices", "TreantJs/vendor/raphael.js")
+    ui.includeJavascript("hivtestingservices", "TreantJs/Treant.js")
+/*    ui.includeJavascript("hivtestingservices", "TreantJs/vendor/jquery.min.js")*/
+    ui.includeJavascript("hivtestingservices", "TreantJs/jquery.easing.js")
+    ui.includeJavascript("hivtestingservices", "TreantJs/collapsable.js")
+
 %>
+
 <style>
 div.grid {
     display: block;
@@ -102,6 +115,7 @@ div.section-title {
             <div class="ke-tabmenu-item" data-tabid="contact_list">List of Contacts</div>
 
             <div class="ke-tabmenu-item" data-tabid="contact_trace">Client Tracing History</div>
+            <div class="ke-tabmenu-item" data-tabid="contacts_tree">Client Contacts Tree</div>
 
         </div>
 
@@ -175,12 +189,14 @@ div.section-title {
                                 </button>
                             </div>
 
+                            <% if(rel.patient == null) { %>
                             <div class="column-ten">
                                 <button type="button"
                                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: rel.id, returnUrl: ui.thisUrl() ])}')">
                                     <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Register
                                 </button>
                             </div>
+                            <% } %>
 
                         </div>
 
@@ -286,8 +302,14 @@ div.section-title {
 
     </div>
 
-</div>
 
+</div>
+<div id="contact-tree" title="Contact Tree View" style="display: none">
+    ${ ui.includeFragment("hivtestingservices", "contactTreeView") }
+    <div align="center">
+        <button type="button" onclick="kenyaui.closeDialog();"><img src="${ ui.resourceLink("kenyaui", "images/glyphs/cancel.png") }" /> Close</button>
+    </div>
+</div>
 
 <script type="text/javascript">
 
@@ -296,6 +318,8 @@ div.section-title {
 
         var result;
         var lastTrace;
+
+
         lastTrace = jq('#lTraceStat').val();
         result = jq('#lTraceStat').val().localeCompare("Contacted and Linked");
 
@@ -307,5 +331,9 @@ div.section-title {
         }
 
     }); // end of jQuery initialization bloc
+
+    function openContactsTree() {
+        kenyaui.openPanelDialog({ templateId: 'contact-tree', width: 85, height: 70, scrolling: true });
+    }
 
 </script>
