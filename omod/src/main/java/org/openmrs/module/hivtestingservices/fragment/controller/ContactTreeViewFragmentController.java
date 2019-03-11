@@ -15,6 +15,7 @@ import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
@@ -130,7 +131,7 @@ public class ContactTreeViewFragmentController {
             relNode.put("image", linkIcon);
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", person.getPersonName().toString());
-            textNode.put("title", age);
+            textNode.put("title", age.concat(", Status: ").concat((enrolled) ? "In Care" : "Not Enrolled"));
             //textNode.put("desc", (enrolled) ? "In Care" : "Not Enrolled");
             relNode.put("text", textNode);
 
@@ -226,7 +227,7 @@ public class ContactTreeViewFragmentController {
             relNode.put("image", linkIcon);
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", person.getPersonName().toString());
-            textNode.put("title", age);
+            textNode.put("title", age.concat(", Status: ").concat((enrolled) ? "In Care" : "Not Enrolled"));
             //textNode.put("desc", enrolled ? "In Care" : "Not Enrolled");
             relNode.put("text", textNode);
             patientContacts.add(relNode);
@@ -324,7 +325,7 @@ public class ContactTreeViewFragmentController {
             relNode.put("image", linkIcon);
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", fullName);
-            textNode.put("title", age);
+            textNode.put("title", age.concat(", Status: ").concat(status !=null? status : "Uknown"));
             //textNode.put("desc", status);
             relNode.put("text", textNode);
             if (childrenOfListedContacts.size() > 0) {
