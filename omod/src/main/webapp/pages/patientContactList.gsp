@@ -268,7 +268,7 @@ div.section-title {
 
                             <div class="column-fourteen">${rel.facilityLinkedTo}</div>
 
-                            <div class="column-fifteen">${rel.healthWorkerHandedTo}</div>
+                            <div class="column-fifteen">${rel.healthWorkerHandedTo ?: ""}</div>
 
                             <div class="column-sixteen">${rel.remarks}</div>
 
