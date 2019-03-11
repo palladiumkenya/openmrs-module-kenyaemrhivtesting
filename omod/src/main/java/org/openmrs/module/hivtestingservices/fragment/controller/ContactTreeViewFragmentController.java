@@ -131,7 +131,9 @@ public class ContactTreeViewFragmentController {
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", person.getPersonName().toString());
             textNode.put("title", age);
+            //textNode.put("desc", (enrolled) ? "In Care" : "Not Enrolled");
             relNode.put("text", textNode);
+
 
             // person - relationship person, patient - index client
             Set<Integer> indexClient = new HashSet<Integer>();
@@ -225,6 +227,7 @@ public class ContactTreeViewFragmentController {
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", person.getPersonName().toString());
             textNode.put("title", age);
+            //textNode.put("desc", enrolled ? "In Care" : "Not Enrolled");
             relNode.put("text", textNode);
             patientContacts.add(relNode);
 
@@ -256,6 +259,7 @@ public class ContactTreeViewFragmentController {
             ObjectNode relNode = getJsonNodeFactory().objectNode();
             String type = formatRelationshipType(patientContact.getRelationType());
             String age = "";
+            String status = "";
 
 
             String linkIcon;
@@ -268,8 +272,10 @@ public class ContactTreeViewFragmentController {
                 age = new StringBuilder().append(type).append(", ").append(patientFromContact.getAge()).append(" Yrs").toString();
                 if (contactEnrolledInHivProgram(patient)) {
                     linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
+                    status = "In Care";
                 } else {
                     linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
+                    status = "Not Enrolled";
                 }
 
                 ArrayNode relChildren = getRelationshipContacts(patientFromContact, new HashSet<Integer>(), ui);
@@ -285,7 +291,7 @@ public class ContactTreeViewFragmentController {
                 //params.put("personId", person.getId());
                 String cage = patientContact.getBirthDate() != null ? calculateContactAge(patientContact.getBirthDate(), new Date()).toString() : "" ;
                 age = new StringBuilder().append(type).append(", ").append(cage).append(" Yrs").toString();
-                String baselineHivStatus = patientContact.getBaselineHivStatus();
+                status = patientContact.getBaselineHivStatus();
 
                 Integer ageOfContact = null;
                 if (patientContact.getBirthDate() != null) {
@@ -319,6 +325,7 @@ public class ContactTreeViewFragmentController {
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", fullName);
             textNode.put("title", age);
+            //textNode.put("desc", status);
             relNode.put("text", textNode);
             if (childrenOfListedContacts.size() > 0) {
                 relNode.put("children", childrenOfListedContacts);

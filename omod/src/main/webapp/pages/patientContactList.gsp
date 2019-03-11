@@ -11,7 +11,6 @@
 
     ui.includeJavascript("hivtestingservices", "TreantJs/vendor/raphael.js")
     ui.includeJavascript("hivtestingservices", "TreantJs/Treant.js")
-/*    ui.includeJavascript("hivtestingservices", "TreantJs/vendor/jquery.min.js")*/
     ui.includeJavascript("hivtestingservices", "TreantJs/jquery.easing.js")
     ui.includeJavascript("hivtestingservices", "TreantJs/collapsable.js")
 
@@ -115,7 +114,6 @@ div.section-title {
             <div class="ke-tabmenu-item" data-tabid="contact_list">List of Contacts</div>
 
             <div class="ke-tabmenu-item" data-tabid="contact_trace">Client Tracing History</div>
-            <div class="ke-tabmenu-item" data-tabid="contacts_tree">Client Contacts Tree</div>
 
         </div>
 
@@ -303,12 +301,6 @@ div.section-title {
     </div>
 
 
-</div>
-<div id="contact-tree" title="Contact Tree View" style="display: none">
-    ${ ui.includeFragment("hivtestingservices", "contactTreeView") }
-    <div align="center">
-        <button type="button" onclick="kenyaui.closeDialog();"><img src="${ ui.resourceLink("kenyaui", "images/glyphs/cancel.png") }" /> Close</button>
-    </div>
 </div>
 
 <script type="text/javascript">
