@@ -52,9 +52,11 @@ public class ContactTreeViewFragmentController {
         String iconPathStr = null;
 
         if (patient.getAge().intValue() <= 5) {
-            iconPathStr =  "images/baby_grey_person_" ;
+            iconPathStr =  "images/baby_green_person_" ;
+        } else if (patient.getAge().intValue() < 15){
+            iconPathStr =  "images/youth_green_person_";
         } else {
-            iconPathStr =  "images/grey_person_";
+            iconPathStr =  "images/green_person_";
         }
 
 
@@ -111,24 +113,12 @@ public class ContactTreeViewFragmentController {
             if (person.isPatient()) {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("patientId", person.getId());
-
-                if (patient.getAge().intValue() <= 5) {
-                    relIconPathString =  "images/baby_grey_person_" ;
-                } else {
-                    relIconPathString =  "images/grey_person_";
-                }
-                linkIcon = ui.resourceLink("hivtestingservices", relIconPathString + genderCode + ".png");
+                linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + genderCode + ".png");
             }
             else {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("personId", person.getId());
-
-                if (patient.getAge().intValue() <= 5) {
-                    relIconPathString =  "images/baby_grey_person_" ;
-                } else {
-                    relIconPathString =  "images/grey_person_";
-                }
-                linkIcon = ui.resourceLink("hivtestingservices", relIconPathString + genderCode + ".png");
+                linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + genderCode + ".png");
             }
 
 
@@ -215,15 +205,15 @@ public class ContactTreeViewFragmentController {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("patientId", person.getId());
                 if (contactEnrolledInHivProgram(personPatient)) {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(true, personPatient.getAge().intValue()) + personPatient.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + personPatient.getGender().toLowerCase() + ".png");
                 } else {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(false, personPatient.getAge().intValue()) + personPatient.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + personPatient.getGender().toLowerCase() + ".png");
                 }
             }
             else {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("personId", person.getId());
-                linkIcon = ui.resourceLink("hivtestingservices", "images/grey_person_" + genderCode + ".png");
+                linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + genderCode + ".png");
             }
 
 
@@ -277,9 +267,9 @@ public class ContactTreeViewFragmentController {
                 fullName = patientFromContact.getPersonName().toString();
                 age = new StringBuilder().append(type).append(", ").append(patientFromContact.getAge()).append(" Yrs").toString();
                 if (contactEnrolledInHivProgram(patient)) {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(true, patientFromContact.getAge().intValue()) + patientFromContact.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
                 } else {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForRelationships(false, patientFromContact.getAge().intValue()) + patientFromContact.getGender().toLowerCase() + ".png");
+                    linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
                 }
 
                 ArrayNode relChildren = getRelationshipContacts(patientFromContact, new HashSet<Integer>(), ui);
@@ -297,11 +287,15 @@ public class ContactTreeViewFragmentController {
                 age = new StringBuilder().append(type).append(", ").append(cage).append(" Yrs").toString();
                 String baselineHivStatus = patientContact.getBaselineHivStatus();
 
+                Integer ageOfContact = null;
+                if (patientContact.getBirthDate() != null) {
+                    ageOfContact = calculateContactAge(patientContact.getBirthDate(), new Date());
+                }
 
-                if (baselineHivStatus != null && getGenderIconForContacts(baselineHivStatus, calculateContactAge(patientContact.getBirthDate(), new Date()).intValue()) != null) {
-                    linkIcon = ui.resourceLink("hivtestingservices", getGenderIconForContacts(baselineHivStatus, calculateContactAge(patientContact.getBirthDate(), new Date()).intValue()) + patientContact.getSex().toLowerCase() + ".png");
+                if (ageOfContact != null) {
+                    linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(ageOfContact) + patientContact.getSex().toLowerCase() + ".png");
 
-                } else {
+                } else {//patient.getAge().intValue()
                     linkIcon = ui.resourceLink("hivtestingservices", "images/grey_person_" + patientContact.getSex().toLowerCase() + ".png");
 
                 }
@@ -497,6 +491,19 @@ public class ContactTreeViewFragmentController {
     private JsonNodeFactory getJsonNodeFactory() {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory;
+    }
+
+    private String getPersonIconForAge(Integer age) {
+        if (age == null) {
+            return null;
+        }
+        if (age <=5) {
+            return "images/baby_grey_person_";
+        } else if (age < 15) {
+            return "images/youth_black_person_";
+        } else {
+            return "images/grey_person_";
+        }
     }
 }
 
