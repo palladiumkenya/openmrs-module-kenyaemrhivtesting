@@ -167,7 +167,7 @@
 				<ref bean="kenyaemr.app.hts" />
 			</set>
 		</property>
-		<property name="showIfCalculation" value="org.openmrs.module.kenyaemr.calculation.library.hiv.hts.PatientsEligibleForHtsLinkageAndReferralCalculation" />
+		<property name="showIfCalculation" value="org.openmrs.module.kenyaemr.calculation.library.hiv.hts.PatientsEligibleForHtsScreeningCalculation" />
 		<property name="icon" value="kenyaui:forms/generic.png" />
 		<property name="htmlform" value="hivtestingservices:hts/htsscreeningform.html" />
 		<property name="order" value="200999" />
