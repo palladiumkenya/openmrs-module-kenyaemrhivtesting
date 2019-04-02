@@ -19,12 +19,33 @@
         var populationTypeSelected = function () {
             var val = jq(this).val();
             var keypop = jq('#key-population');
+
             if (val == 164929 ){
                 jq("#key-population").show();
             }
             if(val == 164928){
                 jq("#key-population").hide();
                 clearHiddenSections(keypop);
+            }
+        }
+        var everTested = function (){
+            var val = jq(this).val();
+            var testResults = jq('#ever-tested');
+            var testDate = jq('#duration_months');
+            var eligibleForTesting = jq('#eligible-test');
+
+            if (val == 1066 ){
+                clearHiddenSections(testDate);
+                clearHiddenSections(testResults);
+                jq('#test-result').hide();
+                jq('#eligible-for-test').show();
+                jq('#eligible-test input[value=1065]').prop("checked", true);
+
+            }
+            if (val == 1065){
+                clearHiddenSections(eligibleForTesting);
+                jq('#eligible-for-test').hide();
+                jq('#test-result').show();
             }
         }
 
@@ -49,27 +70,28 @@
             //pop type
             jq("#key-population").hide();
             jq('#population-type :input[type=radio]').change(populationTypeSelected);
-           /*
-            if(everTested == 1066 ){
-                jq('#prev-test-location input').prop("disabled", true);
-                jq('#prev-test-date input').prop("disabled", true);
-                clearHiddenSections(jq('#prev-test-location'));
-                clearHiddenSections(jq('#prev-test-date'));
-            }
+            jq('#test-history :input[type=radio]').change(everTested);
+            /*
+             if(everTested == 1066 ){
+                 jq('#prev-test-location input').prop("disabled", true);
+                 jq('#prev-test-date input').prop("disabled", true);
+                 clearHiddenSections(jq('#prev-test-location'));
+                 clearHiddenSections(jq('#prev-test-date'));
+             }
 
-            //First test
-            var firstTest = getField("hiv-test1-result.value").val();
-            //Negative
-            if(firstTest ==664) {
+             //First test
+             var firstTest = getField("hiv-test1-result.value").val();
+             //Negative
+             if(firstTest ==664) {
 
-                jq("#hiv-test2-result select").prop("disabled", true);
-                jq(".kit-name2 select").prop("disabled", true);
-                jq(".lot-number2 input").prop("disabled", true);
-                jq("#expiry-date2 input").prop("disabled", true);
-                getField('hiv-final-result.value').val(664);
-                jq('#ccc-no input').prop("disabled", true);
-            }
-*/
+                 jq("#hiv-test2-result select").prop("disabled", true);
+                 jq(".kit-name2 select").prop("disabled", true);
+                 jq(".lot-number2 input").prop("disabled", true);
+                 jq("#expiry-date2 input").prop("disabled", true);
+                 getField('hiv-final-result.value').val(664);
+                 jq('#ccc-no input').prop("disabled", true);
+             }
+ */
         });
         //Before Submit
         beforeSubmit.push(function() {
@@ -115,13 +137,14 @@
             <div>
                 Tested for HIV before :
                 <obs conceptId="164401"
+                     id="test-history"
                      answerConceptIds="1065,1066"
                      answerLabels="Yes,No"
                      style="radio" />
             </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset id="test-result">
             <legend>Test Result</legend>
             <table id="testResult">
                 <tr>
@@ -142,11 +165,11 @@
             </table>
         </fieldset>
 
-        <fieldset>
+        <fieldset id="eligible-for-test">
             <legend>Eligible for Testing</legend>
             <div>
                 Client eligible? :
-                <obs conceptId="162699"
+                <obs conceptId="162699" id="eligible-test"
                      answerConceptIds="1065,1066"
                      answerLabels="Yes,No"
                      style="radio" />
