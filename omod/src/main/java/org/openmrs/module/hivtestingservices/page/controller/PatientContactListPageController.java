@@ -83,6 +83,7 @@ public class PatientContactListPageController {
                     "birthDate", kenyaUi.formatDate(contact.getBirthDate()),
                     "maritalStatus", formatMaritalStatusOptions(contact.getMaritalStatus()),
                     "pnsApproach", formatpnsApproachOptions(contact.getPnsApproach()),
+                    "patient", contact.getPatient(),
                     "contactListingDeclineReason",contact.getContactListingDeclineReason(),
                     "consentedContactListing",contact.getConsentedContactListing()
             );
