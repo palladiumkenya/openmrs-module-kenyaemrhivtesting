@@ -44,7 +44,7 @@
             }
             if (val == 1065){
                 clearHiddenSections(eligibleForTesting);
-                jq('#eligible-for-test').hide();
+                jq('#eligible-for-test').show();
                 jq('#test-result').show();
             }
         }
@@ -71,27 +71,7 @@
             jq("#key-population").hide();
             jq('#population-type :input[type=radio]').change(populationTypeSelected);
             jq('#test-history :input[type=radio]').change(everTested);
-            /*
-             if(everTested == 1066 ){
-                 jq('#prev-test-location input').prop("disabled", true);
-                 jq('#prev-test-date input').prop("disabled", true);
-                 clearHiddenSections(jq('#prev-test-location'));
-                 clearHiddenSections(jq('#prev-test-date'));
-             }
-
-             //First test
-             var firstTest = getField("hiv-test1-result.value").val();
-             //Negative
-             if(firstTest ==664) {
-
-                 jq("#hiv-test2-result select").prop("disabled", true);
-                 jq(".kit-name2 select").prop("disabled", true);
-                 jq(".lot-number2 input").prop("disabled", true);
-                 jq("#expiry-date2 input").prop("disabled", true);
-                 getField('hiv-final-result.value').val(664);
-                 jq('#ccc-no input').prop("disabled", true);
-             }
- */
+            jq('#test-result').hide();
         });
         //Before Submit
         beforeSubmit.push(function() {
@@ -100,7 +80,7 @@
            </script>
 
     <div class="ke-form-header">
-        <table style="width: 100%">
+        <table style="width: 100%" class="simple-table">
             <tr>
                 <td>
                     Screening date: <encounterDate id="encounter-date" showTime="true" required="true"/>
