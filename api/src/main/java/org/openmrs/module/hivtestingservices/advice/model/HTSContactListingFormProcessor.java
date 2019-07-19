@@ -166,7 +166,7 @@ public class HTSContactListingFormProcessor {
             }
 
         }
-        if(contactName != null) {
+        if(contactName != null && ageUnit != null) {
             PatientContact contact = fillContactName(contactName);
             contact.setRelationType(relType);
             contact.setBaselineHivStatus(baselineStatus);
