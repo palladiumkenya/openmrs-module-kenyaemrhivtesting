@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,11 +94,11 @@ public class PatientContactListPageController {
             }
 
             // check if contact is registered, and has undertaken hts
-            String hasTestData = "";
+            Date dateTested = null;
             if (contact.getPatient() != null) {
                 Encounter encounter = lastEncounter(contact.getPatient(), et, Arrays.asList(initial, retest));
                 if (encounter != null) {
-                    hasTestData = "Yes";
+                    dateTested = encounter.getEncounterDatetime();
                     for (Obs o : encounter.getObs()) {
                         if (o.getConcept().getUuid().equals(finalResultConceptUUID)) {
                             Concept val = o.getValueCoded();
@@ -113,8 +114,6 @@ public class PatientContactListPageController {
                             break;
                         }
                     }
-                } else {
-                    hasTestData = "No";
                 }
 
             }
@@ -133,7 +132,7 @@ public class PatientContactListPageController {
                     "patient", contact.getPatient(),
                     "contactListingDeclineReason",contact.getContactListingDeclineReason(),
                     "consentedContactListing",contact.getConsentedContactListing(),
-                    "tested",hasTestData,
+                    "dateTested",dateTested !=null ? kenyaUi.formatDate(dateTested) : "",
                     "testResult",finalResult
             );
             objects.add(contactObject);
