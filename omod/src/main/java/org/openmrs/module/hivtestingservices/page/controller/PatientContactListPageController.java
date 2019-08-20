@@ -2,7 +2,14 @@ package org.openmrs.module.hivtestingservices.page.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.Form;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.api.EncounterService;
+import org.openmrs.api.FormService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -16,6 +23,8 @@ import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +33,9 @@ import java.util.Map;
 public class PatientContactListPageController {
 
     protected static final Log log = LogFactory.getLog(PatientContactListPageController.class);
+    public static final String HTS = "9c0a7a57-62ff-4f75-babe-5835b0e921b7";
+    public static final String HTS_INITIAL_TEST = "402dc5d7-46da-42d4-b2be-f43ea4ad87b0";
+    public static final String HTS_CONFIRMATORY_TEST = "b08471f6-0892-4bf7-ab2b-bf79797b8ea4";
 
     public void controller(@SpringBean KenyaUiUtils kenyaUi,
                            @RequestParam(value = "patientId") Patient patient,
@@ -57,6 +69,14 @@ public class PatientContactListPageController {
     private List<SimpleObject> patientContactFormatter(KenyaUiUtils kenyaUi, List<PatientContact> contacts) {
         List<SimpleObject> objects = new ArrayList<SimpleObject>();
 
+        EncounterService encService = Context.getEncounterService();
+        FormService formService = Context.getFormService();
+        EncounterType et = encService.getEncounterTypeByUuid(HTS);
+        Form initial = formService.getFormByUuid(HTS_INITIAL_TEST);
+        Form retest = formService.getFormByUuid(HTS_CONFIRMATORY_TEST);
+        String finalResultConceptUUID = "159427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        String finalResult = "";
+
         for(PatientContact contact : contacts) {
             String fullName = "";
 
@@ -70,6 +90,33 @@ public class PatientContactListPageController {
 
             if(contact.getLastName() != null) {
                 fullName+= " " + contact.getLastName();
+            }
+
+            // check if contact is registered, and has undertaken hts
+            String hasTestData = "";
+            if (contact.getPatient() != null) {
+                Encounter encounter = lastEncounter(contact.getPatient(), et, Arrays.asList(initial, retest));
+                if (encounter != null) {
+                    hasTestData = "Yes";
+                    for (Obs o : encounter.getObs()) {
+                        if (o.getConcept().getUuid().equals(finalResultConceptUUID)) {
+                            Concept val = o.getValueCoded();
+                            if (val != null) {
+                                if (val.getConceptId().intValue() == 703) {
+                                    finalResult = "Positive";
+                                } else if (val.getConceptId().intValue() == 664) {
+                                    finalResult = "Negative";
+                                } else if (val.getConceptId().intValue() == 1138) {
+                                    finalResult = "Inconclusive";
+                                }
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    hasTestData = "No";
+                }
+
             }
             SimpleObject contactObject = SimpleObject.create(
                     "id", contact.getId(),
@@ -85,7 +132,9 @@ public class PatientContactListPageController {
                     "pnsApproach", formatpnsApproachOptions(contact.getPnsApproach()),
                     "patient", contact.getPatient(),
                     "contactListingDeclineReason",contact.getContactListingDeclineReason(),
-                    "consentedContactListing",contact.getConsentedContactListing()
+                    "consentedContactListing",contact.getConsentedContactListing(),
+                    "tested",hasTestData,
+                    "testResult",finalResult
             );
             objects.add(contactObject);
 
@@ -148,6 +197,11 @@ public class PatientContactListPageController {
         options.put(1058, "Divorced");
         options.put(1059, "Widowed");
         return options;
+    }
+
+    public static Encounter lastEncounter(Patient patient, EncounterType type, List<Form> forms) {
+        List<Encounter> encounters = Context.getEncounterService().getEncounters(patient, null, null, null, forms, Collections.singleton(type), null, null, null, false);
+        return encounters.size() > 0 ? encounters.get(encounters.size() - 1) : null;
     }
 
 }

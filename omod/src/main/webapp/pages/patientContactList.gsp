@@ -144,6 +144,8 @@ div.section-title {
                         <div class="column-seven col-header">Booking Date</div>
 
                         <div class="column-seven col-header">PNS Approach</div>
+                        <div class="column-seven col-header">Client Tested</div>
+                        <div class="column-seven col-header">Test Result</div>
 
                         <div class="column-eight col-header"></div>
 
@@ -171,6 +173,8 @@ div.section-title {
                             <div class="column-seven">${rel.appointmentDate ?: ''}</div>
 
                             <div class="column-seven">${rel.pnsApproach ?: ''}</div>
+                            <div class="column-seven">${rel.tested ?: ''}</div>
+                            <div class="column-seven">${rel.testResult ?: ''}</div>
 
                             <div class="column-eight">
                                 <button type="button"
