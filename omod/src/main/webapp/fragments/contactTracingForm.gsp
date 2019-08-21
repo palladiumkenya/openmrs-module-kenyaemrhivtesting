@@ -12,7 +12,8 @@
             [
 
                     [object: command, property: "contactType", label: "Contact Type"],
-                    [object: command, property: "status", label: "Status"]
+                    [object: command, property: "status", label: "Status"],
+                    [object: command, property: "reasonUncontacted", label: "Reason not Contacted"]
 
             ]
     ]
@@ -62,6 +63,7 @@
                 <tr>
                     <td class="ke-field-label">Contact Type</td>
                     <td class="ke-field-label">Outcome</td>
+                    <td class="ke-field-label">Reason not Contacted</td>
                 </tr>
                 <tr>
                     <td style="width: 270px">
@@ -80,13 +82,29 @@
                             <% } %>
                         </select>
                     </td>
+                    <td style="width: 260px">
+                        <div id="phoneSection">
+                        <select name="reasonUncontacted" id="uncontactedReasonPhone">
+                            <option></option>
+                            <% reasonUncontactedByPhone.each { %>
+                            <option ${(command.reasonUncontacted == null)? "" : it == command.reasonUncontacted ? "selected" : ""} value="${it}">${it}</option>
+                            <% } %>
+                        </select>
+                        </div>
+                        <div id="physicalSection">
+                            <select name="reasonUncontacted" id="uncontactedReasonPhysical">
+                                <option></option>
+                                <% reasonUncontactedByPhysical.each { %>
+                                <option ${(command.reasonUncontacted == null)? "" : it == command.reasonUncontacted ? "selected" : ""} value="${it}">${it}</option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </td>
 
                 </tr>
             </table>
-
         </fieldset>
-
-        <fieldset id="linkageSection">
+     <fieldset id="linkageSection">
             <legend>Linkage Details</legend>
             <% linkageToCare.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
@@ -125,13 +143,15 @@
     //On ready
     jQuery(function () {
         //defaults
+        jQuery("#phoneSection select").prop("disabled", true); //disable select section
+        jQuery("#physicalSection").hide(); //hide physical section
+       // jQuery("#phoneSection").hide(); //hide physical section
 
         <% if (command.original != null  &&  command.status == "Contacted and Linked") { %>
             jQuery("#linkageSection").show(); //hide linkage section
             <% } else { %>
             jQuery("#linkageSection").hide(); //hide linkage section
         <% } %>
-
 
         jQuery('#patient-contact-trace-form .cancel-button').click(function () {
             ui.navigate('${ config.returnUrl }');
@@ -164,16 +184,57 @@
             }
         });
 
+
         jQuery('#contactType').change(function () {
-            var selectedOutcome = jQuery(this).val();
+            var contactType = jQuery(this).val();
             var outcome = jQuery("#tracingOutcome").val();
 
-            if(selectedOutcome != "" && outcome != "") {
+            if(contactType != "" && outcome != "") {
                 if (outcome == "Contacted and Linked") {
                     jQuery("#linkageSection").show();
                 } else {
                     jQuery("#linkageSection input").val("");
                     jQuery("#linkageSection").hide();
+                }
+            }
+        });
+
+        jQuery('#contactType').change(function () {
+            var outcome = jQuery(this).val();
+            var contactType = jQuery("#tracingOutcome").val();
+
+            if(contactType != "" && outcome != "") {
+                if (contactType == "Phone" && outcome == "Not Contacted") {
+
+                    jQuery("#phoneSection").show(); //hide phone section
+                    jQuery("#phoneSection select").prop("disabled", false); //disable select section
+                    jQuery("#physicalSection").hide(); //hide phone section
+                }
+                if (contactType == "Physical" && outcome == "Not Contacted") {
+
+                    jQuery("#physicalSection").show(); //hide phone section{
+                    jQuery("#physicalSection select").prop("disabled", false); //disable select section
+                    jQuery("#phoneSection").hide(); //hide phone section
+                }
+            }
+        });
+
+        jQuery('#tracingOutcome').change(function () {
+            var outcome = jQuery(this).val();
+            var contactType = jQuery("#contactType").val();
+
+            if(contactType != "" && outcome != "") {
+                if (contactType == "Phone" && outcome == "Not Contacted") {
+
+                    jQuery("#phoneSection").show(); //hide phone section
+                    jQuery("#phoneSection select").prop("disabled", false); //disable select section
+                    jQuery("#physicalSection").hide(); //hide phone section
+                }
+                if (contactType == "Physical" && outcome == "Not Contacted") {
+
+                    jQuery("#physicalSection").show(); //hide phone section{
+                    jQuery("#physicalSection select").prop("disabled", false); //disable select section
+                    jQuery("#phoneSection").hide(); //hide phone section
                 }
             }
         });

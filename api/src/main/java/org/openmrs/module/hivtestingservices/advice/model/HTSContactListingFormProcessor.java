@@ -228,6 +228,7 @@ public class HTSContactListingFormProcessor {
         Map<Concept, String> pnsApproachList = new HashMap<Concept, String>();
         pnsApproachList.put(conceptService.getConcept(162284),"Dual referral");
         pnsApproachList.put(conceptService.getConcept(163096),"Provider referral");
+        pnsApproachList.put(conceptService.getConcept(161642),"Contract referral");
         pnsApproachList.put(conceptService.getConcept(160551),"Passive referral");
         return pnsApproachList.get(key);
     }
