@@ -1,5 +1,6 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -242,7 +243,8 @@ public class PatientContactFormFragmentController {
                 }
             }
 
-            if (appointmentDate != null) {
+            if (appointmentDate != null && !DateUtils.isSameDay(appointmentDate, new Date())) {
+
                 if (appointmentDate.before(new Date())) {
                     errors.rejectValue("appointmentDate", "Cannot be in the past");
                 } else {
