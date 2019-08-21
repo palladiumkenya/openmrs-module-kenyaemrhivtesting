@@ -145,7 +145,6 @@
         //defaults
         jQuery("#phoneSection select").prop("disabled", true); //disable select section
         jQuery("#physicalSection").hide(); //hide physical section
-       // jQuery("#phoneSection").hide(); //hide physical section
 
         <% if (command.original != null  &&  command.status == "Contacted and Linked") { %>
             jQuery("#linkageSection").show(); //hide linkage section
@@ -200,8 +199,8 @@
         });
 
         jQuery('#contactType').change(function () {
-            var outcome = jQuery(this).val();
-            var contactType = jQuery("#tracingOutcome").val();
+            var contactType = jQuery(this).val();
+            var outcome = jQuery("#tracingOutcome").val();
 
             if(contactType != "" && outcome != "") {
                 if (contactType == "Phone" && outcome == "Not Contacted") {
@@ -209,12 +208,14 @@
                     jQuery("#phoneSection").show(); //hide phone section
                     jQuery("#phoneSection select").prop("disabled", false); //disable select section
                     jQuery("#physicalSection").hide(); //hide phone section
+                    jQuery("#physicalSection select").val("");
                 }
                 if (contactType == "Physical" && outcome == "Not Contacted") {
 
                     jQuery("#physicalSection").show(); //hide phone section{
                     jQuery("#physicalSection select").prop("disabled", false); //disable select section
                     jQuery("#phoneSection").hide(); //hide phone section
+                    jQuery("#phoneSection select").val("");
                 }
             }
         });
@@ -229,12 +230,15 @@
                     jQuery("#phoneSection").show(); //hide phone section
                     jQuery("#phoneSection select").prop("disabled", false); //disable select section
                     jQuery("#physicalSection").hide(); //hide phone section
+                    jQuery("#physicalSection select").val("");
+
                 }
                 if (contactType == "Physical" && outcome == "Not Contacted") {
 
                     jQuery("#physicalSection").show(); //hide phone section{
                     jQuery("#physicalSection select").prop("disabled", false); //disable select section
                     jQuery("#phoneSection").hide(); //hide phone section
+                    jQuery("#phoneSection select").val("");
                 }
             }
         });
