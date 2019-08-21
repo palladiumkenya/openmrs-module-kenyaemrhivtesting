@@ -110,6 +110,9 @@
             <column name="status" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="reason_uncontacted" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
             <column name="unique_patient_no" type="varchar(50)">
                 <constraints nullable="true"/>
             </column>

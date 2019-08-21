@@ -12,6 +12,7 @@ public class ContactTrace extends BaseOpenmrsData {
     private PatientContact patientContact;
     private String contactType;
     private String status;
+    private String reasonUncontacted;
     private String uniquePatientNo;
     private String facilityLinkedTo;
     private String healthWorkerHandedTo;
@@ -27,6 +28,7 @@ public class ContactTrace extends BaseOpenmrsData {
         this.uuid = uuid;
         this.contactType = contactType;
         this.status = status;
+        this.reasonUncontacted = reasonUncontacted;
         this.uniquePatientNo = uniquePatientNo;
         this.facilityLinkedTo = facilityLinkedTo;
         this.healthWorkerHandedTo = healthWorkerHandedTo;
@@ -76,9 +78,13 @@ public class ContactTrace extends BaseOpenmrsData {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(String status) { this.status = status;  }
+
+    public String getReasonUncontacted() {
+        return reasonUncontacted;
     }
+
+    public void setReasonUncontacted(String reasonUncontacted) { this.reasonUncontacted = reasonUncontacted; }
 
     public String getUniquePatientNo() {
         return uniquePatientNo;

@@ -84,7 +84,9 @@ div.section-title {
 
                     <div class="column-three col-header">Status</div>
 
-                    <div class="column-four col-header">Facility Linked To</div>
+                    <div class="column-four col-header">Reason not Contacted</div>
+
+                    <div class="column-five col-header">Facility Linked To</div>
 
                     <div class="column-six col-header">Remarks</div>
 
@@ -105,7 +107,9 @@ div.section-title {
 
                         <div class="column-three">${rel.status}</div>
 
-                        <div class="column-four">${rel.facilityLinkedTo}</div>
+                        <div class="column-four">${rel.reasonUncontacted}</div>
+
+                        <div class="column-five">${rel.facilityLinkedTo}</div>
 
                         <div class="column-six">${rel.remarks}</div>
 

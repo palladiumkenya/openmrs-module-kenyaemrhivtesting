@@ -15,6 +15,7 @@
 		<property name="uuid" type="java.lang.String" column="uuid" length="38" unique="true" />
 		<property name="contactType" type ="java.lang.String" column ="contact_type" length="50"/>
 		<property name="status" type="java.lang.String" column="status" length="50"/>
+		<property name="reasonUncontacted" type="java.lang.String" column="reason_uncontacted" length="255"/>
 		<property name="uniquePatientNo" type="java.lang.String" column="unique_patient_no" length="50"/>
 		<property name="facilityLinkedTo" type="java.lang.String" column ="facility_linked_to" length="255"/>
 		<property name="healthWorkerHandedTo" type="java.lang.String" column="health_worker_handed_to"/>

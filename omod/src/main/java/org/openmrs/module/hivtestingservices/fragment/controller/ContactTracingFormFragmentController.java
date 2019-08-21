@@ -30,14 +30,36 @@ public class ContactTracingFormFragmentController {
         model.addAttribute("command", newContactTraceForm(exists, patientContact));
         model.addAttribute("contactOptions", contactTypeList());
         model.addAttribute("tracingOutcomeOptions", tracingOutcomeList());
+        model.addAttribute("reasonUncontactedByPhone", reasonsPhoneList());
+        model.addAttribute("reasonUncontactedByPhysical", reasonsPhysicalList());
 
 
     }
 
+    private List<String> reasonsPhoneList() {
+        return Arrays.asList(
+                new String("No locator information"),
+                new String("Incorrect locator information"),
+                new String("Calls not going through"),
+                new String("Died"),
+                new String("Others")
+                );
+    }
+
+    private List<String> reasonsPhysicalList() {
+        return Arrays.asList(
+                new String("No locator information"),
+                new String("Incorrect locator information"),
+                new String("Migrated"),
+                new String("Not found at home"),
+                new String("Died"),
+                new String("Others")
+        );
+    }
+
     private List<String> tracingOutcomeList() {
         return Arrays.asList(
-                new String("Contacted and Reached"),
-                new String("Contacted and not Reached"),
+                new String("Contacted"),
                 new String("Contacted and Linked"),
                 new String("Not Contacted")
         );
@@ -76,6 +98,7 @@ public class ContactTracingFormFragmentController {
         private PatientContact patientContact;
         private String contactType;
         private String status;
+        private String reasonUncontacted;
         private String uniquePatientNo;
         private String facilityLinkedTo;
         private String healthWorkerHandedTo;
@@ -95,6 +118,7 @@ public class ContactTracingFormFragmentController {
             this.original = contactTrace;
             this.contactType = contactTrace.getContactType();
             this.status = contactTrace.getStatus();
+            this.reasonUncontacted = contactTrace.getReasonUncontacted();
             this.uniquePatientNo = contactTrace.getUniquePatientNo();
             this.facilityLinkedTo = contactTrace.getFacilityLinkedTo();
             this.healthWorkerHandedTo = contactTrace.getHealthWorkerHandedTo();
@@ -116,6 +140,7 @@ public class ContactTracingFormFragmentController {
             toSave.setDate(date);
             toSave.setContactType(contactType);
             toSave.setStatus(status);
+            toSave.setReasonUncontacted(reasonUncontacted);
             toSave.setUniquePatientNo(uniquePatientNo);
             toSave.setFacilityLinkedTo(facilityLinkedTo);
             toSave.setHealthWorkerHandedTo(healthWorkerHandedTo);
@@ -130,6 +155,7 @@ public class ContactTracingFormFragmentController {
         public void validate(Object o, Errors errors) {
             require(errors, "contactType");
             require(errors, "status");
+            require(errors, "reasonUncontacted");
             require(errors, "date");
 
             if (date != null) {
@@ -182,13 +208,17 @@ public class ContactTracingFormFragmentController {
             this.contactType = contactType;
         }
 
-        public String getStatus() {
-            return status;
-        }
+        public String getStatus() { return status; }
 
         public void setStatus(String status) {
             this.status = status;
         }
+
+        public String getReasonUncontacted() {
+            return reasonUncontacted;
+        }
+
+        public void setReasonUncontacted(String reasonUncontacted) { this.reasonUncontacted = reasonUncontacted; }
 
         public String getUniquePatientNo() {
             return uniquePatientNo;

@@ -47,8 +47,6 @@ public class PatientContactListPageController {
         model.put("lastTraceStatus", lastTraceStatus);
         model.put("traces", contactTrace);
         model.put("patientContact", contactEntry);
-
-
         model.put("contacts", patientContactFormatter(kenyaUi, patientContacts));
         model.put("patient", patient);
 
@@ -135,6 +133,7 @@ public class PatientContactListPageController {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(162284,"Dual referral");
         options.put(160551,"Passive referral");
+        options.put(161642,"Contract referral");
         options.put(163096,"Provider referral");
         return options;
 
