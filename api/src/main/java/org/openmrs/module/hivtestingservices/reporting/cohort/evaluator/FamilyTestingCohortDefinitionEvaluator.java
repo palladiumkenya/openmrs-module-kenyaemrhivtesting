@@ -34,7 +34,7 @@ public class FamilyTestingCohortDefinitionEvaluator implements PatientContactQue
 		PatientContactQueryResult queryResult = new PatientContactQueryResult(definition, context);
 
 		String qry = "SELECT c.id from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id\n" +
-				" where t.voided=0 and t.test_type=2 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive'; ";
+				" where t.voided=0 and t.test_type in(1,2) and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive'; ";
 
 		SqlQueryBuilder builder = new SqlQueryBuilder();
 		builder.append(qry);
