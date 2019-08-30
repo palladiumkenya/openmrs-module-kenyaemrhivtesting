@@ -109,8 +109,8 @@ public class CommonHtsDimensionLibrary {
 		dim.addCohortDefinition("25-29", map(commonCohortLibrary.agedAtLeastAgedAtMost(25, 29), "effectiveDate=${onDate}"));
 		dim.addCohortDefinition("30-34", map(commonCohortLibrary.agedAtLeastAgedAtMost(30, 34), "effectiveDate=${onDate}"));
 		dim.addCohortDefinition("35-39", map(commonCohortLibrary.agedAtLeastAgedAtMost(35, 39), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("40-45", map(commonCohortLibrary.agedAtLeastAgedAtMost(40, 45), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("46-49", map(commonCohortLibrary.agedAtLeastAgedAtMost(46, 49), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("40-44", map(commonCohortLibrary.agedAtLeastAgedAtMost(40, 44), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("45-49", map(commonCohortLibrary.agedAtLeastAgedAtMost(45, 49), "effectiveDate=${onDate}"));
 		// previous one
 		dim.addCohortDefinition("50+", map(commonCohortLibrary.agedAtLeast(50), "effectiveDate=${onDate}"));
 
