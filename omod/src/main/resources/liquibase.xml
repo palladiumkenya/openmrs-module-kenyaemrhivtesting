@@ -110,9 +110,6 @@
             <column name="status" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="reason_uncontacted" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
             <column name="unique_patient_no" type="varchar(50)">
                 <constraints nullable="true"/>
             </column>
@@ -354,5 +351,15 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="pwangoo" id="kenyaemr_hiv_testing_018">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_client_trace" columnName="reason_uncontacted"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_client_trace">
+            <column name="reason_uncontacted" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
