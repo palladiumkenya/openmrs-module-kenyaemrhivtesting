@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A Set of Visit Ids
+ * A Set of PatientContact Ids
  */
 public class PatientContactIdSet extends BaseIdSet<Visit> {
 

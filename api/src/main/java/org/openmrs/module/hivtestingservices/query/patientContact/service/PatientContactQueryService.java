@@ -11,7 +11,7 @@ import org.openmrs.module.reporting.query.visit.VisitQueryResult;
 import org.openmrs.module.reporting.query.visit.definition.VisitQuery;
 
 /**
- * Interface for methods used to manage and evaluate Visit Queries
+ * Interface for methods used to manage and evaluate PatientContact Queries
  */
 public interface PatientContactQueryService extends DefinitionService<PatientContactQuery> {
 

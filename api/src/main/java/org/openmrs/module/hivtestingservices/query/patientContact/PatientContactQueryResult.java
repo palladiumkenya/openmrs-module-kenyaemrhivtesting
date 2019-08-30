@@ -7,7 +7,7 @@ import org.openmrs.module.reporting.query.visit.VisitIdSet;
 import org.openmrs.module.reporting.query.visit.definition.VisitQuery;
 
 /**
- * Result of an Evaluated Visit Query
+ * Result of an Evaluated PatientContact Query
  */
 public class PatientContactQueryResult extends PatientContactIdSet implements Evaluated<PatientContactQuery> {
 

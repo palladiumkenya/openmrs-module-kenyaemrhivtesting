@@ -30,7 +30,7 @@ import org.openmrs.module.reporting.query.visit.definition.VisitQuery;
 import org.openmrs.module.reporting.query.visit.evaluator.VisitQueryEvaluator;
 
 /**
- * The logic that evaluates a {@link AllVisitQuery} and produces an {@link Query}
+ * The logic that evaluates a {@link PatientContactQuery} and produces an {@link Query}
  */
 @Handler(supports=AllPatientContactQuery.class)
 public class AllPatientContactQueryEvaluator implements PatientContactQueryEvaluator {
