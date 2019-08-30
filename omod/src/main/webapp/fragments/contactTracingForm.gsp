@@ -63,7 +63,7 @@
                 <tr>
                     <td class="ke-field-label">Contact Type</td>
                     <td class="ke-field-label">Outcome</td>
-                    <td class="ke-field-label">Reason not Contacted</td>
+                    <td id="reasons-ke" class="ke-field-label ">Reason not Contacted</td>
                 </tr>
                 <tr>
                     <td style="width: 270px">
@@ -143,8 +143,10 @@
     //On ready
     jQuery(function () {
         //defaults
-        jQuery("#phoneSection select").prop("disabled", true); //disable select section
+        jQuery("#reasons-ke").hide(); //hide header
+       // jQuery("#phoneSection select").prop("disabled", true); //disable select section
         jQuery("#physicalSection").hide(); //hide physical section
+        jQuery("#phoneSection").hide(); //hide phone section
 
         <% if (command.original != null  &&  command.status == "Contacted and Linked") { %>
             jQuery("#linkageSection").show(); //hide linkage section
@@ -225,20 +227,29 @@
             var contactType = jQuery("#contactType").val();
 
             if(contactType != "" && outcome != "") {
-                if (contactType == "Phone" && outcome == "Not Contacted") {
 
-                    jQuery("#phoneSection").show(); //hide phone section
-                    jQuery("#phoneSection select").prop("disabled", false); //disable select section
-                    jQuery("#physicalSection").hide(); //hide phone section
-                    jQuery("#physicalSection select").val("");
+                if(outcome == "Not Contacted") {
 
-                }
-                if (contactType == "Physical" && outcome == "Not Contacted") {
+                    if (contactType == "Phone") {
+                        jQuery("#reasons-ke").show(); //show header
+                        jQuery("#phoneSection").show(); //hide phone section
+                        jQuery("#phoneSection select").prop("disabled", false); //disable select section
+                        jQuery("#physicalSection").hide(); //hide phone section
+                        jQuery("#physicalSection select").val("");
 
-                    jQuery("#physicalSection").show(); //hide phone section{
-                    jQuery("#physicalSection select").prop("disabled", false); //disable select section
-                    jQuery("#phoneSection").hide(); //hide phone section
-                    jQuery("#phoneSection select").val("");
+                    } else if (contactType == "Physical") {
+                        jQuery("#reasons-ke").show(); //show header
+                        jQuery("#physicalSection").show(); //hide phone section{
+                        jQuery("#physicalSection select").prop("disabled", false); //disable select section
+                        jQuery("#phoneSection").hide(); //hide phone section
+                        jQuery("#phoneSection select").val("");
+                    }
+                }else {
+                        jQuery("#reasons-ke").hide(); //hide header
+                        jQuery("#physicalSection").hide(); //hide phone section{
+                        jQuery("#physicalSection select").val("");
+                        jQuery("#phoneSection").hide(); //hide phone section
+                        jQuery("#phoneSection select").val("");
                 }
             }
         });
