@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * Extends the patient-based EvaluationContext to add an additional Visit filter for use within Visit specific queries and data extraction
+ * Extends the patient-based EvaluationContext to add an additional PatientContact filter 
  * Note that this cache is cleared whenever any changes are made to baseContacts
  */
 public class PatientContactEvaluationContext extends EvaluationContext {
