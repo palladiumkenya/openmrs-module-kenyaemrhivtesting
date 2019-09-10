@@ -119,8 +119,8 @@ public class HtsIndicatorReportBuilder extends AbstractReportBuilder {
         ColumnParameters colTotal = new ColumnParameters(null, "Total", "");
 
         List<ColumnParameters> allAgeDisaggregation = Arrays.asList(
-                colInfants, children_1_to_9,  f_10_to_14, m_10_to_14,f_15_to_19, m_15_to_19,
-                f_20_to_24,m_20_to_24,f_25_to_29, m_25_to_29, f_30_to_34, m_30_to_34, f_35_to_39, m_35_to_39, f_40_to_44, m_40_to_44, f_45_to_49, m_45_to_49 ,f_50_and_above,m_50_and_above , colTotal);
+                colInfants, children_1_to_9,  m_10_to_14, f_10_to_14,m_15_to_19, f_15_to_19,
+                m_20_to_24,f_20_to_24,m_25_to_29, f_25_to_29, m_30_to_34, f_30_to_34, m_35_to_39, f_35_to_39, m_40_to_44, f_40_to_44, m_45_to_49, f_45_to_49 ,m_50_and_above,f_50_and_above , colTotal);
 
 
         String indParams = "startDate=${startDate},endDate=${endDate}";
