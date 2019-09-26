@@ -123,7 +123,7 @@ public class PatientContactFormFragmentController {
         options.put(972, "Sibling");
         options.put(1528, "Child");
         options.put(5617, "Spouse");
-        options.put(163565, "Partner");
+        options.put(163565, "Sexual partner");
         options.put(162221, "Co-wife");
         options.put(157351, "Injectable drug user");
         return options;
