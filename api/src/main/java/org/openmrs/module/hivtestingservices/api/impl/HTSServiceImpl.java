@@ -67,8 +67,8 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
-    public void voidPatientContact(int theId) {
-        patientContactDAO.voidPatientContact(theId);
+    public void voidPatientContact(int theId, String reason) {
+        patientContactDAO.voidPatientContact(theId, reason);
     }
 
     @Override

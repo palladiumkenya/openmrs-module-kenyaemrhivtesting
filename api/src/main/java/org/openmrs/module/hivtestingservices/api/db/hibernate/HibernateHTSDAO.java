@@ -125,7 +125,7 @@ public class HibernateHTSDAO implements HTSDAO {
     }
 
     @Override
-    public void voidPatientContact(int theId) {
+    public void voidPatientContact(int theId, String reason) {
 
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
     }

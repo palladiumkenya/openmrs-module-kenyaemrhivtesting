@@ -16,6 +16,22 @@
 
 %>
 
+<script type="text/javascript">
+    function onVoidPatientContact(contactId) {
+        kenyaui.openConfirmDialog({
+            heading: 'Void Patient Contact',
+            message: '${ ui.message("kenyaemr.confirmVoidRelationship") }',
+            okCallback: function() { doPatientContactVoid(contactId); }
+        });
+    }
+
+    function doPatientContactVoid(contactId) {
+        ui.getFragmentActionAsJson('hivtestingservices', 'Utils', 'voidContact', { id: contactId, reason: 'Data entry error' }, function() {
+            ui.reloadPage();
+        });
+    }
+</script>
+
 <style>
 div.grid {
     display: block;
@@ -197,6 +213,10 @@ div.section-title {
                                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: rel.id, returnUrl: ui.thisUrl() ])}')">
                                     <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Register
                                 </button>
+                            </div>
+
+                            <div class="column-ten">
+                                <button type="button" class="ke-compact" onclick="onVoidPatientContact(${ rel.id })"><img src="${ ui.resourceLink("kenyaui", "images/glyphs/void.png") }" /></button>
                             </div>
                             <% } else { %>
                             <div class="column-ten">
