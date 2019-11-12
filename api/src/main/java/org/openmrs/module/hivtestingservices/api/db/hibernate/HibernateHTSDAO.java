@@ -66,7 +66,8 @@ public class HibernateHTSDAO implements HTSDAO {
 
     @Override
     public PatientContact savePatientContact(PatientContact patientContact) throws DAOException {
-
+log.info("Voided.............................."+patientContact.getVoided());
+log.info("Voided.............................."+patientContact.getFirstName());
         sessionFactory.getCurrentSession().saveOrUpdate(patientContact);
         return patientContact;
 
@@ -76,6 +77,7 @@ public class HibernateHTSDAO implements HTSDAO {
     public List<PatientContact> getPatientContactByPatient(Patient patient) {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
         criteria.add(Restrictions.eq("patientRelatedTo", patient));
+        criteria.add(Restrictions.eq("voided", false));
         return criteria.list();
     }
 
@@ -125,9 +127,9 @@ public class HibernateHTSDAO implements HTSDAO {
     }
 
     @Override
-    public void voidPatientContact(int theId, String reason) {
+    public void voidPatientContact(int theId) {
 
-        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+     sessionFactory.getCurrentSession().saveOrUpdate(theId);
     }
 
     @Override

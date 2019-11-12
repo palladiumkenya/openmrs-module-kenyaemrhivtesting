@@ -14,6 +14,7 @@ import org.openmrs.ui.framework.annotation.MethodParam;
 import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.converter.util.ConversionUtil;
 import org.openmrs.ui.framework.fragment.FragmentModel;
+import org.openmrs.ui.framework.fragment.action.SuccessResult;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -170,6 +171,15 @@ public class PatientContactProfileFragmentController {
 
             return age;
         }
+    /**
+     * Voids the given patient contact
+     * @param contact the contact
+     * @return the simplified contact
+     */
+    public SuccessResult voidContact(@RequestParam("relationshipId") PatientContact contact) {
+        Context.getService(HTSService.class).getPatientContactByID(contact.getId()).setVoided(true);
+        return new SuccessResult("Patient contact voided");
+    }
 }
 
 

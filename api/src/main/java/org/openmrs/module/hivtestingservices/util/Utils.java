@@ -33,14 +33,4 @@ public class Utils {
     public static final String UNIQUE_PATIENT_NUMBER = "05ee9cf4-7242-4a17-b4d4-00f707265c8a";
     public static final String NATIONAL_UNIQUE_PATIENT_IDENTIFIER = "f85081e2-b4be-4e48-b3a4-7994b69bb101";
 
-    /**
-     * Voids the given patient contact
-     * @param contact the contact
-     * @param reason the reason for voiding
-     * @return the simplified visit
-     */
-    public SuccessResult voidContact(@RequestParam("relationshipId") PatientContact contact, @RequestParam("reason") String reason) {
-        Context.getService(HTSService.class).voidPatientContact(contact.getId(), reason);
-        return new SuccessResult("Patient contact voided");
-    }
 }

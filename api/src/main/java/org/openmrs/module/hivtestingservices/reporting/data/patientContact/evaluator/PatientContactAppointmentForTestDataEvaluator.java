@@ -25,7 +25,7 @@ public class PatientContactAppointmentForTestDataEvaluator implements PatientCon
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, appointment_date  as appointment_date from kenyaemr_hiv_testing_patient_contact; ";
+        String qry = "select id, appointment_date  as appointment_date from kenyaemr_hiv_testing_patient_contact where voided=0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

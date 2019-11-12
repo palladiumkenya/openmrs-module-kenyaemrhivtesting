@@ -1,6 +1,8 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -16,6 +18,9 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
+import java.util.logging.Logger;
+
+import static java.awt.SystemColor.info;
 
 /**
  * Controller for adding and editing Patient Contacts

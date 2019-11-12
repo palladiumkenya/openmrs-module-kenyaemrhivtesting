@@ -26,7 +26,7 @@ public class RelatedPatientInCareDataEvaluator implements PatientContactDataEval
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
         String qry = "select c.id, IF(l.facility_linked_to is not null and l.ccc_number is not null, 'Y', 'N') as isRelatedPatientInCare\n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_related_to; ";
+                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_related_to where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

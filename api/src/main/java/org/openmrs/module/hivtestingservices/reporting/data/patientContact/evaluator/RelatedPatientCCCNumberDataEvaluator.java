@@ -26,7 +26,7 @@ public class RelatedPatientCCCNumberDataEvaluator implements PatientContactDataE
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
         String qry = "select c.id, l.ccc_number  as relatedPatientCCCNumber\n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_related_to; ";
+                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_related_to and c.voided =0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

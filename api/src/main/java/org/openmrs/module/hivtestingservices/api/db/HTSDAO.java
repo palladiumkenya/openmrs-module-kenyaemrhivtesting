@@ -31,7 +31,7 @@ public interface HTSDAO {
     public PatientContact savePatientContact(PatientContact patientContact);
     public List<PatientContact> getPatientContactByPatient(Patient patient);
     public List<PatientContact> getPatientContacts();
-    public void voidPatientContact(int theId, String reason);
+    public void voidPatientContact(int theId);
     public List<PatientContact> searchPatientContact(String searchName);
     public PatientContact getPatientContactByID (Integer patientContactId);
     public ContactTrace saveClientTrace(ContactTrace contactTrace);

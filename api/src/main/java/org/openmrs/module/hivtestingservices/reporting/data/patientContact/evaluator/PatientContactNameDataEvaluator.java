@@ -24,7 +24,7 @@ public class PatientContactNameDataEvaluator implements PatientContactDataEvalua
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, concat_ws(' ', first_name, last_name, middle_name) as fullName from kenyaemr_hiv_testing_patient_contact; ";
+        String qry = "select id, concat_ws(' ', first_name, last_name, middle_name) as fullName from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

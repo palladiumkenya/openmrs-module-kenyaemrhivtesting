@@ -26,7 +26,7 @@ public class RelatedPatientTestStrategyDataEvaluator implements PatientContactDa
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
         String qry = "select c.id, t.test_strategy as testStrategy\n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on t.patient_id=c.patient_related_to; ";
+                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on t.patient_id=c.patient_related_to where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

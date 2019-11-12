@@ -4,6 +4,7 @@ package org.openmrs.module.hivtestingservices.api;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.User;
 
 import java.util.Date;
 import java.util.UUID;
@@ -31,6 +32,10 @@ public class PatientContact extends BaseOpenmrsData {
     private Integer pnsApproach;
     private String contactListingDeclineReason;
     private Integer consentedContactListing;
+    private Boolean voided;
+    private String voidedBy;
+    private Date dateVoided;
+    private String voidedReason;
 
     public PatientContact() {
         prePersist();
@@ -41,7 +46,7 @@ public class PatientContact extends BaseOpenmrsData {
                           String phoneContact, Integer relationType, Date appointmentDate,
                           String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,
                           String contactListingDeclineReason, Date dateCreated, Integer consentedContactListing,
-                          Integer changedBy, Date dateChanged, boolean voided, Integer voidedBy, Date dateVoided, String voidedReason) {
+                          Integer changedBy, Date dateChanged, boolean voided, String voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
         // this.obsGroupId = obsGroupId;
         this.firstName = firstName;
@@ -61,6 +66,10 @@ public class PatientContact extends BaseOpenmrsData {
         this.pnsApproach = pnsApproach;
         this.contactListingDeclineReason = contactListingDeclineReason;
         this.consentedContactListing = consentedContactListing;
+        this.voided = voided;
+        this.voidedBy = voidedBy;
+        this.dateVoided = dateVoided;
+        this.voidedReason = voidedReason;
 
 
     }
@@ -239,6 +248,51 @@ public class PatientContact extends BaseOpenmrsData {
 
     public void setConsentedContactListing(Integer consentedContactListing) {
         this.consentedContactListing = consentedContactListing;
+    }
+
+    @Override
+    public Boolean getVoided() {
+        return voided;
+    }
+
+    @Override
+    public void setVoided(Boolean voided) {
+        this.voided = voided;
+    }
+
+    @Override
+    public User getVoidedBy() {
+        return super.getVoidedBy();
+    }
+
+    @Override
+    public Date getDateVoided() {
+        return dateVoided;
+    }
+
+    @Override
+    public void setDateVoided(Date dateVoided) {
+        this.dateVoided = dateVoided;
+    }
+
+    @Override
+    public User getCreator() {
+        return super.getCreator();
+    }
+
+    @Override
+    public void setVoidedBy(User voidedBy) {
+        super.setVoidedBy(voidedBy);
+    }
+
+    @Override
+    public String getVoidReason() {
+        return super.getVoidReason();
+    }
+
+    @Override
+    public void setVoidReason(String voidReason) {
+        super.setVoidReason(voidReason);
     }
 }
 

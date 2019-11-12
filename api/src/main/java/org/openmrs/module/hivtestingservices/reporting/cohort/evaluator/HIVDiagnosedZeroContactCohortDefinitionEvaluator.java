@@ -35,7 +35,7 @@ public class HIVDiagnosedZeroContactCohortDefinitionEvaluator implements Encount
 
 		String qry = "select encounter_id from (\n" +
 				"SELECT t.encounter_id, t.visit_date, c.patient_related_to from kenyaemr_etl.etl_hts_test t left join kenyaemr_hiv_testing_patient_contact c on t.patient_id=c.patient_related_to \n" +
-				"where t.test_type = 2 and t.voided = 0 \n" +
+				"where t.test_type = 2 and t.voided = 0  and c.voided = 0\n" +
 				") at where patient_related_to is null  AND date(visit_date) BETWEEN date(:startDate) AND date(:endDate); ";
 
 
