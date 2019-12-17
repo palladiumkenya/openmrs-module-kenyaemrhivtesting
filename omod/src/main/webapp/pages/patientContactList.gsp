@@ -203,6 +203,12 @@ div.section-title {
                                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: rel.id, returnUrl: ui.thisUrl() ])}')">
                                     <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Register
                                 </button>
+                        </div>
+                            <div>
+                                <button type="button" class="ke-compact"
+                                        onclick="onVoidPatientContact(${ rel.id })">
+                                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/void.png")}"/> Delete
+                                </button>
                             </div>
 
                             <% } else { %>
@@ -214,10 +220,7 @@ div.section-title {
                             </div>
                             <% } %>
                             <div class="column-eleven">
-                                <button type="button" class="ke-compact"
-                                        onclick="onVoidPatientContact(${ rel.id })"><img
-                                        src="${ui.resourceLink("kenyaui", "images/glyphs/void.png")}"/>
-                                </button>
+
                             </div>
                         </div>
 

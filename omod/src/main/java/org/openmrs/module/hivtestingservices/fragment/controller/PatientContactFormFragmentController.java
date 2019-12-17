@@ -4,6 +4,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -137,7 +138,6 @@ public class PatientContactFormFragmentController {
 
     public SimpleObject savePatientContact(@MethodParam("newEditPatientContactForm") @BindParams EditPatientContactForm form, UiUtils ui) {
         ui.validate(form, form, null);
-
         PatientContact patientContact = form.save();
 
         return SimpleObject.create("id", patientContact.getPatientRelatedTo().getId());
@@ -172,6 +172,10 @@ public class PatientContactFormFragmentController {
         private Integer pnsApproach;
         private String contactListingDeclineReason;
         private Integer consentedContactListing;
+        private Boolean voided = false;
+        private User voidedBy;
+        private Date dateVoided;
+        private String voidedReason;
 
 
         public EditPatientContactForm() {
@@ -200,6 +204,10 @@ public class PatientContactFormFragmentController {
             this.livingWithPatient = patientContact.getLivingWithPatient();
             this.pnsApproach = patientContact.getPnsApproach();
             this.contactListingDeclineReason = patientContact.getContactListingDeclineReason();
+            this.voided = patientContact.getVoided();
+            this.voidedBy = patientContact.getVoidedBy();
+            this.dateVoided = patientContact.getDateVoided();
+            this.voidedReason = patientContact.getVoidReason();
 
         }
 
@@ -228,6 +236,10 @@ public class PatientContactFormFragmentController {
             toSave.setPnsApproach(pnsApproach);
             toSave.setConsentedContactListing(consentedContactListing);
             toSave.setContactListingDeclineReason(contactListingDeclineReason);
+            toSave.setVoided(voided);
+            toSave.setVoidedBy(voidedBy);
+            toSave.setDateVoided(dateVoided);
+            toSave.setVoidReason(voidedReason);
             PatientContact pc = Context.getService(HTSService.class).savePatientContact(toSave);
             return pc;
         }

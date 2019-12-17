@@ -33,9 +33,7 @@ public class PatientContact extends BaseOpenmrsData {
     private String contactListingDeclineReason;
     private Integer consentedContactListing;
     private Boolean voided;
-    private String voidedBy;
     private Date dateVoided;
-    private String voidedReason;
 
     public PatientContact() {
         prePersist();
@@ -45,8 +43,8 @@ public class PatientContact extends BaseOpenmrsData {
                           String lastName, String sex, Date birthDate, String physicalAddress,
                           String phoneContact, Integer relationType, Date appointmentDate,
                           String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,
-                          String contactListingDeclineReason, Date dateCreated, Integer consentedContactListing,
-                          Integer changedBy, Date dateChanged, boolean voided, String voidedBy, Date dateVoided, String voidedReason) {
+                          String contactListingDeclineReason, Integer consentedContactListing,
+                           boolean voided, User voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
         // this.obsGroupId = obsGroupId;
         this.firstName = firstName;
@@ -67,9 +65,7 @@ public class PatientContact extends BaseOpenmrsData {
         this.contactListingDeclineReason = contactListingDeclineReason;
         this.consentedContactListing = consentedContactListing;
         this.voided = voided;
-        this.voidedBy = voidedBy;
         this.dateVoided = dateVoided;
-        this.voidedReason = voidedReason;
 
 
     }
