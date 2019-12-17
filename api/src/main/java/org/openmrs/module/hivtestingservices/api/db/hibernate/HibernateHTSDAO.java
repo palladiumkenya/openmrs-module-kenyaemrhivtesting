@@ -66,8 +66,6 @@ public class HibernateHTSDAO implements HTSDAO {
 
     @Override
     public PatientContact savePatientContact(PatientContact patientContact) throws DAOException {
-log.info("Voided.............................."+patientContact.getVoided());
-log.info("Voided.............................."+patientContact.getFirstName());
         sessionFactory.getCurrentSession().saveOrUpdate(patientContact);
         return patientContact;
 
