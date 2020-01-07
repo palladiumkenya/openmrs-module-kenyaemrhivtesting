@@ -185,17 +185,17 @@ public class HibernateHTSDAO implements HTSDAO {
         }
 
         String prefixTerm = "";
-        StringBuilder query = new StringBuilder("select id from kenyaemr_hiv_testing_patient_contact where voided = 0 and ( ");
+        StringBuilder query = new StringBuilder("select c.id from kenyaemr_hiv_testing_patient_contact c where c.voided = 0 and ( ");
         if (includeMales) {
-            query.append(" sex = 'M' ");
+            query.append(" c.sex = 'M' ");
             prefixTerm = " or";
         }
         if (includeFemales) {
-            query.append(prefixTerm + " sex = 'F'");
+            query.append(prefixTerm + " c.sex = 'F'");
             prefixTerm = " or";
         }
         if (includeUnknownGender) {
-            query.append(prefixTerm + " sex is null or (sex != 'M' and sex != 'F')");
+            query.append(prefixTerm + " c.sex is null or (c.sex != 'M' and c.sex != 'F')");
         }
         query.append(")");
         Query q = sessionFactory.getCurrentSession().createSQLQuery(query.toString());
