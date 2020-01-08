@@ -26,7 +26,7 @@ public class RelatedPatientLandMarkDataEvaluator implements PatientContactDataEv
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
         String qry = "select c.id, a.address2 as landMark\n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join person_address a on a.person_id=c.patient_related_to and a.voided=0; ";
+                "from kenyaemr_hiv_testing_patient_contact c inner join person_address a on a.person_id=c.patient_related_to and a.voided=0 and c.voided =0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

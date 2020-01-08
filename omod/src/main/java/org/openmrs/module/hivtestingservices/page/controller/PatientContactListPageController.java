@@ -2,12 +2,7 @@ package org.openmrs.module.hivtestingservices.page.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Concept;
-import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
-import org.openmrs.Form;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
+import org.openmrs.*;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.FormService;
 import org.openmrs.api.context.Context;
@@ -22,13 +17,7 @@ import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class PatientContactListPageController {
@@ -76,19 +65,19 @@ public class PatientContactListPageController {
         String finalResultConceptUUID = "159427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
         String finalResult = "";
 
-        for(PatientContact contact : contacts) {
+        for (PatientContact contact : contacts) {
             String fullName = "";
 
-            if(contact.getFirstName() != null) {
-                fullName+=contact.getFirstName();
+            if (contact.getFirstName() != null) {
+                fullName += contact.getFirstName();
             }
 
-            if(contact.getMiddleName() != null) {
-                fullName+= " " + contact.getMiddleName();
+            if (contact.getMiddleName() != null) {
+                fullName += " " + contact.getMiddleName();
             }
 
-            if(contact.getLastName() != null) {
-                fullName+= " " + contact.getLastName();
+            if (contact.getLastName() != null) {
+                fullName += " " + contact.getLastName();
             }
 
             // check if contact is registered, and has undertaken hts
@@ -123,15 +112,15 @@ public class PatientContactListPageController {
                     "phoneContact", contact.getPhoneContact(),
                     "relationType", formatRelationshipType(contact.getRelationType()),
                     "baselineHivStatus", contact.getBaselineHivStatus(),
-                    "appointmentDate",  kenyaUi.formatDate(contact.getAppointmentDate()),
+                    "appointmentDate", kenyaUi.formatDate(contact.getAppointmentDate()),
                     "birthDate", kenyaUi.formatDate(contact.getBirthDate()),
                     "maritalStatus", formatMaritalStatusOptions(contact.getMaritalStatus()),
                     "pnsApproach", formatpnsApproachOptions(contact.getPnsApproach()),
                     "patient", contact.getPatient(),
-                    "contactListingDeclineReason",contact.getContactListingDeclineReason(),
-                    "consentedContactListing",contact.getConsentedContactListing(),
-                    "dateTested",dateTested !=null ? kenyaUi.formatDate(dateTested) : "",
-                    "testResult",finalResult
+                    "contactListingDeclineReason", contact.getContactListingDeclineReason(),
+                    "consentedContactListing", contact.getConsentedContactListing(),
+                    "dateTested", dateTested != null ? kenyaUi.formatDate(dateTested) : "",
+                    "testResult", finalResult
             );
             objects.add(contactObject);
 
@@ -164,7 +153,7 @@ public class PatientContactListPageController {
         }
     }
 
-    private Map<Integer, String> relationshipOptions () {
+    private Map<Integer, String> relationshipOptions() {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(970, "Mother");
         options.put(971, "Father");
@@ -179,10 +168,10 @@ public class PatientContactListPageController {
 
     private Map<Integer, String> pnsApproachOptions() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(162284,"Dual referral");
-        options.put(160551,"Passive referral");
-        options.put(161642,"Contract referral");
-        options.put(163096,"Provider referral");
+        options.put(162284, "Dual referral");
+        options.put(160551, "Passive referral");
+        options.put(161642, "Contract referral");
+        options.put(163096, "Provider referral");
         return options;
 
     }

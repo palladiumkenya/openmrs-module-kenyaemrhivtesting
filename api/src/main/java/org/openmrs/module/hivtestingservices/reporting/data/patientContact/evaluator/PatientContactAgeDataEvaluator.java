@@ -25,7 +25,7 @@ public class PatientContactAgeDataEvaluator implements PatientContactDataEvaluat
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),birth_date)), '%Y')+0 as age from kenyaemr_hiv_testing_patient_contact; ";
+        String qry = "select c.id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),c.birth_date)), '%Y')+0 as age from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

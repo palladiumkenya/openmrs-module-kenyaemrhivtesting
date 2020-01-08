@@ -13,6 +13,7 @@
     ui.includeJavascript("hivtestingservices", "TreantJs/Treant.js")
     ui.includeJavascript("hivtestingservices", "TreantJs/jquery.easing.js")
     ui.includeJavascript("hivtestingservices", "TreantJs/collapsable.js")
+    ui.includeJavascript("kenyaui", "kenyaui.js")
 
 %>
 
@@ -144,7 +145,9 @@ div.section-title {
                         <div class="column-seven col-header">Booking Date</div>
 
                         <div class="column-seven col-header">PNS Approach</div>
+
                         <div class="column-seven col-header">Date Tested</div>
+
                         <div class="column-seven col-header">Test Result</div>
 
                         <div class="column-eight col-header"></div>
@@ -173,7 +176,9 @@ div.section-title {
                             <div class="column-seven">${rel.appointmentDate ?: ''}</div>
 
                             <div class="column-seven">${rel.pnsApproach ?: ''}</div>
+
                             <div class="column-seven">${rel.dateTested ?: ''}</div>
+
                             <div class="column-seven">${rel.testResult ?: ''}</div>
 
                             <div class="column-eight">
@@ -189,15 +194,23 @@ div.section-title {
                                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientContactId: rel.id, patientId: currentPatient.id, returnUrl: ui.thisUrl() ])}')">
                                     <img src="${ui.resourceLink("kenyaui", "images/glyphs/edit.png")}"/> Edit
                                 </button>
+
                             </div>
 
-                            <% if(rel.patient == null) { %>
+                            <% if (rel.patient == null) { %>
                             <div class="column-ten">
                                 <button type="button"
                                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: rel.id, returnUrl: ui.thisUrl() ])}')">
                                     <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Register
                                 </button>
+                        </div>
+                            <div>
+                                <button type="button" class="ke-compact"
+                                        onclick="onVoidPatientContact(${ rel.id })">
+                                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/void.png")}"/> Delete
+                                </button>
                             </div>
+
                             <% } else { %>
                             <div class="column-ten">
                                 <button type="button"
@@ -206,7 +219,9 @@ div.section-title {
                                 </button>
                             </div>
                             <% } %>
+                            <div class="column-eleven">
 
+                            </div>
                         </div>
 
                         <div class="clear"></div>
@@ -224,9 +239,10 @@ div.section-title {
 
             <div align="center">
 
-                <button type="button" class ="addContact"
+                <button type="button" class="addContact"
                         onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientId: patient.id,  returnUrl: ui.thisUrl() ])}')">
-                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/person_m.png")}" style="display:none;"/>Add Contact
+                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/person_m.png")}"
+                         style="display:none;"/>Add Contact
                 </button>
 
             </div>
@@ -264,6 +280,7 @@ div.section-title {
                         </div>
 
                     </div>
+
                     <div class="clear"></div>
 
                     <% traces.each { rel -> %>
@@ -311,7 +328,6 @@ div.section-title {
 
     </div>
 
-
 </div>
 
 <script type="text/javascript">
@@ -336,7 +352,23 @@ div.section-title {
     }); // end of jQuery initialization bloc
 
     function openContactsTree() {
-        kenyaui.openPanelDialog({ templateId: 'contact-tree', width: 85, height: 70, scrolling: true });
+        kenyaui.openPanelDialog({templateId: 'contact-tree', width: 85, height: 70, scrolling: true});
+    }
+
+    function onVoidPatientContact(contactId) {
+        kenyaui.openConfirmDialog({
+            heading: 'Void Patient Contact',
+            message: '${ ui.message("Are you sure you want to void this contact?") }',
+            okCallback: function () {
+                voidPatientContact(contactId);
+            }
+        });
+    }
+
+    function voidPatientContact(contactId) {
+        ui.getFragmentActionAsJson('hivtestingservices', 'htsUtils', 'voidContact', {id: contactId}, function () {
+            ui.reloadPage();
+        });
     }
 
 </script>

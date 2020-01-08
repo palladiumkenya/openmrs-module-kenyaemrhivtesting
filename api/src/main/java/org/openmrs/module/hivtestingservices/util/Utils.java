@@ -1,5 +1,12 @@
 package org.openmrs.module.hivtestingservices.util;
 
+import org.openmrs.Relationship;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.HTSService;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.ui.framework.fragment.action.SuccessResult;
+import org.springframework.web.bind.annotation.RequestParam;
+
 public class Utils {
     /**
      * Lifted from KenyaEMR common metadata

@@ -25,7 +25,7 @@ public class PatientContactPhoneContactDataEvaluator implements PatientContactDa
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, phone_contact as phone_contact from kenyaemr_hiv_testing_patient_contact; ";
+        String qry = "select id, phone_contact as phone_contact from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

@@ -27,7 +27,7 @@ public class RelatedPatientVisitDateDataEvaluator implements PatientContactDataE
 
         String qry = "SELECT c.id, max(t.visit_date) as test_date \n" +
                 "from kenyaemr_etl.etl_hts_test t right join kenyaemr_hiv_testing_patient_contact c on t.patient_id=c.patient_related_to\n" +
-                "where t.test_type = 2 and t.voided = 0 \n" +
+                "where t.test_type = 2 and t.voided = 0 and c.voided =0\n" +
                 "group by c.id, t.patient_id ; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();

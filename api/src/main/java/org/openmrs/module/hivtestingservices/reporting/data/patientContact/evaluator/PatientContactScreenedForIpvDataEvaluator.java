@@ -25,7 +25,7 @@ public class PatientContactScreenedForIpvDataEvaluator implements PatientContact
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, if(ipv_outcome is not null, 'Y', 'N/A')  as ipv_screening_done from kenyaemr_hiv_testing_patient_contact; ";
+        String qry = "select id, if(ipv_outcome is not null, 'Y', 'N/A')  as ipv_screening_done from kenyaemr_hiv_testing_patient_contact c where c.voided =0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

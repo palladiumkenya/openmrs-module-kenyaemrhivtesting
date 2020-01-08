@@ -66,7 +66,6 @@ public class HibernateHTSDAO implements HTSDAO {
 
     @Override
     public PatientContact savePatientContact(PatientContact patientContact) throws DAOException {
-
         sessionFactory.getCurrentSession().saveOrUpdate(patientContact);
         return patientContact;
 
@@ -76,6 +75,7 @@ public class HibernateHTSDAO implements HTSDAO {
     public List<PatientContact> getPatientContactByPatient(Patient patient) {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
         criteria.add(Restrictions.eq("patientRelatedTo", patient));
+        criteria.add(Restrictions.eq("voided", false));
         return criteria.list();
     }
 
@@ -127,7 +127,7 @@ public class HibernateHTSDAO implements HTSDAO {
     @Override
     public void voidPatientContact(int theId) {
 
-        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+     sessionFactory.getCurrentSession().saveOrUpdate(theId);
     }
 
     @Override
@@ -185,17 +185,17 @@ public class HibernateHTSDAO implements HTSDAO {
         }
 
         String prefixTerm = "";
-        StringBuilder query = new StringBuilder("select id from kenyaemr_hiv_testing_patient_contact where voided = 0 and ( ");
+        StringBuilder query = new StringBuilder("select c.id from kenyaemr_hiv_testing_patient_contact c where c.voided = 0 and ( ");
         if (includeMales) {
-            query.append(" sex = 'M' ");
+            query.append(" c.sex = 'M' ");
             prefixTerm = " or";
         }
         if (includeFemales) {
-            query.append(prefixTerm + " sex = 'F'");
+            query.append(prefixTerm + " c.sex = 'F'");
             prefixTerm = " or";
         }
         if (includeUnknownGender) {
-            query.append(prefixTerm + " sex is null or (sex != 'M' and sex != 'F')");
+            query.append(prefixTerm + " c.sex is null or (c.sex != 'M' and c.sex != 'F')");
         }
         query.append(")");
         Query q = sessionFactory.getCurrentSession().createSQLQuery(query.toString());

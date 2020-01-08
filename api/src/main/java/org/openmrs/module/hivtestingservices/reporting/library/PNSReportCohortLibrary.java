@@ -158,7 +158,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id and t.test_type=2\n" +
-                " where t.voided=0 and c.relationship_type in(163565, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+                " where t.voided=0 and c.relationship_type in(163565, 5617) and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("totalContactsIdentified");
@@ -178,7 +178,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id and t.test_type=1\n" +
-                " where t.voided=0 and c.relationship_type in(163565, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status='Positive'\n" +
+                " where t.voided=0 and c.relationship_type in(163565, 5617) and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status='Positive'\n" +
                 " group by c.id  ) t\n" +
                 " ;";
         cd.setName("knownPositiveContacts");
@@ -198,7 +198,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id and t.test_type=2\n" +
-                " where t.voided=0 and c.relationship_type in(163565, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status !='Positive'\n" +
+                " where t.voided=0 and c.relationship_type in(163565, 5617) and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status !='Positive'\n" +
                 " group by c.id  ) t\n" +
                 " ;";
         cd.setName("contactsEligibleForTesting");
@@ -218,7 +218,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id\n" +
-                " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+                " where t.voided=0 and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("contactsTested");
@@ -238,7 +238,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id\n" +
-                " where t.voided=0 and t.test_type=2 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive' \n" +
+                " where t.voided=0 and t.test_type=2 and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive' \n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("contactsNewlyIdentifiedPositive");
@@ -259,7 +259,7 @@ public class PNSReportCohortLibrary {
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id \n" +
                 " inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_id and l.voided=0 and date(l.visit_date) between date(:startDate) and date(:endDate)\n" +
-                " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+                " where t.voided=0 and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("contactsLinkedToHaart");
@@ -282,7 +282,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id and t.test_type=2\n" +
-                " where t.voided=0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+                " where t.voided=0 and c.voided = 0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("totalContactsIdentified");
@@ -302,7 +302,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id and t.test_type=2\n" +
-                " where t.voided=0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status='Positive'\n" +
+                " where t.voided=0 and c.voided = 0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status='Positive'\n" +
                 " group by c.id  ) t\n" +
                 " ;";
         cd.setName("knownPositiveContacts");
@@ -322,7 +322,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id and t.test_type=2\n" +
-                " where t.voided=0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status !='Positive'\n" +
+                " where t.voided=0 and c.voided = 0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and c.baseline_hiv_status !='Positive'\n" +
                 " group by c.id  ) t\n" +
                 " ;";
         cd.setName("contactsEligibleForTesting");
@@ -342,7 +342,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id\n" +
-                " where t.voided=0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+                " where t.voided=0 and c.voided =0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("contactsTested");
@@ -362,7 +362,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id\n" +
-                " where t.voided=0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and t.test_type=2 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive' \n" +
+                " where t.voided=0 and c.voided =0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and t.test_type=2 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive' \n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("contactsNewlyIdentifiedPositive");
@@ -383,7 +383,7 @@ public class PNSReportCohortLibrary {
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id \n" +
                 " inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_id and l.voided=0 and date(l.visit_date) between date(:startDate) and date(:endDate)\n" +
-                " where t.voided=0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+                " where t.voided=0 and c.voided =0 and c.relationship_type in(971, 972, 1528, 162221, 970, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("contactsLinkedToHaart");
