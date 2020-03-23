@@ -101,6 +101,10 @@ public class RegisterContactFragmentController {
 	String cowifeRelType = "2ac0d501-eadc-4624-b982-563c70035d46";
 	String injectableDrugUserRelType = "58da0d1e-9c89-42e9-9412-275cef1e0429";
 
+	String coworkerRelType = "da9cded8-4f0c-463f-92e4-298d3d8ca0c7";
+	String airPassangerRelType = "a3ea745a-0f3c-43ab-9cbb-c1ba13763d95";
+	String roadPassangerRelType = "ce38734b-a1eb-4172-b7e6-b125cb89df54";
+
 	/**
 	 * Main controller method
 	 * @param patientContact the patientContact
@@ -148,7 +152,9 @@ public class RegisterContactFragmentController {
 			new String("Uncle"),
 			new String("Guardian"),
 			new String("Friend"),
-			new String("Co-worker")
+			new String("Co-worker"),
+			new String("Passanger in aircraft"),
+			new String("Passanger in vehicle")
 		);
 
 		model.addAttribute("nextOfKinRelationshipOptions", nextOfKinRelationshipOptions);
@@ -571,6 +577,9 @@ public class RegisterContactFragmentController {
 |                    7 | 007b765f-6725-4ae9-afee-9966302bace4 | Partner    | Partner      |
 |                    8 | 2ac0d501-eadc-4624-b982-563c70035d46 | Co-wife    | Co-wife      |
 |                    9 | 58da0d1e-9c89-42e9-9412-275cef1e0429 | Injectable Drug User| Injectable Drug User|
+|                    10| da9cded8-4f0c-463f-92e4-298d3d8ca0c7 | Co-worker  | Co-worker    |
+|                    11| a3ea745a-0f3c-43ab-9cbb-c1ba13763d95 | Air passanger | Air passanger |
+|                    12| ce38734b-a1eb-4172-b7e6-b125cb89df54 | Road passanger | Road passanger |
 +----------------------+--------------------------------------+------------+--------------+
 */
 
@@ -585,6 +594,9 @@ public class RegisterContactFragmentController {
 		private String relationshipOptionsToRelTypeMapper (Integer relType) {
 			Map<Integer, String> options = new HashMap<Integer, String>();
 
+			options.put(160237, coworkerRelType);
+			options.put(114319, airPassangerRelType);
+			options.put(130728, roadPassangerRelType);
 			options.put(970, parentChildRelType);
 			options.put(971, parentChildRelType);
 			options.put(972, siblingRelType);

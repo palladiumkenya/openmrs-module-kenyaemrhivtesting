@@ -19,6 +19,9 @@ public class PatientContact extends BaseOpenmrsData {
     private String lastName;
     private String sex;
     private Date birthDate;
+    private String subcounty;
+    private String town;
+    private String facility;
     private String physicalAddress;
     private String phoneContact;
     private Patient patientRelatedTo;
@@ -40,7 +43,7 @@ public class PatientContact extends BaseOpenmrsData {
     }
 
     public PatientContact(String uuid, String firstName, String middleName,
-                          String lastName, String sex, Date birthDate, String physicalAddress,
+                          String lastName, String sex, Date birthDate, String physicalAddress, String subcounty, String town, String facility,
                           String phoneContact, Integer relationType, Date appointmentDate,
                           String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,
                           String contactListingDeclineReason, Integer consentedContactListing,
@@ -52,7 +55,10 @@ public class PatientContact extends BaseOpenmrsData {
         this.lastName = lastName;
         this.sex = sex;
         this.birthDate = birthDate;
+        this.subcounty = subcounty;
+        this.town = town;
         this.physicalAddress = physicalAddress;
+        this.facility = facility;
         this.phoneContact = phoneContact;
         // this.patientRelatedTo = patientRelatedTo;
         this.relationType = relationType;
@@ -148,6 +154,30 @@ public class PatientContact extends BaseOpenmrsData {
 
     public void setPhysicalAddress(String physicalAddress) {
         this.physicalAddress = physicalAddress;
+    }
+
+    public String getTown() {
+        return town;
+    }
+
+    public void setTown(String town) {
+        this.town = town;
+    }
+
+    public String getFacility() {
+        return facility;
+    }
+
+    public void setFacility(String facility) {
+        this.facility = facility;
+    }
+
+    public String getSubcounty() {
+        return subcounty;
+    }
+
+    public void setSubcounty(String subcounty) {
+        this.subcounty = subcounty;
     }
 
     public String getPhoneContact() {

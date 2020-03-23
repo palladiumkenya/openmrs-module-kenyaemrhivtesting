@@ -113,6 +113,9 @@ public class HTSContactListingFormProcessor {
         Integer pnsApproachConcept = 164408;
         Integer consentedContactListingConcept = 163089;
         Integer physicalAddressConcept = 159942;
+        Integer townConcept = 1354;
+        Integer facilityConcept = 162724;
+        Integer subcountyConcept = 165851;
 
 
         Integer relType = null;
@@ -128,6 +131,9 @@ public class HTSContactListingFormProcessor {
         Integer pnsApproach = null;
         Integer consentedContactListing = null;
         String physicalAddress = null;
+        String facility = null;
+        String town = null;
+        String suncounty = null;
 
         for(Obs obs:obsList) {
 
@@ -164,6 +170,15 @@ public class HTSContactListingFormProcessor {
             else if (obs.getConcept().getConceptId().equals(physicalAddressConcept)){
                 physicalAddress = obs.getValueText();
             }
+            else if (obs.getConcept().getConceptId().equals(facilityConcept)){
+                facility = obs.getValueText();
+            }
+            else if (obs.getConcept().getConceptId().equals(townConcept)){
+                town = obs.getValueText();
+            }
+            else if (obs.getConcept().getConceptId().equals(subcountyConcept)){
+                suncounty = obs.getValueText();
+            }
 
         }
         if(contactName != null && ageUnit != null) {
@@ -181,6 +196,9 @@ public class HTSContactListingFormProcessor {
            /* contact.setContactListingDeclineReason(contactListingDeclineReason);*/
             contact.setConsentedContactListing(consentedContactListing);
             contact.setPhysicalAddress(physicalAddress);
+            contact.setTown(town);
+            contact.setSubcounty(suncounty);
+            contact.setFacility(facility);
             return contact;
         }
         return null;
@@ -204,14 +222,17 @@ public class HTSContactListingFormProcessor {
 
     Integer relationshipConverter (Concept key) {
         Map<Concept, Integer> relationshipList = new HashMap<Concept, Integer>();
-        relationshipList.put(conceptService.getConcept(970), 3); // parent
-        relationshipList.put(conceptService.getConcept(971), 3); //parent
-        relationshipList.put(conceptService.getConcept(972), 2); //sibling
-        relationshipList.put(conceptService.getConcept(1528), 3); //child
-        relationshipList.put(conceptService.getConcept(5617), 6); // spouse
-        relationshipList.put(conceptService.getConcept(163565), 7); // partner
-        relationshipList.put(conceptService.getConcept(162221), 8); // co-wife
-        relationshipList.put(conceptService.getConcept(157351), 9); // Injectable drug user
+        relationshipList.put(conceptService.getConcept(970), 5); // parent
+        relationshipList.put(conceptService.getConcept(971), 6); //parent
+        relationshipList.put(conceptService.getConcept(972), 7); //sibling
+        relationshipList.put(conceptService.getConcept(1528), 8); //child
+        relationshipList.put(conceptService.getConcept(5617), 9); // spouse
+        relationshipList.put(conceptService.getConcept(163565), 10); // partner
+        relationshipList.put(conceptService.getConcept(162221), 11); // co-wife
+        relationshipList.put(conceptService.getConcept(157351), 12); // Injectable drug user
+        relationshipList.put(conceptService.getConcept(160237), 2); // CO-worker
+        relationshipList.put(conceptService.getConcept(114319), 3); // Aircraft passanger
+        relationshipList.put(conceptService.getConcept(130728), 4); // Vehicle passanger
 
         return relationshipList.get(key);
     }

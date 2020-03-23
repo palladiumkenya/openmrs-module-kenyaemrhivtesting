@@ -7,25 +7,16 @@
                     [object: command, property: "middleName", label: "Middle Name"],
                     [object: command, property: "lastName", label: "Last Name"]
 
-            ],
+            ]
     ]
 
 
     def addressRows = [
             [
-                    [object: command, property: "physicalAddress", label: "Physical Address/Landmark"],
-                    [object: command, property: "phoneContact", label: "Phone No."]
-
-            ]
-    ]
-
-    def hivData = [
-            [
-
-
-                    [object: command, property: "baselineHivStatus", label: "Baseline HIV status"],
-                    [object: command, property: "appointmentDate", label: "Booking date"]
-
+                    [object: command, property: "physicalAddress", label: "Address"],
+                    [object: command, property: "subcounty", label: "Sub county"],
+                    [object: command, property: "town", label: "Town"],
+                    [object: command, property: "phoneContact", label: "Phone number."]
 
             ]
     ]
@@ -77,25 +68,13 @@
                     </td>
                     <td valign="top"></td>
                     <td valign="top">
-                    <td style="width: 140px">
-                    <label class="ke-field-label">Marital Status</label>
-                    <select name="maritalStatus" id="maritalStatus">
-                        <option></option>
-                        <% maritalStatusOptions.each { %>
-                        <option ${
-                                (command.maritalStatus == null) ? "" : it.value == command.maritalStatus ? "selected" : ""}
-                                value="${it.value}">${it.label}</option>
-                        <% } %>
-                    </select>
-
-                    </td>
                 </tr>
             </table>
 
         </fieldset>
 
         <fieldset>
-            <legend>Contact</legend>
+            <legend>Address</legend>
 
             <% addressRows.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
@@ -107,8 +86,12 @@
             <legend>Relationship</legend>
             <table>
                 <tr>
-                    <td class="ke-field-label">Relationship to Patient</td>
-                    <td class="ke-field-label">Living with Client?</td>
+                    <td class="ke-field-label">Relation to case</td>
+                    <td class="ke-field-label">Date of Last Contact</td>
+                    <td class="ke-field-label">Head of household</td>
+                    <td class="ke-field-label">Contact is a Healthcare Worker</td>
+                    <td></td>
+                    <td class="ke-field-label">Facility</td>
                 </tr>
                 <tr>
                     <td style="width: 260px">
@@ -121,6 +104,9 @@
                             <% } %>
                         </select>
                     </td>
+                    <td style="width: 200px">
+                        ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
+                    </td>
                     <td style="width: 260px">
                         <select name="livingWithPatient" id="livingWithPatient">
                             <option></option>
@@ -131,91 +117,32 @@
                             <% } %>
                         </select>
                     </td>
-                </tr>
-            </table>
-        </fieldset>
-
-        <fieldset class="ipvQuestions">
-            <legend>IPV Questions</legend>
-            <table>
-                <tr>
                     <td>
-                        <label class="ke-field-label">1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?</label>
-                    </td><td>
-                    <span class="ke-field-content">
-                        <input type="radio" name="physicalAssault" class="ipv" value="1065"/> Yes
-                        <input type="radio" name="physicalAssault" class="ipv" value="1066"/> No
-                    </span>
-                </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label class="ke-field-label">2. Has he/she ever threatened to hurt you?</label>
-                    </td><td>
-                    <span class="ke-field-content">
-                        <input type="radio" name="threatened" class="ipv" value="1065"/> Yes
-                        <input type="radio" name="threatened" class="ipv" value="1066"/> No
-                    </span>
-                </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label class="ke-field-label">3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?</label>
-                    </td><td>
-                    <span class="ke-field-content">
-                        <input type="radio" name="sexualAssault" class="ipv" value="1065"/> Yes
-                        <input type="radio" name="sexualAssault" class="ipv" value="1066"/> No
-                    </span>
-                </td>
-                </tr>
-            </table>
-        </fieldset>
-        <fieldset class="ipvOutcome">
-            <legend>IPV Outcome</legend>
-            <table>
-                <tr>
-                    <td class="ke-field-label">IPV Outcome</td>
-                </tr>
-                <tr>
-                    <td>
-                        <select name="ipvOutcome" id="ipvOutcome">
+                        <select name="maritalStatus" id="maritalStatus">
                             <option></option>
-                            <% ipvOutcomeOptions.each { %>
-                            <option ${(command.ipvOutcome == null) ? "" : it == command.ipvOutcome ? "selected" : ""}
-                                    value="${it}">${it}</option>
+                            <% maritalStatusOptions.each { %>
+                            <option ${
+                                    (command.maritalStatus == null) ? "" : it.value == command.maritalStatus ? "selected" : ""}
+                                    value="${it.value}">${it.label}</option>
                             <% } %>
                         </select>
                     </td>
+                    <td></td>
+                    <td>
+                        <textarea class ="facility" name="facility"  rows="0" cols="15">${(command.facility != null)? command.facility : ""}</textarea>
+                    </td>
                 </tr>
             </table>
-
         </fieldset>
+
 
         <fieldset>
-            <legend>Baseline Information</legend>
+            <legend>Contact type</legend>
             <table>
                 <tr>
-                    <td class="ke-field-label">HIV Status</td>
-                     <td class="ke-field-label">Booking Date</td>
-                    <td class="ke-field-label">Preferred PNS Approach</td>
+                    <td class="ke-field-label">Type of contact</td>
                 </tr>
                 <tr>
-                    <td style="width: 140px">
-                        <select name="baselineHivStatus" id="baselineHivStatus">
-                            <option></option>
-                            <% hivStatusOptions.each { %>
-                            <option ${
-                                    (command.baselineHivStatus == null) ? "" : it == command.baselineHivStatus ? "selected" : ""}
-                                    value="${it}">${it}
-                            </option>
-                            <% } %>
-                        </select>
-                    </td>
-
-                    <td style="width: 200px">
-                        ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
-                    </td>
-
                     <td style="width: 260px">
                         <select name="pnsApproach" id="pnsApproach">
                             <option></option>
@@ -271,44 +198,6 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
     //On ready
     jQuery(function () {
         //defaults
-        const YES_CONCEPT_ID = 1065;
-        const NO_CONCEPT_ID = 1066;
-        var assessmentYesResponses = [];
-        var assessmentNoResponses = [];
-        const TOTAL_RESPONSES = 3;
-
-        // Add event listener for opening and closing details
-        jQuery('.ipv').on('click', function () {
-            var radio = jQuery(this).closest('input[type=radio]');
-            var value = radio.val();
-            if (value == YES_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES) {
-
-                assessmentYesResponses.push(value);
-            }
-            if (value == NO_CONCEPT_ID && assessmentNoResponses.length <= TOTAL_RESPONSES) {
-
-                assessmentNoResponses.push(value);
-            }
-
-            if (value == NO_CONCEPT_ID && assessmentYesResponses.length <= TOTAL_RESPONSES) {
-
-                assessmentYesResponses.pop();
-            }
-
-            if (assessmentYesResponses.length == 0 && assessmentNoResponses.length == 0) {
-                alert("Please select an IPV question")
-            } else {
-                if (assessmentYesResponses.length > 0) {
-
-                    jQuery('#ipvOutcome').val("True");
-
-                } else {
-                    jQuery('#ipvOutcome').val("False");
-
-                }
-            }
-
-        });
 
         jQuery('#from-age-button').appendTo(jQuery('#from-age-button-placeholder'));
         jQuery('#edit-patient-contact-form .cancel-button').click(function () {
@@ -328,23 +217,23 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
             }
         });
 
-        //IPV validation
-        jq('.ipvQuestions').hide();
-        jq('.ipvOutcome').hide();
-        jq("select[name='relationType']").change(function () {
+        //HCW Exposure validation
+        jq('.facility').prop('disabled', true);
+        jq('.facility').prop('disabled', true);
+        jq("select[name='maritalStatus']").change(function () {
 
-            var relType = jq(this).val();
+            var exposureType = jq(this).val();
 
-            console.log('Relationship type ' + relType);
+            console.log('HCW exposure type ' + exposureType);
 
-            if (relType === "5617" || relType === "163565"/* Spouse or Partner*/) {
+            if (exposureType === "1065"/* Spouse or Partner*/) {
 
-                jq('.ipvQuestions').show();
-                jq('.ipvOutcome').show();
+                jq('.facility').prop('disabled', false);
+                jq('.facility').prop('disabled', false);
             }
             else {
-                jq('.ipvQuestions').hide();
-                jq('.ipvOutcome').hide();
+                jq('.facility').prop('disabled', true);
+                jq('.facility').prop('disabled', true);
             }
         });
 

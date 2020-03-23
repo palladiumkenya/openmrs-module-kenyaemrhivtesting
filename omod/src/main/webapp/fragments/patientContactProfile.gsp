@@ -25,19 +25,6 @@
                 </span>
             </div>
 
-            <div>
-                <span class="ke-identifier-type">Marital Status:</span>
-                <span class="ke-identifier-value">${patientContact.maritalStatus}
-                </span>
-            </div>
-
-            <div>
-                <span class="ke-identifier-type">Living with Index:</span>
-                <span class="ke-identifier-value">${patientContact.livingWithPatient}
-                </span>
-            </div>
-
-
         </div>
 
         <div style="float: left; width: 30%; text-align: left">
@@ -45,8 +32,15 @@
                 <span class="ke-identifier-type">Physical Address:</span>
                 <span class="ke-identifier-value">${patientContact.physicalAddress}</span>
             </div>
-
             <div>
+                <span class="ke-identifier-type">Subcounty:</span>
+                <span class="ke-identifier-value">${patientContact.subcounty}</span>
+            </div>
+            <div>
+                <span class="ke-identifier-type">Physical Address:</span>
+                <span class="ke-identifier-value">${patientContact.town}</span>
+            </div>
+             <div>
                 <span class="ke-identifier-type">Phone Contact:</span>
                 <span class="ke-identifier-value">${patientContact.phoneContact}</span>
             </div>
@@ -54,17 +48,17 @@
 
         <div style="float: left; width: 30%; text-align: left">
             <div>
-                <span class="ke-identifier-type">Baseline HIV Status:</span>
-                <span class="ke-identifier-value">${patientContact.baselineHivStatus}</span>
+                <span class="ke-identifier-type">Relation to Case:</span>
+                <span class="ke-identifier-value">${patientContact.relationType}</span>
             </div>
 
             <div>
-                <span class="ke-identifier-type">Booking Date:</span>
+                <span class="ke-identifier-type">Contact Date:</span>
                 <span class="ke-identifier-value">${patientContact.appointmentDate}</span>
             </div>
 
             <div>
-                <span class="ke-identifier-type">PNS Approach:</span>
+                <span class="ke-identifier-type">Contact Type:</span>
                 <span class="ke-identifier-value">${patientContact.pnsApproach}</span>
             </div>
 

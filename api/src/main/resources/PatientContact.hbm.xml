@@ -18,6 +18,9 @@
 		<property name="lastName" type="java.lang.String" column="last_name" length="255"/>
 		<property name="sex" type="java.lang.String" column ="sex" length="1"/>
 		<property name="birthDate" type="java.util.Date" column="birth_date"/>
+		<property name="town" type ="java.lang.String" column ="physical_town" length="255"/>
+		<property name="subcounty" type ="java.lang.String" column ="physical_subcounty" length="255"/>
+		<property name="facility" type ="java.lang.String" column ="physical_facility" length="255"/>
 		<property name="physicalAddress" type ="java.lang.String" column ="physical_address" length="255"/>
 		<property name="phoneContact" type="java.lang.String" column ="phone_contact" length="255"/>
 		<property name="relationType" type="java.lang.Integer" column ="relationship_type" length="19"/>

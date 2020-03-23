@@ -54,21 +54,19 @@ public class PatientContactFormFragmentController {
 
     private Map<Integer, String> createPreferredPNSApproachOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(162284,"Dual referral");
-        options.put(160551,"Passive referral");
-        options.put(161642,"Contract referral");
-        options.put(163096,"Provider referral");
+        options.put(160237,"Working together with a nCoV patient");
+        options.put(165656,"Traveling together with a nCoV patient");
+        options.put(1060,"Living together with a nCoV patient");
+        options.put(117163,"Health care associated exposure");
         return options;
 
     }
 
     private Map<Integer, String> createMaritalStatusOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(1057, "Single");
-        options.put(5555, "Married Monogamous");
-        options.put(159715, "Married Polygamous");
-        options.put(1058, "Divorced");
-        options.put(1059, "Widowed");
+        options.put(1065, "Yes");
+        options.put(1066, "No");
+        options.put(162570, "Declined to Answer");
         return options;
     }
 
@@ -124,6 +122,9 @@ public class PatientContactFormFragmentController {
 
     private Map<Integer, String> createRelationshipOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237, "Co-worker");
+        options.put(114319, "Passanger in aircraft");
+        options.put(130728, "Passanger in vehicle");
         options.put(970, "Mother");
         options.put(971, "Father");
         options.put(972, "Sibling");
@@ -159,6 +160,9 @@ public class PatientContactFormFragmentController {
         private String lastName;
         private String sex;
         private Date birthDate;
+        private String facility;
+        private String town;
+        private String subcounty;
         private String physicalAddress;
         private String phoneContact;
         private Patient patientRelatedTo;
@@ -194,6 +198,9 @@ public class PatientContactFormFragmentController {
             this.sex = patientContact.getSex();
             this.birthDate = patientContact.getBirthDate();
             this.physicalAddress = patientContact.getPhysicalAddress();
+            this.town = patientContact.getTown();
+            this.facility = patientContact.getFacility();
+            this.subcounty = patientContact.getSubcounty();
             this.phoneContact = patientContact.getPhoneContact();
             this.patientRelatedTo = patient;
             this.relationType = patientContact.getRelationType();
@@ -226,6 +233,9 @@ public class PatientContactFormFragmentController {
             toSave.setBirthDate(birthDate);
             toSave.setPatientRelatedTo(patientRelatedTo);
             toSave.setRelationType(relationType);
+            toSave.setFacility(facility);
+            toSave.setSubcounty(subcounty);
+            toSave.setTown(town);
             toSave.setPhysicalAddress(physicalAddress);
             toSave.setPhoneContact(phoneContact);
             toSave.setAppointmentDate(appointmentDate);
@@ -263,8 +273,8 @@ public class PatientContactFormFragmentController {
 
             if (appointmentDate != null && !DateUtils.isSameDay(appointmentDate, new Date())) {
 
-                if (appointmentDate.before(new Date())) {
-                    errors.rejectValue("appointmentDate", "Cannot be in the past");
+                if (appointmentDate.after(new Date())) {
+                    errors.rejectValue("appointmentDate", "Cannot be in the future");
                 } else {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(new Date());
@@ -331,6 +341,29 @@ public class PatientContactFormFragmentController {
         public void setPhysicalAddress(String physicalAddress) {
             this.physicalAddress = physicalAddress;
         }
+
+        public String getTown() {
+            return town;
+        }
+
+        public void setTown(String town) {
+            this.town = town;
+        }
+
+        public String getFacility() {
+            return facility;
+        }
+
+        public void setFacility(String facility) { this.facility = facility; }
+
+        public String getSubcounty() {
+            return subcounty;
+        }
+
+        public void setSubcounty(String subcounty) {
+            this.subcounty = subcounty;
+        }
+
 
         public String getPhoneContact() {
             return phoneContact;
