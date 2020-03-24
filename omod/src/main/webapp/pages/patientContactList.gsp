@@ -134,21 +134,17 @@ div.section-title {
 
                         <div class="column-two col-header">Gender</div>
 
-                        <div class="column-three col-header">Physical Address</div>
+                        <div class="column-three col-header">Sub County</div>
+
+                         <div class="column-three col-header">Town</div>
 
                         <div class="column-four col-header">Phone</div>
 
                         <div class="column-five col-header">Relationship</div>
 
-                        <div class="column-six col-header">Baseline HIV Status</div>
+                        <div class="column-six col-header">Date of Last Contact</div>
 
-                        <div class="column-seven col-header">Booking Date</div>
-
-                        <div class="column-seven col-header">PNS Approach</div>
-
-                        <div class="column-seven col-header">Date Tested</div>
-
-                        <div class="column-seven col-header">Test Result</div>
+                        <div class="column-seven col-header">Contact type</div>
 
                         <div class="column-eight col-header"></div>
 
@@ -165,21 +161,18 @@ div.section-title {
 
                             <div class="column-two">${rel.sex}</div>
 
-                            <div class="column-three">${rel.physicalAddress ?: ""}</div>
+                            <div class="column-three">${rel.subcounty ?: ""}</div>
+
+                            <div class="column-three">${rel.town ?: ""}</div>
 
                             <div class="column-four">${rel.phoneContact ?: ""}</div>
 
                             <div class="column-five">${rel.relationType}</div>
 
-                            <div class="column-six">${rel.baselineHivStatus ?: ''}</div>
-
                             <div class="column-seven">${rel.appointmentDate ?: ''}</div>
 
                             <div class="column-seven">${rel.pnsApproach ?: ''}</div>
 
-                            <div class="column-seven">${rel.dateTested ?: ''}</div>
-
-                            <div class="column-seven">${rel.testResult ?: ''}</div>
 
                             <div class="column-eight">
                                 <button type="button"

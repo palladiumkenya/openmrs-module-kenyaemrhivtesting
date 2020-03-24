@@ -49,6 +49,9 @@ public class PatientContactProfileFragmentController {
                         "fullName", fullName,
                         "sex", patientContact.getSex(),
                         "physicalAddress", patientContact.getPhysicalAddress() != null ? patientContact.getPhysicalAddress() : "",
+                        "town", patientContact.getTown() != null ? patientContact.getTown() : "",
+                        "subcounty", patientContact.getSubcounty() != null ? patientContact.getSubcounty() : "",
+                        "facility", patientContact.getFacility() != null ? patientContact.getFacility() : "",
                         "phoneContact", patientContact.getPhoneContact() != null ? patientContact.getPhoneContact() : "",
                         "relationType", formatRelationshipType(patientContact.getRelationType()),
                         "baselineHivStatus", patientContact.getBaselineHivStatus() != null ? patientContact.getBaselineHivStatus() : "",
@@ -98,10 +101,10 @@ public class PatientContactProfileFragmentController {
 
     private Map<Integer, String> pnsApproachOptions() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(162284,"Dual referral");
-        options.put(160551,"Passive referral");
-        options.put(161642,"Contract referral");
-        options.put(163096,"Provider referral");
+        options.put(160237,"Working together with a nCoV patient");
+        options.put(165656,"Traveling together with a nCoV patient");
+        options.put(1060,"Living together with a nCoV patient");
+        options.put(117163,"Health care associated exposure");
         return options;
 
     }
@@ -126,6 +129,9 @@ public class PatientContactProfileFragmentController {
 
     private Map<Integer, String> relationshipOptions () {
         Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237, "Co-worker");
+        options.put(114319, "Passanger in aircraft");
+        options.put(130728, "Passanger in vehicle");
         options.put(970, "Mother");
         options.put(971, "Father");
         options.put(972, "Sibling");

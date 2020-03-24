@@ -109,6 +109,9 @@ public class PatientContactListPageController {
                     "fullName", fullName,
                     "sex", contact.getSex(),
                     "physicalAddress", contact.getPhysicalAddress(),
+                    "town", contact.getTown(),
+                    "facility", contact.getFacility(),
+                    "subcounty", contact.getSubcounty(),
                     "phoneContact", contact.getPhoneContact(),
                     "relationType", formatRelationshipType(contact.getRelationType()),
                     "baselineHivStatus", contact.getBaselineHivStatus(),
@@ -155,6 +158,9 @@ public class PatientContactListPageController {
 
     private Map<Integer, String> relationshipOptions() {
         Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237, "Co-worker");
+        options.put(114319, "Passanger in aircraft");
+        options.put(130728, "Passanger in vehicle");
         options.put(970, "Mother");
         options.put(971, "Father");
         options.put(972, "Sibling");
@@ -168,21 +174,19 @@ public class PatientContactListPageController {
 
     private Map<Integer, String> pnsApproachOptions() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(162284, "Dual referral");
-        options.put(160551, "Passive referral");
-        options.put(161642, "Contract referral");
-        options.put(163096, "Provider referral");
+        options.put(160237,"Working together with a nCoV patient");
+        options.put(165656,"Traveling together with a nCoV patient");
+        options.put(1060,"Living together with a nCoV patient");
+        options.put(117163,"Health care associated exposure");
         return options;
 
     }
 
     private Map<Integer, String> maritalStatusOptions() {
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(1057, "Single");
-        options.put(5555, "Married Monogamous");
-        options.put(159715, "Married Polygamous");
-        options.put(1058, "Divorced");
-        options.put(1059, "Widowed");
+        options.put(1065, "Yes");
+        options.put(1066, "No");
+        options.put(162570, "Declined to Answer");
         return options;
     }
 

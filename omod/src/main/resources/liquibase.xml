@@ -40,6 +40,15 @@
             <column name="birth_date" type="datetime">
                 <constraints nullable="true"/>
             </column>
+            <column name="physical_town" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="physical_subcounty" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="physical_facility" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
             <column name="physical_address" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
