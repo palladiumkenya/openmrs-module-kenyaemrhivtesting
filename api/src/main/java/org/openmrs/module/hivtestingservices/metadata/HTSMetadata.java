@@ -60,8 +60,8 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(relationshipType("Co-wife", "Co-wife", "Female member spouse in a polygamist household", _RelationshipType.CO_WIFE));
 		install(relationshipType("Injectable-drug-user", "Injectable-druguser", "Those who share drug needles", _RelationshipType.INJECTABLE_DRUG_USER));
 		install(relationshipType("Co-worker", "Co-worker", "Those who work together", _RelationshipType.CO_WORKER));
-		install(relationshipType("Air passenger", "Air passanger", "Travel by air together", _RelationshipType.AIR_PASSENGER));
-		install(relationshipType("Road passenger", "Road passanger", "Travel by road together", _RelationshipType.ROAD_PASSENGER));
+		install(relationshipType("Air passenger", "Air passenger", "Travel by air together", _RelationshipType.AIR_PASSENGER));
+		install(relationshipType("Road passenger", "Road passenger", "Travel by road together", _RelationshipType.ROAD_PASSENGER));
 	}
 
 }
