@@ -17,7 +17,7 @@ div.column-one {
 }
 
 div.column-two {
-    width: 100px;
+    width: 110px;
 }
 
 div.column-three {
@@ -25,11 +25,11 @@ div.column-three {
 }
 
 div.column-four {
-    width: 180px;
+    width: 200px;
 }
 
 div.column-five {
-    width: 140px;
+    width: 160px;
 }
 
 div.column-six {
@@ -146,12 +146,15 @@ div.section-title {
 
                         <div class="column-six">${rel.remarks}</div>
 
+                        <% if (patientContact.patient == null) { %>
+
                         <div class="column-seven">
                             <button type="button"
                                     onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientContact: patientContact.id, patientId: currentPatient.patientId, traceId: rel.id,  returnUrl: ui.thisUrl() ])}')">
                                 <img src="${ui.resourceLink("hivtestingservices", "images/glyphs/edit.png")}"/> Edit
                             </button>
                         </div>
+                        <% } %>
 
                     </div>
 
@@ -169,6 +172,7 @@ div.section-title {
 
     </div>
 
+    <% if (patientContact.patient == null) { %>
     <div align="center">
 
         <button class="addTrace" name="addTrace" type="button"
@@ -176,7 +180,14 @@ div.section-title {
             <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Add Trace
         </button>
 
+
+            <button type="button"
+                    onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: patientContact.id, returnUrl: ui.pageLink("hivtestingservices", "patientContactList", [patient: currentPatient, patientId: currentPatient.patientId]) ])}')">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Register and Followup
+            </button>
+
     </div>
+    <% } %>
 
 </div>
 

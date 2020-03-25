@@ -159,8 +159,7 @@ public class PatientContactListPageController {
     private Map<Integer, String> relationshipOptions() {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(160237, "Co-worker");
-        options.put(114319, "Passanger in aircraft");
-        options.put(130728, "Passanger in vehicle");
+        options.put(165656, "Traveled together");
         options.put(970, "Mother");
         options.put(971, "Father");
         options.put(972, "Sibling");
@@ -168,7 +167,6 @@ public class PatientContactListPageController {
         options.put(5617, "Spouse");
         options.put(163565, "Sexual partner");
         options.put(162221, "Co-wife");
-        options.put(157351, "Injectable drug user");
         return options;
     }
 

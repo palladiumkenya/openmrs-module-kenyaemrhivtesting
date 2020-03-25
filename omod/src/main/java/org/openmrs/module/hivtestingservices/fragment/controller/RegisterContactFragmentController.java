@@ -94,16 +94,10 @@ public class RegisterContactFragmentController {
 	ConceptService conceptService = Context.getConceptService();
 	PersonService personService = Context.getPersonService();
 
-	String siblingRelType = "8d91a01c-c2cc-11de-8d13-0010c6dffd0f";
-	String parentChildRelType = "8d91a210-c2cc-11de-8d13-0010c6dffd0f";
-	String spouseRelType = "d6895098-5d8d-11e3-94ee-b35a4132a5e3";
-	String partnerRelType = "007b765f-6725-4ae9-afee-9966302bace4";
-	String cowifeRelType = "2ac0d501-eadc-4624-b982-563c70035d46";
-	String injectableDrugUserRelType = "58da0d1e-9c89-42e9-9412-275cef1e0429";
-
-	String coworkerRelType = "da9cded8-4f0c-463f-92e4-298d3d8ca0c7";
-	String airPassengerRelType = "a3ea745a-0f3c-43ab-9cbb-c1ba13763d95";
-	String roadPassengerRelType = "ce38734b-a1eb-4172-b7e6-b125cb89df54";
+	String healthCareExposureRelType = "8ea99662-6ed3-11ea-bc55-0242ac130003";
+	String coworkerRelType = "8ea9902c-6ed3-11ea-bc55-0242ac130003";
+	String traveledTogetherRelType = "8ea992ac-6ed3-11ea-bc55-0242ac130003";
+	String livingTogetherRelType = "8ea993ba-6ed3-11ea-bc55-0242ac130003";
 
 	/**
 	 * Main controller method
@@ -151,10 +145,7 @@ public class RegisterContactFragmentController {
 			new String("Aunt"),
 			new String("Uncle"),
 			new String("Guardian"),
-			new String("Friend"),
-			new String("Co-worker"),
-			new String("Passanger in aircraft"),
-			new String("Passanger in vehicle")
+			new String("Friend")
 		);
 
 		model.addAttribute("nextOfKinRelationshipOptions", nextOfKinRelationshipOptions);
@@ -560,11 +551,11 @@ public class RegisterContactFragmentController {
 			if (relationshipType == 970 || relationshipType == 971) {
 				personA = contact;
 				personB = patient;
-				type = personService.getRelationshipTypeByUuid(parentChildRelType);
+				type = personService.getRelationshipTypeByUuid(healthCareExposureRelType);
 			} else if (relationshipType == 1528) {
 				personA = patient;
 				personB = contact;
-				type = personService.getRelationshipTypeByUuid(parentChildRelType);
+				type = personService.getRelationshipTypeByUuid(healthCareExposureRelType);
 			} else {
 				personA = contact;
 				personB = patient;
@@ -601,16 +592,9 @@ public class RegisterContactFragmentController {
 			Map<Integer, String> options = new HashMap<Integer, String>();
 
 			options.put(160237, coworkerRelType);
-			options.put(114319, airPassengerRelType);
-			options.put(130728, roadPassengerRelType);
-			options.put(970, parentChildRelType);
-			options.put(971, parentChildRelType);
-			options.put(972, siblingRelType);
-			options.put(1528, parentChildRelType);
-			options.put(5617, spouseRelType);
-			options.put(163565, partnerRelType);
-			options.put(162221, cowifeRelType);
-			options.put(157351, injectableDrugUserRelType);
+			options.put(165656, traveledTogetherRelType);
+			options.put(1060, livingTogetherRelType);
+			options.put(117163, healthCareExposureRelType);
 			return options.get(relType);
 		}
 		/**

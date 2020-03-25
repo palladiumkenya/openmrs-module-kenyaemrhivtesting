@@ -125,118 +125,122 @@ div.section-title {
 
                     <div class="clear"></div>
 
-                    <% if (contacts) { %>
-                    <div class="grid">
+<% if (contacts) { %>
+<div class="grid">
 
-                        <div class="column-one col-header">Name</div>
+    <div class="column-one col-header">Name</div>
 
-                        <div class="column-two col-header">Gender</div>
+    <div class="column-two col-header">Gender</div>
 
-                        <div class="column-three col-header">Sub County</div>
+    <div class="column-three col-header">Sub County</div>
 
-                         <div class="column-three col-header">Town</div>
+    <div class="column-three col-header">Town</div>
 
-                        <div class="column-four col-header">Phone</div>
+    <div class="column-four col-header">Phone</div>
 
-                        <div class="column-five col-header">Relationship</div>
+    <div class="column-five col-header">Relationship</div>
 
-                        <div class="column-six col-header">Date of Last Contact</div>
+    <div class="column-six col-header">Date of Last Contact</div>
 
-                        <div class="column-seven col-header">Contact type</div>
+    <div class="column-seven col-header">Contact type</div>
 
-                        <div class="column-eight col-header"></div>
+    <div class="column-eight col-header"></div>
 
-                    </div>
+</div>
 
-                    <div class="clear"></div>
+<div class="clear"></div>
 
-                    <% contacts.each { rel -> %>
+<% contacts.each { rel -> %>
 
-                    <div class="ke-stack-item ke-navigable">
-                        <div class="grid">
+<div class="ke-stack-item ke-navigable">
+    <div class="grid">
 
-                            <div class="column-one">${rel.fullName}</div>
+        <div class="column-one">${rel.fullName}</div>
 
-                            <div class="column-two">${rel.sex}</div>
+        <div class="column-two">${rel.sex}</div>
 
-                            <div class="column-three">${rel.subcounty ?: ""}</div>
+        <div class="column-three">${rel.subcounty ?: ""}</div>
 
-                            <div class="column-three">${rel.town ?: ""}</div>
+        <div class="column-three">${rel.town ?: ""}</div>
 
-                            <div class="column-four">${rel.phoneContact ?: ""}</div>
+        <div class="column-four">${rel.phoneContact ?: ""}</div>
 
-                            <div class="column-five">${rel.relationType}</div>
+        <div class="column-five">${rel.relationType}</div>
 
-                            <div class="column-seven">${rel.appointmentDate ?: ''}</div>
+        <div class="column-seven">${rel.appointmentDate ?: ''}</div>
 
-                            <div class="column-seven">${rel.pnsApproach ?: ''}</div>
+        <div class="column-seven">${rel.pnsApproach ?: ''}</div>
 
 
-                            <div class="column-eight">
-                                <button type="button"
-                                        onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "contactTraceList", [ patientContact: rel.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
-                                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/view.png")}"/>History
-                                </button>
-                            </div>
+        <div class="column-eleven">
+            <% if (rel.patient == null) { %>
+            <button type="button"
+                    onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "contactTraceList", [ patientContact: rel.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/view.png")}"/>Trace/Register
+            </button>
+            <% } else { %>
 
-                            <div class="column-nine">
+            <button type="button"
+                    onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "contactTraceList", [ patientContact: rel.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/view.png")}"/>Trace History
+            </button>
 
-                                <button type="button"
-                                        onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientContactId: rel.id, patientId: currentPatient.id, returnUrl: ui.thisUrl() ])}')">
-                                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/edit.png")}"/> Edit
-                                </button>
+            <% } %>
+        </div>
 
-                            </div>
+        <% if (rel.patient == null) { %>
+        <div class="column-nine">
 
-                            <% if (rel.patient == null) { %>
-                            <div class="column-ten">
-                                <button type="button"
-                                        onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: rel.id, returnUrl: ui.thisUrl() ])}')">
-                                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Register
-                                </button>
-                        </div>
-                            <div>
-                                <button type="button" class="ke-compact"
-                                        onclick="onVoidPatientContact(${ rel.id })">
-                                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/void.png")}"/> Delete
-                                </button>
-                            </div>
-
-                            <% } else { %>
-                            <div class="column-ten">
-                                <button type="button"
-                                        onclick="ui.navigate('${ ui.pageLink("kenyaemr", "surveillance/surveillanceViewPatient", [patientId: rel.patient.patientId])}')">
-                                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> View
-                                </button>
-                            </div>
-                            <% } %>
-
-                        </div>
-
-                        <div class="clear"></div>
-
-                    </div>
-                    <% }
-                    } else { %>
-                    No Patient Contact found
-                    <% } %>
-                </div>
-
-                <div class="clear"></div>
-
-            </div>
-
-            <div align="center">
-
-                <button type="button" class="addContact"
-                        onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientId: patient.id,  returnUrl: ui.thisUrl() ])}')">
-                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/person_m.png")}"
-                         style="display:none;"/>Add Contact
-                </button>
-
-            </div>
+            <button type="button"
+                    onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientContactId: rel.id, patientId: currentPatient.id, returnUrl: ui.thisUrl() ])}')">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/edit.png")}"/> Edit
+            </button>
 
         </div>
+        <% } %>
+        <% if (rel.patient == null) { %>
+        <div>
+            <button type="button" class="ke-compact"
+                    onclick="onVoidPatientContact(${ rel.id })">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/void.png")}"/> Delete
+            </button>
+        </div>
+
+        <% } else { %>
+        <div class="column-ten">
+            <button type="button"
+                    onclick="ui.navigate('${ ui.pageLink("kenyaemr", "surveillance/surveillanceViewPatient", [patientId: rel.patient.patientId])}')">
+                <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Follow up
+            </button>
+        </div>
+        <% } %>
+
+    </div>
+
+    <div class="clear"></div>
+
+</div>
+<% }
+} else { %>
+No Patient Contact found
+<% } %>
+</div>
+
+<div class="clear"></div>
+
+</div>
+
+<div align="center">
+
+    <button type="button" class="addContact"
+            onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newEditPatientContactForm", [ patientId: patient.id,  returnUrl: ui.thisUrl() ])}')">
+        <img src="${ui.resourceLink("kenyaui", "images/glyphs/person_m.png")}"
+             style="display:none;"/>Add Contact
+    </button>
+
+</div>
+
+</div>
 </div>
 
 <script type="text/javascript">

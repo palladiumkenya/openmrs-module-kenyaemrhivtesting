@@ -1,8 +1,6 @@
 package org.openmrs.module.hivtestingservices.fragment.controller;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
@@ -19,9 +17,6 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
-import java.util.logging.Logger;
-
-import static java.awt.SystemColor.info;
 
 /**
  * Controller for adding and editing Patient Contacts
@@ -52,7 +47,7 @@ public class PatientContactFormFragmentController {
         return options;
     }
 
-    private Map<Integer, String> createPreferredPNSApproachOptionsFromConcepts() {
+    private Map<Integer, String> createContactTypeOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(160237,"Working together with a nCoV patient");
         options.put(165656,"Traveling together with a nCoV patient");
@@ -114,7 +109,7 @@ public class PatientContactFormFragmentController {
 
     protected List<SimpleObject> getPreferredPNSApproachOptions() {
         List<SimpleObject> options = new ArrayList<SimpleObject>();
-        for (Map.Entry<Integer, String> option : createPreferredPNSApproachOptionsFromConcepts().entrySet())
+        for (Map.Entry<Integer, String> option : createContactTypeOptionsFromConcepts().entrySet())
             options.add(SimpleObject.create("value", option.getKey(), "label", option.getValue()));
 
         return options;
@@ -123,8 +118,7 @@ public class PatientContactFormFragmentController {
     private Map<Integer, String> createRelationshipOptionsFromConcepts() {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(160237, "Co-worker");
-        options.put(114319, "Passanger in aircraft");
-        options.put(130728, "Passanger in vehicle");
+        options.put(165656,"Traveled together");
         options.put(970, "Mother");
         options.put(971, "Father");
         options.put(972, "Sibling");
@@ -132,7 +126,7 @@ public class PatientContactFormFragmentController {
         options.put(5617, "Spouse");
         options.put(163565, "Sexual partner");
         options.put(162221, "Co-wife");
-        options.put(157351, "Injectable drug user");
+
         return options;
     }
 
