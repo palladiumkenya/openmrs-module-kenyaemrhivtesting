@@ -255,6 +255,8 @@ public class RegisterContactFragmentController {
 		private String nationalIdNumber;
 		private String patientClinicNumber;
 		private String uniquePatientNumber;
+		private String alienNumber;
+		private String passportNumber;
 		private String telephoneContact;
 		private String nameOfNextOfKin;
 		private String nextOfKinRelationship;
@@ -349,6 +351,8 @@ public class RegisterContactFragmentController {
 			validateIdentifierField(errors, "nationalIdNumber", Utils.NATIONAL_ID);
 			validateIdentifierField(errors, "patientClinicNumber", Utils.PATIENT_CLINIC_NUMBER);
 			validateIdentifierField(errors, "uniquePatientNumber", Utils.UNIQUE_PATIENT_NUMBER);
+			validateIdentifierField(errors, "alienNumber", PatientWrapper.ALIEN_NUMBER);
+			validateIdentifierField(errors, "passportNumber", PatientWrapper.PASSPORT_NUMBER);
 
 			// check birth date against future dates and really old dates
 			if (birthdate != null) {
@@ -416,6 +420,8 @@ public class RegisterContactFragmentController {
 			wrapper.setNationalIdNumber(nationalIdNumber, location);
 			wrapper.setPatientClinicNumber(patientClinicNumber, location);
 			wrapper.setUniquePatientNumber(uniquePatientNumber, location);
+			wrapper.setAlienNumber(alienNumber, location);
+			wrapper.setPassportNumber(passportNumber, location);
 			wrapper.setNextOfKinName(nameOfNextOfKin);
 			wrapper.setNextOfKinRelationship(nextOfKinRelationship);
 			wrapper.setNextOfKinContact(nextOfKinContact);
@@ -692,6 +698,22 @@ public class RegisterContactFragmentController {
 		public void setNationalIdNumber(String nationalIdNumber) {
 
 			this.nationalIdNumber = nationalIdNumber;
+		}
+
+		public String getAlienNumber() {
+			return alienNumber;
+		}
+
+		public void setAlienNumber(String alienNumber) {
+			this.alienNumber = alienNumber;
+		}
+
+		public String getPassportNumber() {
+			return passportNumber;
+		}
+
+		public void setPassportNumber(String passportNumber) {
+			this.passportNumber = passportNumber;
 		}
 
 		/**

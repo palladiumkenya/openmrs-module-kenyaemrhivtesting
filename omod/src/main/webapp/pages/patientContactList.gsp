@@ -205,7 +205,7 @@ div.section-title {
                             <% } else { %>
                             <div class="column-ten">
                                 <button type="button"
-                                        onclick="ui.navigate('${ ui.pageLink("kenyaemr", "hivTesting/htsViewPatient", [patientId: rel.patient.patientId])}')">
+                                        onclick="ui.navigate('${ ui.pageLink("kenyaemr", "surveillance/surveillanceViewPatient", [patientId: rel.patient.patientId])}')">
                                     <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> View
                                 </button>
                             </div>
