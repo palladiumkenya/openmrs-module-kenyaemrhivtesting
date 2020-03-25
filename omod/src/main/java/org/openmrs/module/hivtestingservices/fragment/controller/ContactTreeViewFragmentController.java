@@ -6,14 +6,21 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.openmrs.Concept;
+import org.openmrs.Obs;
+import org.openmrs.Order;
+import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PatientProgram;
 import org.openmrs.Person;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.ObsService;
+import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
+import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -27,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +47,9 @@ public class ContactTreeViewFragmentController {
     protected static final Log log = LogFactory.getLog(ContactTreeViewFragmentController.class);
     PatientService patientService = Context.getPatientService();
     ConceptService conceptService = Context.getConceptService();
+    ObsService obsService = Context.getObsService();
     HTSService htsService = Context.getService(HTSService.class);
+    Concept covid19LabTestConcept = Context.getConceptService().getConcept(165611);
     SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final String UNIQUE_PATIENT_NUMBER = "05ee9cf4-7242-4a17-b4d4-00f707265c8a";
 
@@ -86,7 +96,7 @@ public class ContactTreeViewFragmentController {
             String age = null;
             PatientIdentifier UPN = null;
             Boolean alive = null;
-            Boolean enrolled = false;
+            Boolean confirmed = false;
 
             if (patient.equals(relationship.getPersonA())) {
                 person = relationship.getPersonB();
@@ -123,16 +133,16 @@ public class ContactTreeViewFragmentController {
             }
 
 
-            if(UPN != null) { // for patient enrolled in HIV
-                enrolled = true;
+            if(UPN != null) { // for patient confirmed in HIV
+                confirmed = true;
             }
 
             exludes.add(person.getPersonId());
             relNode.put("image", linkIcon);
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", person.getPersonName().toString());
-            textNode.put("title", age.concat(", Status: ").concat((enrolled) ? "In Care" : "Not Enrolled"));
-            //textNode.put("desc", (enrolled) ? "In Care" : "Not Enrolled");
+            textNode.put("title", age.concat(", Status: ").concat((confirmed) ? "In Care" : "Not Enrolled"));
+            //textNode.put("desc", (confirmed) ? "In Care" : "Not Enrolled");
             relNode.put("text", textNode);
 
 
@@ -173,9 +183,6 @@ public class ContactTreeViewFragmentController {
             Patient personPatient = null;
             String type = null;
             String age = null;
-            PatientIdentifier UPN = null;
-            Boolean alive = null;
-            Boolean enrolled = false;
 
             if (patient.equals(relationship.getPersonA())) {
                 person = relationship.getPersonB();
@@ -195,19 +202,13 @@ public class ContactTreeViewFragmentController {
             String genderCode = person.getGender().toLowerCase();
             String linkUrl, linkIcon;
             age = new StringBuilder().append(type).append(", ").append(person.getAge()).append(" Yrs").toString();
-            PatientIdentifierType pit = patientService.getPatientIdentifierTypeByUuid(UNIQUE_PATIENT_NUMBER);
-            List<PatientIdentifier> identifierList = patientService.getPatientIdentifiers(null, Arrays.asList(pit), null, Arrays.asList(personPatient),null);
-            if (identifierList.size() > 0) {
-                UPN = identifierList.get(0);
-            }
 
-            alive = person.isDead();
-
+            String covidStatus = isCovidCase(personPatient);
 
             if (person.isPatient()) {
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("patientId", person.getId());
-                if (contactEnrolledInHivProgram(personPatient)) {
+                if (covidStatus != null) {
                     linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + personPatient.getGender().toLowerCase() + ".png");
                 } else {
                     linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + personPatient.getGender().toLowerCase() + ".png");
@@ -219,15 +220,10 @@ public class ContactTreeViewFragmentController {
                 linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(person.getAge()) + genderCode + ".png");
             }
 
-
-            if(UPN != null) { // for patient enrolled in HIV
-                enrolled = true;
-            }
-
             relNode.put("image", linkIcon);
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", person.getPersonName().toString());
-            textNode.put("title", age.concat(", Status: ").concat((enrolled) ? "In Care" : "Not Enrolled"));
+            textNode.put("title", age.concat(", Status: ").concat(covidStatus));
             //textNode.put("desc", enrolled ? "In Care" : "Not Enrolled");
             relNode.put("text", textNode);
             patientContacts.add(relNode);
@@ -260,7 +256,7 @@ public class ContactTreeViewFragmentController {
             ObjectNode relNode = getJsonNodeFactory().objectNode();
             String type = formatRelationshipType(patientContact.getRelationType());
             String age = "";
-            String status = "";
+            String status = isCovidCase(patient);
 
 
             String linkIcon;
@@ -271,13 +267,8 @@ public class ContactTreeViewFragmentController {
 
                 fullName = patientFromContact.getPersonName().toString();
                 age = new StringBuilder().append(type).append(", ").append(patientFromContact.getAge()).append(" Yrs").toString();
-                if (contactEnrolledInHivProgram(patient)) {
-                    linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
-                    status = "In Care";
-                } else {
-                    linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
-                    status = "Not Enrolled";
-                }
+                linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
+
 
                 ArrayNode relChildren = getRelationshipContacts(patientFromContact, new HashSet<Integer>(), ui);
                 ArrayNode relContacts = getListedContactsContacts(patientFromContact, getAllRelationshipsForPatient(patientFromContact), ui);
@@ -292,7 +283,12 @@ public class ContactTreeViewFragmentController {
                 //params.put("personId", person.getId());
                 String cage = patientContact.getBirthDate() != null ? calculateContactAge(patientContact.getBirthDate(), new Date()).toString() : "" ;
                 age = new StringBuilder().append(type).append(", ").append(cage).append(" Yrs").toString();
-                status = patientContact.getBaselineHivStatus();
+                ContactTrace lastTrace = htsService.getLastTraceForPatientContact(patientContact);
+                if (lastTrace != null) {
+                    status = lastTrace.getStatus();
+                } else {
+                    status = "Not traced";
+                }
 
                 Integer ageOfContact = null;
                 if (patientContact.getBirthDate() != null) {
@@ -351,15 +347,74 @@ public class ContactTreeViewFragmentController {
         return allRelatedPersons;
     }
 
-    protected boolean contactEnrolledInHivProgram(Patient patient) {
-        PatientIdentifierType pit = patientService.getPatientIdentifierTypeByUuid(UNIQUE_PATIENT_NUMBER);
-        PatientIdentifier UPN = null;
-        List<PatientIdentifier> identifierList = patientService.getPatientIdentifiers(null, Arrays.asList(pit), null, Arrays.asList(patient),null);
-        if (identifierList.size() > 0) {
-            UPN = identifierList.get(0);
-        }
-        return UPN != null;
+    /**
+     * Checks if one is an active covid case
+     * @param patient
+     * @return
+     */
+    protected String isCovidCase(Patient patient) {
+        String COVID_PROGRAM = "e7ee7548-6958-4361-bed9-ee2614423947";
+        String TEST_ORDER_TYPE_UUID = "52a447d3-a64a-11e3-9aeb-50e549534c5e";
 
+        ProgramWorkflowService service = Context.getProgramWorkflowService();
+        List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(COVID_PROGRAM), null, null, null,null, true);
+        Concept lastTest = getLastCovid19Result(patient);
+
+        OrderService orderService = Context.getOrderService();
+        //Check whether client has active covid order
+        OrderType patientLabOrders = orderService.getOrderTypeByUuid(TEST_ORDER_TYPE_UUID);
+        if (patientLabOrders != null) {
+            //Get active lab orders
+            List<Order> activeVLTestOrders = orderService.getActiveOrders(patient, patientLabOrders, null, null);
+            if (activeVLTestOrders.size() > 0) {
+                for (Order o : activeVLTestOrders) {
+                    if (o.getConcept().getConceptId().equals(165611)) {
+                        return  "Under Lab investigation";
+                    }
+                }
+            }
+        }
+
+       if (programs.size() > 0 &&  lastTest!= null) {
+           if (lastTest.getConceptId().equals(703)) {
+               return "Confirmed Case";
+           } else if (lastTest.getConceptId().equals(664)) {
+               return "Covid-19 Negative";
+           } else {
+               return "Result Indeterminate";
+           }
+       }
+
+        if (programs.size() > 0) {
+            return "Enrolled Case";
+        }
+
+       return null;
+    }
+
+    private Concept getLastCovid19Result(Patient patient) {
+        /*public List<Obs> getObservations(List<Person> whom, List<Encounter> encounters, List<Concept> questions,
+	        List<Concept> answers, List<PERSON_TYPE> personTypes, List<Location> locations, List<String> sort,
+	        Integer mostRecentN, Integer obsGroupId, Date fromDate, Date toDate, boolean includeVoidedObs,
+	        String accessionNumber) throws APIException;*/
+        List<Obs> lastResult = obsService.getObservations(
+                Collections.singletonList(patient.getPerson()),
+                null,
+                Collections.singletonList(covid19LabTestConcept),
+                null,
+                null,
+                null,
+                null,
+                1,
+                null,
+                null,
+                null,
+                false
+        );
+        if (lastResult != null) {
+            return lastResult.get(0).getValueCoded();
+        }
+        return null;
     }
 
     protected String getGenderIconForRelationships(boolean status, int age) {
