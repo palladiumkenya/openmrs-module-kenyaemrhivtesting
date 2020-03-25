@@ -49,6 +49,10 @@
 		<kenyauiVersion>2.0.3</kenyauiVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
 		<idgenVersion>2.6</idgenVersion>
+		<jacksonVersion>2.9.2</jacksonVersion>
+		<webservicesRestVersion>2.1</webservicesRestVersion>
+
+
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -154,6 +158,37 @@
 				<version>${idgenVersion}</version>
 				<scope>provided</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>webservices.rest-omod</artifactId>
+				<version>${webservicesRestVersion}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>webservices.rest-omod-common</artifactId>
+				<version>${webservicesRestVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>webservices.rest-omod-1.8</artifactId>
+				<version>${webservicesRestVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+
+
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>webservices.rest-omod-common</artifactId>
+				<version>${webservicesRestVersion}</version>
+				<classifier>tests</classifier>
+				<scope>test</scope>
+			</dependency>
 			<!-- End OpenMRS modules -->
 
 			<!-- Begin OpenMRS core -->
@@ -221,7 +256,24 @@
 			</dependency>
 
 
-			<!-- End external libraries -->
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jacksonVersion}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jacksonVersion}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jacksonVersion}</version>
+			</dependency>
+			<!-- end of external dependencies-->
 
 		</dependencies>
 	</dependencyManagement>
