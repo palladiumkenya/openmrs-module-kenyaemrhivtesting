@@ -36,7 +36,7 @@ div.column-two {
 }
 
 div.column-three {
-    width: 200px;
+    width: 120px;
 }
 
 div.column-four {
@@ -44,7 +44,7 @@ div.column-four {
 }
 
 div.column-five {
-    width: 160px;
+    width: 120px;
 }
 
 div.column-six {
@@ -52,7 +52,7 @@ div.column-six {
 }
 
 div.column-seven {
-    width: 140px;
+    width: 120px;
 }
 
 div.column-eight {
@@ -113,8 +113,6 @@ div.section-title {
     <div id="program-tabs" class="ke-tabs">
         <div class="ke-tabmenu">
             <div class="ke-tabmenu-item" data-tabid="contact_list">List of Contacts</div>
-
-            <div class="ke-tabmenu-item" data-tabid="contact_trace">Client Tracing History</div>
 
         </div>
 
@@ -212,9 +210,7 @@ div.section-title {
                                 </button>
                             </div>
                             <% } %>
-                            <div class="column-eleven">
 
-                            </div>
                         </div>
 
                         <div class="clear"></div>
@@ -241,86 +237,6 @@ div.section-title {
             </div>
 
         </div>
-
-        <div class="ke-tab" data-tabid="contact_trace">
-            <div class="ke-panel-frame">
-                <div class="ke-panel-heading">Tracing History of Patient</div>
-
-                <div class="ke-panel-content">
-                    <input type="hidden" name="lTraceStat" value="${lastTraceStatus}" id="lTraceStat"/>
-
-                    <div class="section-title"></div>
-
-                    <div class="clear"></div>
-
-                    <% if (traces) { %>
-                    <div class="grid">
-
-                        <div class="column-eleven col-header">Date</div>
-
-                        <div class="column-twelve col-header">Contact Type</div>
-
-                        <div class="column-thirteen col-header">Status</div>
-
-                        <div class="column-fourteen col-header">Facility Linked To</div>
-
-                        <div class="column-fifteen col-header">Health Worker Handed To</div>
-
-                        <div class="column-sixteen col-header">Remarks</div>
-
-                        <div style="float: left; width: 60px">
-
-                        </div>
-
-                    </div>
-
-                    <div class="clear"></div>
-
-                    <% traces.each { rel -> %>
-
-                    <div class="ke-stack-item">
-                        <div class="grid">
-
-                            <div class="column-eleven">${rel.date}</div>
-
-                            <div class="column-twelve">${rel.contactType}</div>
-
-                            <div class="column-thirteen">${rel.status}</div>
-
-                            <div class="column-fourteen">${rel.facilityLinkedTo}</div>
-
-                            <div class="column-fifteen">${rel.healthWorkerHandedTo ?: ""}</div>
-
-                            <div class="column-sixteen">${rel.remarks}</div>
-
-                        </div>
-
-                        <div class="clear"></div>
-
-                    </div>
-                    <% }
-                    } else { %>
-                    No Contact trace found
-                    <% } %>
-                </div>
-            </div>
-
-            <div class="clear"></div>
-            <% if (patientContact) { %>
-            <div align="center">
-
-                <button class="addTrace" name="addTrace" type="button"
-                        onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "newContactTraceForm", [ patientContact: patientContact.id, patientId: currentPatient.patientId,  returnUrl: ui.thisUrl() ])}')">
-                    <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Add Trace
-                </button>
-
-            </div>
-            <% } %>
-
-        </div>
-
-    </div>
-
 </div>
 
 <script type="text/javascript">
