@@ -78,6 +78,7 @@ public class ContactTreeViewFragmentController {
         ObjectNode pTextNode = getJsonNodeFactory().objectNode();
         pTextNode.put("name", patientName);
         pTextNode.put("title", patient.getAge().toString().concat("Yrs"));
+        pTextNode.put("status", isCovidCase(patient));
         patientNode.put("text", pTextNode);
 
         Set<Integer> exludes = new HashSet<Integer>(); // list of persons to be exluded from contacts list. initialize the list with index client
@@ -111,14 +112,12 @@ public class ContactTreeViewFragmentController {
             String genderCode = person.getGender().toLowerCase();
             String linkUrl, linkIcon;
             age = new StringBuilder().append(type).append(", ").append(person.getAge()).append(" Yrs").toString();
-            PatientIdentifierType pit = patientService.getPatientIdentifierTypeByUuid(UNIQUE_PATIENT_NUMBER);
-            List<PatientIdentifier> identifierList = patientService.getPatientIdentifiers(null, Arrays.asList(pit), null, Arrays.asList(patientService.getPatient(person.getId())),null);
-            if (identifierList.size() > 0) {
-                UPN = identifierList.get(0);
-            }
+
 
             alive = person.isDead();
             String relIconPathString = null;
+            String covidStatus = isCovidCase(Context.getPatientService().getPatient(person.getPersonId()));
+
 
 
             if (person.isPatient()) {
@@ -133,16 +132,11 @@ public class ContactTreeViewFragmentController {
             }
 
 
-            if(UPN != null) { // for patient confirmed in HIV
-                confirmed = true;
-            }
-
             exludes.add(person.getPersonId());
             relNode.put("image", linkIcon);
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", person.getPersonName().toString());
-            textNode.put("title", age.concat(", Status: ").concat((confirmed) ? "In Care" : "Not Enrolled"));
-            //textNode.put("desc", (confirmed) ? "In Care" : "Not Enrolled");
+            textNode.put("title", age.concat(", Status: ").concat(covidStatus != null? covidStatus : "Not yet enrolled"));
             relNode.put("text", textNode);
 
 
@@ -256,7 +250,7 @@ public class ContactTreeViewFragmentController {
             ObjectNode relNode = getJsonNodeFactory().objectNode();
             String type = formatRelationshipType(patientContact.getRelationType());
             String age = "";
-            String status = isCovidCase(patient);
+            String status = null;
 
 
             String linkIcon;
@@ -265,6 +259,7 @@ public class ContactTreeViewFragmentController {
 
             if (patientFromContact != null) {
 
+                status = isCovidCase(patientFromContact);
                 fullName = patientFromContact.getPersonName().toString();
                 age = new StringBuilder().append(type).append(", ").append(patientFromContact.getAge()).append(" Yrs").toString();
                 linkIcon = ui.resourceLink("hivtestingservices", getPersonIconForAge(patientFromContact.getAge()) + patientFromContact.getGender().toLowerCase() + ".png");
@@ -321,7 +316,7 @@ public class ContactTreeViewFragmentController {
             relNode.put("image", linkIcon);
             ObjectNode textNode = getJsonNodeFactory().objectNode();
             textNode.put("name", fullName);
-            textNode.put("title", age.concat(", Status: ").concat(status !=null? status : "Uknown"));
+            textNode.put("title", age.concat(", Status: ").concat(status !=null? status : "Not yet enrolled"));
             //textNode.put("desc", status);
             relNode.put("text", textNode);
             if (childrenOfListedContacts.size() > 0) {
@@ -411,7 +406,7 @@ public class ContactTreeViewFragmentController {
                 null,
                 false
         );
-        if (lastResult != null) {
+        if (lastResult != null && lastResult.size() > 0) {
             return lastResult.get(0).getValueCoded();
         }
         return null;
