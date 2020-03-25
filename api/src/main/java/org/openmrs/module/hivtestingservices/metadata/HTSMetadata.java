@@ -43,8 +43,8 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		public static final String CO_WIFE = "2ac0d501-eadc-4624-b982-563c70035d46";
 		public static final String INJECTABLE_DRUG_USER = "58da0d1e-9c89-42e9-9412-275cef1e0429";
 		public static final String CO_WORKER = "da9cded8-4f0c-463f-92e4-298d3d8ca0c7";
-		public static final String AIR_PASSANGER = "a3ea745a-0f3c-43ab-9cbb-c1ba13763d95";
-		public static final String ROAD_PASSANGER = "ce38734b-a1eb-4172-b7e6-b125cb89df54";
+		public static final String AIR_PASSENGER = "a3ea745a-0f3c-43ab-9cbb-c1ba13763d95";
+		public static final String ROAD_PASSENGER = "ce38734b-a1eb-4172-b7e6-b125cb89df54";
 
 	}
 
@@ -60,8 +60,8 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(relationshipType("Co-wife", "Co-wife", "Female member spouse in a polygamist household", _RelationshipType.CO_WIFE));
 		install(relationshipType("Injectable-drug-user", "Injectable-druguser", "Those who share drug needles", _RelationshipType.INJECTABLE_DRUG_USER));
 		install(relationshipType("Co-worker", "Co-worker", "Those who work together", _RelationshipType.CO_WORKER));
-		install(relationshipType("Air passanger", "Air passanger", "Travel by air together", _RelationshipType.AIR_PASSANGER));
-		install(relationshipType("Road passanger", "Road passanger", "Travel by road together", _RelationshipType.ROAD_PASSANGER));
+		install(relationshipType("Air passenger", "Air passanger", "Travel by air together", _RelationshipType.AIR_PASSENGER));
+		install(relationshipType("Road passenger", "Road passanger", "Travel by road together", _RelationshipType.ROAD_PASSENGER));
 	}
 
 }

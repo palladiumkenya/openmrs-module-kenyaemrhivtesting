@@ -102,8 +102,8 @@ public class RegisterContactFragmentController {
 	String injectableDrugUserRelType = "58da0d1e-9c89-42e9-9412-275cef1e0429";
 
 	String coworkerRelType = "da9cded8-4f0c-463f-92e4-298d3d8ca0c7";
-	String airPassangerRelType = "a3ea745a-0f3c-43ab-9cbb-c1ba13763d95";
-	String roadPassangerRelType = "ce38734b-a1eb-4172-b7e6-b125cb89df54";
+	String airPassengerRelType = "a3ea745a-0f3c-43ab-9cbb-c1ba13763d95";
+	String roadPassengerRelType = "ce38734b-a1eb-4172-b7e6-b125cb89df54";
 
 	/**
 	 * Main controller method
@@ -601,8 +601,8 @@ public class RegisterContactFragmentController {
 			Map<Integer, String> options = new HashMap<Integer, String>();
 
 			options.put(160237, coworkerRelType);
-			options.put(114319, airPassangerRelType);
-			options.put(130728, roadPassangerRelType);
+			options.put(114319, airPassengerRelType);
+			options.put(130728, roadPassengerRelType);
 			options.put(970, parentChildRelType);
 			options.put(971, parentChildRelType);
 			options.put(972, siblingRelType);
