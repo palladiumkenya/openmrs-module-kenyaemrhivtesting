@@ -99,9 +99,7 @@ public class ContactTracingFormFragmentController {
         private String contactType;
         private String status;
         private String reasonUncontacted;
-        private String uniquePatientNo;
         private String facilityLinkedTo;
-        private String healthWorkerHandedTo;
         private String remarks;
         private Date date;
         private  Date appointmentDate;
@@ -119,9 +117,7 @@ public class ContactTracingFormFragmentController {
             this.contactType = contactTrace.getContactType();
             this.status = contactTrace.getStatus();
             this.reasonUncontacted = contactTrace.getReasonUncontacted();
-            this.uniquePatientNo = contactTrace.getUniquePatientNo();
             this.facilityLinkedTo = contactTrace.getFacilityLinkedTo();
-            this.healthWorkerHandedTo = contactTrace.getHealthWorkerHandedTo();
             this.remarks = contactTrace.getRemarks();
             this.date = contactTrace.getDate();
             this.appointmentDate = patientContact.getAppointmentDate();
@@ -141,9 +137,7 @@ public class ContactTracingFormFragmentController {
             toSave.setContactType(contactType);
             toSave.setStatus(status);
             toSave.setReasonUncontacted(reasonUncontacted);
-            toSave.setUniquePatientNo(uniquePatientNo);
             toSave.setFacilityLinkedTo(facilityLinkedTo);
-            toSave.setHealthWorkerHandedTo(healthWorkerHandedTo);
             toSave.setRemarks(remarks);
             toSave.setAppointmentDate(appointmentDate);
             ContactTrace cTrace = Context.getService(HTSService.class).saveClientTrace(toSave);
@@ -220,28 +214,12 @@ public class ContactTracingFormFragmentController {
 
         public void setReasonUncontacted(String reasonUncontacted) { this.reasonUncontacted = reasonUncontacted; }
 
-        public String getUniquePatientNo() {
-            return uniquePatientNo;
-        }
-
-        public void setUniquePatientNo(String uniquePatientNo) {
-            this.uniquePatientNo = uniquePatientNo;
-        }
-
         public String getFacilityLinkedTo() {
             return facilityLinkedTo;
         }
 
         public void setFacilityLinkedTo(String facilityLinkedTo) {
             this.facilityLinkedTo = facilityLinkedTo;
-        }
-
-        public String getHealthWorkerHandedTo() {
-            return healthWorkerHandedTo;
-        }
-
-        public void setHealthWorkerHandedTo(String healthWorkerHandedTo) {
-            this.healthWorkerHandedTo = healthWorkerHandedTo;
         }
 
         public String getRemarks() {
