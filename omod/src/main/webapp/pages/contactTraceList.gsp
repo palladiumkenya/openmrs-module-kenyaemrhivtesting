@@ -15,23 +15,56 @@ div.grid div {
 div.column-one {
     width: 180px;
 }
+
 div.column-two {
+    width: 100px;
+}
+
+div.column-three {
+    width: 120px;
+}
+
+div.column-four {
+    width: 180px;
+}
+
+div.column-five {
     width: 140px;
 }
-div.column-three {
-    width: 200px;
-}
-div.column-four {
-    width: 200px;
-}
-div.column-five {
-    width: 200px;
-}
+
 div.column-six {
-    width: 200px;
+    width: 180px;
 }
 
 div.column-seven {
+    width: 120px;
+}
+
+div.column-eight {
+    width: 100px;
+}
+
+div.column-eleven {
+    width: 200px;
+}
+
+div.column-twelve {
+    width: 180px;
+}
+
+div.column-thirteen {
+    width: 220px;
+}
+
+div.column-fourteen {
+    width: 200px;
+}
+
+div.column-fifteen {
+    width: 240px;
+}
+
+div.column-sixteen {
     width: 200px;
 }
 
