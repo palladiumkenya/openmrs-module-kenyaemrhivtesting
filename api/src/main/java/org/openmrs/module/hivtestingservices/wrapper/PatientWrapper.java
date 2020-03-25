@@ -48,7 +48,9 @@ public class PatientWrapper extends AbstractPatientWrapper {
 	public static final String PATIENT_CLINIC_NUMBER = "b4d66522-11fc-45c7-83e3-39a1af21ae0d";
 	public static final String UNIQUE_PATIENT_NUMBER = "05ee9cf4-7242-4a17-b4d4-00f707265c8a";
 	public static final String NATIONAL_UNIQUE_PATIENT_IDENTIFIER = "f85081e2-b4be-4e48-b3a4-7994b69bb101";
-	
+	public static final String ALIEN_NUMBER = "e1e80b5c-6d7e-11ea-bc55-0242ac130003"; // this takes care of migration
+	public static final String PASSPORT_NUMBER = "e1e80daa-6d7e-11ea-bc55-0242ac130003";
+
 	private PersonWrapper person;
 
 	/**
@@ -128,6 +130,38 @@ public class PatientWrapper extends AbstractPatientWrapper {
 		setAsIdentifier(NATIONAL_ID, value, location);
 	}
 
+	/**
+	 * Gets the patient clinic number
+	 * @return the identifier value
+	 */
+	public String getAlienNumber() {
+		return getAsIdentifier(ALIEN_NUMBER);
+	}
+
+	/**
+	 * Sets the patient clinic number
+	 * @param value the identifier value
+	 * @param location the identifier location
+	 */
+	public void setAlienNumber(String value, Location location) {
+		setAsIdentifier(ALIEN_NUMBER, value, location);
+	}
+	/**
+	 * Gets the patient clinic number
+	 * @return the identifier value
+	 */
+	public String getPassportNumber() {
+		return getAsIdentifier(PASSPORT_NUMBER);
+	}
+
+	/**
+	 * Sets the patient clinic number
+	 * @param value the identifier value
+	 * @param location the identifier location
+	 */
+	public void setPassportNumber(String value, Location location) {
+		setAsIdentifier(PASSPORT_NUMBER, value, location);
+	}
 	/**
 	 * Gets the address of next of kin
 	 * @return the address

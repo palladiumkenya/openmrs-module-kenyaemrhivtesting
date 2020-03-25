@@ -88,6 +88,16 @@
                     <td>${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "nationalIdNumber"])}</td>
                     <td class="ke-field-instructions"><% if (!command.nationalIdNumber) { %>(If the patient is below 18 years of age, enter the guardian`s National Identification Number if available.)<% } %></td>
                 </tr>
+                <tr>
+                    <td class="ke-field-label">Passport Number</td>
+                    <td>${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "passportNumber"])}</td>
+                    <td class="ke-field-instructions"></td>
+                </tr>
+                <tr>
+                    <td class="ke-field-label">Alien Number</td>
+                    <td>${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "alienNumber"])}</td>
+                    <td class="ke-field-instructions"></td>
+                </tr>
             </table>
 
         </fieldset>
@@ -249,7 +259,11 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         kenyaui.setupAjaxPost('edit-patient-form', {
             onSuccess: function (data) {
                 if (data.id) {
-                    ui.navigate('kenyaemr', 'registration/registrationViewPatient', {patientId: data.id});
+                    <% if (config.returnUrl) { %>
+                    ui.navigate('${ config.returnUrl }');
+                    <% } else { %>
+                    ui.navigate('kenyaemr', 'surveillance/surveillanceViewPatient', {patientId: data.id});
+                    <% } %>
                 } else {
                     kenyaui.notifyError('Saving patient was successful, but unexpected response');
                 }
