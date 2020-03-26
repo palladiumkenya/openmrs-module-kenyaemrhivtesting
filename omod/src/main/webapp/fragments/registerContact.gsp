@@ -1,6 +1,7 @@
 <%
     ui.decorateWith("kenyaui", "panel", [heading: "Register Patient Contact", frameOnly: true])
 
+
     def nameFields = [
             [
                     [object: command, property: "personName.familyName", label: "Surname *"],
@@ -155,6 +156,22 @@
         <fieldset>
             <legend>Address</legend>
 
+            <table>
+                <tr>
+                    <td class="ke-field-label" style="width: 265px">Nationality</td>
+                </tr>
+                <tr>
+                    <td style="width: 265px">
+                        <select name="personAddress.country">
+                            <option></option>
+                            <%countryList.each { %>
+                            <option value="${it}">${it}</option>
+                            <%}%>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <br/>
             <% contactsFields.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
             <% } %>
