@@ -128,6 +128,9 @@ public class RegisterContactFragmentController {
 			}
 		}
 
+		// populate country list
+		model.addAttribute("countryList", Utils.getCountryList());
+
 		Set<String> uniqueCountyList = new HashSet<String>(countyList);
 		model.addAttribute("countyList", uniqueCountyList);
 
