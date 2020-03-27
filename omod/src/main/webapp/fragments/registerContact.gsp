@@ -1,5 +1,5 @@
 <%
-    ui.decorateWith("kenyaui", "panel", [heading: "Register Patient Contact", frameOnly: true])
+    ui.decorateWith("kenyaui", "panel", [heading: "Register Case Contact", frameOnly: true])
 
 
     def nameFields = [
@@ -79,7 +79,7 @@
 
             <table>
                 <tr>
-                    <td class="ke-field-label">Patient Clinic Number</td>
+                    <td class="ke-field-label">Case ID</td>
                     <td>${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "patientClinicNumber"])}</td>
                     <td class="ke-field-instructions"><% if (!command.patientClinicNumber) { %>(if available)<%
                         } %></td>
