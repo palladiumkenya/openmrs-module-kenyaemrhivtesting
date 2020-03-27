@@ -233,15 +233,27 @@ public class OutgoingPatientSHR {
             patientSHR.put("PATIENT_IDENTIFICATION", patientIdentificationNode);
             patientSHR.put("PATIENT_CONTACTS", getPatientContacts());*/
 
-            HTSService htsService = Context.getService(HTSService.class);
+            /*HTSService htsService = Context.getService(HTSService.class);
             List<PatientContact> patientContacts = htsService.getPatientContactByPatient(this.patient);
 
             PatientContact pc = null;
             if (patientContacts != null && patientContacts.size() > 0) {
                 pc = patientContacts.get(0);
                 patientSHR = buildContactPayload(pc);
-            }
+            }*/
 
+            return patientSHR;
+        } else {
+            return patientSHR;
+        }
+    }
+
+    public ArrayNode getContactListCht() {
+
+        JsonNodeFactory factory = getJsonNodeFactory();
+        ArrayNode patientSHR = factory.arrayNode();
+        if (patient != null) {
+            patientSHR = buildContactPayload();
             return patientSHR;
         } else {
             return patientSHR;
@@ -378,120 +390,88 @@ public class OutgoingPatientSHR {
 
     }
 
-    private ObjectNode buildContactPayload(PatientContact c) {
+    private ArrayNode buildContactPayload() {
 
-        /*{
-  "_id": "0fca552baea1cfd18180e1fb1a00190d",
-  "place": "a452eebc-00a3-4c03-bc2b-43df627bf0f1", // rather than using the parent object
-  "family_name": "Profile (Pushed)",
-  "given_names": "Test",
-  "role": "covid_contact",
-  "name": "Test Profile (Pushed)",
-  "country_of_residence": "kenya",
-  "date_of_birth": "2000-02-01",
-  "sex": "female",
-  "primary_phone": "+254717054679",
-  "alternate_phone": "",
-  "email": "",
-  "type": "person",
-  "reported_date": 1584977411264, // Unix timestamp
-  "patient_id": "89667",
-  "phone": "+254717059345",
-  "date_of_last_contact": "2020-03-04",
-  "outbreak_case_id": "1X000",
-  "relation_to_case": "Child",
-  "type_of_contact": "1 2", // types of contact the person had with the case. It's a space separated list
-  "household_head": "MIke",
-  "subcounty": "bunyala",
-  "town": "Town X",
-  "address": "Near the river",
-  "healthcare_worker": "true",
-  "facility": "Facility Y" //only given if healthcare_worker = true
-}*/
-        String givenNames = "";
-        String sex = "";
-        String dateFormat = "yyyy-MM-dd";
+        ArrayNode patientContactNode = getJsonNodeFactory().arrayNode();
+        HTSService htsService = Context.getService(HTSService.class);
+        List<PatientContact> patientContacts = htsService.getPatientContactByPatient(this.patient);
 
-        String fullName = "";
+        if (patientContacts != null && patientContacts.size() > 0) {
 
-        if (c.getFirstName() != null) {
-            fullName += c.getFirstName();
-        }
+            for (PatientContact c : patientContacts) {
+                String givenNames = "";
+                String sex = "";
+                String dateFormat = "yyyy-MM-dd";
 
-        if (c.getMiddleName() != null) {
-            fullName += " " + c.getMiddleName();
-        }
+                String fullName = "";
 
-        if (c.getLastName() != null) {
-            fullName += " " + c.getLastName();
-        }
+                if (c.getFirstName() != null) {
+                    fullName += c.getFirstName();
+                }
 
-        if (c.getFirstName() != null && c.getMiddleName() != null) {
-            givenNames += c.getFirstName();
-            givenNames += " " + c.getMiddleName();
-        } else {
-            if (c.getFirstName() != null) {
-                givenNames += c.getFirstName();
+                if (c.getMiddleName() != null) {
+                    fullName += " " + c.getMiddleName();
+                }
+
+                if (c.getLastName() != null) {
+                    fullName += " " + c.getLastName();
+                }
+
+                if (c.getFirstName() != null && c.getMiddleName() != null) {
+                    givenNames += c.getFirstName();
+                    givenNames += " " + c.getMiddleName();
+                } else {
+                    if (c.getFirstName() != null) {
+                        givenNames += c.getFirstName();
+                    }
+
+                    if (c.getMiddleName() != null) {
+                        givenNames += c.getMiddleName();
+                    }
+                }
+
+                if (c.getSex() != null) {
+                    if (c.getSex().equals("M")) {
+                        sex = "male";
+                    } else {
+                        sex = "female";
+                    }
+                }
+                ObjectNode contact = getJsonNodeFactory().objectNode();
+                ObjectNode parentNode = getJsonNodeFactory().objectNode();
+                parentNode.put("_id", "a452eebc-00a3-4c03-bc2b-43df627bf0f1");
+
+                contact.put("_id", c.getUuid());
+                contact.put("parent", parentNode);
+                contact.put("given_names", givenNames);
+                contact.put("role", "covid_contact");
+                contact.put("name", fullName);
+                contact.put("country_of_residence", "Kenya");
+                contact.put("date_of_birth", c.getBirthDate() != null ? getSimpleDateFormat(dateFormat).format(c.getBirthDate()) : "");
+                contact.put("sex", sex);
+                contact.put("primary_phone", c.getPhoneContact() != null ? c.getPhoneContact() : "");
+                contact.put("alternate_phone", "");
+                contact.put("email", "");
+                contact.put("type", "person");
+                contact.put("reported_date", c.getDateCreated().getTime());
+                contact.put("patient_id", c.getPatientRelatedTo().getPatientId().toString());
+                contact.put("phone", "");// this could be patient phone
+                contact.put("date_of_last_contact", c.getAppointmentDate() != null ? getSimpleDateFormat(dateFormat).format(c.getAppointmentDate()) : "");
+                contact.put("outbreak_case_id", "1X000");
+                contact.put("relation_to_case", c.getRelationType() != null ? getContactRelation().get(c.getRelationType()) : "");
+                contact.put("type_of_contact", c.getPnsApproach() != null ? getContactType().get(c.getPnsApproach()) : "");
+                contact.put("household_head", c.getLivingWithPatient() != null && c.getLivingWithPatient().equals(1065) ? givenNames : "");
+                contact.put("subcounty", c.getSubcounty() != null ? c.getSubcounty() : "");
+                contact.put("town", c.getTown() != null ? c.getTown() : "");
+                contact.put("address", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
+                contact.put("healthcare_worker", c.getMaritalStatus() != null && c.getMaritalStatus().equals(1065) ? "true" : "false");
+                contact.put("facility", c.getFacility() != null ? c.getFacility() : "");
+                patientContactNode.add(contact);
+
             }
-
-            if (c.getMiddleName() != null) {
-                givenNames += c.getMiddleName();
-            }
         }
 
-        if (c.getSex() != null) {
-            if (c.getSex().equals("M")) {
-                sex = "male";
-            } else {
-                sex = "female";
-            }
-        }
-        ObjectNode contact = getJsonNodeFactory().objectNode();
-        contact.put("_id", c.getUuid());
-        contact.put("place", "a452eebc-00a3-4c03-bc2b-43df627bf0f1");
-        contact.put("given_names", givenNames);
-        contact.put("role", "covid_contact");
-        contact.put("name", fullName);
-        contact.put("country_of_residence", "Kenya");
-        contact.put("date_of_birth", c.getBirthDate() != null ? getSimpleDateFormat(dateFormat).format(c.getBirthDate()) : "");
-        contact.put("sex", sex);
-        contact.put("primary_phone", c.getPhoneContact() != null ? c.getPhoneContact() : "");
-        contact.put("alternate_phone", "");
-        contact.put("email", "");
-        contact.put("type", "person");
-        contact.put("reported_date", c.getDateCreated().getTime());
-        contact.put("patient_id", c.getPatientRelatedTo().getPatientId().toString());
-        contact.put("phone", "");// this could be patient phone
-        contact.put("date_of_last_contact", c.getAppointmentDate() != null ? getSimpleDateFormat(dateFormat).format(c.getAppointmentDate()) : "");
-        contact.put("outbreak_case_id", "1X000");
-        contact.put("relation_to_case", c.getRelationType() != null ? getContactRelation().get(c.getRelationType()) : "");
-        contact.put("type_of_contact", c.getPnsApproach() != null ? getContactType().get(c.getPnsApproach()) : "");
-        contact.put("household_head", c.getLivingWithPatient() != null && c.getLivingWithPatient().equals(1065) ? givenNames : "");
-        contact.put("subcounty", c.getSubcounty() != null ? c.getSubcounty() : "");
-        contact.put("town", c.getTown() != null ? c.getTown() : "");
-        contact.put("address", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
-        contact.put("healthcare_worker", c.getMaritalStatus() != null && c.getMaritalStatus().equals(1065) ? "true" : "false");
-        contact.put("facility", c.getFacility());
-
-        return contact;
-
-
-
-        /*"reported_date": 1584977411264, // Unix timestamp
-  "patient_id": "89667",
-  "phone": "+254717059345",
-  "date_of_last_contact": "2020-03-04",
-  "outbreak_case_id": "1X000",
-  "relation_to_case": "Child",
-  "type_of_contact": "1 2", // types of contact the person had with the case. It's a space separated list
-  "household_head": "MIke",
-  "subcounty": "bunyala",
-  "town": "Town X",
-  "address": "Near the river",
-  "healthcare_worker": "true",
-  "facility": "Facility Y" */
-
-
+        return patientContactNode;
 
     }
 

@@ -66,7 +66,7 @@ public class SHRRestController extends BaseRestController {
 		patientID=Integer.parseInt(thisRequest.getPatientID());
 		if (patientID != 0) {
 			OutgoingPatientSHR shr = new OutgoingPatientSHR(patientID);
-			return shr.patientIdentification().toString();
+			return shr.getContactListCht().toString();
 
 		}
 		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
