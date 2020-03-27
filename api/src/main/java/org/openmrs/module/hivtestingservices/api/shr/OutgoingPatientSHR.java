@@ -178,7 +178,7 @@ public class OutgoingPatientSHR {
         ObjectNode patientSHR = factory.objectNode();
         if (patient != null) {
 
-            PatientIdentifierType NATIONAL_ID_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.NATIONAL_ID);
+            /*PatientIdentifierType NATIONAL_ID_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.NATIONAL_ID);
             PatientIdentifierType ALIEN_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.ALIEN_NUMBER);
             PatientIdentifierType PASSPORT_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.PASSPORT_NUMBER);
 
@@ -231,7 +231,16 @@ public class OutgoingPatientSHR {
             patientIdentificationNode.put("PHONE_NUMBER", getPatientPhoneNumber());
             patientSHR.put("VERSION", "1.0.0");
             patientSHR.put("PATIENT_IDENTIFICATION", patientIdentificationNode);
-            patientSHR.put("PATIENT_CONTACTS", getPatientContacts());
+            patientSHR.put("PATIENT_CONTACTS", getPatientContacts());*/
+
+            HTSService htsService = Context.getService(HTSService.class);
+            List<PatientContact> patientContacts = htsService.getPatientContactByPatient(this.patient);
+
+            PatientContact pc = null;
+            if (patientContacts != null && patientContacts.size() > 0) {
+                pc = patientContacts.get(0);
+                patientSHR = buildContactPayload(pc);
+            }
 
             return patientSHR;
         } else {
@@ -366,6 +375,148 @@ public class OutgoingPatientSHR {
 
     protected RelationshipType getParentChildType() {
         return personService.getRelationshipTypeByUuid("8d91a210-c2cc-11de-8d13-0010c6dffd0f");
+
+    }
+
+    private ObjectNode buildContactPayload(PatientContact c) {
+
+        /*{
+  "_id": "0fca552baea1cfd18180e1fb1a00190d",
+  "place": "a452eebc-00a3-4c03-bc2b-43df627bf0f1", // rather than using the parent object
+  "family_name": "Profile (Pushed)",
+  "given_names": "Test",
+  "role": "covid_contact",
+  "name": "Test Profile (Pushed)",
+  "country_of_residence": "kenya",
+  "date_of_birth": "2000-02-01",
+  "sex": "female",
+  "primary_phone": "+254717054679",
+  "alternate_phone": "",
+  "email": "",
+  "type": "person",
+  "reported_date": 1584977411264, // Unix timestamp
+  "patient_id": "89667",
+  "phone": "+254717059345",
+  "date_of_last_contact": "2020-03-04",
+  "outbreak_case_id": "1X000",
+  "relation_to_case": "Child",
+  "type_of_contact": "1 2", // types of contact the person had with the case. It's a space separated list
+  "household_head": "MIke",
+  "subcounty": "bunyala",
+  "town": "Town X",
+  "address": "Near the river",
+  "healthcare_worker": "true",
+  "facility": "Facility Y" //only given if healthcare_worker = true
+}*/
+        String givenNames = "";
+        String sex = "";
+        String dateFormat = "yyyy-MM-dd";
+
+        String fullName = "";
+
+        if (c.getFirstName() != null) {
+            fullName += c.getFirstName();
+        }
+
+        if (c.getMiddleName() != null) {
+            fullName += " " + c.getMiddleName();
+        }
+
+        if (c.getLastName() != null) {
+            fullName += " " + c.getLastName();
+        }
+
+        if (c.getFirstName() != null && c.getMiddleName() != null) {
+            givenNames += c.getFirstName();
+            givenNames += " " + c.getMiddleName();
+        } else {
+            if (c.getFirstName() != null) {
+                givenNames += c.getFirstName();
+            }
+
+            if (c.getMiddleName() != null) {
+                givenNames += c.getMiddleName();
+            }
+        }
+
+        if (c.getSex() != null) {
+            if (c.getSex().equals("M")) {
+                sex = "male";
+            } else {
+                sex = "female";
+            }
+        }
+        ObjectNode contact = getJsonNodeFactory().objectNode();
+        contact.put("_id", c.getUuid());
+        contact.put("place", "a452eebc-00a3-4c03-bc2b-43df627bf0f1");
+        contact.put("given_names", givenNames);
+        contact.put("role", "covid_contact");
+        contact.put("name", fullName);
+        contact.put("country_of_residence", "Kenya");
+        contact.put("date_of_birth", c.getBirthDate() != null ? getSimpleDateFormat(dateFormat).format(c.getBirthDate()) : "");
+        contact.put("sex", sex);
+        contact.put("primary_phone", c.getPhoneContact() != null ? c.getPhoneContact() : "");
+        contact.put("alternate_phone", "");
+        contact.put("email", "");
+        contact.put("type", "person");
+        contact.put("reported_date", c.getDateCreated().getTime());
+        contact.put("patient_id", c.getPatientRelatedTo().getPatientId().toString());
+        contact.put("phone", "");// this could be patient phone
+        contact.put("date_of_last_contact", c.getAppointmentDate() != null ? getSimpleDateFormat(dateFormat).format(c.getAppointmentDate()) : "");
+        contact.put("outbreak_case_id", "1X000");
+        contact.put("relation_to_case", c.getRelationType() != null ? getContactRelation().get(c.getRelationType()) : "");
+        contact.put("type_of_contact", c.getPnsApproach() != null ? getContactType().get(c.getPnsApproach()) : "");
+        contact.put("household_head", c.getLivingWithPatient() != null && c.getLivingWithPatient().equals(1065) ? givenNames : "");
+        contact.put("subcounty", c.getSubcounty() != null ? c.getSubcounty() : "");
+        contact.put("town", c.getTown() != null ? c.getTown() : "");
+        contact.put("address", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
+        contact.put("healthcare_worker", c.getMaritalStatus() != null && c.getMaritalStatus().equals(1065) ? "true" : "false");
+        contact.put("facility", c.getFacility());
+
+        return contact;
+
+
+
+        /*"reported_date": 1584977411264, // Unix timestamp
+  "patient_id": "89667",
+  "phone": "+254717059345",
+  "date_of_last_contact": "2020-03-04",
+  "outbreak_case_id": "1X000",
+  "relation_to_case": "Child",
+  "type_of_contact": "1 2", // types of contact the person had with the case. It's a space separated list
+  "household_head": "MIke",
+  "subcounty": "bunyala",
+  "town": "Town X",
+  "address": "Near the river",
+  "healthcare_worker": "true",
+  "facility": "Facility Y" */
+
+
+
+    }
+
+    private Map<Integer, String> getContactRelation() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237, "Co-worker");
+        options.put(165656,"Traveled together");
+        options.put(970, "Mother");
+        options.put(971, "Father");
+        options.put(972, "Sibling");
+        options.put(1528, "Child");
+        options.put(5617, "Spouse");
+        options.put(163565, "Sexual partner");
+        options.put(162221, "Co-wife");
+
+        return options;
+    }
+
+    private Map<Integer, String> getContactType() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237,"Working together with a nCoV patient");
+        options.put(165656,"Traveling together with a nCoV patient");
+        options.put(1060,"Living together with a nCoV patient");
+        options.put(117163,"Health care associated exposure");
+        return options;
 
     }
 

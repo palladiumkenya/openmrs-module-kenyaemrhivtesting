@@ -134,7 +134,7 @@ public class PatientContactListPageController {
 
     private String formatRelationshipType(Integer typeId) {
         if (typeId == null) {
-            return null;
+            return "";
         } else {
             return relationshipOptions().get(typeId);
         }
@@ -142,7 +142,7 @@ public class PatientContactListPageController {
 
     private String formatpnsApproachOptions(Integer typeId) {
         if (typeId == null) {
-            return null;
+            return "";
         } else {
             return pnsApproachOptions().get(typeId);
         }
@@ -150,7 +150,7 @@ public class PatientContactListPageController {
 
     private String formatMaritalStatusOptions(Integer typeId) {
         if (typeId == null) {
-            return null;
+            return "";
         } else {
             return maritalStatusOptions().get(typeId);
         }
