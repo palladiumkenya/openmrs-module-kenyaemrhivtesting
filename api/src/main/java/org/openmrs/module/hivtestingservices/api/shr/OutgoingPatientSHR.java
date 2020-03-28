@@ -178,7 +178,7 @@ public class OutgoingPatientSHR {
         ObjectNode patientSHR = factory.objectNode();
         if (patient != null) {
 
-            /*PatientIdentifierType NATIONAL_ID_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.NATIONAL_ID);
+            PatientIdentifierType NATIONAL_ID_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.NATIONAL_ID);
             PatientIdentifierType ALIEN_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.ALIEN_NUMBER);
             PatientIdentifierType PASSPORT_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.PASSPORT_NUMBER);
 
@@ -231,16 +231,7 @@ public class OutgoingPatientSHR {
             patientIdentificationNode.put("PHONE_NUMBER", getPatientPhoneNumber());
             patientSHR.put("VERSION", "1.0.0");
             patientSHR.put("PATIENT_IDENTIFICATION", patientIdentificationNode);
-            patientSHR.put("PATIENT_CONTACTS", getPatientContacts());*/
-
-            /*HTSService htsService = Context.getService(HTSService.class);
-            List<PatientContact> patientContacts = htsService.getPatientContactByPatient(this.patient);
-
-            PatientContact pc = null;
-            if (patientContacts != null && patientContacts.size() > 0) {
-                pc = patientContacts.get(0);
-                patientSHR = buildContactPayload(pc);
-            }*/
+            patientSHR.put("PATIENT_CONTACTS", getPatientContacts());
 
             return patientSHR;
         } else {
@@ -248,16 +239,17 @@ public class OutgoingPatientSHR {
         }
     }
 
-    public ArrayNode getContactListCht() {
+    public ObjectNode getContactListCht() {
 
+        ObjectNode docs = getJsonNodeFactory().objectNode();
         JsonNodeFactory factory = getJsonNodeFactory();
         ArrayNode patientSHR = factory.arrayNode();
         if (patient != null) {
-            patientSHR = buildContactPayload();
-            return patientSHR;
+            docs.put("docs", buildContactPayload());
         } else {
-            return patientSHR;
+            docs.put("docs",patientSHR); // put an empty array
         }
+        return docs;
     }
 
     private ArrayNode getPatientContacts() {

@@ -46,7 +46,7 @@ public class SHRRestController extends BaseRestController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/getshr")
+	@RequestMapping(method = RequestMethod.POST, value = "/getcasecontacts")
 	@ResponseBody
 	public Object receiveSHR(HttpServletRequest request) {
 		Integer patientID=null;
@@ -67,6 +67,38 @@ public class SHRRestController extends BaseRestController {
 		if (patientID != 0) {
 			OutgoingPatientSHR shr = new OutgoingPatientSHR(patientID);
 			return shr.getContactListCht().toString();
+
+		}
+		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+	}
+
+
+	/**
+	 * gets SHR based on patient/client internal ID
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/getcontactlist") // end point for mhealth kenya
+	@ResponseBody
+	public Object getMhealthContactList(HttpServletRequest request) {
+		Integer patientID=null;
+		String requestBody = null;
+		MiddlewareRequest thisRequest = null;
+		try {
+			requestBody = SHRUtils.fetchRequestBody(request.getReader());
+		} catch (IOException e) {
+			return new SimpleObject().add("ServerResponse", "Error extracting request body");
+		}
+		try {
+			thisRequest = new ObjectMapper().readValue(requestBody, MiddlewareRequest.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new SimpleObject().add("ServerResponse", "Error reading patient id: " + requestBody);
+		}
+		patientID=Integer.parseInt(thisRequest.getPatientID());
+		if (patientID != 0) {
+			OutgoingPatientSHR shr = new OutgoingPatientSHR(patientID);
+			return shr.patientIdentification().toString();
 
 		}
 		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
