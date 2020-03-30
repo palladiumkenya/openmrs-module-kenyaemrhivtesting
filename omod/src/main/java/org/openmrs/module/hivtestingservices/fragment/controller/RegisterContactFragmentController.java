@@ -464,7 +464,7 @@ public class RegisterContactFragmentController {
 			}
 
 			// add relationship and update PatientContact record
-			addRelationship(patientRelatedTo, ret, patientContact.getRelationType());
+			addRelationship(patientRelatedTo, ret, patientContact.getPnsApproach());
 			patientContact.setPatient(ret);
 			Context.getService(HTSService.class).savePatientContact(patientContact);
 
@@ -548,40 +548,15 @@ public class RegisterContactFragmentController {
 
 		private void addRelationship(Person patient, Person contact, Integer relationshipType) {
 
-			Person personA, personB;
-			RelationshipType type;
+			Person personA = null, personB = null;
+			RelationshipType type = null;
 
-			if (relationshipType == 970 || relationshipType == 971) {
-				personA = contact;
-				personB = patient;
-				type = personService.getRelationshipTypeByUuid(healthCareExposureRelType);
-			} else if (relationshipType == 1528) {
-				personA = patient;
-				personB = contact;
-				type = personService.getRelationshipTypeByUuid(healthCareExposureRelType);
-			} else {
+			if (relationshipType != null) {
 				personA = contact;
 				personB = patient;
 				type = personService.getRelationshipTypeByUuid(relationshipOptionsToRelTypeMapper(relationshipType));
 			}
 
-/*+----------------------+--------------------------------------+------------+--------------+
-| relationship_type_id | uuid                                 | a_is_to_b  | b_is_to_a    |
-+----------------------+--------------------------------------+------------+--------------+
-|                    1 | 8d919b58-c2cc-11de-8d13-0010c6dffd0f | Doctor     | Patient      |
-|                    2 | 8d91a01c-c2cc-11de-8d13-0010c6dffd0f | Sibling    | Sibling      |
-|                    3 | 8d91a210-c2cc-11de-8d13-0010c6dffd0f | Parent     | Child        |
-|                    4 | 8d91a3dc-c2cc-11de-8d13-0010c6dffd0f | Aunt/Uncle | Niece/Nephew |
-|                    5 | 5f115f62-68b7-11e3-94ee-6bef9086de92 | Guardian   | Dependant    |
-|                    6 | d6895098-5d8d-11e3-94ee-b35a4132a5e3 | Spouse     | Spouse       |
-|                    7 | 007b765f-6725-4ae9-afee-9966302bace4 | Partner    | Partner      |
-|                    8 | 2ac0d501-eadc-4624-b982-563c70035d46 | Co-wife    | Co-wife      |
-|                    9 | 58da0d1e-9c89-42e9-9412-275cef1e0429 | Injectable Drug User| Injectable Drug User|
-|                    10| da9cded8-4f0c-463f-92e4-298d3d8ca0c7 | Co-worker  | Co-worker    |
-|                    11| a3ea745a-0f3c-43ab-9cbb-c1ba13763d95 | Air passanger | Air passanger |
-|                    12| ce38734b-a1eb-4172-b7e6-b125cb89df54 | Road passanger | Road passanger |
-+----------------------+--------------------------------------+------------+--------------+
-*/
 
 			Relationship rel = new Relationship();
 			rel.setRelationshipType(type);
