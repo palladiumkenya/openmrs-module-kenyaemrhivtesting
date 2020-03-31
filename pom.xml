@@ -49,7 +49,7 @@
 		<kenyauiVersion>2.0.3</kenyauiVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
 		<idgenVersion>2.6</idgenVersion>
-		<jacksonVersion>2.9.2</jacksonVersion>
+		<jacksonVersion>2.10.1</jacksonVersion>
 		<webservicesRestVersion>2.1</webservicesRestVersion>
 
 
