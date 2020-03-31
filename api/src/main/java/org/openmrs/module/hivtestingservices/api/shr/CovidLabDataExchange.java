@@ -227,6 +227,20 @@ public class CovidLabDataExchange {
         String dob = patient.getBirthdate() != null ? OutgoingPatientSHR.getSimpleDateFormat("yyyy-MM-dd").format(patient.getBirthdate()) : "";
         String deathDate = patient.getDeathDate() != null ? OutgoingPatientSHR.getSimpleDateFormat("yyyy-MM-dd").format(patient.getDeathDate()) : "";
 
+        String fullName = "";
+
+        if (patient.getGivenName() != null) {
+            fullName += patient.getGivenName();
+        }
+
+        if (patient.getMiddleName() != null) {
+            fullName += " " + patient.getMiddleName();
+        }
+
+        if (patient.getFamilyName() != null) {
+            fullName += " " + patient.getFamilyName();
+        }
+
         //ArrayNode labTests = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
         if (patientLabOrders != null) {
             //Get active lab orders
@@ -237,7 +251,7 @@ public class CovidLabDataExchange {
                     test.put("case_id", caseId);
                     test.put("identifier_type", idMap.get("type"));
                     test.put("identifier", idMap.get("identifier"));
-                    test.put("patient_name", patient.getGivenName() + " " + patient.getFamilyName() + " " + patient.getMiddleName());
+                    test.put("patient_name", fullName);
                     test.put("justification", "");
                     test.put("county", cifInfo.get("county"));
                     test.put("subcounty", cifInfo.get("subCounty"));
