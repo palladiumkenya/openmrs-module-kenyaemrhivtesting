@@ -4,17 +4,24 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.openmrs.Cohort;
+import org.openmrs.Concept;
+import org.openmrs.Order;
+import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PatientProgram;
 import org.openmrs.Person;
 import org.openmrs.PersonAddress;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
+import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -22,6 +29,7 @@ import org.openmrs.module.hivtestingservices.api.PatientContact;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +79,7 @@ public class OutgoingPatientSHR {
         setPatientUsingIdentifier();
     }
 
-    private JsonNodeFactory getJsonNodeFactory() {
+    public static JsonNodeFactory getJsonNodeFactory() {
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory;
     }
@@ -85,11 +93,11 @@ public class OutgoingPatientSHR {
         return nameNode;
     }
 
-    private String getSHRDateFormat() {
+    public static String getSHRDateFormat() {
         return "yyyyMMdd";
     }
 
-    private SimpleDateFormat getSimpleDateFormat(String pattern) {
+    public static SimpleDateFormat getSimpleDateFormat(String pattern) {
         return new SimpleDateFormat(pattern);
     }
 
@@ -238,6 +246,7 @@ public class OutgoingPatientSHR {
             return patientSHR;
         }
     }
+
 
     public ObjectNode getContactListCht() {
 
@@ -466,6 +475,8 @@ public class OutgoingPatientSHR {
         return patientContactNode;
 
     }
+
+
 
     private Map<Integer, String> getContactRelation() {
         Map<Integer, String> options = new HashMap<Integer, String>();

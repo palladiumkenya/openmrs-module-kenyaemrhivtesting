@@ -16,6 +16,7 @@ package org.openmrs.module.hivtestingservices.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.hivtestingservices.api.shr.CovidLabDataExchange;
 import org.openmrs.module.hivtestingservices.api.shr.MiddlewareRequest;
 import org.openmrs.module.hivtestingservices.api.shr.OutgoingPatientSHR;
 import org.openmrs.module.hivtestingservices.api.shr.SHRAuthentication;
@@ -123,6 +124,18 @@ public class SHRRestController extends BaseRestController {
 		/*IncomingPatientSHR shr = new IncomingPatientSHR(encryptedSHR);
 		return shr.processIncomingSHR();*/
 		return null;
+	}
+
+	/**
+	 * Return active lab request
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.GET, value = "/getlabrequest")
+	@ResponseBody
+	public Object getActiveLabRequests(HttpServletRequest request) {
+			CovidLabDataExchange e = new CovidLabDataExchange();
+			return e.getCovidLabRequests().toString();
 	}
 
 
