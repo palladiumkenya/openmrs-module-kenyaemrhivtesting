@@ -36,7 +36,6 @@ public class CovidLabDataExchange {
     ObsService obsService = Context.getObsService();
     ConceptService conceptService = Context.getConceptService();
     EncounterService encounterService = Context.getEncounterService();
-    String patientIdentifier;
 
     String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
     String TEST_ORDER_TYPE_UUID = "52a447d3-a64a-11e3-9aeb-50e549534c5e";
@@ -46,10 +45,11 @@ public class CovidLabDataExchange {
      * Returns a list of active lab requests
      * @return
      */
-    public ArrayNode getCovidLabRequests() {
+    public ObjectNode getCovidLabRequests() {
 
         JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
         ArrayNode activeRequests = factory.arrayNode();
+        ObjectNode requestWrapper = factory.objectNode();
         Set<Integer> allPatients = getPatientsWithOrders();
 
         if (!allPatients.isEmpty()) {
@@ -59,7 +59,8 @@ public class CovidLabDataExchange {
                 activeRequests = getActiveLabRequestForPatient(p, activeRequests);
             }
         }
-        return activeRequests;
+        requestWrapper.put("samples",activeRequests);
+        return requestWrapper;
 
     }
 
@@ -98,15 +99,6 @@ public class CovidLabDataExchange {
      * @return
      */
     private ObjectNode getPatientAddress(Patient patient) {
-
-        /**
-         * county: personAddress.country
-         * sub-county: personAddress.stateProvince
-         * ward: personAddress.address4
-         * landmark: personAddress.address2
-         * postal address: personAddress.address1
-         */
-
         Set<PersonAddress> addresses = patient.getAddresses();
         //patient address
         ObjectNode patientAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
@@ -261,6 +253,8 @@ public class CovidLabDataExchange {
                     test.put("health_status", cifInfo.get("healthStatus"));
                     test.put("date_symptoms", "");
                     test.put("date_admission", "");
+                    test.put("speciment_id", o.getOrderId());
+                    test.put("patient_id", patient.getPatientId());
                     test.put("date_isolation", "");
                     test.put("date_death", deathDate);
                     test.put("date_birth", dob);
@@ -331,14 +325,6 @@ public class CovidLabDataExchange {
 
 
     private ObjectNode getCovidEnrollmentDetails(Patient patient) {
-        /*public List<Obs> getObservations(List<Person> whom, List<Encounter> encounters, List<Concept> questions,
-	        List<Concept> answers, List<PERSON_TYPE> personTypes, List<Location> locations, List<String> sort,
-	        Integer mostRecentN, Integer obsGroupId, Date fromDate, Date toDate, boolean includeVoidedObs,
-	        String accessionNumber) throws APIException;*/
-
-        /*<obs id="status-at-reporting" conceptId="159640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" "
-                             answerConceptIds="159405AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160432AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Stable,Severly ill,Dead,Unknown"/>*/
 
         Concept countyConcept = conceptService.getConcept(165197);
         Concept subCountyConcept = conceptService.getConcept(161551);
@@ -433,4 +419,8 @@ public class CovidLabDataExchange {
         return patientWithActiveLabs;
     }
 
+    public String processIncomingLabResults(String resultPayload) {
+
+        return null;
+    }
 }
