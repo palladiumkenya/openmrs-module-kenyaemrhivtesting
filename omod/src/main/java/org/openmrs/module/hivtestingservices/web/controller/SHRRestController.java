@@ -186,6 +186,30 @@ public class SHRRestController extends BaseRestController {
 		return SHRAuthentication.authenticateUser(userName.trim(), pwd.trim()).toString();
 	}
 
+	/**
+	 * processes incoming covid lab results
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/labresults") // end point for mhealth kenya
+	@ResponseBody
+	public Object processCovidLabResults(HttpServletRequest request) {
+		String requestBody = null;
+		try {
+			requestBody = SHRUtils.fetchRequestBody(request.getReader());
+		} catch (IOException e) {
+			return new SimpleObject().add("ServerResponse", "Error extracting request body");
+		}
+
+		if (requestBody != null) {
+			CovidLabDataExchange shr = new CovidLabDataExchange();
+			return shr.processIncomingLabResults(requestBody);
+
+		}
+		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+	}
+
+
 
 	/**
 	 * @see BaseRestController#getNamespace()
