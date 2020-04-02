@@ -44,6 +44,7 @@ public class PushLabRequestsTask extends AbstractTask {
 
 			CovidLabDataExchange e = new CovidLabDataExchange();
 			String payload = e.getCovidLabRequests().toString();
+			String API_KEY = "uTnt6OIdy5EvOCcoFdi3lOY0K";
 
 			try
 			{
@@ -52,6 +53,7 @@ public class PushLabRequestsTask extends AbstractTask {
 
 				//Set the API media type in http content-type header
 				postRequest.addHeader("content-type", "application/json");
+				postRequest.addHeader("apikey", API_KEY);
 
 				//Set the request post body
 				StringEntity userEntity = new StringEntity(payload);
@@ -66,6 +68,8 @@ public class PushLabRequestsTask extends AbstractTask {
 				{
 					throw new RuntimeException("Failed with HTTP error code : " + statusCode);
 				}
+				System.out.println("Successfully pushed samples to the lab.");
+				log.info("Successfully pushed samples to the lab.");
 			}
 			finally
 			{
