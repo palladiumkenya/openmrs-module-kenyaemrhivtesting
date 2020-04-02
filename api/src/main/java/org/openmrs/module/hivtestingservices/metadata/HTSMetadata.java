@@ -18,6 +18,7 @@ import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.springframework.stereotype.Component;
 
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.globalProperty;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.relationshipType;
 
 /**
@@ -27,6 +28,7 @@ import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.relation
 public class HTSMetadata extends AbstractMetadataBundle {
 
 	public static final String MODULE_ID = "hivtestingservices";
+	public static final String LAST_LAB_ORDER_ENTRY = "lab.lastUpdate";
 
 	public static final class _EncounterType {
 		public static final String HTS = "9c0a7a57-62ff-4f75-babe-5835b0e921b7";
@@ -62,6 +64,7 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(relationshipType("Co-worker", "Co-worker", "Those who work together", _RelationshipType.CO_WORKER));
 		install(relationshipType("Air passenger", "Air passenger", "Travel by air together", _RelationshipType.AIR_PASSENGER));
 		install(relationshipType("Road passenger", "Road passenger", "Travel by road together", _RelationshipType.ROAD_PASSENGER));
+
 	}
 
 }

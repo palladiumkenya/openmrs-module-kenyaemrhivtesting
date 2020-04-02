@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.OrderType;
@@ -26,6 +27,7 @@ import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,6 +48,7 @@ public class CovidLabDataExchange {
     String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
     String TEST_ORDER_TYPE_UUID = "52a447d3-a64a-11e3-9aeb-50e549534c5e";
     String LAB_ENCOUNTER_TYPE_UUID = "e1406e88-e9a9-11e8-9f32-f2801f1b9fd1";
+    String COVID_19_CASE_INVESTIGATION = "a4414aee-6832-11ea-bc55-0242ac130003";
     Concept covidTestConcept = conceptService.getConcept(165611);
     Concept covidPosConcept = conceptService.getConcept(703);
     Concept covidNegConcept = conceptService.getConcept(664);
@@ -64,14 +67,15 @@ public class CovidLabDataExchange {
         ArrayNode activeRequests = factory.arrayNode();
         ObjectNode requestWrapper = factory.objectNode();
         Set<Integer> allPatients = getPatientsWithOrders();
-
+        Integer patientsFound = 0;
         if (!allPatients.isEmpty()) {
-
+            patientsFound = allPatients.size();
             for (Integer ptId : allPatients) {
                 Patient p = patientService.getPatient(ptId);
                 activeRequests = getActiveLabRequestForPatient(p, activeRequests);
             }
         }
+        System.out.println("Preparing lab requests for " + patientsFound + " cases for the lab system");
         requestWrapper.put("samples",activeRequests);
         return requestWrapper;
 
@@ -369,7 +373,6 @@ public class CovidLabDataExchange {
         Integer healthStatus = null;
         Double temp = null;
 
-        String COVID_19_CASE_INVESTIGATION = "a4414aee-6832-11ea-bc55-0242ac130003";
 
         EncounterType covid_enc_type = encounterService.getEncounterTypeByUuid(COVID_19_CASE_INVESTIGATION);
         Encounter lastEncounter = lastEncounter(patient, covid_enc_type);
@@ -440,7 +443,23 @@ public class CovidLabDataExchange {
     protected Set<Integer> getPatientsWithOrders() {
 
         Set<Integer> patientWithActiveLabs = new HashSet<Integer>();
-        String sql = "select patient_id from orders where order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+        GlobalProperty lastLabEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.LAST_LAB_ORDER_ENTRY);
+        String lastOrdersql = "select max(order_id) last_id from orders where voided=0;";
+        List<List<Object>> lastOrderId = Context.getAdministrationService().executeSQL(lastOrdersql, true);
+        Integer lastId = (Integer) lastOrderId.get(0).get(0);
+        String sql = "";
+        if (lastLabEntry != null) {
+            Integer lastEntry = Integer.parseInt(lastLabEntry.getValue().toString());
+            sql = "select patient_id from orders where order_id >" + lastEntry + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+        } else {
+            lastLabEntry = new GlobalProperty();
+            lastLabEntry.setProperty(HTSMetadata.LAST_LAB_ORDER_ENTRY);
+            lastLabEntry.setDescription("Id of the last order entry");
+            sql = "select patient_id from orders where order_id <= " + lastId + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+
+        }
+        lastLabEntry.setPropertyValue(lastId.toString());
+
         List<List<Object>> activeOrders = Context.getAdministrationService().executeSQL(sql, true);
         if (!activeOrders.isEmpty()) {
             for (List<Object> res : activeOrders) {
@@ -448,6 +467,8 @@ public class CovidLabDataExchange {
                 patientWithActiveLabs.add(patientId);
             }
         }
+
+        Context.getAdministrationService().saveGlobalProperty(lastLabEntry);
         return patientWithActiveLabs;
     }
 
