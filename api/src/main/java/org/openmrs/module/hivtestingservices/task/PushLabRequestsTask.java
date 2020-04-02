@@ -68,8 +68,8 @@ public class PushLabRequestsTask extends AbstractTask {
 				{
 					throw new RuntimeException("Failed with HTTP error code : " + statusCode);
 				}
-				System.out.println("Successfully pushed samples to the lab.");
-				log.info("Successfully pushed samples to the lab.");
+				System.out.println("Successfully executed the task that pushes lab requests");
+				log.info("Successfully executed the task that pushes lab requests");
 			}
 			finally
 			{
