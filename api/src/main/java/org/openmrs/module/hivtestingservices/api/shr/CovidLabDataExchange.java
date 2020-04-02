@@ -1,8 +1,12 @@
 package org.openmrs.module.hivtestingservices.api.shr;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -25,6 +29,7 @@ import org.openmrs.api.context.Context;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,9 +41,17 @@ public class CovidLabDataExchange {
     ObsService obsService = Context.getObsService();
     ConceptService conceptService = Context.getConceptService();
     EncounterService encounterService = Context.getEncounterService();
+    OrderService orderService = Context.getOrderService();
 
     String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
     String TEST_ORDER_TYPE_UUID = "52a447d3-a64a-11e3-9aeb-50e549534c5e";
+    String LAB_ENCOUNTER_TYPE_UUID = "e1406e88-e9a9-11e8-9f32-f2801f1b9fd1";
+    Concept covidTestConcept = conceptService.getConcept(165611);
+    Concept covidPosConcept = conceptService.getConcept(703);
+    Concept covidNegConcept = conceptService.getConcept(664);
+    Concept covidIndeterminateConcept = conceptService.getConcept(1138);
+    EncounterType labEncounterType = encounterService.getEncounterTypeByUuid(LAB_ENCOUNTER_TYPE_UUID);
+
 
 
     /**
@@ -253,11 +266,11 @@ public class CovidLabDataExchange {
                     test.put("health_status", cifInfo.get("healthStatus"));
                     test.put("date_symptoms", "");
                     test.put("date_admission", "");
-                    test.put("speciment_id", o.getOrderId());
+                    test.put("specimen_id", o.getOrderId());
                     test.put("patient_id", patient.getPatientId());
                     test.put("date_isolation", "");
                     test.put("date_death", deathDate);
-                    test.put("date_birth", dob);
+                    test.put("dob", dob);
                     test.put("lab_id", getRequestLab(o.getCommentToFulfiller()));
                     test.put("test_type_id",o.getOrderReason() != null ? getOrderReasonCode(o.getOrderReason().getConceptId()) : "");
                     test.put("occupation", "");
@@ -427,7 +440,7 @@ public class CovidLabDataExchange {
     protected Set<Integer> getPatientsWithOrders() {
 
         Set<Integer> patientWithActiveLabs = new HashSet<Integer>();
-        String sql = "select patient_id from orders where order_action='NEW' and instructions is not null and voided=0;";
+        String sql = "select patient_id from orders where order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
         List<List<Object>> activeOrders = Context.getAdministrationService().executeSQL(sql, true);
         if (!activeOrders.isEmpty()) {
             for (List<Object> res : activeOrders) {
@@ -438,8 +451,78 @@ public class CovidLabDataExchange {
         return patientWithActiveLabs;
     }
 
+    /**
+     * processes results from lab     *
+     * @param resultPayload this should be an array
+     * @return
+     */
     public String processIncomingLabResults(String resultPayload) {
 
-        return null;
+        Integer statusCode;
+        String statusMsg;
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode resultsObj = null;
+        try {
+            JsonNode actualObj = mapper.readTree(resultPayload);
+            resultsObj = (ArrayNode) actualObj;
+        } catch (JsonProcessingException e) {
+            statusCode = 400;
+            statusMsg = "The payload could not be understood. An array is expected!";
+            e.printStackTrace();
+            return statusMsg;
+        }
+
+        if (resultsObj.size() > 0) {
+            for (int i = 0; i < resultsObj.size(); i++) {
+                ObjectNode o = (ObjectNode) resultsObj.get(i);
+                Integer specimenId = o.get("specimen_id").intValue();
+                Integer specimenReceivedStatus = o.get("receivedstatus").intValue();// 1-received, 2-rejected
+                String specimenRejectedReason = o.get("rejectedreason").textValue();
+                Integer results = o.get("result").intValue(); //1 - negative, 2 - positive, 5 - inconclusive
+                updateOrder(specimenId, results, specimenReceivedStatus, specimenRejectedReason);
+            }
+        }
+        return "Results updated successfully";
+    }
+
+    private void updateOrder(Integer orderId, Integer result, Integer receivedStatus, String rejectedReason) {
+
+        Order od = Context.getOrderService().getOrder(orderId);
+        if (od != null && od.isActive()) {
+
+            if (receivedStatus == 2 || StringUtils.isNotBlank(rejectedReason)) {
+                try {
+                    orderService.discontinueOrder(od, rejectedReason != null ? rejectedReason : "Rejected order", new Date(), od.getOrderer(),
+                            od.getEncounter());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Encounter enc = new Encounter();
+                enc.setEncounterType(labEncounterType);
+                enc.setEncounterDatetime(new Date());
+                enc.setPatient(od.getPatient());
+                enc.setCreator(Context.getUserService().getUser(1));
+
+                Obs o = new Obs();
+                o.setConcept(covidTestConcept);
+                o.setDateCreated(new Date());
+                o.setCreator(Context.getUserService().getUser(1));
+                o.setObsDatetime(new Date());
+                o.setPerson(od.getPatient());
+                o.setOrder(od);
+                o.setValueCoded(result == 1 ? covidNegConcept : result == 2 ? covidPosConcept : covidIndeterminateConcept);
+                enc.addObs(o);
+
+                try {
+                    encounterService.saveEncounter(enc);
+                    orderService.discontinueOrder(od, "Results received", new Date(), od.getOrderer(),
+                            od.getEncounter());
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

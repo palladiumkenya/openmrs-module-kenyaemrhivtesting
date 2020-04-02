@@ -191,7 +191,7 @@ public class SHRRestController extends BaseRestController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/labresults") // end point for mhealth kenya
+	@RequestMapping(method = RequestMethod.POST, value = "/labresults") // end point for CHAI kenya
 	@ResponseBody
 	public Object processCovidLabResults(HttpServletRequest request) {
 		String requestBody = null;
