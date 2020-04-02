@@ -258,7 +258,7 @@ public class CovidLabDataExchange {
                     test.put("date_isolation", "");
                     test.put("date_death", deathDate);
                     test.put("date_birth", dob);
-                    test.put("lab_id", "");
+                    test.put("lab_id", getRequestLab(o.getCommentToFulfiller()));
                     test.put("test_type_id",o.getOrderReason() != null ? getOrderReasonCode(o.getOrderReason().getConceptId()) : "");
                     test.put("occupation", "");
                     test.put("temperature", cifInfo.get("temp"));
@@ -274,12 +274,31 @@ public class CovidLabDataExchange {
         return labTests;
     }
 
+    private String getRequestLab(String lab) {
+
+        if (lab == null) {
+            return "";
+        }
+        Integer code= null;
+        if (lab.equals("NPHL")) {
+            code = 7;
+        } else if (lab.equals("KEMRI Nairobi")) {
+            code = 1;
+        }  else if (lab.equals("KEMRI Kilifi")) {
+            code = 12;
+        } else if (lab.equals("KEMRI CDC Kisumu")) {
+            code = 2;
+        } else if (lab.equals("KEMRI Walter Reed Kericho")) {
+            code = 4;
+        }
+        return code.toString();
+    }
     private String getSampleTypeCode(String type) {
 
         if (type == null) {
             return "";
         }
-        Integer code;
+        Integer code = null;
         if (type.equals("Blood")) {
             code = 3;
         } else if (type.equals("OP Swab")) {
