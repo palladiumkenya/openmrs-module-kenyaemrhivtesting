@@ -469,9 +469,9 @@ public class CovidLabDataExchange {
             for (int i = 0; i < resultsObj.size(); i++) {
                 ObjectNode o = (ObjectNode) resultsObj.get(i);
                 Integer specimenId = o.get("specimen_id").intValue();
-                Integer specimenReceivedStatus = o.get("receivedstatus").intValue();
+                Integer specimenReceivedStatus = o.get("receivedstatus").intValue();// 1-received, 2-rejected
                 String specimenRejectedReason = o.get("rejectedreason").textValue();
-                Integer results = o.get("result").intValue();
+                Integer results = o.get("result").intValue(); //1 - negative, 2 - positive, 5 - inconclusive
                 updateOrder(specimenId, results, specimenReceivedStatus, specimenRejectedReason);
             }
         }
@@ -481,38 +481,40 @@ public class CovidLabDataExchange {
     private void updateOrder(Integer orderId, Integer result, Integer receivedStatus, String rejectedReason) {
 
         Order od = Context.getOrderService().getOrder(orderId);
+        if (od.isActive()) {
 
-        if (receivedStatus == 2 || StringUtils.isNotBlank(rejectedReason)) {
-            try {
-                orderService.discontinueOrder(od, rejectedReason != null ? rejectedReason : "Rejected order", new Date(), od.getOrderer(),
-                        od.getEncounter());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            Encounter enc = new Encounter();
-            enc.setEncounterType(labEncounterType);
-            enc.setEncounterDatetime(new Date());
-            enc.setPatient(od.getPatient());
-            enc.setCreator(Context.getUserService().getUser(1));
+            if (receivedStatus == 2 || StringUtils.isNotBlank(rejectedReason)) {
+                try {
+                    orderService.discontinueOrder(od, rejectedReason != null ? rejectedReason : "Rejected order", new Date(), od.getOrderer(),
+                            od.getEncounter());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Encounter enc = new Encounter();
+                enc.setEncounterType(labEncounterType);
+                enc.setEncounterDatetime(new Date());
+                enc.setPatient(od.getPatient());
+                enc.setCreator(Context.getUserService().getUser(1));
 
-            Obs o = new Obs();
-            o.setConcept(covidTestConcept);
-            o.setDateCreated(new Date());
-            o.setCreator(Context.getUserService().getUser(1));
-            o.setObsDatetime(new Date());
-            o.setPerson(od.getPatient());
-            o.setOrder(od);
-            o.setValueCoded(result == 1 ? covidPosConcept : covidNegConcept);
-            enc.addObs(o);
+                Obs o = new Obs();
+                o.setConcept(covidTestConcept);
+                o.setDateCreated(new Date());
+                o.setCreator(Context.getUserService().getUser(1));
+                o.setObsDatetime(new Date());
+                o.setPerson(od.getPatient());
+                o.setOrder(od);
+                o.setValueCoded(result == 1 ? covidPosConcept : covidNegConcept);
+                enc.addObs(o);
 
-            try {
-                encounterService.saveEncounter(enc);
-                orderService.discontinueOrder(od, "Results received", new Date(), od.getOrderer(),
-                        od.getEncounter());
-            } catch (Exception e) {
+                try {
+                    encounterService.saveEncounter(enc);
+                    orderService.discontinueOrder(od, "Results received", new Date(), od.getOrderer(),
+                            od.getEncounter());
+                } catch (Exception e) {
 
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
             }
         }
     }
