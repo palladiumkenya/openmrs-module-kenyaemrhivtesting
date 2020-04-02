@@ -210,6 +210,30 @@ public class SHRRestController extends BaseRestController {
 	}
 
 
+	/**
+	 * processes incoming contact tracing information
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/contacttracing") // end point mhealth
+	@ResponseBody
+	public Object processContactTracingInfo(HttpServletRequest request) {
+		String requestBody = null;
+		try {
+			requestBody = SHRUtils.fetchRequestBody(request.getReader());
+		} catch (IOException e) {
+			return new SimpleObject().add("ServerResponse", "Error extracting request body");
+		}
+
+		if (requestBody != null) {
+			CovidLabDataExchange shr = new CovidLabDataExchange();
+			return shr.processIncomingContactTracingInfo(requestBody);
+
+		}
+		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+	}
+
+
 
 	/**
 	 * @see BaseRestController#getNamespace()

@@ -6,6 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+
+
+
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -28,7 +32,12 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
-
+import org.openmrs.module.hivtestingservices.api.ContactTrace;
+import org.openmrs.module.hivtestingservices.api.HTSService;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -54,6 +63,8 @@ public class CovidLabDataExchange {
     Concept covidNegConcept = conceptService.getConcept(664);
     Concept covidIndeterminateConcept = conceptService.getConcept(1138);
     EncounterType labEncounterType = encounterService.getEncounterTypeByUuid(LAB_ENCOUNTER_TYPE_UUID);
+    HTSService htsService = Context.getService(HTSService.class);
+
 
 
 
@@ -506,6 +517,51 @@ public class CovidLabDataExchange {
         return "Results updated successfully";
     }
 
+    /**
+     * processes contact tracing
+     * @param resultPayload this should be an object
+     * @return
+     */
+    public String processIncomingContactTracingInfo(String resultPayload) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        Integer statusCode;
+        String statusMsg;
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = null;
+        try {
+             jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (jsonNode != null) {
+            Date appointmentDate = null;
+            Date encounterdate = null;
+            String contactType = jsonNode.get("follow_up_type").textValue();
+            String status = "";
+            String reasonUncontacted = "";
+            String facilityLinkedTo = "";
+            String uuid = jsonNode.get("_id").textValue();
+            PatientContact patientContact = htsService.getPatientContactByUuid(uuid);
+            String remarks ="";
+
+
+            try {
+
+                encounterdate = df.parse(jsonNode.get("date_last_contacted").textValue());
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            saveTrace(contactType,status,reasonUncontacted,facilityLinkedTo,patientContact,remarks,encounterdate);
+
+        }
+        return "Contact trace created successfully";
+    }
+
+
     private void updateOrder(Integer orderId, Integer result, Integer receivedStatus, String rejectedReason) {
 
         Order od = Context.getOrderService().getOrder(orderId);
@@ -546,4 +602,24 @@ public class CovidLabDataExchange {
             }
         }
     }
+
+
+    private void saveTrace(String contactType,String status,String reasonUncontacted,String facilityLinkedTo,
+                      PatientContact patientContact,String remarks,Date encounterdate    ) {
+
+        ContactTrace contactTrace = new ContactTrace();
+        contactTrace.setPatientContact(patientContact);
+        contactTrace.setDate(encounterdate);
+        contactTrace.setContactType(contactType);
+        contactTrace.setStatus(status);
+        contactTrace.setReasonUncontacted(reasonUncontacted);
+        contactTrace.setFacilityLinkedTo(facilityLinkedTo);
+        contactTrace.setRemarks(remarks);
+    //    contactTrace.setAppointmentDate(appointmentDate);
+        htsService.saveClientTrace(contactTrace);
+
+    }
+
+
+
 }
