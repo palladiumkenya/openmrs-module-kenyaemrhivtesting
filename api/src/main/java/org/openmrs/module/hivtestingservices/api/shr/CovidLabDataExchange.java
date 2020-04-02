@@ -49,6 +49,7 @@ public class CovidLabDataExchange {
     Concept covidTestConcept = conceptService.getConcept(165611);
     Concept covidPosConcept = conceptService.getConcept(703);
     Concept covidNegConcept = conceptService.getConcept(664);
+    Concept covidIndeterminateConcept = conceptService.getConcept(1138);
     EncounterType labEncounterType = encounterService.getEncounterTypeByUuid(LAB_ENCOUNTER_TYPE_UUID);
 
 
@@ -450,6 +451,11 @@ public class CovidLabDataExchange {
         return patientWithActiveLabs;
     }
 
+    /**
+     * processes results from lab     *
+     * @param resultPayload this should be an array
+     * @return
+     */
     public String processIncomingLabResults(String resultPayload) {
 
         Integer statusCode;
@@ -463,6 +469,7 @@ public class CovidLabDataExchange {
             statusCode = 400;
             statusMsg = "The payload could not be understood. An array is expected!";
             e.printStackTrace();
+            return statusMsg;
         }
 
         if (resultsObj.size() > 0) {
@@ -481,7 +488,7 @@ public class CovidLabDataExchange {
     private void updateOrder(Integer orderId, Integer result, Integer receivedStatus, String rejectedReason) {
 
         Order od = Context.getOrderService().getOrder(orderId);
-        if (od.isActive()) {
+        if (od != null && od.isActive()) {
 
             if (receivedStatus == 2 || StringUtils.isNotBlank(rejectedReason)) {
                 try {
@@ -504,7 +511,7 @@ public class CovidLabDataExchange {
                 o.setObsDatetime(new Date());
                 o.setPerson(od.getPatient());
                 o.setOrder(od);
-                o.setValueCoded(result == 1 ? covidPosConcept : covidNegConcept);
+                o.setValueCoded(result == 1 ? covidNegConcept : result == 2 ? covidPosConcept : covidIndeterminateConcept);
                 enc.addObs(o);
 
                 try {
