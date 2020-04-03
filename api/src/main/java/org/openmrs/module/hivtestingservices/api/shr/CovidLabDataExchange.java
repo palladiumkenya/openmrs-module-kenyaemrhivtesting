@@ -8,8 +8,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
-
-
+import com.thoughtworks.xstream.core.util.PresortedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -22,6 +21,7 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAddress;
+import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.api.ConceptService;
@@ -35,6 +35,9 @@ import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,6 +47,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+
+import static org.openmrs.module.hivtestingservices.wrapper.PatientWrapper.OPENMRS_ID;
+import static org.openmrs.util.LocationUtility.getDefaultLocation;
 
 public class CovidLabDataExchange {
 
@@ -559,6 +566,121 @@ public class CovidLabDataExchange {
 
         }
         return "Contact trace created successfully";
+    }
+    /**
+     * processes contact registration
+     * @param resultPayload this should be an object
+     * @return
+     */
+    public String processIncomingContactRegistrationInfo(String resultPayload) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = null;
+        try {
+            jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (jsonNode != null) {
+            boolean errorOccured = false;
+
+            String familyName = jsonNode.get("family_name").textValue();
+            String middleName = jsonNode.get("given_names").textValue();
+            String lastName = jsonNode.get("name").textValue();
+            String patientName = jsonNode.get("patient_name").textValue();
+            String dob = jsonNode.get("date_of_birth").textValue();
+            String sex = jsonNode.get("sex").textValue();
+            String phone = jsonNode.get("phone").textValue();
+            String primaryPhone = jsonNode.get("primary_phone").textValue();
+            String alternatePhone = jsonNode.get("alternate_phone").textValue();
+            String email = jsonNode.get("email").textValue();
+            String county = jsonNode.get("county").textValue();
+            String country = jsonNode.get("country_of_residence").textValue();
+            String subCounty = jsonNode.get("subcounty").textValue();
+            String postalAddress = jsonNode.get("postal_address").textValue();
+            String patient_id = jsonNode.get("patient_id").textValue();
+            String uuid = jsonNode.get("_id").textValue();
+
+            PatientContact patientContact = htsService.getPatientContactByUuid(uuid);
+
+//Register patient
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+            Patient patient = new Patient();
+            patient = new Patient();
+            // Add gender
+            if (sex != null) {
+                if (sex.equals("male")) {
+                    patient.setGender("M");
+                } else if (sex.equals("female")) {
+                    patient.setGender("F");
+                }else{patient.setGender("");}
+            }
+            // Add names
+            PersonName personName = new PersonName();
+            SortedSet<PersonName> names = new PresortedSet();
+            personName.setGivenName(lastName != null ? lastName : "");
+            personName.setMiddleName(middleName != null ? middleName : "");
+            personName.setFamilyName(familyName != null ? familyName : "");
+            names.add(personName);
+            patient.setNames(names);
+
+            //patient.addName(new PersonName(familyName, middleName, lastName));
+            // Add dob
+            if (dob != null) {
+                try {
+                    patient.setBirthdate(formatter.parse(dob));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Make sure everyone gets an OpenMRS ID
+            PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, OPENMRS_ID);
+            PatientIdentifier openmrsId = patient.getPatientIdentifier(openmrsIdType);
+
+            if (openmrsId == null) {
+                String generated = Context.getService(IdentifierSourceService.class).generateIdentifier(openmrsIdType, "Registration");
+                openmrsId = new PatientIdentifier(generated, openmrsIdType, getDefaultLocation());
+                patient.addIdentifier(openmrsId);
+
+                if (!patient.getPatientIdentifier().isPreferred()) {
+                    openmrsId.setPreferred(true);
+                }
+            }
+
+            // Add county, sub county and postal address
+            SortedSet<PersonAddress> addresses = new PresortedSet();
+            PersonAddress personAddress = new PersonAddress();
+            personAddress.setPreferred(true);
+            personAddress.setStateProvince(subCounty != null ? subCounty : "");
+            personAddress.setCountyDistrict(county != null ? county : "");
+            personAddress.setCountry(country != null ? country : "");
+            personAddress.setAddress1(postalAddress != null ? postalAddress : "");
+            addresses.add(personAddress);
+            patient.setAddresses(addresses);
+
+            //        Process phone number as an attribute
+
+            if (primaryPhone != null) {
+                PersonAttribute phoneAttribute = new PersonAttribute();
+                PersonAttributeType phoneAttributeType = Context.getPersonService().getPersonAttributeTypeByUuid("b2c38640-2603-4629-aebd-3b54f33f1e3a");
+                phoneAttribute.setAttributeType(phoneAttributeType);
+                phoneAttribute.setValue(primaryPhone);
+                patient.addAttribute(phoneAttribute);
+            }
+
+            // Save patient
+            try {
+
+                patient = Context.getPatientService().savePatient(patient);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorOccured = true;
+            }
+        }
+        return "Contact registered/created successfully";
     }
 
 

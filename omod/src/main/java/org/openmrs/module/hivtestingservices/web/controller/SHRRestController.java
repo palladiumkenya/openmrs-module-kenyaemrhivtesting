@@ -232,6 +232,28 @@ public class SHRRestController extends BaseRestController {
 		}
 		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
 	}
+	/**
+	 * processes incoming contact registration information
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/register") // end point medic mobile
+	@ResponseBody
+	public Object processContactRegistrationInfo(HttpServletRequest request) {
+		String requestBody = null;
+		try {
+			requestBody = SHRUtils.fetchRequestBody(request.getReader());
+		} catch (IOException e) {
+			return new SimpleObject().add("ServerResponse", "Error extracting request body");
+		}
+
+		if (requestBody != null) {
+			CovidLabDataExchange shr = new CovidLabDataExchange();
+			return shr.processIncomingContactRegistrationInfo(requestBody);
+
+		}
+		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+	}
 
 
 
