@@ -526,38 +526,45 @@ public class CovidLabDataExchange {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
         Integer statusCode;
-        String statusMsg;
+        String statusMsg = "" ;
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode jsonNode = null;
         try {
              jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+
+            if (jsonNode != null) {
+                Date appointmentDate = null;
+                Date encounterdate = null;
+                String contactType = jsonNode.get("follow_up_type").textValue();
+                String status = "";
+                String reasonUncontacted = "";
+                String facilityLinkedTo = "";
+                String uuid = jsonNode.get("patient_id").textValue();
+                PatientContact patientContact = htsService.getPatientContactByUuid(uuid);
+                String remarks ="";
+
+
+                try {
+
+                    encounterdate = df.parse(jsonNode.get("date_last_contacted").textValue());
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if(patientContact !=null){
+                    saveTrace(contactType,status,reasonUncontacted,facilityLinkedTo,patientContact,remarks,encounterdate);
+
+                }else {
+                   return statusMsg = "Contact you are adding trace for does not exists. Please check the uuid of the contact";
+
+                }
+
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if (jsonNode != null) {
-            Date appointmentDate = null;
-            Date encounterdate = null;
-            String contactType = jsonNode.get("follow_up_type").textValue();
-            String status = "";
-            String reasonUncontacted = "";
-            String facilityLinkedTo = "";
-            String uuid = jsonNode.get("_id").textValue();
-            PatientContact patientContact = htsService.getPatientContactByUuid(uuid);
-            String remarks ="";
-
-
-            try {
-
-                encounterdate = df.parse(jsonNode.get("date_last_contacted").textValue());
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            saveTrace(contactType,status,reasonUncontacted,facilityLinkedTo,patientContact,remarks,encounterdate);
-
-        }
         return "Contact trace created successfully";
     }
 
