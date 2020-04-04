@@ -194,6 +194,23 @@ public class SHRRestController extends BaseRestController {
 	}
 
 
+	@RequestMapping(method = RequestMethod.POST, value = "/mhealthreport") // end point for CHAI kenya
+	@ResponseBody
+	public Object processMhealthTraceReports(HttpServletRequest request) {
+		String requestBody = null;
+		try {
+			requestBody = SHRUtils.fetchRequestBody(request.getReader());
+		} catch (IOException e) {
+			return new SimpleObject().add("ServerResponse", "Error extracting request body");
+		}
+
+		if (requestBody != null) {
+			MhealthDataExchange shr = new MhealthDataExchange();
+			return shr.processMhealthPayload(requestBody);
+
+		}
+		return new SimpleObject().add("Contact trace reports", "It seems there are no reports to process");
+	}
 	/**
 	 * processes incoming contact tracing information
 	 * @param request
