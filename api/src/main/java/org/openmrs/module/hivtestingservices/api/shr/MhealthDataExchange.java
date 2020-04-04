@@ -401,15 +401,16 @@ public class MhealthDataExchange {
         if (resultsObj.size() > 0) {
             for (int i = 0; i < resultsObj.size(); i++) {
                 ObjectNode o = (ObjectNode) resultsObj.get(i);
-                Integer specimenId = o.get("specimen_id").intValue();
-                Integer specimenReceivedStatus = o.get("receivedstatus").intValue();// 1-received, 2-rejected
-                String specimenRejectedReason = o.get("rejectedreason").textValue();
-                Integer results = o.get("result").intValue(); //1 - negative, 2 - positive, 5 - inconclusive
+
             }
         }
         return "Results updated successfully";
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayNode getContacts() {
 
         ArrayNode patientContactNode = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
@@ -463,7 +464,6 @@ public class MhealthDataExchange {
         }
 
         return patientContactNode;
-
     }
 
     private static String getContactPhoneNumber(Patient patient, PersonService personService) {
