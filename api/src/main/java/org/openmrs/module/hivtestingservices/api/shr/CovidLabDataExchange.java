@@ -126,7 +126,7 @@ public class CovidLabDataExchange {
      * @param patient
      * @return
      */
-    private ObjectNode getPatientAddress(Patient patient) {
+    public static ObjectNode getPatientAddress(Patient patient) {
         Set<PersonAddress> addresses = patient.getAddresses();
         //patient address
         ObjectNode patientAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
