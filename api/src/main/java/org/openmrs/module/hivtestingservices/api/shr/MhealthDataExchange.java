@@ -168,8 +168,7 @@ public class MhealthDataExchange {
             addRelationship(covidCase, p, patientContact.getPnsApproach());
             // date of quarantine is sufficient to denote a contact is in quarantine program
             // needs enrollment to the program
-            if (dateQuarantined != null) {
-
+            if (dateQuarantined != null && !dateQuarantined.equals("")) {
 
                 p = enrollPatientInCovidQuarantine(p, parseDateString(dateQuarantined, "yyyyMMdd"), placeQuarantined);
                 saveQuarantineFollowupReports(p, (ArrayNode) followups);
@@ -418,6 +417,9 @@ public class MhealthDataExchange {
     }
 
     private Date parseDateString(String dateString, String format) {
+        if (dateString.equals("") || dateString == null) {
+            return null;
+        }
         SimpleDateFormat df = new SimpleDateFormat(format);
         Date date = null;
         try {
@@ -447,7 +449,7 @@ public class MhealthDataExchange {
             String cough = report.get("COUGH").textValue();
             String fever = report.get("FEVER").textValue();
             String difficultyBreathing = report.get("DIFFICULTY_BREATHING").textValue();
-            String soreThroat = report.get("SORE_THROAT").textValue();
+            //String soreThroat = report.get("SORE_THROAT").textValue();
             String comment = report.get("COMMENT").textValue();
             Date encDate = null;
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
