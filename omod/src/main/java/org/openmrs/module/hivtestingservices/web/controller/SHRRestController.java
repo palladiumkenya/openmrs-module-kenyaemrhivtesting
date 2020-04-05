@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.hivtestingservices.api.shr.CovidLabDataExchange;
+import org.openmrs.module.hivtestingservices.api.shr.MhealthDataExchange;
 import org.openmrs.module.hivtestingservices.api.shr.MiddlewareRequest;
 import org.openmrs.module.hivtestingservices.api.shr.OutgoingPatientSHR;
 import org.openmrs.module.hivtestingservices.api.shr.SHRAuthentication;
@@ -75,34 +76,17 @@ public class SHRRestController extends BaseRestController {
 
 
 	/**
-	 * gets SHR based on patient/client internal ID
+	 * gets payload with list of contacts for followup
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/getcontactlist") // end point for mhealth kenya
+	@RequestMapping(method = RequestMethod.GET, value = "/contactlist") // end point for mhealth kenya
 	@ResponseBody
 	public Object getMhealthContactList(HttpServletRequest request) {
-		Integer patientID=null;
-		String requestBody = null;
-		MiddlewareRequest thisRequest = null;
-		try {
-			requestBody = SHRUtils.fetchRequestBody(request.getReader());
-		} catch (IOException e) {
-			return new SimpleObject().add("ServerResponse", "Error extracting request body");
-		}
-		try {
-			thisRequest = new ObjectMapper().readValue(requestBody, MiddlewareRequest.class);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new SimpleObject().add("ServerResponse", "Error reading patient id: " + requestBody);
-		}
-		patientID=Integer.parseInt(thisRequest.getPatientID());
-		if (patientID != 0) {
-			OutgoingPatientSHR shr = new OutgoingPatientSHR(patientID);
-			return shr.patientIdentification().toString();
 
-		}
-		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+		MhealthDataExchange e = new MhealthDataExchange();
+		return e.getContacts().toString();
+		//return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
 	}
 
 	/**
@@ -210,6 +194,23 @@ public class SHRRestController extends BaseRestController {
 	}
 
 
+	@RequestMapping(method = RequestMethod.POST, value = "/mhealthreport") // end point for CHAI kenya
+	@ResponseBody
+	public Object processMhealthTraceReports(HttpServletRequest request) {
+		String requestBody = null;
+		try {
+			requestBody = SHRUtils.fetchRequestBody(request.getReader());
+		} catch (IOException e) {
+			return new SimpleObject().add("ServerResponse", "Error extracting request body");
+		}
+
+		if (requestBody != null) {
+			MhealthDataExchange shr = new MhealthDataExchange();
+			return shr.processMhealthPayload(requestBody);
+
+		}
+		return new SimpleObject().add("Contact trace reports", "It seems there are no reports to process");
+	}
 	/**
 	 * processes incoming contact tracing information
 	 * @param request

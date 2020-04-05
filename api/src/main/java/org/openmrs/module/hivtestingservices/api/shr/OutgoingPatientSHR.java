@@ -273,6 +273,7 @@ public class OutgoingPatientSHR {
             for (PatientContact c : patientContacts) {
                 ObjectNode contact = factory.objectNode();
                 contact.put("CONTACT_UUID", c.getUuid());
+                contact.put("CONTACT_STATE", "LISTED");
                 contact.put("FIRST_NAME", c.getFirstName() != null ? c.getFirstName() : "");
                 contact.put("MIDDLE_NAME", c.getMiddleName() != null ? c.getMiddleName() : "");
                 contact.put("LAST_NAME", c.getLastName() != null ? c.getLastName() : "");
