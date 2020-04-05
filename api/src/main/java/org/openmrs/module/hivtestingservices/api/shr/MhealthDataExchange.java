@@ -112,7 +112,7 @@ public class MhealthDataExchange {
     }
 
     private void processContactObject(ObjectNode contact) {
-        String patientStatus = contact.get("CONTACT_STATUS").textValue();
+        String patientStatus = contact.get("CONTACT_STATE").textValue();
 
         if (patientStatus.equals("LISTED")) {
             processListedContacts(contact);
@@ -154,8 +154,8 @@ public class MhealthDataExchange {
             ObjectNode idNoNode = (ObjectNode) identifierNode.get(0);
             String idNo = idNoNode.get("ID").textValue();
             String dobString = patientIdentificatonNode.get("DATE_OF_BIRTH").textValue();
-            String sex = idNoNode.get("SEX").textValue();
-            String phoneNumber = idNoNode.get("PHONE_NUMBER").textValue();
+            String sex = patientIdentificatonNode.get("SEX").textValue();
+            String phoneNumber = patientIdentificatonNode.get("PHONE_NUMBER").textValue();
 
             Patient p = createPatient(fName, mName, lName, parseDateString(dobString,"yyyyMMdd"), sex, idNo);
             p = addPersonAddresses(p, null, county, subCounty, null, null);
@@ -252,7 +252,7 @@ public class MhealthDataExchange {
         Patient patient = null;
         String PASSPORT_NUMBER = "e1e80daa-6d7e-11ea-bc55-0242ac130003";
 
-        if (fName != null && fName.equals("") && lName != null && lName.equals("") ) {
+        if (fName != null && !fName.equals("") && lName != null && !lName.equals("") ) {
 
             patient = new Patient();
             if (sex == null || sex.equals("") || StringUtils.isEmpty(sex)) {
@@ -563,7 +563,7 @@ public class MhealthDataExchange {
      * @param nokPhone
      * @return
      */
-    private static Patient addPersonAttributes(Patient patient, String phone, String nokName, String nokPhone) {
+    private Patient addPersonAttributes(Patient patient, String phone, String nokName, String nokPhone) {
 
         String NEXT_OF_KIN_CONTACT = "342a1d39-c541-4b29-8818-930916f4c2dc";
         String NEXT_OF_KIN_NAME = "830bef6d-b01f-449d-9f8d-ac0fede8dbd3";
@@ -655,7 +655,7 @@ public class MhealthDataExchange {
      * @param postaladdress
      * @return
      */
-    private static Patient addPersonAddresses(Patient patient, String nationality, String county, String subCounty, String ward, String postaladdress) {
+    private Patient addPersonAddresses(Patient patient, String nationality, String county, String subCounty, String ward, String postaladdress) {
 
         Set<PersonAddress> patientAddress = patient.getAddresses();
         if (patientAddress.size() > 0) {
