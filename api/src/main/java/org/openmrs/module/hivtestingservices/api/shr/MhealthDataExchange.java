@@ -10,6 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Attributable;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.Obs;
@@ -40,6 +42,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -373,12 +376,19 @@ public class MhealthDataExchange {
             String comment = report.get("COMMENT").textValue();
             Date encDate = parseDateString(followupDate, "yyyyMMdd");
 
+            EncounterType et = Context.getEncounterService().getEncounterTypeByUuid(COVID_QUARANTINE_FOLLOWUP_ENCOUNTER);
+            Form form = Context.getFormService().getFormByUuid(COVID_QUARANTINE_FOLLOWUP_FORM);
+
+            if (hasEncounterOnDate(et, form, patient, encDate)) {
+                continue;
+            }
+
             Encounter enc = new Encounter();
-            enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(COVID_QUARANTINE_FOLLOWUP_ENCOUNTER));
+            enc.setEncounterType(et);
             enc.setEncounterDatetime(encDate);
             enc.setPatient(patient);
             enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
-            enc.setForm(Context.getFormService().getFormByUuid(COVID_QUARANTINE_FOLLOWUP_FORM));
+            enc.setForm(form);
 
             // set temp obs
             if (sequenceNumber != null) {
@@ -457,12 +467,19 @@ public class MhealthDataExchange {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            EncounterType et = Context.getEncounterService().getEncounterTypeByUuid(COVID_19_CONTACT_TRACING_ENCOUNTER);
+            Form form = Context.getFormService().getFormByUuid(COVID_19_CONTACT_TRACING_FORM);
+
+            if (hasEncounterOnDate(et, form, patient, encDate)) {
+                continue;
+            }
             Encounter enc = new Encounter();
-            enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(COVID_19_CONTACT_TRACING_ENCOUNTER));
+            enc.setEncounterType(et);
             enc.setEncounterDatetime(encDate);
             enc.setPatient(patient);
             enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
-            enc.setForm(Context.getFormService().getFormByUuid(COVID_19_CONTACT_TRACING_FORM));
+            enc.setForm(form);
 
             // set temp obs
             if (sequenceNumber != null) {
@@ -884,6 +901,23 @@ public class MhealthDataExchange {
             Context.removeProxyPrivilege(PrivilegeConstants.VIEW_LOCATIONS);
             Context.removeProxyPrivilege(PrivilegeConstants.VIEW_GLOBAL_PROPERTIES);
         }
+
+    }
+
+    /**
+     * Checks if a patient already has encounter of same type and form on same date
+     * @param enctype
+     * @param form
+     * @param patient
+     * @param date
+     * @return
+     */
+    public boolean hasEncounterOnDate(EncounterType enctype, Form form, Patient patient, Date date) {
+        List<Encounter> encounters = Context.getEncounterService().getEncounters(patient, null, date, date, Collections.singleton(form), Collections.singleton(enctype), null, null, null, false);
+        Integer size = encounters.size();
+        log.info("Checking for enc type=" + enctype + ", form=" + form + "date, "+ date + " result=" + size);
+        System.out.println("Checking for enc type=" + enctype + ", form=" + form + "date, "+ date + " result=" + size);
+        return encounters.size() > 0;
 
     }
 }
