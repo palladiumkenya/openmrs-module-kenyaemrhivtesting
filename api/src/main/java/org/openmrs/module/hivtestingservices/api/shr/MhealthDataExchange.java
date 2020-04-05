@@ -268,15 +268,10 @@ public class MhealthDataExchange {
             if (mName != null && !mName.equals("")) {
                 pn.setMiddleName(mName);
             }
-            System.out.print("Person name: " + pn);
 
             patient.addName(pn);
-
-
             patient.setBirthdate(dob);
             patient.setBirthdateEstimated(true);
-
-            System.out.println(", ID No: " + idNo);
 
             PatientIdentifier openMRSID = generateOpenMRSID();
 
@@ -713,18 +708,19 @@ public class MhealthDataExchange {
      * Get a list of contacts for tracing
      * @return
      */
-    public ArrayNode getContacts() {
+    public ObjectNode getContacts() {
 
+        JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
         ArrayNode patientContactNode = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
+        ObjectNode responseWrapper = factory.objectNode();
+
         HTSService htsService = Context.getService(HTSService.class);
-        PatientService patientService = Context.getPatientService();
         PersonService personService = Context.getPersonService();
 
         Set<Integer> listedContacts = getListedContacts();
         Set<Integer> quarantinedContacts = getContactsInQuarantineProgram();
 
         if (listedContacts != null && listedContacts.size() > 0) {
-            JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
 
             for (Integer pc : listedContacts) {
                 PatientContact c = htsService.getPatientContactByID(pc);
@@ -744,7 +740,6 @@ public class MhealthDataExchange {
         }
 
         if (quarantinedContacts != null && quarantinedContacts.size() > 0) {
-            JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
 
             for (Integer pc : quarantinedContacts) {
                 Patient c = Context.getPatientService().getPatient(pc);
@@ -764,8 +759,8 @@ public class MhealthDataExchange {
 
             }
         }
-
-        return patientContactNode;
+        responseWrapper.put("contacts", patientContactNode);
+        return responseWrapper;
     }
 
     /**
