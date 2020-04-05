@@ -86,7 +86,6 @@ public class SHRRestController extends BaseRestController {
 
 		MhealthDataExchange e = new MhealthDataExchange();
 		return e.getContacts().toString();
-		//return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
 	}
 
 	/**
@@ -190,7 +189,7 @@ public class SHRRestController extends BaseRestController {
 			return shr.processIncomingLabResults(requestBody);
 
 		}
-		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+		return new SimpleObject().add("Report", "The request could not be interpreted properly");
 	}
 
 
