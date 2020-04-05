@@ -66,6 +66,10 @@ public class MhealthDataExchange {
     public static final String NO_CONCEPT = "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     public static final String FOLLOWUP_SEQUENCE_CONCEPT = "165416AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     public static final String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
+    public static final String COVID_19_CONTACT_TRACING_FORM = "37ef8f3c-6cd2-11ea-bc55-0242ac130003";
+    public static final String COVID_19_CONTACT_TRACING_ENCOUNTER = "6dd1ace2-6ce2-11ea-bc55-0242ac130003";
+
+
 
     ConceptService conceptService = Context.getConceptService();
     EncounterService encounterService = Context.getEncounterService();
@@ -459,11 +463,11 @@ public class MhealthDataExchange {
                 e.printStackTrace();
             }
             Encounter enc = new Encounter();
-            enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(COVID_QUARANTINE_FOLLOWUP_ENCOUNTER));
+            enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(COVID_19_CONTACT_TRACING_ENCOUNTER));
             enc.setEncounterDatetime(encDate);
             enc.setPatient(patient);
             enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
-            enc.setForm(Context.getFormService().getFormByUuid(COVID_QUARANTINE_FOLLOWUP_FORM));
+            enc.setForm(Context.getFormService().getFormByUuid(COVID_19_CONTACT_TRACING_FORM));
 
             // set temp obs
             if (sequenceNumber != null) {
