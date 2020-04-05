@@ -48,7 +48,7 @@ public class PushContactsToMhealthTask extends AbstractTask {
             }
             String serverUrl = "http://ears-covid.mhealthkenya.co.ke/api/emr/receiver";
             String loginUrl = "http://ears-covid.mhealthkenya.co.ke/api/user/login";
-            String authCode = null;
+            boolean successful = false;
             CloseableHttpClient loginClient = HttpClients.createDefault();
             String token = null;
 
@@ -58,7 +58,7 @@ public class PushContactsToMhealthTask extends AbstractTask {
                 HttpPost loginRequest = new HttpPost(loginUrl);
                 ObjectNode loginObject = factory.objectNode();
                 loginObject.put("username", "Admin");
-                loginObject.put("username", "Admin!@#");
+                loginObject.put("password", "Admin!@#");
 
                 //Set the API media type in http content-type header
                 loginRequest.addHeader("content-type", "application/json");
@@ -77,14 +77,12 @@ public class PushContactsToMhealthTask extends AbstractTask {
                 }
                 HttpEntity entity = response.getEntity();
                 String responseString = EntityUtils.toString(entity, "UTF-8");
-
                 Map<String, Object> responseMap = new ObjectMapper().readValue(responseString, Map.class);
 
                 Boolean success = (Boolean) responseMap.get("success");
                 token = responseMap.get("token").toString();
-                authCode = token;
-                System.out.println("Token: " + token);
-                log.info("Token: " + token);
+                successful = success;
+
             } finally {
                 //Important: Close the connect
                 loginClient.close();
@@ -96,7 +94,7 @@ public class PushContactsToMhealthTask extends AbstractTask {
             String payload = e.getContacts().toString();
             String API_KEY = token;
 
-            if (API_KEY != null) {
+            if (successful && API_KEY != null) {
                 try {
                     //Define a postRequest request
                     HttpPost postRequest = new HttpPost(serverUrl);
@@ -115,7 +113,7 @@ public class PushContactsToMhealthTask extends AbstractTask {
 
                     //verify the valid error code first
                     int statusCode = response.getStatusLine().getStatusCode();
-                    if (statusCode != 201) {
+                    if (statusCode != 200) {
                         throw new RuntimeException("Failed with HTTP error code : " + statusCode);
                     }
                     System.out.println("Successfully executed the task that pushes lab requests");
