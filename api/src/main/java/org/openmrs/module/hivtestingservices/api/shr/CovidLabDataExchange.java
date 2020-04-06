@@ -466,7 +466,7 @@ public class CovidLabDataExchange {
             lastLabEntry = new GlobalProperty();
             lastLabEntry.setProperty(HTSMetadata.LAST_LAB_ORDER_ENTRY);
             lastLabEntry.setDescription("Id of the last order entry");
-            sql = "select patient_id from orders where order_id <= " + lastId + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+            sql = "select patient_id from orders where order_id >= " + lastId + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
 
         }
         lastLabEntry.setPropertyValue(lastId.toString());

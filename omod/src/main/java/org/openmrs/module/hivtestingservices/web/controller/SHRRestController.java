@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.hivtestingservices.api.shr.CovidLabDataExchange;
+import org.openmrs.module.hivtestingservices.api.shr.MedicMobileDataExchange;
 import org.openmrs.module.hivtestingservices.api.shr.MhealthDataExchange;
 import org.openmrs.module.hivtestingservices.api.shr.MiddlewareRequest;
 import org.openmrs.module.hivtestingservices.api.shr.OutgoingPatientSHR;
@@ -85,6 +86,19 @@ public class SHRRestController extends BaseRestController {
 	public Object getMhealthContactList(HttpServletRequest request) {
 
 		MhealthDataExchange e = new MhealthDataExchange();
+		return e.getContacts().toString();
+	}
+
+	/**
+	 * gets payload with list of contacts for followup
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(method = RequestMethod.GET, value = "/contactlistcht") // end point for Medic Mobile
+	@ResponseBody
+	public Object getMedicMobileContactList(HttpServletRequest request) {
+
+		MedicMobileDataExchange e = new MedicMobileDataExchange();
 		return e.getContacts().toString();
 	}
 
@@ -215,7 +229,7 @@ public class SHRRestController extends BaseRestController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/contacttracing") // end point mhealth
+	@RequestMapping(method = RequestMethod.POST, value = "/chtcontactreport") // end point for CHT trace/followup report POST
 	@ResponseBody
 	public Object processContactTracingInfo(HttpServletRequest request) {
 		String requestBody = null;
@@ -226,11 +240,11 @@ public class SHRRestController extends BaseRestController {
 		}
 
 		if (requestBody != null) {
-			CovidLabDataExchange shr = new CovidLabDataExchange();
-			return shr.processIncomingContactTracingInfo(requestBody);
+			MedicMobileDataExchange shr = new MedicMobileDataExchange();
+			return shr.processTraceReport(requestBody);
 
 		}
-		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+		return new SimpleObject().add("Report", "Apparently, the request body was blank");
 	}
 
 
