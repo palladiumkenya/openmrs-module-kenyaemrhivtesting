@@ -50,9 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MhealthDataExchange {
+public class MedicMobileDataExchange {
 
-    protected static final Log log = LogFactory.getLog(MhealthDataExchange.class);
+    protected static final Log log = LogFactory.getLog(MedicMobileDataExchange.class);
     public static final String COVID_QUARANTINE_ENROLLMENT_ENCOUNTER = "33a3a55c-73ae-11ea-bc55-0242ac130003";
     public static final String COVID_QUARANTINE_ENROLLMENT_FORM = "9a5d57b6-739a-11ea-bc55-0242ac130003";
     public static final String COVID_QUARANTINE_PROGRAM = "9a5d555e-739a-11ea-bc55-0242ac130003";
@@ -732,54 +732,128 @@ public class MhealthDataExchange {
         ObjectNode responseWrapper = factory.objectNode();
 
         HTSService htsService = Context.getService(HTSService.class);
-        PersonService personService = Context.getPersonService();
-
         Set<Integer> listedContacts = getListedContacts();
-        Set<Integer> quarantinedContacts = getContactsInQuarantineProgram();
 
         if (listedContacts != null && listedContacts.size() > 0) {
 
             for (Integer pc : listedContacts) {
                 PatientContact c = htsService.getPatientContactByID(pc);
                 ObjectNode contact = factory.objectNode();
-                contact.put("CONTACT_UUID", c.getUuid());
-                contact.put("CONTACT_STATE", "LISTED");
-                contact.put("FIRST_NAME", c.getFirstName() != null ? c.getFirstName() : "");
-                contact.put("MIDDLE_NAME", c.getMiddleName() != null ? c.getMiddleName() : "");
-                contact.put("LAST_NAME", c.getLastName() != null ? c.getLastName() : "");
-                contact.put("DATE_OF_BIRTH", c.getBirthDate() != null ? OutgoingPatientSHR.getSimpleDateFormat(OutgoingPatientSHR.getSHRDateFormat()).format(c.getBirthDate()) : "");
-                contact.put("SEX", c.getSex() != null ? c.getSex() : "");
-                contact.put("PHYSICAL_ADDRESS", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
-                contact.put("PHONE_NUMBER", c.getPhoneContact() != null ? c.getPhoneContact() : "");
+                ObjectNode parentNode = factory.objectNode();
+                ObjectNode fieldNode = factory.objectNode();
+                ObjectNode inputsNode = factory.objectNode();
+                ObjectNode contactNode = factory.objectNode();
+                ObjectNode report = factory.objectNode();
+
+                String givenNames = "";
+                String sex = "";
+                String dateFormat = "yyyy-MM-dd";
+
+                String fullName = "";
+
+                if (c.getFirstName() != null) {
+                    fullName += c.getFirstName();
+                }
+
+                if (c.getMiddleName() != null) {
+                    fullName += " " + c.getMiddleName();
+                }
+
+                if (c.getLastName() != null) {
+                    fullName += " " + c.getLastName();
+                }
+
+                if (c.getFirstName() != null && c.getMiddleName() != null) {
+                    givenNames += c.getFirstName();
+                    givenNames += " " + c.getMiddleName();
+                } else {
+                    if (c.getFirstName() != null) {
+                        givenNames += c.getFirstName();
+                    }
+
+                    if (c.getMiddleName() != null) {
+                        givenNames += c.getMiddleName();
+                    }
+                }
+
+                if (c.getSex() != null) {
+                    if (c.getSex().equals("M")) {
+                        sex = "male";
+                    } else {
+                        sex = "female";
+                    }
+                }
+                parentNode.put("_id", "a452eebc-00a3-4c03-bc2b-43df627bf0f1");
+                contact.put("_id", c.getUuid());
+                contact.put("parent", parentNode);
+                contact.put("given_names", givenNames);
+                contact.put("role", "covid_contact");
+                contact.put("name", fullName);
+                contact.put("country_of_residence", "Kenya");
+                contact.put("date_of_birth", c.getBirthDate() != null ? OutgoingPatientSHR.getSimpleDateFormat(dateFormat).format(c.getBirthDate()) : "");
+                contact.put("sex", sex);
+                contact.put("primary_phone", c.getPhoneContact() != null ? c.getPhoneContact() : "");
+                contact.put("alternate_phone", "");
+                contact.put("email", "");
+                contact.put("type", "person");
+                contact.put("reported_date", c.getDateCreated().getTime());
+                contact.put("patient_id", c.getPatientRelatedTo().getPatientId().toString());
+                contact.put("phone", "");// this could be patient phone
+                contact.put("date_of_last_contact", c.getAppointmentDate() != null ? OutgoingPatientSHR.getSimpleDateFormat(dateFormat).format(c.getAppointmentDate()) : "");
+                contact.put("outbreak_case_id", "1X000");
+                contact.put("relation_to_case", c.getRelationType() != null ? getContactRelation().get(c.getRelationType()) : "");
+                contact.put("type_of_contact", c.getPnsApproach() != null ? getContactType().get(c.getPnsApproach()) : "");
+                contact.put("household_head", c.getLivingWithPatient() != null && c.getLivingWithPatient().equals(1065) ? givenNames : "");
+                contact.put("subcounty", c.getSubcounty() != null ? c.getSubcounty() : "");
+                contact.put("town", c.getTown() != null ? c.getTown() : "");
+                contact.put("address", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
+                contact.put("healthcare_worker", c.getMaritalStatus() != null && c.getMaritalStatus().equals(1065) ? "true" : "false");
+                contact.put("facility", c.getFacility() != null ? c.getFacility() : "");
+                contactNode.put("_id",c.getUuid());
+                inputsNode.put("contact",contactNode);
+                fieldNode.put("patient_id",c.getUuid());
+                fieldNode.put("case_number","");
+                fieldNode.put("case_confirmation_date","");
+                fieldNode.put("inputs",inputsNode);
+                report.put("form","case_information");
+                report.put("type","data_record");
+                report.put("content_type","xml");
+                report.put("reported_date",c.getDateCreated().getTime());
+                report.put("fields",fieldNode);
                 patientContactNode.add(contact);
+                patientContactNode.add(report);
 
             }
         }
 
-        if (quarantinedContacts != null && quarantinedContacts.size() > 0) {
-
-            for (Integer pc : quarantinedContacts) {
-                Patient c = Context.getPatientService().getPatient(pc);
-                ObjectNode address = CovidLabDataExchange.getPatientAddress(c);
-
-                ObjectNode contact = factory.objectNode();
-                contact.put("CONTACT_UUID", c.getUuid());
-                contact.put("CONTACT_STATE", "ENROLLED");
-                contact.put("FIRST_NAME", c.getGivenName() != null ? c.getGivenName() : "");
-                contact.put("MIDDLE_NAME", c.getMiddleName() != null ? c.getMiddleName() : "");
-                contact.put("LAST_NAME", c.getFamilyName() != null ? c.getFamilyName() : "");
-                contact.put("DATE_OF_BIRTH", c.getBirthdate() != null ? OutgoingPatientSHR.getSimpleDateFormat(OutgoingPatientSHR.getSHRDateFormat()).format(c.getBirthdate()) : "");
-                contact.put("SEX", c.getGender() != null ? c.getGender() : "");
-                contact.put("PHYSICAL_ADDRESS", address.get("POSTAL_ADDRESS"));
-                contact.put("PHONE_NUMBER", getContactPhoneNumber(c,personService) != null ? getContactPhoneNumber(c,personService) : "");
-                patientContactNode.add(contact);
-
-            }
-        }
-        responseWrapper.put("contacts", patientContactNode);
+        responseWrapper.put("docs", patientContactNode);
         return responseWrapper;
     }
 
+    private Map<Integer, String> getContactRelation() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237, "Co-worker");
+        options.put(165656,"Traveled together");
+        options.put(970, "Mother");
+        options.put(971, "Father");
+        options.put(972, "Sibling");
+        options.put(1528, "Child");
+        options.put(5617, "Spouse");
+        options.put(163565, "Sexual partner");
+        options.put(162221, "Co-wife");
+
+        return options;
+    }
+
+    private Map<Integer, String> getContactType() {
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237,"Working together with a nCoV patient");
+        options.put(165656,"Traveling together with a nCoV patient");
+        options.put(1060,"Living together with a nCoV patient");
+        options.put(117163,"Health care associated exposure");
+        return options;
+
+    }
     /**
      * get a patient's phone contact
      * @param patient
@@ -799,7 +873,7 @@ public class MhealthDataExchange {
     protected Set<Integer> getListedContacts() {
 
         Set<Integer> eligibleList = new HashSet<Integer>();
-        GlobalProperty lastContactEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MHEALTH_LAST_PATIENT_CONTACT_ENTRY);
+        GlobalProperty lastContactEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY);
         String lastOrdersql = "select max(id) last_id from kenyaemr_hiv_testing_patient_contact where voided=0;";
         List<List<Object>> lastOrderId = Context.getAdministrationService().executeSQL(lastOrdersql, true);
         Integer lastId = (Integer) lastOrderId.get(0).get(0);
@@ -810,8 +884,8 @@ public class MhealthDataExchange {
             sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastEntry + " and patient_id is null and voided=0;"; // get contacts not registered
         } else {
             lastContactEntry = new GlobalProperty();
-            lastContactEntry.setProperty(HTSMetadata.MHEALTH_LAST_PATIENT_CONTACT_ENTRY);
-            lastContactEntry.setDescription("Id for the last case contact entry ");
+            lastContactEntry.setProperty(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY);
+            lastContactEntry.setDescription("Id for the last case contact entry for CHT");
             sql = "select id from kenyaemr_hiv_testing_patient_contact where id >= " + lastId + " and patient_id is null and voided=0;";
 
         }
@@ -855,7 +929,7 @@ public class MhealthDataExchange {
             lastPatientEntry.setDescription("Id for the last patient entry");
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='9a5d555e-739a-11ea-bc55-0242ac130003') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_id >= " + lastId + " and pp.voided=0;";
+                    "where pp.patient_id <= " + lastId + " and pp.voided=0;";
 
         }
         lastPatientEntry.setPropertyValue(lastId.toString());

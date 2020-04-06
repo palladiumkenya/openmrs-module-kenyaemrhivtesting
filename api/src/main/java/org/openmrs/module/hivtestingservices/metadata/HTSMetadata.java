@@ -30,6 +30,7 @@ public class HTSMetadata extends AbstractMetadataBundle {
 	public static final String MODULE_ID = "hivtestingservices";
 	public static final String LAST_LAB_ORDER_ENTRY = "lab.lastUpdate";
 	public static final String MHEALTH_LAST_PATIENT_CONTACT_ENTRY = "mhealth.lastListedContactUpdate";
+	public static final String MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY = "medicMobile.lastListedContactUpdate";
 	public static final String MHEALTH_LAST_PATIENT_ENTRY = "mhealth.lastQuarantineEnrollmentUpdate";
 
 	public static final class _EncounterType {
