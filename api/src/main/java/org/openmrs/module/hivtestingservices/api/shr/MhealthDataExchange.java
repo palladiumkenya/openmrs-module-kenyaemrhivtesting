@@ -170,6 +170,7 @@ public class MhealthDataExchange {
             p = savePatient(p);
 
             patientContact.setPatient(p); // link contact to the created person
+            Context.getService(HTSService.class).savePatientContact(patientContact);
             //establish relationship between new person and case
             Patient covidCase = patientContact.getPatientRelatedTo();
             addRelationship(covidCase, p, patientContact.getPnsApproach());
@@ -407,12 +408,12 @@ public class MhealthDataExchange {
             }
 
             if (cough != null) {
-                Obs coughObs = setupCodedObs(patient, COUGH_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs coughObs = setupCodedObs(patient, COUGH_CONCEPT, (cough.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(coughObs);
             }
 
             if (difficultyBreathing != null) {
-                Obs dbObs = setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs dbObs = setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (difficultyBreathing.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(dbObs);
             }
 
@@ -498,12 +499,12 @@ public class MhealthDataExchange {
             }
 
             if (cough != null) {
-                Obs coughObs = setupCodedObs(patient, COUGH_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs coughObs = setupCodedObs(patient, COUGH_CONCEPT, (cough.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(coughObs);
             }
 
             if (difficultyBreathing != null) {
-                Obs dbObs = setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs dbObs = setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (difficultyBreathing.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(dbObs);
             }
 

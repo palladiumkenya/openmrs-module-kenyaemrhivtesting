@@ -40,6 +40,7 @@ import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -85,37 +86,71 @@ public class MedicMobileDataExchange {
     String traveledTogetherRelType = "8ea992ac-6ed3-11ea-bc55-0242ac130003";
     String livingTogetherRelType = "8ea993ba-6ed3-11ea-bc55-0242ac130003";
 
-
     /**
-     * processes results from mhealth     *
-     * @param resultPayload this should be an array
+     * processes payload posted from CHT
+     * @param resultPayload
      * @return
      */
-    public String processMhealthPayload(String resultPayload) {
+    public String processTraceReport(String resultPayload) {
 
-        Integer statusCode;
-        String statusMsg;
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode payload = null;
-        ArrayNode resultsObj = null;
+        ObjectNode jsonNode = null;
         try {
-            JsonNode actualObj = mapper.readTree(resultPayload);
-            payload = (ObjectNode) actualObj;
-        } catch (JsonProcessingException e) {
-            statusCode = 400;
-            statusMsg = "The payload could not be understood. An array is expected!";
+            jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+        } catch (IOException e) {
             e.printStackTrace();
-            return statusMsg;
         }
 
-        resultsObj = (ArrayNode) payload.get("contacts");
-        if (resultsObj.size() > 0) {
-            for (int i = 0; i < resultsObj.size(); i++) {
-                ObjectNode o = (ObjectNode) resultsObj.get(i);
-                processContactObject(o);
+        if (jsonNode != null) {
+
+            ObjectNode contactNode = (ObjectNode) jsonNode.get("contact");
+
+            String uuid = contactNode.get("_id").textValue();
+            PatientContact c = htsService.getPatientContactByUuid(uuid);
+            if (c == null) {
+                return "Invalid request. There is no such contact in the system" ;
+            }
+            Patient contactRegistered = c.getPatient();
+            String fName = c.getFirstName();
+            String mName = c.getMiddleName();
+            String lName = c.getLastName();
+
+            String county = contactNode.get("county").textValue();
+            String subCounty = contactNode.get("subcounty").textValue();
+            String postalAddress = contactNode.get("postal_address").textValue();
+            String phoneNumber = contactNode.get("phone").textValue();
+            String dobString = contactNode.get("date_of_birth").textValue();
+            String idNumber = contactNode.get("national_id").textValue();
+            Date dob = parseDateString(dobString, "yyyy-MM-dd");
+
+            ObjectNode traceReport = (ObjectNode) jsonNode.get("trace");
+            String encDateStr = traceReport.get("date_last_contacted").textValue();
+
+            Date encounterdate = parseDateString(encDateStr, "yyyy-MM-dd");
+            Double followupSequence = traceReport.get("follow_up_count").doubleValue();
+            Double temp = traceReport.get("temperature").doubleValue();
+            String cough = traceReport.get("cough").textValue();
+            String fever = traceReport.get("fever").textValue();
+            String soreThroat = traceReport.get("sore_throat").textValue();
+            String difficultyBreathing = traceReport.get("difficulty_breathing").textValue();
+
+            if (contactRegistered != null) {
+                saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
+            } else {
+                Patient patient = createPatient(fName, mName, lName, dob, c.getSex(), idNumber);
+                patient = addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
+                patient = addPersonAttributes(patient, phoneNumber, null, null);
+                patient = savePatient(patient);
+
+                saveContactFollowupReport(patient, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
+                c.setPatient(patient); // link contact to the created person
+                Context.getService(HTSService.class).savePatientContact(c);
+                //establish relationship between new person and case
+                Patient covidCase = c.getPatientRelatedTo();
+                addRelationship(covidCase, patient, c.getPnsApproach());
             }
         }
-        return "Results updated successfully";
+        return "Contact followup created successfully";
     }
 
     private void processContactObject(ObjectNode contact) {
@@ -513,6 +548,68 @@ public class MedicMobileDataExchange {
             }
             encounterService.saveEncounter(enc);
         }
+
+    }
+
+    /**
+     * Saves individual trace report from CHT
+     * @param patient
+     * @param encDate
+     * @param temp
+     * @param fever
+     * @param cough
+     * @param difficultyBreathing
+     * @param followupSequence
+     */
+    private void saveContactFollowupReport(
+            Patient patient,
+            Date encDate,
+            Double temp, String fever, String cough, String difficultyBreathing, Double followupSequence, String soreThroat) {
+
+            EncounterType et = Context.getEncounterService().getEncounterTypeByUuid(COVID_19_CONTACT_TRACING_ENCOUNTER);
+            Form form = Context.getFormService().getFormByUuid(COVID_19_CONTACT_TRACING_FORM);
+
+            if (hasEncounterOnDate(et, form, patient, encDate)) {
+                return;
+            }
+            Encounter enc = new Encounter();
+            enc.setEncounterType(et);
+            enc.setEncounterDatetime(encDate);
+            enc.setPatient(patient);
+            enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
+            enc.setForm(form);
+
+            // set temp obs
+            if (followupSequence != null) {
+                Obs followUpSequenceObs = setupNumericObs(patient, FOLLOWUP_SEQUENCE_CONCEPT, followupSequence, encDate);
+                enc.addObs(followUpSequenceObs);
+            }
+
+            if (temp != null) {
+                Obs tempObs = setupNumericObs(patient, TEMPERATURE_CONCEPT, temp, encDate);
+                enc.addObs(tempObs);
+            }
+
+            if (fever != null) {
+                Obs feverObs = setupCodedObs(patient, FEVER_CONCEPT, (fever.equals("yes") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                enc.addObs(feverObs);
+            }
+
+            if (cough != null) {
+                Obs coughObs = setupCodedObs(patient, COUGH_CONCEPT, (cough.equals("yes") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                enc.addObs(coughObs);
+            }
+
+            if (difficultyBreathing != null) {
+                Obs dbObs = setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (difficultyBreathing.equals("yes") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                enc.addObs(dbObs);
+            }
+
+        if (soreThroat != null) {
+            Obs dbObs = setupCodedObs(patient, SORE_THROAT_CONCEPT, (soreThroat.equals("yes") ? HAS_SORE_THROAT_CONCEPT : NO_CONCEPT), encDate);
+            enc.addObs(dbObs);
+        }
+            encounterService.saveEncounter(enc);
 
     }
 

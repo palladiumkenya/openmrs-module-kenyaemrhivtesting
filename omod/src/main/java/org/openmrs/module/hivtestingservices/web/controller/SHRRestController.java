@@ -229,7 +229,7 @@ public class SHRRestController extends BaseRestController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/contacttracing") // end point mhealth
+	@RequestMapping(method = RequestMethod.POST, value = "/chtcontactreport") // end point for CHT trace/followup report POST
 	@ResponseBody
 	public Object processContactTracingInfo(HttpServletRequest request) {
 		String requestBody = null;
@@ -240,11 +240,11 @@ public class SHRRestController extends BaseRestController {
 		}
 
 		if (requestBody != null) {
-			CovidLabDataExchange shr = new CovidLabDataExchange();
-			return shr.processIncomingContactTracingInfo(requestBody);
+			MedicMobileDataExchange shr = new MedicMobileDataExchange();
+			return shr.processTraceReport(requestBody);
 
 		}
-		return new SimpleObject().add("identification", "No patient id specified in the request: Got this: => " + request.getParameter("patientID"));
+		return new SimpleObject().add("Report", "Apparently, the request body was blank");
 	}
 
 
