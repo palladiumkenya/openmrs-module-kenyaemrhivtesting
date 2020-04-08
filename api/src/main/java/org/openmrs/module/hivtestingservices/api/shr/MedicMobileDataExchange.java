@@ -1,6 +1,5 @@
 package org.openmrs.module.hivtestingservices.api.shr;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -821,15 +820,17 @@ public class MedicMobileDataExchange {
     /**
      * Get a list of contacts for tracing
      * @return
+     * @param lastContactEntry
+     * @param lastId
      */
-    public ObjectNode getContacts() {
+    public ObjectNode getContacts(Integer lastContactEntry, Integer lastId) {
 
         JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
         ArrayNode patientContactNode = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
         ObjectNode responseWrapper = factory.objectNode();
 
         HTSService htsService = Context.getService(HTSService.class);
-        Set<Integer> listedContacts = getListedContacts();
+        Set<Integer> listedContacts = getListedContacts(lastContactEntry, lastId);
 
         if (listedContacts != null && listedContacts.size() > 0) {
 
@@ -967,26 +968,16 @@ public class MedicMobileDataExchange {
      * Filters out contacts who have been registered in the system as person/patient
      * @return
      */
-    protected Set<Integer> getListedContacts() {
+    protected Set<Integer> getListedContacts(Integer lastContactEntry, Integer lastId) {
 
         Set<Integer> eligibleList = new HashSet<Integer>();
-        GlobalProperty lastContactEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY);
-        String lastOrdersql = "select max(id) last_id from kenyaemr_hiv_testing_patient_contact where voided=0;";
-        List<List<Object>> lastOrderId = Context.getAdministrationService().executeSQL(lastOrdersql, true);
-        Integer lastId = (Integer) lastOrderId.get(0).get(0);
-        lastId = lastId != null ? lastId : 0;
         String sql = "";
-        if (lastContactEntry != null) {
-            Integer lastEntry = Integer.parseInt(lastContactEntry.getValue().toString());
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastEntry + " and patient_id is null and voided=0;"; // get contacts not registered
+        if (lastContactEntry != null && lastContactEntry > 0) {
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0;"; // get contacts not registered
         } else {
-            lastContactEntry = new GlobalProperty();
-            lastContactEntry.setProperty(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY);
-            lastContactEntry.setDescription("Id for the last case contact entry for CHT");
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >= " + lastId + " and patient_id is null and voided=0;";
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0;";
 
         }
-        lastContactEntry.setPropertyValue(lastId.toString());
 
         List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
         if (!activeList.isEmpty()) {
@@ -995,8 +986,6 @@ public class MedicMobileDataExchange {
                 eligibleList.add(patientId);
             }
         }
-
-        Context.getAdministrationService().saveGlobalProperty(lastContactEntry);
         return eligibleList;
     }
 

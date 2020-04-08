@@ -32,6 +32,15 @@ public class HTSMetadata extends AbstractMetadataBundle {
 	public static final String MHEALTH_LAST_PATIENT_CONTACT_ENTRY = "mhealth.lastListedContactUpdate";
 	public static final String MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY = "medicMobile.lastListedContactUpdate";
 	public static final String MHEALTH_LAST_PATIENT_ENTRY = "mhealth.lastQuarantineEnrollmentUpdate";
+    public static final String MEDIC_MOBILE_SERVER_URL = "medic.cht_server_url";
+	public static final String MEDIC_MOBILE_USER = "medic.cht_user";
+	public static final String MEDIC_MOBILE_PWD = "medic.cht_pwd";
+	public static final String MHEALTH_LOGIN_URL = "mhealth.login_url";
+	public static final String MHEALTH_POST_CONTACT_URL = "mhealth.server_url";
+	public static final String MHEALTH_USER = "mhealth.login_user";
+	public static final String MHEALTH_PWD = "mhealth.login_pwd";
+	public static final String LAB_SERVER_URL = "chai.server_url";
+	public static final String LAB_API_TOKEN = "chai.api_token";
 
 	public static final class _EncounterType {
 		public static final String HTS = "9c0a7a57-62ff-4f75-babe-5835b0e921b7";
@@ -68,6 +77,21 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(relationshipType("Air passenger", "Air passenger", "Travel by air together", _RelationshipType.AIR_PASSENGER));
 		install(relationshipType("Road passenger", "Road passenger", "Travel by road together", _RelationshipType.ROAD_PASSENGER));
 
+		install(globalProperty(MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY, "Id for the last case contact entry for CHT", null));
+		install(globalProperty(MEDIC_MOBILE_SERVER_URL, "Server URL for Medic Mobile CHT", null));
+		install(globalProperty(MEDIC_MOBILE_USER, "Medic Mobile CHT user", null));
+		install(globalProperty(MEDIC_MOBILE_PWD, "Medic Mobile CHT pwd", null));
+
+		install(globalProperty(MHEALTH_LOGIN_URL, "Mhealth login url", null));
+		install(globalProperty(MHEALTH_USER, "Mhealth user", null));
+		install(globalProperty(MHEALTH_PWD, "Mhealth pwd", null));
+		install(globalProperty(MHEALTH_POST_CONTACT_URL, "Mhealth post url", null));
+		install(globalProperty(MHEALTH_LAST_PATIENT_CONTACT_ENTRY, "Mhealth last patient contact entry id", null));
+		install(globalProperty(MHEALTH_LAST_PATIENT_ENTRY, "Mhealth last patient entry id", null));
+
+		install(globalProperty(LAB_SERVER_URL, "Lab server url", null));
+		install(globalProperty(LAB_API_TOKEN, "Lab Api token", null));
+		install(globalProperty(LAST_LAB_ORDER_ENTRY, "Lab last order entry id", null));
 	}
 
 }
