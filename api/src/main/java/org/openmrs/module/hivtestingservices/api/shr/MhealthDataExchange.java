@@ -597,7 +597,7 @@ public class MhealthDataExchange {
      * @param encDate
      * @return
      */
-    private Obs setupCodedObs(Patient patient, String qConcept, String ans, Date encDate) {
+    public Obs setupCodedObs(Patient patient, String qConcept, String ans, Date encDate) {
         Obs obs = new Obs();
         obs.setConcept(conceptService.getConceptByUuid(qConcept));
         obs.setDateCreated(new Date());

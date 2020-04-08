@@ -152,15 +152,133 @@ public class MedicMobileDataExchange {
         return "Contact followup created successfully";
     }
 
+
     private void processContactObject(ObjectNode contact) {
         String patientStatus = contact.get("CONTACT_STATE").textValue();
 
-        if (patientStatus.equals("LISTED")) {
-            processListedContacts(contact);
-        } else { // process for enrolled contacts -- ENROLLED
-            processRegisteredContact(contact);
+        if (patientStatus !=null && patientStatus.equals("case_investigation_form")) {
+            processNewRegistration(contact);
+        } else if (patientStatus != null && patientStatus.equals("trace_report")) {
+            processFollowupReports(contact);
+        } else {
+
         }
     }
+
+    /**
+     * Processes followup
+     * @param contact
+     */
+    private void processFollowupReports(ObjectNode contact) {
+
+    }
+
+    private void processNewRegistration(ObjectNode contactNode) {
+        if (contactNode == null) {return;}
+
+        if (contactNode != null) {
+
+
+            String fName = "";
+            String mName = "";
+
+            String lName = contactNode.get("family_name").textValue();
+            String givenNames = contactNode.get("given_names").textValue();
+            String county = contactNode.get("county").textValue();
+            String subCounty = contactNode.get("subcounty").textValue();
+            String postalAddress = contactNode.get("postal_address").textValue();
+            String location = contactNode.get("place_location").textValue();
+            String estate = contactNode.get("sublocation_estate").textValue();
+            String phoneNumber = contactNode.get("phone").textValue();
+            String dobString = contactNode.get("date_of_birth").textValue();
+            String idNumber = contactNode.get("national_id").textValue();
+            String passportNumber = contactNode.get("passport_number").textValue();
+            String alienNumber = contactNode.get("alien_id").textValue();
+            Date dob = parseDateString(dobString, "yyyy-MM-dd");
+
+            ObjectNode cif = (ObjectNode) contactNode.get("case_investigation");
+
+            if (cif != null) {
+                enrollForCovidCaseInvestigation(cif);
+            }
+        }
+    }
+
+    private void enrollForCovidCaseInvestigation(Patient patient, ObjectNode cif) {
+
+        ObjectNode fields = (ObjectNode) cif.get("fields");
+        ObjectNode reportingInfo = (ObjectNode) fields.get("group_reporting_info");
+        ObjectNode patientInfo = (ObjectNode) fields.get("group_patient_information");
+        ObjectNode clinicalInfo = (ObjectNode) fields.get("group_clinical_information");
+        ObjectNode symptomsInfo = (ObjectNode) fields.get("group_patient_symptoms");
+        ObjectNode comorbidityInfo = (ObjectNode) fields.get("group_conditions_comorbidity");
+        ObjectNode exposureInfo = (ObjectNode) fields.get("group_exposure_travel_information");
+
+
+        // reporting info
+        String reportingDate = reportingInfo.get("date_of_reporting").textValue();
+        String reportingFacility = reportingInfo.get("reporting_facility").textValue();
+        String reportingCounty = reportingInfo.get("county").textValue();
+        String reportingSubCounty = reportingInfo.get("subcounty").textValue();
+        String poeDetection = reportingInfo.get("poe_detected").textValue();
+        String poeDetectionDate = reportingInfo.get("poe_detection_date").textValue();
+
+        // reporting info
+        String caseIdentifier = patientInfo.get("case_identifier").textValue();
+
+        // clinical information
+        String symptomatic = clinicalInfo.get("patient_condition").textValue();
+        String symptomsOnsetDate = clinicalInfo.get("symptoms_onset_date").textValue();
+        String firstAdmissionDate = clinicalInfo.get("first_admission_date").textValue();
+        String hospitalName = clinicalInfo.get("hospital_name").textValue();
+        String isolationDate = clinicalInfo.get("isolation_date").textValue();
+        String patientVentilated = clinicalInfo.get("patient_ventilated").textValue();
+        String patientHealthStatus = clinicalInfo.get("patient_health_status").textValue();
+        String deathDate = clinicalInfo.get("death_date").textValue();
+        Date encDate = parseDateString(reportingDate, "yyyyMMdd");
+
+        // exposure
+        String patientTravelledPast2Weeks = exposureInfo.get("patient_travelled_past_2_weeks").textValue();
+        String occupation = exposureInfo.get("occupation").textValue();
+
+        EncounterType encType = Context.getEncounterService().getEncounterTypeByUuid(COVID_QUARANTINE_ENROLLMENT_ENCOUNTER);
+        Encounter encounter = new Encounter();
+        encounter.setEncounterType(encType);
+        encounter.setPatient(patient);
+        encounter.setEncounterDatetime(encDate);
+        // build observations
+        Obs obsReportingCounty = ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_COUNTY, reportingCounty, encDate);
+        Obs obsReportingSubCounty = ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_SUB_COUNTY, reportingSubCounty, encDate);
+        Obs obsDetectionPoint = ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, poeDetection.equals("yes") ? ObsUtils.POE : ObsUtils.COMMUNITY, encDate);
+        Obs obsDateDetected = ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_DETECTED, parseDateString(poeDetectionDate, "yyyyMMdd"), encDate);
+
+        Obs obsSymptomatic = ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_SYMPTOMATIC, symptomatic.equals("symptomatic") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsDateofSymptoms = ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ONSET_OF_SYMPTOMS, parseDateString(symptomsOnsetDate, "yyyyMMdd"), encDate);
+        Obs obsDateofAdmission = ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ADMISSION_TO_HOSPITAL, parseDateString(firstAdmissionDate, "yyyyMMdd"), encDate);
+        Obs obsHospitalofAdmission = ObsUtils.setupTextObs(patient, ObsUtils.NAME_OF_HOSPITAL_ADMITTED, hospitalName, encDate);
+        Obs obsDateofIsolation = ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ISOLATION, parseDateString(isolationDate, "yyyyMMdd"), encDate);
+
+        Obs obsPatientVentilated = ObsUtils.setupCodedObs(patient, ObsUtils.WAS_PATIENT_VENTILATED, patientVentilated.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsPatientStatus = ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsDeathDate = ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_DEATH, parseDateString(deathDate, "yyyyMMdd"), encDate);
+
+        Obs obsTravelHistory = ObsUtils.setupCodedObs(patient, ObsUtils.HISTORY_OF_TRAVEL, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsOccupation = ObsUtils.setupCodedObs(patient, ObsUtils.OCCUPATION, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+
+        Obs obsComorbidity = ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsHypertension = ObsUtils.setupCodedObs(patient, ObsUtils.HYPERTENSION, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsDiabetes = ObsUtils.setupCodedObs(patient, ObsUtils.DIABETES, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsLiverDisease = ObsUtils.setupCodedObs(patient, ObsUtils.LIVER_DISEASE, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsNeurologicalDisease = ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_NEUROLOGICAL_DISEASE, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsPostpartum = ObsUtils.setupCodedObs(patient, ObsUtils.POST_PARTUM_LESS_THAN_6_WEEKS, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsImmunodeficiency = ObsUtils.setupCodedObs(patient, ObsUtils.IMMUNODEFICIENCY, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsRenalDisease = ObsUtils.setupCodedObs(patient, ObsUtils.RENAL_DISEASE, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsChronicLungDisease = ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_LUNG_DISEASE, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+        Obs obsMalignancy = ObsUtils.setupCodedObs(patient, ObsUtils.MALIGNANCY, patientHealthStatus.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate);
+
+
+    }
+
 
     private void processListedContacts(ObjectNode contactObj) {
 
