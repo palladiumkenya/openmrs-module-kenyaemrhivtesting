@@ -35,7 +35,6 @@ import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
-import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.util.StringUtils;
@@ -121,16 +120,23 @@ public class MhealthDataExchange {
     private void processContactObject(ObjectNode contact) {
         String patientStatus = contact.get("CONTACT_STATE").textValue();
 
-        if (patientStatus.equals("LISTED")) {
+        if (patientStatus !=null && patientStatus.equals("LISTED")) {
             processListedContacts(contact);
-        } else { // process for enrolled contacts -- ENROLLED
+        } else if (patientStatus != null && patientStatus.equals("ENROLLED")) { // process for enrolled contacts -- ENROLLED
             processRegisteredContact(contact);
+        } else {
+
         }
     }
 
     private void processListedContacts(ObjectNode contactObj) {
 
         String contactUuid = contactObj.get("CONTACT_UUID").textValue();
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(contactUuid)) {
+            return;
+        }
+
         PatientContact patientContact = null;
         if (contactUuid != null) {
             patientContact = htsService.getPatientContactByUuid(contactUuid);
@@ -181,7 +187,7 @@ public class MhealthDataExchange {
                 addRelationship(covidCase, p, patientContact.getPnsApproach());
                 // date of quarantine is sufficient to denote a contact is in quarantine program
                 // needs enrollment to the program
-                if (dateQuarantined != null && !dateQuarantined.equals("")) {
+                if (dateQuarantined != null && !dateQuarantined.equals("") && org.apache.commons.lang3.StringUtils.isNotBlank(placeQuarantined)) {
 
                     p = enrollPatientInCovidQuarantine(p, parseDateString(dateQuarantined, "yyyyMMdd"), placeQuarantined);
                     saveQuarantineFollowupReports(p, (ArrayNode) followups);
@@ -234,12 +240,17 @@ public class MhealthDataExchange {
         String patientUuid = traceReports.get("CONTACT_UUID").textValue();
         // check if patient is enrolled in quarantine program
 
+        if (org.apache.commons.lang3.StringUtils.isBlank(patientUuid)) {
+            return;
+        }
         Patient patient = patientService.getPatientByUuid(patientUuid);
-        JsonNode followups = traceReports.get("PATIENT_FOLLOWUPS");
-        if (inQuarantineProgram(patient)) { // update quarantine followup form
-            saveQuarantineFollowupReports(patient, (ArrayNode) followups);
-        } else {
-            saveContactFollowupReports(patient, (ArrayNode) followups);
+        if (patient != null) {
+            JsonNode followups = traceReports.get("PATIENT_FOLLOWUPS");
+            if (inQuarantineProgram(patient)) { // update quarantine followup form
+                saveQuarantineFollowupReports(patient, (ArrayNode) followups);
+            } else {
+                saveContactFollowupReports(patient, (ArrayNode) followups);
+            }
         }
     }
 
@@ -371,6 +382,10 @@ public class MhealthDataExchange {
             return ;
         }
 
+        if (null == patient) {
+            return;
+        }
+
         for (int i=0; i < reports.size(); i++) {
             ObjectNode report = (ObjectNode) reports.get(i);
             String followupDate = report.get("FOLLOWUP_DATE").textValue();
@@ -455,6 +470,10 @@ public class MhealthDataExchange {
 
         if (reports.size() < 1) {
             return ;
+        }
+
+        if (null == patient) {
+            return;
         }
 
         for (int i=0; i < reports.size(); i++) {
