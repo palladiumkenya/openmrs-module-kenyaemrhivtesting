@@ -131,62 +131,68 @@ public class MhealthDataExchange {
     private void processListedContacts(ObjectNode contactObj) {
 
         String contactUuid = contactObj.get("CONTACT_UUID").textValue();
-        PatientContact patientContact = htsService.getPatientContactByUuid(contactUuid);
-        JsonNode followups = contactObj.get("PATIENT_FOLLOWUPS");
+        PatientContact patientContact = null;
+        if (contactUuid != null) {
+            patientContact = htsService.getPatientContactByUuid(contactUuid);
+        }
 
-        // check if contact is already registered -- may be after contacts had long been pushed out
-        // to mhealth system
-        if (patientContact.getPatient() != null && inQuarantineProgram(patientContact.getPatient())) {
-            saveQuarantineFollowupReports(patientContact.getPatient(), (ArrayNode) followups);
-        } else if (patientContact.getPatient() != null){
-            saveContactFollowupReports(patientContact.getPatient(), (ArrayNode) followups);
-        } else {
-            // check if quarantine details exist
-            ObjectNode patientIdentificatonNode = (ObjectNode) contactObj.get("PATIENT_IDENTIFICATION");
-            ObjectNode quarantineDetailsNode = (ObjectNode) patientIdentificatonNode.get("QUARANTINE_DETAILS");
-            String dateQuarantined = quarantineDetailsNode.get("DATE_QUARANTINED").textValue();
-            String placeQuarantined = quarantineDetailsNode.get("PLACE_OF_QUARANTINE").textValue();
+        if (patientContact != null) {
+            JsonNode followups = contactObj.get("PATIENT_FOLLOWUPS");
 
-            ObjectNode nameNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_NAME");
-            ObjectNode addressNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_ADDRESS");
-            ArrayNode identifierNode = (ArrayNode) patientIdentificatonNode.get("INTERNAL_PATIENT_ID");
-            ObjectNode physicalAddressNode = (ObjectNode) addressNode.get("PHYSICAL_ADDRESS");
+            // check if contact is already registered -- may be after contacts had long been pushed out
+            // to mhealth system
+            if (patientContact.getPatient() != null && inQuarantineProgram(patientContact.getPatient())) {
+                saveQuarantineFollowupReports(patientContact.getPatient(), (ArrayNode) followups);
+            } else if (patientContact.getPatient() != null) {
+                saveContactFollowupReports(patientContact.getPatient(), (ArrayNode) followups);
+            } else {
+                // check if quarantine details exist
+                ObjectNode patientIdentificatonNode = (ObjectNode) contactObj.get("PATIENT_IDENTIFICATION");
+                ObjectNode quarantineDetailsNode = (ObjectNode) patientIdentificatonNode.get("QUARANTINE_DETAILS");
+                String dateQuarantined = quarantineDetailsNode.get("DATE_QUARANTINED").textValue();
+                String placeQuarantined = quarantineDetailsNode.get("PLACE_OF_QUARANTINE").textValue();
 
-            String fName = nameNode.get("FIRST_NAME").textValue();
-            String mName = nameNode.get("MIDDLE_NAME").textValue();
-            String lName = nameNode.get("LAST_NAME").textValue();
-            String county = physicalAddressNode.get("COUNTY").textValue();
-            String subCounty = physicalAddressNode.get("SUB_COUNTY").textValue();
-            String ward = physicalAddressNode.get("WARD").textValue();
-            ObjectNode idNoNode = (ObjectNode) identifierNode.get(0);
-            String idNo = idNoNode.get("ID").textValue();
-            String dobString = patientIdentificatonNode.get("DATE_OF_BIRTH").textValue();
-            String sex = patientIdentificatonNode.get("SEX").textValue();
-            String phoneNumber = patientIdentificatonNode.get("PHONE_NUMBER").textValue();
+                ObjectNode nameNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_NAME");
+                ObjectNode addressNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_ADDRESS");
+                ArrayNode identifierNode = (ArrayNode) patientIdentificatonNode.get("INTERNAL_PATIENT_ID");
+                ObjectNode physicalAddressNode = (ObjectNode) addressNode.get("PHYSICAL_ADDRESS");
 
-            Patient p = createPatient(fName, mName, lName, parseDateString(dobString,"yyyyMMdd"), sex, idNo);
-            p = addPersonAddresses(p, null, county, subCounty, null, null);
-            p = addPersonAttributes(p, phoneNumber, null, null);
-            p = savePatient(p);
+                String fName = nameNode.get("FIRST_NAME").textValue();
+                String mName = nameNode.get("MIDDLE_NAME").textValue();
+                String lName = nameNode.get("LAST_NAME").textValue();
+                String county = physicalAddressNode.get("COUNTY").textValue();
+                String subCounty = physicalAddressNode.get("SUB_COUNTY").textValue();
+                String ward = physicalAddressNode.get("WARD").textValue();
+                ObjectNode idNoNode = (ObjectNode) identifierNode.get(0);
+                String idNo = idNoNode.get("ID").textValue();
+                String dobString = patientIdentificatonNode.get("DATE_OF_BIRTH").textValue();
+                String sex = patientIdentificatonNode.get("SEX").textValue();
+                String phoneNumber = patientIdentificatonNode.get("PHONE_NUMBER").textValue();
 
-            patientContact.setPatient(p); // link contact to the created person
-            Context.getService(HTSService.class).savePatientContact(patientContact);
-            //establish relationship between new person and case
-            Patient covidCase = patientContact.getPatientRelatedTo();
-            addRelationship(covidCase, p, patientContact.getPnsApproach());
-            // date of quarantine is sufficient to denote a contact is in quarantine program
-            // needs enrollment to the program
-            if (dateQuarantined != null && !dateQuarantined.equals("")) {
+                Patient p = createPatient(fName, mName, lName, parseDateString(dobString, "yyyyMMdd"), sex, idNo);
+                p = addPersonAddresses(p, null, county, subCounty, null, null);
+                p = addPersonAttributes(p, phoneNumber, null, null);
+                p = savePatient(p);
 
-                p = enrollPatientInCovidQuarantine(p, parseDateString(dateQuarantined, "yyyyMMdd"), placeQuarantined);
-                saveQuarantineFollowupReports(p, (ArrayNode) followups);
+                patientContact.setPatient(p); // link contact to the created person
+                Context.getService(HTSService.class).savePatientContact(patientContact);
+                //establish relationship between new person and case
+                Patient covidCase = patientContact.getPatientRelatedTo();
+                addRelationship(covidCase, p, patientContact.getPnsApproach());
+                // date of quarantine is sufficient to denote a contact is in quarantine program
+                // needs enrollment to the program
+                if (dateQuarantined != null && !dateQuarantined.equals("")) {
+
+                    p = enrollPatientInCovidQuarantine(p, parseDateString(dateQuarantined, "yyyyMMdd"), placeQuarantined);
+                    saveQuarantineFollowupReports(p, (ArrayNode) followups);
 
 
-            } else { // just update followup
+                } else { // just update followup
 
-                saveContactFollowupReports(p, (ArrayNode) followups);
+                    saveContactFollowupReports(p, (ArrayNode) followups);
+                }
+
             }
-
         }
     }
 
