@@ -176,10 +176,19 @@ public class MhealthDataExchange {
                 String phoneNumber = patientIdentificatonNode.get("PHONE_NUMBER").textValue();
 
                 Patient p = createPatient(fName, mName, lName, parseDateString(dobString, "yyyyMMdd"), sex, idNo);
-                p = addPersonAddresses(p, null, county, subCounty, null, null);
-                p = addPersonAttributes(p, phoneNumber, null, null);
-                p = savePatient(p);
+                if (p != null) {
+                    p = addPersonAddresses(p, null, county, subCounty, null, null);
+                }
+                if (p != null) {
+                    p = addPersonAttributes(p, phoneNumber, null, null);
+                }
+                if (p != null) {
+                    p = savePatient(p);
+                }
 
+                if (null == p) {
+                    return;
+                }
                 patientContact.setPatient(p); // link contact to the created person
                 Context.getService(HTSService.class).savePatientContact(patientContact);
                 //establish relationship between new person and case
