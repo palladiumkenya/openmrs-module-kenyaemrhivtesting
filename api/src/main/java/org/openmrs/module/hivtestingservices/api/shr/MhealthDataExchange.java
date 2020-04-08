@@ -720,13 +720,15 @@ public class MhealthDataExchange {
         return patient;
     }
 
-
-
     /**
      * Get a list of contacts for tracing
+     * @param gpLastPatientId
+     * @param lastPatientId
+     * @param gpLastContactId
+     * @param lastContactId
      * @return
      */
-    public ObjectNode getContacts() {
+    public ObjectNode getContacts(Integer gpLastPatientId, Integer lastPatientId, Integer gpLastContactId, Integer lastContactId) {
 
         JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
         ArrayNode patientContactNode = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
@@ -735,8 +737,8 @@ public class MhealthDataExchange {
         HTSService htsService = Context.getService(HTSService.class);
         PersonService personService = Context.getPersonService();
 
-        Set<Integer> listedContacts = getListedContacts();
-        Set<Integer> quarantinedContacts = getContactsInQuarantineProgram();
+        Set<Integer> listedContacts = getListedContacts(gpLastContactId, lastContactId);
+        Set<Integer> quarantinedContacts = getContactsInQuarantineProgram(gpLastPatientId, lastPatientId);
 
         if (listedContacts != null && listedContacts.size() > 0) {
 
@@ -796,27 +798,19 @@ public class MhealthDataExchange {
      * Retrieves contacts listed under a case and needs follow up
      * Filters out contacts who have been registered in the system as person/patient
      * @return
+     * @param lastContactEntry
+     * @param lastContactId
      */
-    protected Set<Integer> getListedContacts() {
+    protected Set<Integer> getListedContacts(Integer lastContactEntry, Integer lastContactId) {
 
         Set<Integer> eligibleList = new HashSet<Integer>();
-        GlobalProperty lastContactEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MHEALTH_LAST_PATIENT_CONTACT_ENTRY);
-        String lastOrdersql = "select max(id) last_id from kenyaemr_hiv_testing_patient_contact where voided=0;";
-        List<List<Object>> lastOrderId = Context.getAdministrationService().executeSQL(lastOrdersql, true);
-        Integer lastId = (Integer) lastOrderId.get(0).get(0);
-        lastId = lastId != null ? lastId : 0;
+
         String sql = "";
         if (lastContactEntry != null) {
-            Integer lastEntry = Integer.parseInt(lastContactEntry.getValue().toString());
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastEntry + " and patient_id is null and voided=0;"; // get contacts not registered
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0;"; // get contacts not registered
         } else {
-            lastContactEntry = new GlobalProperty();
-            lastContactEntry.setProperty(HTSMetadata.MHEALTH_LAST_PATIENT_CONTACT_ENTRY);
-            lastContactEntry.setDescription("Id for the last case contact entry ");
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >= " + lastId + " and patient_id is null and voided=0;";
-
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastContactId + " and patient_id is null and voided=0;";
         }
-        lastContactEntry.setPropertyValue(lastId.toString());
 
         List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
         if (!activeList.isEmpty()) {
@@ -826,7 +820,6 @@ public class MhealthDataExchange {
             }
         }
 
-        Context.getAdministrationService().saveGlobalProperty(lastContactEntry);
         return eligibleList;
     }
 
@@ -835,31 +828,22 @@ public class MhealthDataExchange {
      * Should exclude those already enrolled for case investigation (COVID program)
      * @return
      */
-    protected Set<Integer> getContactsInQuarantineProgram() {
+    protected Set<Integer> getContactsInQuarantineProgram(Integer lastPatientEntry, Integer lastId) {
 
         Set<Integer> eligibleList = new HashSet<Integer>();
-        GlobalProperty lastPatientEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MHEALTH_LAST_PATIENT_ENTRY);
-        String lastOrdersql = "select max(patient_id) last_id from patient where voided=0;";
-        List<List<Object>> lastOrderId = Context.getAdministrationService().executeSQL(lastOrdersql, true);
-        Integer lastId = (Integer) lastOrderId.get(0).get(0);
-        lastId = lastId != null ? lastId : 0;
 
         String sql = "";
-        if (lastPatientEntry != null) {
-            Integer lastEntry = Integer.parseInt(lastPatientEntry.getValue().toString());
+        if (lastPatientEntry != null && lastPatientEntry > 0) {
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='9a5d555e-739a-11ea-bc55-0242ac130003') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_id >" + lastEntry + " and pp.voided=0;";
+                    "where pp.patient_id >" + lastPatientEntry + " and pp.voided=0;";
         } else {
-            lastPatientEntry = new GlobalProperty();
-            lastPatientEntry.setProperty(HTSMetadata.MHEALTH_LAST_PATIENT_ENTRY);
-            lastPatientEntry.setDescription("Id for the last patient entry");
+
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='9a5d555e-739a-11ea-bc55-0242ac130003') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_id >= " + lastId + " and pp.voided=0;";
+                    "where pp.patient_id <= " + lastId + " and pp.voided=0;";
 
         }
-        lastPatientEntry.setPropertyValue(lastId.toString());
 
         List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
         if (!activeList.isEmpty()) {
@@ -869,7 +853,6 @@ public class MhealthDataExchange {
             }
         }
 
-        Context.getAdministrationService().saveGlobalProperty(lastPatientEntry);
         return eligibleList;
     }
 

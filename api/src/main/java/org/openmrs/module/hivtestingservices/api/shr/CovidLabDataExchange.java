@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
-import org.openmrs.GlobalProperty;
 import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.OrderType;
@@ -31,7 +30,6 @@ import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -71,13 +69,15 @@ public class CovidLabDataExchange {
     /**
      * Returns a list of active lab requests
      * @return
+     * @param gpLastOrderId
+     * @param lastId
      */
-    public ObjectNode getCovidLabRequests() {
+    public ObjectNode getCovidLabRequests(Integer gpLastOrderId, Integer lastId) {
 
         JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
         ArrayNode activeRequests = factory.arrayNode();
         ObjectNode requestWrapper = factory.objectNode();
-        Set<Integer> allPatients = getPatientsWithOrders();
+        Set<Integer> allPatients = getPatientsWithOrders(gpLastOrderId, lastId);
         Integer patientsFound = 0;
         if (!allPatients.isEmpty()) {
             patientsFound = allPatients.size();
@@ -450,26 +450,19 @@ public class CovidLabDataExchange {
     /**
      * Returns a list of patients with active lab orders
      * @return
+     * @param lastLabEntry
+     * @param lastId
      */
-    protected Set<Integer> getPatientsWithOrders() {
+    protected Set<Integer> getPatientsWithOrders(Integer lastLabEntry, Integer lastId) {
 
         Set<Integer> patientWithActiveLabs = new HashSet<Integer>();
-        GlobalProperty lastLabEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.LAST_LAB_ORDER_ENTRY);
-        String lastOrdersql = "select max(order_id) last_id from orders where voided=0;";
-        List<List<Object>> lastOrderId = Context.getAdministrationService().executeSQL(lastOrdersql, true);
-        Integer lastId = (Integer) lastOrderId.get(0).get(0);
         String sql = "";
-        if (lastLabEntry != null) {
-            Integer lastEntry = Integer.parseInt(lastLabEntry.getValue().toString());
-            sql = "select patient_id from orders where order_id >" + lastEntry + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+        if (lastLabEntry != null && lastLabEntry > 0) {
+            sql = "select patient_id from orders where order_id >" + lastLabEntry + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
         } else {
-            lastLabEntry = new GlobalProperty();
-            lastLabEntry.setProperty(HTSMetadata.LAST_LAB_ORDER_ENTRY);
-            lastLabEntry.setDescription("Id of the last order entry");
-            sql = "select patient_id from orders where order_id >= " + lastId + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+            sql = "select patient_id from orders where order_id <= " + lastId + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
 
         }
-        lastLabEntry.setPropertyValue(lastId.toString());
 
         List<List<Object>> activeOrders = Context.getAdministrationService().executeSQL(sql, true);
         if (!activeOrders.isEmpty()) {
@@ -479,7 +472,6 @@ public class CovidLabDataExchange {
             }
         }
 
-        Context.getAdministrationService().saveGlobalProperty(lastLabEntry);
         return patientWithActiveLabs;
     }
 

@@ -81,26 +81,26 @@ public class SHRRestController extends BaseRestController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/contactlist") // end point for mhealth kenya
+/*	@RequestMapping(method = RequestMethod.GET, value = "/contactlist") // end point for mhealth kenya
 	@ResponseBody
 	public Object getMhealthContactList(HttpServletRequest request) {
 
 		MhealthDataExchange e = new MhealthDataExchange();
-		return e.getContacts().toString();
-	}
+		return e.getContacts(lastPatientEntry, lastId).toString();
+	}*/
 
 	/**
 	 * gets payload with list of contacts for followup
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/contactlistcht") // end point for Medic Mobile
+	/*@RequestMapping(method = RequestMethod.GET, value = "/contactlistcht") // end point for Medic Mobile
 	@ResponseBody
 	public Object getMedicMobileContactList(HttpServletRequest request) {
 
 		MedicMobileDataExchange e = new MedicMobileDataExchange();
-		return e.getContacts().toString();
-	}
+		return e.getContacts(lastContactEntry, lastId).toString();
+	}*/
 
 	/**
 	 * Processes SHR read from smart card
@@ -128,12 +128,12 @@ public class SHRRestController extends BaseRestController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/getlabrequest")
+	/*@RequestMapping(method = RequestMethod.GET, value = "/getlabrequest")
 	@ResponseBody
 	public Object getActiveLabRequests(HttpServletRequest request) {
 			CovidLabDataExchange e = new CovidLabDataExchange();
-			return e.getCovidLabRequests().toString();
-	}
+			return e.getCovidLabRequests(gpLastOrderId, lastId).toString();
+	}*/
 
 
 	/**
