@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class ObsUtils {
 
-    public static final String REPORTING_COUNTY = "165197";
+    public static final String REPORTING_COUNTY = "165197AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     public static final String REPORTING_SUB_COUNTY = "161551AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     public static final String DETECTION_POINT = "161010AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     public static final String POE = "165651AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
