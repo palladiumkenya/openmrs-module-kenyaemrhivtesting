@@ -335,7 +335,7 @@ public class CovidLabDataExchange {
             code = 5;
         } else if (type.equals("Sputum")) {
             code = 4;
-        } else if (type.equals("NP Swab")) {
+        } else if (type.equals("OP and NP Swabs")) {
             code = 1;
         } else {
             code = 6;
