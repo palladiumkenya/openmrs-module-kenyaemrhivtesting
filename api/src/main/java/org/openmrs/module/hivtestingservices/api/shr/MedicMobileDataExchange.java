@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Attributable;
@@ -37,7 +38,6 @@ import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.PrivilegeConstants;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -152,15 +152,380 @@ public class MedicMobileDataExchange {
         return "Contact followup created successfully";
     }
 
+
     private void processContactObject(ObjectNode contact) {
         String patientStatus = contact.get("CONTACT_STATE").textValue();
 
-        if (patientStatus.equals("LISTED")) {
-            processListedContacts(contact);
-        } else { // process for enrolled contacts -- ENROLLED
-            processRegisteredContact(contact);
+        if (patientStatus !=null && patientStatus.equals("case_investigation_form")) {
+            processNewRegistration(contact);
+        } else if (patientStatus != null && patientStatus.equals("trace_report")) {
+            processFollowupReports(contact);
+        } else {
+
         }
     }
+
+    /**
+     * Processes followup
+     * @param contact
+     */
+    private void processFollowupReports(ObjectNode contact) {
+
+    }
+
+    public String processCaseReport(String resultPayload) {
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = null;
+        try {
+            jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String result = processNewRegistration(jsonNode);
+        return result;
+    }
+    private String processNewRegistration(ObjectNode contactObject) {
+        if (contactObject == null) {
+            return "An empty payload was encountered!";
+        }
+
+        ObjectNode contactNode = (ObjectNode) contactObject.get("contact");
+
+        if (contactNode != null) {
+            String fName = null;
+            String mName = null;
+
+            String lName = contactNode.get("family_name").textValue();
+            String givenNames = contactNode.get("given_names").textValue();
+            String county = contactNode.get("county").textValue();
+            String subCounty = contactNode.get("subcounty").textValue();
+            String postalAddress = contactNode.get("postal_address").textValue();
+            String location = contactNode.get("place_location").textValue();
+            String sex = contactNode.get("sex").textValue();
+            String estate = contactNode.get("sublocation_estate").textValue();
+            String phoneNumber = contactNode.get("phone").textValue();
+            String dobString = contactNode.get("date_of_birth").textValue();
+            String idNumber = contactNode.get("national_id").textValue();
+            String passportNumber = contactNode.get("passport_number").textValue();
+            String alienNumber = contactNode.get("alien_id").textValue();
+            Date dob = parseDateString(dobString, "yyyy-MM-dd");
+
+            String arrGivenNames[] = givenNames.split(" ");
+            if (arrGivenNames.length > 1) {
+                fName = arrGivenNames[0];
+                mName = arrGivenNames[1];
+            } else if (arrGivenNames.length > 0) {
+                fName = arrGivenNames[0];
+            }
+
+            if(org.apache.commons.lang3.StringUtils.isNotBlank(sex)) {
+                sex = sex.equals("male") ? "M" : sex.equals("female") ? "F" : "U";
+            } else {
+                sex = "U";
+            }
+
+            Patient patient = createPatient(fName, mName, lName, dob, sex, idNumber);
+            patient = savePatient(patient);
+            patient = addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
+            patient = addPersonAttributes(patient, phoneNumber, null, null);
+
+
+            if (patient != null) {
+
+                ObjectNode cif = (ObjectNode) contactObject.get("report");
+
+                if (cif != null) {
+                    enrollForCovidCaseInvestigation(patient, cif);
+                }
+            }
+            return "Successfully created a covid case";
+
+        }
+
+        return "There were no case information provided";
+    }
+
+    private void enrollForCovidCaseInvestigation(Patient patient, ObjectNode cif) {
+
+        ObjectNode fields = (ObjectNode) cif.get("fields");
+        ObjectNode reportingInfo = (ObjectNode) fields.get("group_reporting_info");
+        ObjectNode patientInfo = (ObjectNode) fields.get("group_patient_information");
+        ObjectNode clinicalInfo = (ObjectNode) fields.get("group_clinical_information");
+        ObjectNode symptomsInfo = (ObjectNode) fields.get("group_patient_symptoms");
+        ObjectNode signsInfo = (ObjectNode) fields.get("group_patient_signs");
+        ObjectNode comorbidityInfo = (ObjectNode) fields.get("group_conditions_comorbidity");
+        ObjectNode exposureInfo = (ObjectNode) fields.get("group_exposure_travel_information");
+
+
+        // reporting info
+        String reportingDate = reportingInfo.get("date_of_reporting").textValue();
+        String reportingFacility = reportingInfo.get("reporting_facility").textValue();
+        String reportingCounty = reportingInfo.get("county").textValue();
+        String reportingSubCounty = reportingInfo.get("subcounty").textValue();
+        String poeDetection = reportingInfo.get("poe_detected").textValue();
+        String poeDetectionDate = reportingInfo.get("poe_detection_date").textValue();
+
+
+        // reporting info
+        String caseIdentifier = patientInfo.get("case_identifier").textValue();
+
+        String symptoms = symptomsInfo.get("patient_symptoms").textValue();
+        Double temperature = signsInfo.get("temperature").doubleValue();
+        String signs = signsInfo.get("reported_patient_signs").textValue();
+
+        // clinical information
+        String symptomatic = clinicalInfo.get("patient_condition").textValue();
+        String symptomsOnsetDate = clinicalInfo.get("symptoms_onset_date").textValue();
+        String firstAdmissionDate = clinicalInfo.get("first_admission_date").textValue();
+        String hospitalName = clinicalInfo.get("hospital_name").textValue();
+        String isolationDate = clinicalInfo.get("isolation_date").textValue();
+        String patientVentilated = clinicalInfo.get("patient_ventilated").textValue();
+        String patientHealthStatus = clinicalInfo.get("patient_health_status").textValue();
+        String deathDate = clinicalInfo.get("death_date").textValue();
+        Date encDate = parseDateString(reportingDate, "yyyyMMdd");
+
+        // exposure
+        String patientTravelledPast2Weeks = exposureInfo.get("patient_travelled_past_2_weeks").textValue();
+        String occupation = exposureInfo.get("occupation").textValue();
+        String visitedFacility = exposureInfo.get("has_patient_visited_facility_2_weeks").textValue();
+        String contactWithARI = exposureInfo.get("patient_had_close_contact_ari").textValue();
+        String contactWithSuspectedCase = exposureInfo.get("patient_had_close_contact_with_case").textValue();
+        String visitedAnimalMarket = exposureInfo.get("visited_live_animal_market").textValue();
+
+        // comorbidity
+        String comorbidities = comorbidityInfo.get("conditions_comorbidity").textValue();
+
+        EncounterType encType = Context.getEncounterService().getEncounterTypeByUuid(HTSMetadata.COVID_19_CASE_INVESTIGATION_ENCOUNTER);
+        Form form = Context.getFormService().getFormByUuid(HTSMetadata.COVID_19_CASE_INVESTIGATION_FORM);
+        Encounter encounter = new Encounter();
+        encounter.setEncounterType(encType);
+        encounter.setPatient(patient);
+        encounter.setEncounterDatetime(encDate);
+        encounter.setForm(form);
+
+        // build observations
+        if (StringUtils.isNotBlank(reportingCounty)) {
+            encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_COUNTY, reportingCounty, encDate));
+        }
+        if(StringUtils.isNotBlank(reportingSubCounty)) {
+            encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_SUB_COUNTY, reportingSubCounty, encDate));
+        }
+
+        if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("yes")) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.POE, encDate));
+        } if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("no")) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.COMMUNITY, encDate));
+        } else {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.UNKNOWN, encDate));
+        }
+
+        if(StringUtils.isNotBlank(poeDetectionDate)) {
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_DETECTED, parseDateString(poeDetectionDate, "yyyyMMdd"), encDate));
+        }
+        if(StringUtils.isNotBlank(symptomatic)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_SYMPTOMATIC, symptomatic.equals("symptomatic") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+        }
+        if(StringUtils.isNotBlank(symptomsOnsetDate)) {
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ONSET_OF_SYMPTOMS, parseDateString(symptomsOnsetDate, "yyyyMMdd"), encDate));
+        }
+        if(StringUtils.isNotBlank(firstAdmissionDate) || StringUtils.isNotBlank(hospitalName)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.ADMISSION_TO_HOSPITAL, ObsUtils.YES_CONCEPT, encDate));
+        } else {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.ADMISSION_TO_HOSPITAL, ObsUtils.NO_CONCEPT, encDate));
+        }
+        if(StringUtils.isNotBlank(firstAdmissionDate)) {
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ADMISSION_TO_HOSPITAL, parseDateString(firstAdmissionDate, "yyyyMMdd"), encDate));
+        }
+        if(StringUtils.isNotBlank(hospitalName)) {
+            encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.NAME_OF_HOSPITAL_ADMITTED, hospitalName, encDate));
+        }
+        if(StringUtils.isNotBlank(isolationDate)) {
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ISOLATION, parseDateString(isolationDate, "yyyyMMdd"), encDate));
+        }
+        if(StringUtils.isNotBlank(patientVentilated)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.WAS_PATIENT_VENTILATED, patientVentilated.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+        }
+        if(StringUtils.isNotBlank(patientHealthStatus) && patientHealthStatus.equals("stable")) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.PATIENT_STATUS_STABLE, encDate));
+        } else if(StringUtils.isNotBlank(patientHealthStatus) && patientHealthStatus.equals("severely ill")) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.PATIENT_STATUS_SEVERELY_ILL, encDate));
+        } else if(StringUtils.isNotBlank(patientHealthStatus) && patientHealthStatus.equals("dead")) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.PATIENT_STATUS_DEAD, encDate));
+        } else if(StringUtils.isNotBlank(patientHealthStatus)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.UNKNOWN, encDate));
+        }
+        if(StringUtils.isNotBlank(deathDate)) {
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_DEATH, parseDateString(deathDate, "yyyyMMdd"), encDate));
+        }
+        if(StringUtils.isNotBlank(patientTravelledPast2Weeks)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HISTORY_OF_TRAVEL, patientTravelledPast2Weeks.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+        }
+
+        if(StringUtils.isNotBlank(contactWithARI)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CONTACT_WITH_RESPIRATORY_INFECTED, contactWithARI.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+        }
+        if(StringUtils.isNotBlank(contactWithSuspectedCase)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CONTACT_WITH_SUSPECTED_CASE, contactWithSuspectedCase.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+        }
+        if(StringUtils.isNotBlank(visitedAnimalMarket)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.VISITED_ANIMAL_MARKET, visitedAnimalMarket.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+        }
+        if(StringUtils.isNotBlank(visitedFacility)) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.VISITED_FACILITY, visitedFacility.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+        }
+
+        // PROCESS SYMPTOMS
+        if(StringUtils.isNotBlank(symptoms)) {
+            String arrSymptoms[] = symptoms.split(" ");
+            if (arrSymptoms.length > 0) {
+                for (int i = 0; i < arrSymptoms.length; i++) {
+                    String pSymptom = arrSymptoms[i];
+                    if (StringUtils.isBlank(pSymptom)) {
+                        continue;
+                    }
+
+                    if (pSymptom.trim().equals("history_of_fever_chills")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, FEVER_CONCEPT, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSymptom.trim().equals("general_weakness")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.GENERAL_WEAKNESS, ObsUtils.HAS_GENERAL_WEAKNESS, encDate));
+                    } else if (pSymptom.trim().equals("cough")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, COUGH_CONCEPT, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSymptom.trim().equals("sore_throat")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, SORE_THROAT_CONCEPT, HAS_SORE_THROAT_CONCEPT, encDate));
+                    } else if (pSymptom.trim().equals("running_nose")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.RUNNY_NOSE, ObsUtils.HAS_RUNNY_NOSE, encDate));
+                    } else if (pSymptom.trim().equals("shortness_of_breath")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSymptom.trim().equals("diarrhoea")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DIARRHOEA, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSymptom.trim().equals("nausea_vomiting")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.NAUSEA_VOMITING, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSymptom.trim().equals("headache")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HEADACHE, ObsUtils.HAS_HEADACHE, encDate));
+                    } else if (pSymptom.trim().equals("irritability_confusion")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.IRRITABILITY_CONFUSION, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSymptom.trim().equals("pain")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHEST_PAIN, ObsUtils.HAS_CHEST_PAIN, encDate));
+                    } else {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.OTHER_SYMPTOMS, ObsUtils.HAS_OTHER_SYMPTOMS, encDate));
+                    }
+                }
+            }
+
+        }
+
+        // PROCESS SIGNS
+        if(temperature != null) {
+            encounter.addObs(ObsUtils.setupNumericObs(patient, ObsUtils.TEMPERATURE, temperature, encDate));
+        }
+        if(StringUtils.isNotBlank(signs)) {
+            String arrSigns[] = signs.split(" ");
+            if (arrSigns.length > 0) {
+                for (int i = 0; i < arrSigns.length; i++) {
+                    String pSign = arrSigns[i];
+                    if (StringUtils.isBlank(pSign)) {
+                        continue;
+                    }
+
+                    if (pSign.trim().equals("pharyngeal_exudate")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PHARYNGEAL_EXUDATE, ObsUtils.PHARYNGEAL_EXUDATE_PRESENT, encDate));
+                    } else if (pSign.trim().equals("conjunctival_injection")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CONJUCTIVAL_INJECTION, ObsUtils.CONJUCTIVAL_INJECTION_PRESENT, encDate));
+                    } else if (pSign.trim().equals("seizure")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.SEIZURES, YES_CONCEPT, encDate));
+                    } else if (pSign.trim().equals("coma")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.COMA, ObsUtils.COMA_PRESENT, encDate));
+                    } else if (pSign.trim().equals("dyspnea_tachypnea")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DYSPNEA_TACHYPNEA, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSign.trim().equals("abnormal_lung_auscultation")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.ABNORMAL_LUNG_AUSCULTATION, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (pSign.trim().equals("abnormal_lung_x-ray_findings")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.ABNORMAL_LUNG_X_RAY, ObsUtils.ABNORMAL_LUNG_X_RAY_PRESENT, encDate));
+                    } else {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.OTHER_SIGNS, ObsUtils.OTHER_SIGNS_PRESENT, encDate));
+                    }
+                }
+            }
+
+        }
+
+        if(StringUtils.isNotBlank(occupation)) {
+            String arrOccupation[] = occupation.split(" ");
+            if (arrOccupation.length > 0) {
+                for (int i = 0; i < arrOccupation.length; i++) {
+                    String indOccupation = arrOccupation[i];
+                    if (StringUtils.isBlank(indOccupation)) {
+                        continue;
+                    }
+
+                    if (indOccupation.trim().equals("student")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.OCCUPATION, ObsUtils.OCCUPATION_STUDENT, encDate));
+                    } else if (indOccupation.trim().equals("health_care_worker")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.OCCUPATION, ObsUtils.OCCUPATION_HCW, encDate));
+                    } else if (indOccupation.trim().equals("working_with_animals")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.OCCUPATION, ObsUtils.OCCUPATION_WORKING_WITH_ANIMALS, encDate));
+                    } else if (indOccupation.trim().equals("health_laboratory_worker")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.OCCUPATION, ObsUtils.OCCUPATION_LAB_WORKER, encDate));
+                    } else {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.OCCUPATION, ObsUtils.OTHER_SPECIFY, encDate));
+                    }
+                }
+            }
+
+        }
+
+
+
+        if (StringUtils.isNotBlank(comorbidities)) {
+            String comorbitiesArr[] = comorbidities.split(" ");
+            if (comorbitiesArr.length > 0) {
+                encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.YES_CONCEPT, encDate));
+
+                for (int i = 0; i < comorbitiesArr.length; i++) {
+                    String condition = comorbitiesArr[i];
+                    if (condition == null || condition.equals("")) {
+                        continue;
+                    }
+
+                    if (condition.equals("diabetes")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DIABETES, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("liver_disease")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.LIVER_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("renal_disease")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.RENAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("hypertension")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HYPERTENSION, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("chronic_neurological_disease")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_NEUROLOGICAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("post_partum_less_than_6_weeks")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.POST_PARTUM_LESS_THAN_6_WEEKS, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("chronic_lung_disease")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_LUNG_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("immunodeficiency")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.IMMUNODEFICIENCY, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("malignancy")) {
+                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.MALIGNANCY, ObsUtils.YES_CONCEPT, encDate));
+                    }
+                }
+            } else {
+                encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.NO_CONCEPT, encDate));
+            }
+        } else {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.UNKNOWN, encDate));
+        }
+
+        encounterService.saveEncounter(encounter);
+
+        PatientProgram pp = new PatientProgram();
+        pp.setPatient(patient);
+        pp.setProgram(Context.getProgramWorkflowService().getProgramByUuid(HTSMetadata.COVID_19_CASE_INVESTIGATION_PROGRAM));
+        pp.setDateEnrolled(encDate);
+        pp.setDateCreated(new Date());
+        Context.getProgramWorkflowService().savePatientProgram(pp);
+
+    }
+
 
     private void processListedContacts(ObjectNode contactObj) {
 

@@ -224,6 +224,24 @@ public class SHRRestController extends BaseRestController {
 		}
 		return new SimpleObject().add("Contact trace reports", "It seems there are no reports to process");
 	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/casereport") // end point for CHAI kenya
+	@ResponseBody
+	public Object processNewCovidCaseRegistration(HttpServletRequest request) {
+		String requestBody = null;
+		try {
+			requestBody = SHRUtils.fetchRequestBody(request.getReader());
+		} catch (IOException e) {
+			return new SimpleObject().add("ServerResponse", "Error extracting request body");
+		}
+
+		if (requestBody != null) {
+			MedicMobileDataExchange shr = new MedicMobileDataExchange();
+			return shr.processCaseReport(requestBody);
+
+		}
+		return new SimpleObject().add("Report", "The request body could not be interpreted");
+	}
 	/**
 	 * processes incoming contact tracing information
 	 * @param request
