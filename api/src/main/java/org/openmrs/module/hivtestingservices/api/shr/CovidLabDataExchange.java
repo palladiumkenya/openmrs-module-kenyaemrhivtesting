@@ -308,17 +308,36 @@ public class CovidLabDataExchange {
             return "";
         }
         Integer code= null;
-        if (lab.equals("NPHL")) {
-            code = 7;
-        } else if (lab.equals("KEMRI Nairobi")) {
+        if (lab.equals("KEMRI Nairobi")) {
             code = 1;
-        }  else if (lab.equals("KEMRI Kilifi")) {
-            code = 12;
         } else if (lab.equals("KEMRI CDC Kisumu")) {
             code = 2;
+        } else if (lab.equals("KEMRI Alupe HIV Lab")) {
+            code = 3;
         } else if (lab.equals("KEMRI Walter Reed Kericho")) {
             code = 4;
+        } else if (lab.equals("AMPATH Care Lab Eldoret")) {
+            code = 5;
+        } else if (lab.equals("Coast Provincial General Hospital Molecular Lab")) {
+            code = 6;
+        } else if (lab.equals("NPHL")) {
+            code = 7;
+        } else if (lab.equals("Nyumbani Diagnostic Lab")) {
+            code = 8;
+        } else if (lab.equals("Kenyatta National Hospial Lab Nairobi")) {
+            code = 9;
+        } else if (lab.equals("EDARP Nairobi")) {
+            code = 10;
+        } else if (lab.equals("NIC")) {
+            code = 11;
+        }  else if (lab.equals("KEMRI Kilifi")) {
+            code = 12;
+        } else if (lab.equals("Aga Khan")) {
+            code = 13;
+        } else if (lab.equals("Lancet")) {
+            code = 14;
         }
+
         return code.toString();
     }
     private String getSampleTypeCode(String type) {
