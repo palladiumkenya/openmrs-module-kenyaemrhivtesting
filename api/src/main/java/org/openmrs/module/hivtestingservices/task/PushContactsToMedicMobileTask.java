@@ -61,6 +61,16 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
             Integer gpLastContactId = StringUtils.isNotBlank(lastContactIdStr) ? Integer.parseInt(lastContactIdStr) : 0;
             boolean hasData = false;
 
+            String serverUrl = chtServerName.getPropertyValue();
+            String username = chtUser.getPropertyValue();
+            String pwd = chtPwd.getPropertyValue();
+
+            if (serverUrl == null || username == null || pwd == null) {
+                System.out.println("Please set credentials for pushing contacts to Medic Mobile CHT");
+                return;
+
+            }
+
             MedicMobileDataExchange e = new MedicMobileDataExchange();
 
 
@@ -68,16 +78,12 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
             ObjectNode contactWrapper = e.getContacts(gpLastContactId, lastId);
             ArrayNode docs = (ArrayNode) contactWrapper.get("docs");
 
-            System.out.println("CHT Post request. Records found: " + docs.size());
-
 
             if (contactWrapper != null && docs.size() > 0) {
                 hasData = true;
             }
 
-            String serverUrl = chtServerName.getPropertyValue();
-            String username = chtUser.getPropertyValue();
-            String pwd = chtPwd.getPropertyValue();
+            System.out.println("CHT Post request. Records found: " + docs.size());
 
             if (serverUrl != null && username != null && pwd != null && hasData) {
                 String payload = contactWrapper.toString();

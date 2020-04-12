@@ -75,6 +75,7 @@ public class PushLabRequestsTask extends AbstractTask {
 			}
 
 			String payload = samplesWrapper.toString();
+
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 
 			try

@@ -199,33 +199,52 @@ public class CovidLabDataExchange {
         List<PatientIdentifier> identifierList = patientService.getPatientIdentifiers(null, Arrays.asList(NATIONAL_ID_TYPE, NATIONAL_ID_TYPE, ALIEN_NUMBER_TYPE, PASSPORT_NUMBER_TYPE), null, Arrays.asList(patient), null);
 
         ObjectNode patientIdentifiers = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
+        String pIdentifier = null;
+        Integer idCode = null;
 
         for (PatientIdentifier identifier : identifierList) {
             PatientIdentifierType identifierType = identifier.getIdentifierType();
 
             if (identifierType.equals(NATIONAL_ID_TYPE)) {
+                pIdentifier = identifier.getIdentifier();
+                idCode = 1;
                 patientIdentifiers.put("type", 1);
                 patientIdentifiers.put("identifier", identifier.getIdentifier());
                 return patientIdentifiers;
 
             } else if (identifierType.equals(ALIEN_NUMBER_TYPE)) {
+                pIdentifier = identifier.getIdentifier();
+                idCode = 3;
                 patientIdentifiers.put("type", 3);
                 patientIdentifiers.put("identifier", identifier.getIdentifier());
                 return patientIdentifiers;
 
 
             } else if (identifierType.equals(PASSPORT_NUMBER_TYPE)) {
+                pIdentifier = identifier.getIdentifier();
+                idCode = 2;
                 patientIdentifiers.put("type", 2);
                 patientIdentifiers.put("identifier", identifier.getIdentifier());
                 return patientIdentifiers;
 
-            } else if (identifierType.equals(CASE_ID_TYPE) || identifierType.equals(OPENMRS_ID_TYPE)) { // use this to track those with no documented identifier
+            } else if (identifierType.equals(CASE_ID_TYPE)) { // use this to track those with no documented identifier
+                pIdentifier = identifier.getIdentifier();
+                idCode = 4;
                 patientIdentifiers.put("type", 4);
                 patientIdentifiers.put("identifier", identifier.getIdentifier());
                 return patientIdentifiers;
             }
 
         }
+
+        if (idCode == null || pIdentifier == null) {
+            PatientIdentifier openmrsId = patient.getPatientIdentifier(OPENMRS_ID_TYPE);
+            pIdentifier = openmrsId.getIdentifier();
+            idCode = 4;
+        }
+
+        patientIdentifiers.put("type", idCode);
+        patientIdentifiers.put("identifier", pIdentifier);
         return patientIdentifiers;
     }
 
