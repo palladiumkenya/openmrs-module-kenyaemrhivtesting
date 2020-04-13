@@ -14,6 +14,7 @@
 package org.openmrs.module.hivtestingservices.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.hivtestingservices.api.shr.CovidLabDataExchange;
@@ -26,6 +27,7 @@ import org.openmrs.module.hivtestingservices.api.shr.SHRUtils;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +35,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * The main controller.
@@ -123,65 +131,18 @@ public class SHRRestController extends BaseRestController {
 		return null;
 	}
 
-	/**
-	 * Return active lab request
-	 * @param request
-	 * @return
-	 */
-	/*@RequestMapping(method = RequestMethod.GET, value = "/getlabrequest")
+	@RequestMapping(method = RequestMethod.GET, value = "/dashboard")
 	@ResponseBody
-	public Object getActiveLabRequests(HttpServletRequest request) {
-			CovidLabDataExchange e = new CovidLabDataExchange();
-			return e.getCovidLabRequests(gpLastOrderId, lastId).toString();
-	}*/
+	public Object getActiveLabRequests(HttpServletRequest request) throws IOException {
+		File appDir = new File(OpenmrsUtil.getApplicationDataDirectory());
+		File dashboardPayloadFile = new File(appDir.getPath() + File.separator + "covidDashboardPayload.json");
 
+		String content = FileUtils.readFileToString(dashboardPayloadFile, "UTF-8");
+		System.out.println("Payload:::: " + content);
+		return content;
 
-	/**
-	 * Generates P-Smart SHR based on psmart card serial number
-	 * @param request
-	 * @param cardSerialNo
-	 * @return
-	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/getshrusingcardserial/{cardSerialNo}")
-	@ResponseBody
-	public Object getShrUsingCardSerial(HttpServletRequest request, @PathVariable("cardSerialNo") String cardSerialNo) {
-		if(cardSerialNo != null) {
-			OutgoingPatientSHR shr = new OutgoingPatientSHR(cardSerialNo);
-			return shr.patientIdentification().toString();
-		}
-		return null;
 	}
 
-
-	/**
-	 * Handle authentication
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/authenticateuser")
-	@ResponseBody
-	public Object userAuthentication(HttpServletRequest request) {
-		String requestBody = null;
-		String userName=null;
-		String pwd = null;
-		MiddlewareRequest thisRequest = null;
-		try {
-			requestBody = SHRUtils.fetchRequestBody(request.getReader());//request.getParameter("encryptedSHR") != null? request.getParameter("encryptedSHR"): null;
-		} catch (IOException e) {
-			return new SimpleObject().add("ServerResponse", "Error extracting request body");
-		}
-
-		try {
-			thisRequest = new ObjectMapper().readValue(requestBody, MiddlewareRequest.class);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new SimpleObject().add("ServerResponse", "Error parsing request body: " + requestBody);
-		}
-		userName = thisRequest.getUserName();
-		pwd = thisRequest.getPwd();
-
-		return SHRAuthentication.authenticateUser(userName.trim(), pwd.trim()).toString();
-	}
 
 	/**
 	 * processes incoming covid lab results
