@@ -138,7 +138,6 @@ public class SHRRestController extends BaseRestController {
 		File dashboardPayloadFile = new File(appDir.getPath() + File.separator + "covidDashboardPayload.json");
 
 		String content = FileUtils.readFileToString(dashboardPayloadFile, "UTF-8");
-		System.out.println("Payload:::: " + content);
 		return content;
 
 	}
