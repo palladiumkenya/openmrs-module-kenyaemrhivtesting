@@ -101,16 +101,14 @@ public class MedicMobileDataExchange {
                 c = htsService.getPatientContactByUuid(uuid);
             }
 
-            if (c == null) {
-                patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
-            }
+            patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
 
             if (c == null && patient == null) {
                 return "The payload could not be associated with any individual in the system. Please countercheck the identifying information";
             }
 
             Patient contactRegistered = null;
-            if (c != null) {
+            if (c != null && c.getPatient() != null) {
                 contactRegistered = c.getPatient();
             } else if (patient != null) {
                 contactRegistered = patient;
