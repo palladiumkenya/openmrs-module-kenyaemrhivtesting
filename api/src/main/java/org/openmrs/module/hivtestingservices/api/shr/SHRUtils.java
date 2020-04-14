@@ -24,6 +24,7 @@ import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.api.APIException;
+import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
@@ -33,6 +34,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -446,5 +449,37 @@ public class SHRUtils {
             //e.printStackTrace();
         }
         return date;
+    }
+
+    public static Patient checkIfPatientExists(String idNumber, String passportNumber, String alienId) {
+
+        PatientService patientService = Context.getPatientService();
+        PatientIdentifierType ALIEN_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(ALIEN_NUMBER);
+        PatientIdentifierType PP_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(PASSPORT_NUMBER);
+        PatientIdentifierType NATIONAL_ID_TYPE = patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID);
+
+        List<String> ids = new ArrayList<String>();
+        if (StringUtils.isNotBlank(idNumber)) {
+            ids.add(idNumber);
+        }
+
+        if (StringUtils.isNotBlank(passportNumber)) {
+            ids.add(passportNumber);
+        }
+
+        if (StringUtils.isNotBlank(alienId)) {
+            ids.add(alienId);
+        }
+
+        for (String identifier : ids) {
+            if (identifier != null) {
+                List<Patient> patientsAlreadyAssigned = patientService.getPatients(null, identifier.trim(), Arrays.asList(ALIEN_NUMBER_TYPE, PP_NUMBER_TYPE, NATIONAL_ID_TYPE), false);
+                if (patientsAlreadyAssigned.size() > 0) {
+                    return patientsAlreadyAssigned.get(0);
+                }
+            }
+        }
+
+        return null;
     }
 }

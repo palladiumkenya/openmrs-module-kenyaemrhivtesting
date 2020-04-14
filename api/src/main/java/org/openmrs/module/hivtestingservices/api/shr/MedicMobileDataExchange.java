@@ -214,6 +214,7 @@ public class MedicMobileDataExchange {
 
     private void enrollForCovidCaseInvestigation(Patient patient, ObjectNode cif) {
 
+        String dateFormat = "yyyy-MM-dd";
         ObjectNode fields = (ObjectNode) cif.get("fields");
         ObjectNode reportingInfo = (ObjectNode) fields.get("group_reporting_info");
         ObjectNode patientInfo = (ObjectNode) fields.get("group_patient_information");
@@ -241,7 +242,7 @@ public class MedicMobileDataExchange {
         String signs = signsInfo.has("reported_patient_signs") ? signsInfo.get("reported_patient_signs").textValue() : null;
 
         // clinical information
-        Date encDate = SHRUtils.parseDateString(reportingDate, "yyyyMMdd");
+        Date encDate = SHRUtils.parseDateString(reportingDate, dateFormat);
         if (encDate == null) {
             return;
         }
@@ -291,13 +292,13 @@ public class MedicMobileDataExchange {
         }
 
         if(StringUtils.isNotBlank(poeDetectionDate)) {
-            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_DETECTED, SHRUtils.parseDateString(poeDetectionDate, "yyyyMMdd"), encDate));
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_DETECTED, SHRUtils.parseDateString(poeDetectionDate, dateFormat), encDate));
         }
         if(StringUtils.isNotBlank(symptomatic)) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_SYMPTOMATIC, symptomatic.equals("symptomatic") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
         }
         if(StringUtils.isNotBlank(symptomsOnsetDate)) {
-            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ONSET_OF_SYMPTOMS, SHRUtils.parseDateString(symptomsOnsetDate, "yyyyMMdd"), encDate));
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ONSET_OF_SYMPTOMS, SHRUtils.parseDateString(symptomsOnsetDate, dateFormat), encDate));
         }
         if(StringUtils.isNotBlank(firstAdmissionDate) || StringUtils.isNotBlank(hospitalName)) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.ADMISSION_TO_HOSPITAL, ObsUtils.YES_CONCEPT, encDate));
@@ -305,13 +306,13 @@ public class MedicMobileDataExchange {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.ADMISSION_TO_HOSPITAL, ObsUtils.NO_CONCEPT, encDate));
         }
         if(StringUtils.isNotBlank(firstAdmissionDate)) {
-            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ADMISSION_TO_HOSPITAL, SHRUtils.parseDateString(firstAdmissionDate, "yyyyMMdd"), encDate));
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ADMISSION_TO_HOSPITAL, SHRUtils.parseDateString(firstAdmissionDate, dateFormat), encDate));
         }
         if(StringUtils.isNotBlank(hospitalName)) {
             encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.NAME_OF_HOSPITAL_ADMITTED, hospitalName, encDate));
         }
         if(StringUtils.isNotBlank(isolationDate)) {
-            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ISOLATION, SHRUtils.parseDateString(isolationDate, "yyyyMMdd"), encDate));
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ISOLATION, SHRUtils.parseDateString(isolationDate, dateFormat), encDate));
         }
         if(StringUtils.isNotBlank(patientVentilated)) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.WAS_PATIENT_VENTILATED, patientVentilated.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
@@ -326,7 +327,7 @@ public class MedicMobileDataExchange {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.UNKNOWN, encDate));
         }
         if(StringUtils.isNotBlank(deathDate)) {
-            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_DEATH, SHRUtils.parseDateString(deathDate, "yyyyMMdd"), encDate));
+            encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_DEATH, SHRUtils.parseDateString(deathDate, dateFormat), encDate));
         }
         if(StringUtils.isNotBlank(patientTravelledPast2Weeks)) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HISTORY_OF_TRAVEL, patientTravelledPast2Weeks.equals("yes") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
