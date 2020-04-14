@@ -19,6 +19,7 @@ import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PatientProgram;
 import org.openmrs.PersonAddress;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
@@ -26,6 +27,7 @@ import org.openmrs.PersonName;
 import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.PrivilegeConstants;
@@ -481,5 +483,16 @@ public class SHRUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Checks if a contact is enrolled in a program
+     * @param patient
+     * @return
+     */
+    public static boolean inProgram(Patient patient, String programUUID) {
+        ProgramWorkflowService service = Context.getProgramWorkflowService();
+        List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(programUUID), null, null, null,null, true);
+        return programs.size() > 0;
     }
 }

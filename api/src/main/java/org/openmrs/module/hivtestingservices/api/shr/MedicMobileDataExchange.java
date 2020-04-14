@@ -191,18 +191,26 @@ public class MedicMobileDataExchange {
                 sex = "U";
             }
 
-            Patient patient = SHRUtils.createPatient(fName, mName, lName, dob, sex, idNumber, passportNumber, alienNumber);
-            patient = SHRUtils.savePatient(patient);
-            patient = SHRUtils.addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
-            patient = SHRUtils.addPersonAttributes(patient, phoneNumber, null, null);
 
+            Patient patient = SHRUtils.checkIfPatientExists(idNumber, passportNumber, alienNumber);
+            if (patient == null) {
+                patient = SHRUtils.createPatient(fName, mName, lName, dob, sex, idNumber, passportNumber, alienNumber);
+                patient = SHRUtils.savePatient(patient);
+                patient = SHRUtils.addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
+                patient = SHRUtils.addPersonAttributes(patient, phoneNumber, null, null);
+            }
 
             if (patient != null) {
 
                 ObjectNode cif = (ObjectNode) contactObject.get("report");
+                if (cif == null) {
+                    return "The payload has empty case report!";
+                }
 
-                if (cif != null) {
+                if (!SHRUtils.inProgram(patient, HTSMetadata.COVID_19_CASE_INVESTIGATION_PROGRAM) && cif != null) {
                     enrollForCovidCaseInvestigation(patient, cif);
+                } else {
+                    return "There is an existing enrolment for the case";
                 }
             }
             return "Successfully created a covid case";
@@ -269,6 +277,7 @@ public class MedicMobileDataExchange {
 
         EncounterType encType = Context.getEncounterService().getEncounterTypeByUuid(HTSMetadata.COVID_19_CASE_INVESTIGATION_ENCOUNTER);
         Form form = Context.getFormService().getFormByUuid(HTSMetadata.COVID_19_CASE_INVESTIGATION_FORM);
+
         Encounter encounter = new Encounter();
         encounter.setEncounterType(encType);
         encounter.setPatient(patient);
