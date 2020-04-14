@@ -87,26 +87,34 @@ public class MedicMobileDataExchange {
             ObjectNode contactNode = (ObjectNode) jsonNode.get("contact");
 
             String uuid = contactNode.get("_id").textValue();
-            PatientContact c = htsService.getPatientContactByUuid(uuid);
-            if (c == null) {
-                return "Invalid request. There is no such contact in the system" ;
+            String nationalID = contactNode.get("national_id").textValue();
+            String passportNo = contactNode.get("passport_number").textValue();
+            String alienNo = contactNode.get("alien_id").textValue();
+
+            PatientContact c = null;
+            Patient patient = null;
+
+            if (uuid == null && nationalID == null && passportNo == null && alienNo == null) {
+                return "The payload has no identification information! Nothing has been processed";
             }
-            Patient contactRegistered = c.getPatient();
-            String fName = c.getFirstName();
-            String mName = c.getMiddleName();
-            String lName = c.getLastName();
+            if (StringUtils.isNotBlank(uuid)) {
+                c = htsService.getPatientContactByUuid(uuid);
+            }
 
-            String county = contactNode.get("county").textValue();
-            String subCounty = contactNode.get("subcounty").textValue();
-            String postalAddress = contactNode.get("postal_address").textValue();
-            String phoneNumber = contactNode.get("phone").textValue();
-            String dobString = contactNode.get("date_of_birth").textValue();
-            String idNumber = contactNode.get("national_id").textValue();
-            String ppNumber = contactNode.get("passport_number").textValue();
-            String alienNumber = contactNode.get("alien_id").textValue();
+            if (c == null) {
+                patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
+            }
 
+            if (c == null && patient == null) {
+                return "The payload could not be associated with any individual in the system. Please countercheck the identifying information";
+            }
 
-            Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
+            Patient contactRegistered = null;
+            if (c != null) {
+                contactRegistered = c.getPatient();
+            } else if (patient != null) {
+                contactRegistered = patient;
+            }
 
             ObjectNode traceReport = (ObjectNode) jsonNode.get("trace");
             String encDateStr = traceReport.get("date_last_contacted").textValue();
@@ -122,7 +130,19 @@ public class MedicMobileDataExchange {
             if (contactRegistered != null) {
                 saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
             } else {
-                Patient patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), idNumber, ppNumber, alienNumber);
+
+                String fName = c.getFirstName();
+                String mName = c.getMiddleName();
+                String lName = c.getLastName();
+
+                String county = contactNode.get("county").textValue();
+                String subCounty = contactNode.get("subcounty").textValue();
+                String postalAddress = contactNode.get("postal_address").textValue();
+                String phoneNumber = contactNode.get("phone").textValue();
+                String dobString = contactNode.get("date_of_birth").textValue();
+                Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
+
+                patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
                 patient = SHRUtils.addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
                 patient = SHRUtils.addPersonAttributes(patient, phoneNumber, null, null);
                 patient = SHRUtils.savePatient(patient);
@@ -214,7 +234,6 @@ public class MedicMobileDataExchange {
                 }
             }
             return "Successfully created a covid case";
-
         }
 
         return "There were no case information provided";
