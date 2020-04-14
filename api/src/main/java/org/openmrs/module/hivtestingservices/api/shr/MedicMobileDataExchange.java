@@ -131,16 +131,25 @@ public class MedicMobileDataExchange {
                 saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
             } else {
 
-                String fName = c.getFirstName();
-                String mName = c.getMiddleName();
-                String lName = c.getLastName();
+                String fName = null;
+                String mName = null;
 
+                String lName = contactNode.get("family_name").textValue();
+                String givenNames = contactNode.get("given_names").textValue();
                 String county = contactNode.get("county").textValue();
                 String subCounty = contactNode.get("subcounty").textValue();
                 String postalAddress = contactNode.get("postal_address").textValue();
                 String phoneNumber = contactNode.get("phone").textValue();
                 String dobString = contactNode.get("date_of_birth").textValue();
                 Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
+
+                String arrGivenNames[] = givenNames.split(" ");
+                if (arrGivenNames.length > 1) {
+                    fName = arrGivenNames[0];
+                    mName = arrGivenNames[1];
+                } else if (arrGivenNames.length > 0) {
+                    fName = arrGivenNames[0];
+                }
 
                 patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
                 patient = SHRUtils.addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
