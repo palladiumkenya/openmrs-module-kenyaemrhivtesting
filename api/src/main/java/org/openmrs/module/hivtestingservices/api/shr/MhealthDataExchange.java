@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Attributable;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -20,16 +20,11 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PatientProgram;
 import org.openmrs.Person;
-import org.openmrs.PersonAddress;
-import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
-import org.openmrs.PersonName;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
-import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
-import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
@@ -37,11 +32,9 @@ import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.PrivilegeConstants;
-import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,106 +104,159 @@ public class MhealthDataExchange {
         if (resultsObj.size() > 0) {
             for (int i = 0; i < resultsObj.size(); i++) {
                 ObjectNode o = (ObjectNode) resultsObj.get(i);
-                processContactObject(o);
+                processContactPayload(o);
             }
         }
         return "Results updated successfully";
     }
 
-    private void processContactObject(ObjectNode contact) {
-        String patientStatus = contact.get("CONTACT_STATE").textValue();
+    /**
+     * Gets all patient identifers from a payload
+     * @param contactObj
+     * @return
+     */
+    private ObjectNode extractIdentifiers(ObjectNode contactObj) {
 
-        if (patientStatus !=null && patientStatus.equals("LISTED")) {
-            processListedContacts(contact);
-        } else if (patientStatus != null && patientStatus.equals("ENROLLED")) { // process for enrolled contacts -- ENROLLED
-            processRegisteredContact(contact);
-        } else {
-
+        ObjectNode patientIdentificatonNode = (ObjectNode) contactObj.get("PATIENT_IDENTIFICATION");
+        ArrayNode arrIdentifiers = (ArrayNode) patientIdentificatonNode.get("INTERNAL_PATIENT_ID");
+        String nationalId = null;
+        String alienNumber = null;
+        String passportNumber = null;
+        //PASSPORT_NUMBER,NATIONAL_ID,
+        if (arrIdentifiers.size() > 0) {
+            for (int i =0; i < arrIdentifiers.size(); i++) {
+                ObjectNode identifierNode = (ObjectNode) arrIdentifiers.get(i);
+                String identifier = identifierNode.get("ID").textValue();
+                String identifierType = identifierNode.get("IDENTIFIER_TYPE").textValue();
+                if (StringUtils.isNotBlank(identifier) && StringUtils.isNotBlank(identifierType)) {
+                    if (identifierType.equals("NATIONAL_ID")) {
+                        nationalId = identifier;
+                    } else if (identifierType.equals("PASSPORT_NUMBER")) {
+                        passportNumber = identifier;
+                    } else {
+                        alienNumber = identifier;
+                    }
+                }
+            }
         }
+
+        ObjectNode ids = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
+        ids.put("national_id_number", nationalId);
+        ids.put("passport_number", passportNumber);
+        ids.put("alien_number", alienNumber);
+        return ids;
+
     }
 
-    private void processListedContacts(ObjectNode contactObj) {
+    /**
+     * Processes payload from Mhealth system
+     * Should get a contact/person from contact_uuid in payload or any provided identifiers
+     * Should create new person and update followup details if none exists
+     * Should update followup details for listed/enrolled contacts in the system
+     * @param contactObj
+     */
+    private void processContactPayload(ObjectNode contactObj) {
 
         String contactUuid = contactObj.get("CONTACT_UUID").textValue();
+        ObjectNode patientIdentificatonNode = (ObjectNode) contactObj.get("PATIENT_IDENTIFICATION");
+        ObjectNode identifiersObj = extractIdentifiers(contactObj);
+        String nationalId = null;
+        String alienNumber = null;
+        String passportNumber = null;
+        Patient existingPatient = null;
 
-        if (org.apache.commons.lang3.StringUtils.isBlank(contactUuid)) {
-            return;
+        if (identifiersObj != null) {
+            nationalId = identifiersObj.has("national_id_number") ? identifiersObj.get("national_id_number").textValue() : null;
+            passportNumber = identifiersObj.has("passport_number") ? identifiersObj.get("passport_number").textValue() : null;
+            alienNumber = identifiersObj.has("alien_number") ? identifiersObj.get("alien_number").textValue() : null;
         }
 
+        existingPatient = SHRUtils.checkIfPatientExists(nationalId, passportNumber, alienNumber);
+
         PatientContact patientContact = null;
-        if (contactUuid != null) {
+        Patient patientFromEmr = null;
+        if (contactUuid != null) { // check if is contact in KenyaEMR
             patientContact = htsService.getPatientContactByUuid(contactUuid);
         }
 
-        if (patientContact != null) {
-            JsonNode followups = contactObj.get("PATIENT_FOLLOWUPS");
+        if (contactUuid != null) { // check if is patient from KenyaEMR
+            patientFromEmr = Context.getPatientService().getPatientByUuid(contactUuid);
+        }
 
-            // check if contact is already registered -- may be after contacts had long been pushed out
+        Patient contactRegistered = null;
+        if (patientContact != null && patientContact.getPatient() != null) {
+            contactRegistered = patientContact.getPatient();
+        } else if (patientFromEmr != null) {
+            contactRegistered = patientFromEmr;
+        } else if (existingPatient != null) {
+            contactRegistered = existingPatient;
+        }
+
+        JsonNode followups = contactObj.get("PATIENT_FOLLOWUPS");
+
+        if (contactRegistered != null) {
+
+            // check if contact is already registered -- may be after contacts had long been sent out
             // to mhealth system
-            if (patientContact.getPatient() != null && inQuarantineProgram(patientContact.getPatient())) {
-                saveQuarantineFollowupReports(patientContact.getPatient(), (ArrayNode) followups);
-            } else if (patientContact.getPatient() != null) {
-                saveContactFollowupReports(patientContact.getPatient(), (ArrayNode) followups);
-            } else {
-                // check if quarantine details exist
-                ObjectNode patientIdentificatonNode = (ObjectNode) contactObj.get("PATIENT_IDENTIFICATION");
-                ObjectNode quarantineDetailsNode = (ObjectNode) patientIdentificatonNode.get("QUARANTINE_DETAILS");
-                String dateQuarantined = quarantineDetailsNode.get("DATE_QUARANTINED").textValue();
-                String placeQuarantined = quarantineDetailsNode.get("PLACE_OF_QUARANTINE").textValue();
+            if (contactRegistered != null && inQuarantineProgram(contactRegistered)) {
+                saveQuarantineFollowupReports(contactRegistered, (ArrayNode) followups);
+            } else if (contactRegistered != null) {
+                saveContactFollowupReports(contactRegistered, (ArrayNode) followups);
+            }
+        }  else {
 
-                ObjectNode nameNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_NAME");
-                ObjectNode addressNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_ADDRESS");
-                ArrayNode identifierNode = (ArrayNode) patientIdentificatonNode.get("INTERNAL_PATIENT_ID");
-                ObjectNode physicalAddressNode = (ObjectNode) addressNode.get("PHYSICAL_ADDRESS");
+            ObjectNode quarantineDetailsNode = (ObjectNode) patientIdentificatonNode.get("QUARANTINE_DETAILS");
+            String dateQuarantined = quarantineDetailsNode.get("DATE_QUARANTINED").textValue();
+            String placeQuarantined = quarantineDetailsNode.get("PLACE_OF_QUARANTINE").textValue();
 
-                String fName = nameNode.get("FIRST_NAME").textValue();
-                String mName = nameNode.get("MIDDLE_NAME").textValue();
-                String lName = nameNode.get("LAST_NAME").textValue();
-                String county = physicalAddressNode.get("COUNTY").textValue();
-                String subCounty = physicalAddressNode.get("SUB_COUNTY").textValue();
-                String ward = physicalAddressNode.get("WARD").textValue();
-                ObjectNode idNoNode = (ObjectNode) identifierNode.get(0);
-                String idNo = idNoNode.get("ID").textValue();
-                String dobString = patientIdentificatonNode.get("DATE_OF_BIRTH").textValue();
-                String sex = patientIdentificatonNode.get("SEX").textValue();
-                String phoneNumber = patientIdentificatonNode.get("PHONE_NUMBER").textValue();
+            ObjectNode nameNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_NAME");
+            ObjectNode addressNode = (ObjectNode) patientIdentificatonNode.get("PATIENT_ADDRESS");
+            ObjectNode physicalAddressNode = (ObjectNode) addressNode.get("PHYSICAL_ADDRESS");
 
-                Patient p = createPatient(fName, mName, lName, parseDateString(dobString, "yyyyMMdd"), sex, idNo);
-                if (p != null) {
-                    p = addPersonAddresses(p, null, county, subCounty, null, null);
-                }
-                if (p != null) {
-                    p = addPersonAttributes(p, phoneNumber, null, null);
-                }
-                if (p != null) {
-                    p = savePatient(p);
-                }
+            String fName = nameNode.get("FIRST_NAME").textValue();
+            String mName = nameNode.get("MIDDLE_NAME").textValue();
+            String lName = nameNode.get("LAST_NAME").textValue();
+            String county = physicalAddressNode.get("COUNTY").textValue();
+            String subCounty = physicalAddressNode.get("SUB_COUNTY").textValue();
+            String ward = physicalAddressNode.get("WARD").textValue();
+            String dobString = patientIdentificatonNode.get("DATE_OF_BIRTH").textValue();
+            String sex = patientIdentificatonNode.get("SEX").textValue();
+            String phoneNumber = patientIdentificatonNode.get("PHONE_NUMBER").textValue();
 
-                if (null == p) {
-                    return;
-                }
+            Patient p = SHRUtils.createPatient(fName, mName, lName, SHRUtils.parseDateString(dobString, "yyyyMMdd"), sex, nationalId, passportNumber, alienNumber);
+            if (p != null) {
+                p = SHRUtils.addPersonAddresses(p, null, county, subCounty, null, null);
+                p = SHRUtils.addPersonAttributes(p, phoneNumber, null, null);
+                p = SHRUtils.savePatient(p);
+            }
+
+            if (patientContact != null) { // contact from the EMR
                 patientContact.setPatient(p); // link contact to the created person
                 Context.getService(HTSService.class).savePatientContact(patientContact);
                 //establish relationship between new person and case
                 Patient covidCase = patientContact.getPatientRelatedTo();
                 addRelationship(covidCase, p, patientContact.getPnsApproach());
-                // date of quarantine is sufficient to denote a contact is in quarantine program
-                // needs enrollment to the program
-                if (dateQuarantined != null && !dateQuarantined.equals("") && org.apache.commons.lang3.StringUtils.isNotBlank(placeQuarantined)) {
-
-                    p = enrollPatientInCovidQuarantine(p, parseDateString(dateQuarantined, "yyyyMMdd"), placeQuarantined);
-                    saveQuarantineFollowupReports(p, (ArrayNode) followups);
-
-
-                } else { // just update followup
-
-                    saveContactFollowupReports(p, (ArrayNode) followups);
-                }
-
             }
+
+            // date of quarantine is sufficient to denote a contact is in quarantine program
+            // needs enrollment to the program
+            if (dateQuarantined != null && !dateQuarantined.equals("") && StringUtils.isNotBlank(placeQuarantined)) {
+                p = enrollPatientInCovidQuarantine(p, SHRUtils.parseDateString(dateQuarantined, "yyyyMMdd"), placeQuarantined);
+                saveQuarantineFollowupReports(p, (ArrayNode) followups);
+
+            } else { // just update followup
+                saveContactFollowupReports(p, (ArrayNode) followups);
+            }
+
         }
     }
 
+    /**
+     * Creates relationship for a contact and case (patient)
+     * @param patient
+     * @param contact
+     * @param relationshipType
+     */
     private void addRelationship(Person patient, Person contact, Integer relationshipType) {
 
         Person personA = null, personB = null;
@@ -222,7 +268,6 @@ public class MhealthDataExchange {
             type = personService.getRelationshipTypeByUuid(relationshipOptionsToRelTypeMapper(relationshipType));
         }
 
-
         Relationship rel = new Relationship();
         rel.setRelationshipType(type);
         rel.setPersonA(personA);
@@ -231,6 +276,11 @@ public class MhealthDataExchange {
         Context.getPersonService().saveRelationship(rel);
     }
 
+    /**
+     * Gets mappings for relationship
+     * @param relType
+     * @return
+     */
     private String relationshipOptionsToRelTypeMapper (Integer relType) {
         Map<Integer, String> options = new HashMap<Integer, String>();
 
@@ -239,28 +289,6 @@ public class MhealthDataExchange {
         options.put(1060, livingTogetherRelType);
         options.put(117163, healthCareExposureRelType);
         return options.get(relType);
-    }
-    /**
-     * Process reports of those registered in the system
-     * @param traceReports
-     */
-    private void processRegisteredContact(ObjectNode traceReports) {
-        PatientService patientService = Context.getPatientService();
-        String patientUuid = traceReports.get("CONTACT_UUID").textValue();
-        // check if patient is enrolled in quarantine program
-
-        if (org.apache.commons.lang3.StringUtils.isBlank(patientUuid)) {
-            return;
-        }
-        Patient patient = patientService.getPatientByUuid(patientUuid);
-        if (patient != null) {
-            JsonNode followups = traceReports.get("PATIENT_FOLLOWUPS");
-            if (inQuarantineProgram(patient)) { // update quarantine followup form
-                saveQuarantineFollowupReports(patient, (ArrayNode) followups);
-            } else {
-                saveContactFollowupReports(patient, (ArrayNode) followups);
-            }
-        }
     }
 
     /**
@@ -272,61 +300,7 @@ public class MhealthDataExchange {
         List<PatientProgram> programs = programWorkflowService.getPatientPrograms(patient, programWorkflowService.getProgramByUuid(COVID_QUARANTINE_PROGRAM), null, null, null,null, true);
         return programs.size() > 0;
     }
-    /**
-     * Create a new patient
-     * @param
-     * @param dob
-     * @param sex
-     * @param idNo
-     * @return
-     */
-    private Patient createPatient(String fName, String mName, String lName, Date dob, String sex, String idNo) {
 
-        Patient patient = null;
-        String PASSPORT_NUMBER = "e1e80daa-6d7e-11ea-bc55-0242ac130003";
-
-        if (fName != null && !fName.equals("") && lName != null && !lName.equals("") ) {
-
-            patient = new Patient();
-            if (sex == null || sex.equals("") || StringUtils.isEmpty(sex)) {
-                sex = "U";
-            }
-            patient.setGender(sex);
-            PersonName pn = new PersonName();
-            pn.setGivenName(fName);
-            pn.setFamilyName(lName);
-            if (mName != null && !mName.equals("")) {
-                pn.setMiddleName(mName);
-            }
-
-            patient.addName(pn);
-            patient.setBirthdate(dob);
-            patient.setBirthdateEstimated(true);
-
-            PatientIdentifier openMRSID = generateOpenMRSID();
-
-            if (idNo != null && !idNo.equals("")) {
-                PatientIdentifierType upnType = Context.getPatientService().getPatientIdentifierTypeByUuid(PASSPORT_NUMBER);
-
-                PatientIdentifier upn = new PatientIdentifier();
-                upn.setIdentifierType(upnType);
-                upn.setIdentifier(idNo);
-                upn.setPreferred(true);
-                patient.addIdentifier(upn);
-            } else {
-                openMRSID.setPreferred(true);
-            }
-            patient.addIdentifier(openMRSID);
-
-        }
-        return patient;
-    }
-
-    private Patient savePatient(Patient patient) {
-        Patient p = Context.getPatientService().savePatient(patient);
-        return p;
-
-    }
     /**
      * Complete creation of a patient and enrollment into quarantine program
      * @param patient
@@ -343,29 +317,14 @@ public class MhealthDataExchange {
         enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
         enc.setForm(Context.getFormService().getFormByUuid(COVID_QUARANTINE_ENROLLMENT_FORM));
 
-
         // set quarantine center
-        ConceptService conceptService = Context.getConceptService();
-        Obs o = new Obs();
-        o.setConcept(conceptService.getConcept("162724"));
-        o.setDateCreated(new Date());
-        o.setCreator(Context.getUserService().getUser(1));
-        o.setLocation(enc.getLocation());
-        o.setObsDatetime(admissionDate);
-        o.setPerson(patient);
-        o.setValueText(quarantineCenter);
+        if (StringUtils.isNotBlank(quarantineCenter)) {
+            Obs qCenterObs = ObsUtils.setupTextObs(patient, ObsUtils.QUARANTINE_FACILITY_NAME, quarantineCenter, admissionDate);
+            enc.addObs(qCenterObs);
+        }
 
-        // default all admissions type to new
-        Obs o1 = new Obs();
-        o1.setConcept(conceptService.getConcept("161641"));
-        o1.setDateCreated(new Date());
-        o1.setCreator(Context.getUserService().getUser(1));
-        o1.setLocation(enc.getLocation());
-        o1.setObsDatetime(admissionDate);
-        o1.setPerson(patient);
-        o1.setValueCoded(conceptService.getConcept("164144"));
-        enc.addObs(o);
-        enc.addObs(o1);
+        Obs admissionTypeObs = ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_CATEGORY, ObsUtils.NEW_PATIENT_CATEGORY, admissionDate);
+        enc.addObs(admissionTypeObs);
 
         Context.getEncounterService().saveEncounter(enc);
         // enroll in quarantine program
@@ -386,7 +345,6 @@ public class MhealthDataExchange {
      */
     private void saveQuarantineFollowupReports(Patient patient, ArrayNode reports) {
 
-
         if (reports.size() < 1) {
             return ;
         }
@@ -405,12 +363,12 @@ public class MhealthDataExchange {
             String difficultyBreathing = report.get("DIFFICULTY_BREATHING").textValue();
             //String soreThroat = report.get("SORE_THROAT").textValue();
             String comment = report.get("COMMENT").textValue();
-            Date encDate = parseDateString(followupDate, "yyyyMMdd");
+            Date encDate = SHRUtils.parseDateString(followupDate, "yyyyMMdd");
 
             EncounterType et = Context.getEncounterService().getEncounterTypeByUuid(COVID_QUARANTINE_FOLLOWUP_ENCOUNTER);
             Form form = Context.getFormService().getFormByUuid(COVID_QUARANTINE_FOLLOWUP_FORM);
 
-            if (hasEncounterOnDate(et, form, patient, encDate)) {
+            if (SHRUtils.hasEncounterOnDate(et, form, patient, encDate)) {
                 continue;
             }
 
@@ -423,51 +381,37 @@ public class MhealthDataExchange {
 
             // set temp obs
             if (sequenceNumber != null) {
-                Obs followUpSequenceObs = setupNumericObs(patient, FOLLOWUP_SEQUENCE_CONCEPT, sequenceNumber, encDate);
+                Obs followUpSequenceObs = ObsUtils.setupNumericObs(patient, FOLLOWUP_SEQUENCE_CONCEPT, sequenceNumber, encDate);
                 enc.addObs(followUpSequenceObs);
             }
 
             if (temp != null) {
-                Obs tempObs = setupNumericObs(patient, TEMPERATURE_CONCEPT, temp, encDate);
+                Obs tempObs = ObsUtils.setupNumericObs(patient, TEMPERATURE_CONCEPT, temp, encDate);
                 enc.addObs(tempObs);
             }
 
             if (fever != null) {
-                Obs feverObs = setupCodedObs(patient, FEVER_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs feverObs = ObsUtils.setupCodedObs(patient, FEVER_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(feverObs);
             }
 
             if (cough != null) {
-                Obs coughObs = setupCodedObs(patient, COUGH_CONCEPT, (cough.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs coughObs = ObsUtils.setupCodedObs(patient, COUGH_CONCEPT, (cough.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(coughObs);
             }
 
             if (difficultyBreathing != null) {
-                Obs dbObs = setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (difficultyBreathing.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs dbObs = ObsUtils.setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (difficultyBreathing.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(dbObs);
             }
 
             if (comment != null) {
-                Obs commentObs = setupTextObs(patient, COMMENT_CONCEPT, comment, encDate);
+                Obs commentObs = ObsUtils.setupTextObs(patient, COMMENT_CONCEPT, comment, encDate);
                 enc.addObs(commentObs);
             }
             encounterService.saveEncounter(enc);
         }
 
-    }
-
-    private Date parseDateString(String dateString, String format) {
-        if (dateString.equals("") || dateString == null) {
-            return null;
-        }
-        SimpleDateFormat df = new SimpleDateFormat(format);
-        Date date = null;
-        try {
-            date = df.parse(dateString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date;
     }
 
     /**
@@ -506,7 +450,7 @@ public class MhealthDataExchange {
             EncounterType et = Context.getEncounterService().getEncounterTypeByUuid(COVID_19_CONTACT_TRACING_ENCOUNTER);
             Form form = Context.getFormService().getFormByUuid(COVID_19_CONTACT_TRACING_FORM);
 
-            if (hasEncounterOnDate(et, form, patient, encDate)) {
+            if (SHRUtils.hasEncounterOnDate(et, form, patient, encDate)) {
                 continue;
             }
             Encounter enc = new Encounter();
@@ -518,240 +462,36 @@ public class MhealthDataExchange {
 
             // set temp obs
             if (sequenceNumber != null) {
-                Obs followUpSequenceObs = setupNumericObs(patient, FOLLOWUP_SEQUENCE_CONCEPT, sequenceNumber, encDate);
+                Obs followUpSequenceObs = ObsUtils.setupNumericObs(patient, FOLLOWUP_SEQUENCE_CONCEPT, sequenceNumber, encDate);
                 enc.addObs(followUpSequenceObs);
             }
 
             if (temp != null) {
-                Obs tempObs = setupNumericObs(patient, TEMPERATURE_CONCEPT, temp, encDate);
+                Obs tempObs = ObsUtils.setupNumericObs(patient, TEMPERATURE_CONCEPT, temp, encDate);
                 enc.addObs(tempObs);
             }
 
             if (fever != null) {
-                Obs feverObs = setupCodedObs(patient, FEVER_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs feverObs = ObsUtils.setupCodedObs(patient, FEVER_CONCEPT, (fever.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(feverObs);
             }
 
             if (cough != null) {
-                Obs coughObs = setupCodedObs(patient, COUGH_CONCEPT, (cough.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs coughObs = ObsUtils.setupCodedObs(patient, COUGH_CONCEPT, (cough.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(coughObs);
             }
 
             if (difficultyBreathing != null) {
-                Obs dbObs = setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (difficultyBreathing.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
+                Obs dbObs = ObsUtils.setupCodedObs(patient, DIFFICULTY_BREATHING_CONCEPT, (difficultyBreathing.equals("YES") ? YES_CONCEPT : NO_CONCEPT), encDate);
                 enc.addObs(dbObs);
             }
 
             if (comment != null) {
-                Obs commentObs = setupTextObs(patient, COMMENT_CONCEPT, comment, encDate);
+                Obs commentObs = ObsUtils.setupTextObs(patient, COMMENT_CONCEPT, comment, encDate);
                 enc.addObs(commentObs);
             }
             encounterService.saveEncounter(enc);
         }
-
-    }
-
-    /**
-     * setup numeric obs
-     * @param patient
-     * @param qConcept
-     * @param ans
-     * @param encDate
-     * @return
-     */
-    private Obs setupNumericObs(Patient patient, String qConcept, Double ans, Date encDate) {
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByUuid(qConcept));
-        obs.setDateCreated(new Date());
-        obs.setCreator(Context.getUserService().getUser(1));
-        obs.setObsDatetime(encDate);
-        obs.setPerson(patient);
-        obs.setValueNumeric(ans);
-        return obs;
-    }
-
-    /**
-     * setup text obs
-     * @param patient
-     * @param qConcept
-     * @param ans
-     * @param encDate
-     * @return
-     */
-    private Obs setupTextObs(Patient patient, String qConcept, String ans, Date encDate) {
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByUuid(qConcept));
-        obs.setDateCreated(new Date());
-        obs.setCreator(Context.getUserService().getUser(1));
-        obs.setObsDatetime(encDate);
-        obs.setPerson(patient);
-        obs.setValueText(ans);
-        return obs;
-    }
-
-    /**
-     * set up coded obs
-     * @param patient
-     * @param qConcept
-     * @param ans
-     * @param encDate
-     * @return
-     */
-    public Obs setupCodedObs(Patient patient, String qConcept, String ans, Date encDate) {
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByUuid(qConcept));
-        obs.setDateCreated(new Date());
-        obs.setCreator(Context.getUserService().getUser(1));
-        obs.setObsDatetime(encDate);
-        obs.setPerson(patient);
-        obs.setValueCoded(conceptService.getConceptByUuid(ans));
-        return obs;
-    }
-
-    /**
-     * Set patient attributes
-     * @param patient
-     * @param phone
-     * @param nokName
-     * @param nokPhone
-     * @return
-     */
-    private Patient addPersonAttributes(Patient patient, String phone, String nokName, String nokPhone) {
-
-        String NEXT_OF_KIN_CONTACT = "342a1d39-c541-4b29-8818-930916f4c2dc";
-        String NEXT_OF_KIN_NAME = "830bef6d-b01f-449d-9f8d-ac0fede8dbd3";
-        String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
-
-
-        PersonAttributeType phoneType = Context.getPersonService().getPersonAttributeTypeByUuid(TELEPHONE_CONTACT);
-        PersonAttributeType nokNametype = Context.getPersonService().getPersonAttributeTypeByUuid(NEXT_OF_KIN_NAME);
-        PersonAttributeType nokContacttype = Context.getPersonService().getPersonAttributeTypeByUuid(NEXT_OF_KIN_CONTACT);
-
-        if (phone != null) {
-            PersonAttribute attribute = new PersonAttribute(phoneType, phone);
-
-            try {
-                Object hydratedObject = attribute.getHydratedObject();
-                if (hydratedObject == null || "".equals(hydratedObject.toString())) {
-                    // if null is returned, the value should be blanked out
-                    attribute.setValue("");
-                } else if (hydratedObject instanceof Attributable) {
-                    attribute.setValue(((Attributable) hydratedObject).serialize());
-                } else if (!hydratedObject.getClass().getName().equals(phoneType.getFormat())) {
-                    // if the classes doesn't match the format, the hydration failed somehow
-                    // TODO change the PersonAttribute.getHydratedObject() to not swallow all errors?
-                    throw new APIException();
-                }
-            } catch (APIException e) {
-                //.warn("Got an invalid value: " + value + " while setting personAttributeType id #" + paramName, e);
-                // setting the value to empty so that the user can reset the value to something else
-                attribute.setValue("");
-            }
-            patient.addAttribute(attribute);
-        }
-
-        if (nokName != null) {
-            PersonAttribute attribute = new PersonAttribute(nokNametype, nokName);
-
-            try {
-                Object hydratedObject = attribute.getHydratedObject();
-                if (hydratedObject == null || "".equals(hydratedObject.toString())) {
-                    // if null is returned, the value should be blanked out
-                    attribute.setValue("");
-                } else if (hydratedObject instanceof Attributable) {
-                    attribute.setValue(((Attributable) hydratedObject).serialize());
-                } else if (!hydratedObject.getClass().getName().equals(nokNametype.getFormat())) {
-                    // if the classes doesn't match the format, the hydration failed somehow
-                    // TODO change the PersonAttribute.getHydratedObject() to not swallow all errors?
-                    throw new APIException();
-                }
-            } catch (APIException e) {
-                //.warn("Got an invalid value: " + value + " while setting personAttributeType id #" + paramName, e);
-                // setting the value to empty so that the user can reset the value to something else
-                attribute.setValue("");
-            }
-            patient.addAttribute(attribute);
-        }
-
-        if (nokPhone != null) {
-            PersonAttribute attribute = new PersonAttribute(nokContacttype, nokPhone);
-
-            try {
-                Object hydratedObject = attribute.getHydratedObject();
-                if (hydratedObject == null || "".equals(hydratedObject.toString())) {
-                    // if null is returned, the value should be blanked out
-                    attribute.setValue("");
-                } else if (hydratedObject instanceof Attributable) {
-                    attribute.setValue(((Attributable) hydratedObject).serialize());
-                } else if (!hydratedObject.getClass().getName().equals(nokContacttype.getFormat())) {
-                    // if the classes doesn't match the format, the hydration failed somehow
-                    // TODO change the PersonAttribute.getHydratedObject() to not swallow all errors?
-                    throw new APIException();
-                }
-            } catch (APIException e) {
-                //.warn("Got an invalid value: " + value + " while setting personAttributeType id #" + paramName, e);
-                // setting the value to empty so that the user can reset the value to something else
-                attribute.setValue("");
-            }
-            patient.addAttribute(attribute);
-        }
-        return patient;
-    }
-
-    /**
-     * set up person address
-     * @param patient
-     * @param nationality
-     * @param county
-     * @param subCounty
-     * @param ward
-     * @param postaladdress
-     * @return
-     */
-    private Patient addPersonAddresses(Patient patient, String nationality, String county, String subCounty, String ward, String postaladdress) {
-
-        Set<PersonAddress> patientAddress = patient.getAddresses();
-        if (patientAddress.size() > 0) {
-            for (PersonAddress address : patientAddress) {
-                if (nationality != null) {
-                    address.setCountry(nationality);
-                }
-                if (county != null) {
-                    address.setCountyDistrict(county);
-                }
-                if (subCounty != null) {
-                    address.setStateProvince(subCounty);
-                }
-                if (ward != null) {
-                    address.setAddress4(ward);
-                }
-
-                if (postaladdress != null) {
-                    address.setAddress1(postaladdress);
-                }
-                patient.addAddress(address);
-            }
-        } else {
-            PersonAddress pa = new PersonAddress();
-            if (nationality != null) {
-                pa.setCountry(nationality);
-            }
-            if (county != null) {
-                pa.setCountyDistrict(county);
-            }
-            if (subCounty != null) {
-                pa.setStateProvince(subCounty);
-            }
-            if (ward != null) {
-                pa.setAddress4(ward);
-            }
-
-            if (postaladdress != null) {
-                pa.setAddress1(postaladdress);
-            }
-            patient.addAddress(pa);
-        }
-        return patient;
     }
 
     /**
@@ -919,23 +659,6 @@ public class MhealthDataExchange {
             Context.removeProxyPrivilege(PrivilegeConstants.VIEW_LOCATIONS);
             Context.removeProxyPrivilege(PrivilegeConstants.VIEW_GLOBAL_PROPERTIES);
         }
-
-    }
-
-    /**
-     * Checks if a patient already has encounter of same type and form on same date
-     * @param enctype
-     * @param form
-     * @param patient
-     * @param date
-     * @return
-     */
-    public boolean hasEncounterOnDate(EncounterType enctype, Form form, Patient patient, Date date) {
-        List<Encounter> encounters = Context.getEncounterService().getEncounters(patient, null, date, date, Collections.singleton(form), Collections.singleton(enctype), null, null, null, false);
-        Integer size = encounters.size();
-        log.info("Checking for enc type=" + enctype + ", form=" + form + "date, "+ date + " result=" + size);
-        System.out.println("Checking for enc type=" + enctype + ", form=" + form + "date, "+ date + " result=" + size);
-        return encounters.size() > 0;
 
     }
 }
