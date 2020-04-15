@@ -7,19 +7,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.CareSetting;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Obs;
+import org.openmrs.Order;
+import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.PatientProgram;
 import org.openmrs.Person;
+import org.openmrs.Provider;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
+import org.openmrs.TestOrder;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProgramWorkflowService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -250,6 +258,7 @@ public class MedicMobileDataExchange {
 
         String dateFormat = "yyyy-MM-dd";
         ObjectNode fields = (ObjectNode) cif.get("fields");
+        ObjectNode geolocation = (ObjectNode) cif.get("geolocation");
         ObjectNode reportingInfo = (ObjectNode) fields.get("group_reporting_info");
         ObjectNode patientInfo = (ObjectNode) fields.get("group_patient_information");
         ObjectNode clinicalInfo = (ObjectNode) fields.get("group_clinical_information");
@@ -257,6 +266,14 @@ public class MedicMobileDataExchange {
         ObjectNode signsInfo = (ObjectNode) fields.get("group_patient_signs");
         ObjectNode comorbidityInfo = (ObjectNode) fields.get("group_conditions_comorbidity");
         ObjectNode exposureInfo = (ObjectNode) fields.get("group_exposure_travel_information");
+        ObjectNode labInfo = (ObjectNode) fields.get("group_laboratory_information");
+
+
+        // geological info
+        String longitude = geolocation.has("longitude") ? geolocation.get("longitude").textValue() : null;
+        String latitude = geolocation.has("latitude") ? geolocation.get("latitude").textValue() : null;
+
+        String labRequest = labInfo.has("was_specimen_collected") ? labInfo.get("was_specimen_collected").textValue() : null;
 
 
         // reporting info
@@ -311,6 +328,12 @@ public class MedicMobileDataExchange {
         encounter.setForm(form);
 
         // build observations
+        if (StringUtils.isNotBlank(latitude)) {
+            encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.LATITUDE, latitude, encDate));
+        }
+        if (StringUtils.isNotBlank(longitude)) {
+            encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.LONGITUDE, longitude, encDate));
+        }
         if (StringUtils.isNotBlank(reportingCounty)) {
             encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_COUNTY, reportingCounty, encDate));
         }
@@ -520,7 +543,7 @@ public class MedicMobileDataExchange {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.UNKNOWN, encDate));
         }
 
-        encounterService.saveEncounter(encounter);
+        Encounter savedEnc = encounterService.saveEncounter(encounter);
 
         PatientProgram pp = new PatientProgram();
         pp.setPatient(patient);
@@ -528,6 +551,30 @@ public class MedicMobileDataExchange {
         pp.setDateEnrolled(encDate);
         pp.setDateCreated(new Date());
         Context.getProgramWorkflowService().savePatientProgram(pp);
+
+        // order lab
+        UserService userService = Context.getUserService();
+        ProviderService providerService = Context.getProviderService();
+        Provider provider = null;
+        List<Provider> providers = (List<Provider>) providerService.getProvidersByPerson(Context.getUserService().getUser(1).getPerson());
+
+        if (!providers.isEmpty()) {
+            provider = providers.get(0);
+        }
+        if (StringUtils.isNotBlank(labRequest) && labRequest.equals("yes") && provider != null) {
+            Order anOrder = new TestOrder();
+            anOrder.setPatient(patient);
+            anOrder.setCareSetting(new CareSetting());
+            anOrder.setConcept(conceptService.getConceptByUuid(ObsUtils.COVID_19_LAB_TEST_CONCEPT));
+            anOrder.setDateActivated(encDate);
+            anOrder.setCommentToFulfiller("Kenyatta National Hospial Lab Nairobi"); //place holder for now
+            anOrder.setInstructions("OP and NP Swabs");
+            anOrder.setOrderer(provider);
+            anOrder.setEncounter(savedEnc);
+            anOrder.setCareSetting(Context.getOrderService().getCareSetting(1));
+            anOrder.setOrderReason(conceptService.getConceptByUuid(ObsUtils.COVID_19_BASELINE_TEST_CONCEPT));
+            Context.getOrderService().saveOrder(anOrder, null);
+        }
 
     }
 
