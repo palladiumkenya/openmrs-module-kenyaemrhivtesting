@@ -11,6 +11,7 @@ import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.fragment.controller.PatientContactFormFragmentController;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
+import org.openmrs.module.kenyaui.annotation.AppPage;
 import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.annotation.SpringBean;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 
-
+@AppPage("kenyaemr.surveillance")
 public class PatientContactListPageController {
 
     protected static final Log log = LogFactory.getLog(PatientContactListPageController.class);
