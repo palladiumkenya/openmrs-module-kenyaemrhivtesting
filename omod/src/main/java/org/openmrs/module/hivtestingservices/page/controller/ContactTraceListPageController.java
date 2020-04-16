@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
+@AppPage("kenyaemr.surveillance")
 public class ContactTraceListPageController {
 
     public void controller(@SpringBean KenyaUiUtils kenyaUi,
