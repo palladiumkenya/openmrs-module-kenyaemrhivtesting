@@ -195,6 +195,7 @@ public class MedicMobileDataExchange {
             String fName = null;
             String mName = null;
 
+            String contactUuid = contactNode.get("_id").textValue();
             String lName = contactNode.get("family_name").textValue();
             String givenNames = contactNode.get("given_names").textValue();
             String county = contactNode.get("county").textValue();
@@ -229,6 +230,7 @@ public class MedicMobileDataExchange {
             if (patient == null) {
                 patient = SHRUtils.createPatient(fName, mName, lName, dob, sex, idNumber, passportNumber, alienNumber);
                 patient = SHRUtils.savePatient(patient);
+                patient.setUuid(contactUuid);
                 patient = SHRUtils.addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
                 patient = SHRUtils.addPersonAttributes(patient, phoneNumber, null, null);
             }
