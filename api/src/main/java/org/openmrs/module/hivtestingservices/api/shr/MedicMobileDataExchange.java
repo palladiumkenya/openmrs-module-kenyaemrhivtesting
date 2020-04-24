@@ -194,31 +194,36 @@ public class MedicMobileDataExchange {
         ObjectNode contactNode = (ObjectNode) contactObject.get("contact");
 
         if (contactNode != null) {
-            String fName = null;
-            String mName = null;
+
 
             String contactUuid = contactNode.get("_id").textValue();
-            String lName = contactNode.get("family_name").textValue();
-            String givenNames = contactNode.get("given_names").textValue();
+            String fName = contactNode.get("f_name").textValue();
+            String mName = contactNode.get("o_name").textValue();
+            String lName = contactNode.get("s_name").textValue();
             String county = contactNode.get("county").textValue();
+            String nationality = contactNode.get("nationality").textValue();
             String subCounty = contactNode.get("subcounty").textValue();
             String postalAddress = contactNode.get("postal_address").textValue();
-            String location = contactNode.get("place_location").textValue();
+            String location = contactNode.get("location").textValue();
             String sex = contactNode.get("sex").textValue();
-            String estate = contactNode.get("sublocation_estate").textValue();
+            String sublocation = contactNode.get("sub_location").textValue();
             String phoneNumber = contactNode.get("phone").textValue();
             String dobString = contactNode.get("date_of_birth").textValue();
             String idNumber = contactNode.get("national_id").textValue();
             String passportNumber = contactNode.get("passport_number").textValue();
-            String alienNumber = contactNode.get("alien_id").textValue();
+            String alienNumber = contactNode.get("alien_number").textValue();
+            String caseId = contactNode.get("case_id").textValue();
+            String nokName = contactNode.get("kin_name").textValue();
+            String nokPhoneNo = contactNode.get("kin_phone_number").textValue();
             Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
 
-            String arrGivenNames[] = givenNames.split(" ");
-            if (arrGivenNames.length > 1) {
-                fName = arrGivenNames[0];
-                mName = arrGivenNames[1];
-            } else if (arrGivenNames.length > 0) {
-                fName = arrGivenNames[0];
+            // add caseId
+
+            PatientIdentifier caseIdentifier = null;
+            if (StringUtils.isNotBlank(caseId)) {
+                caseIdentifier = new PatientIdentifier();
+                caseIdentifier.setIdentifierType(SHRUtils.CASE_ID_TYPE);
+                caseIdentifier.setIdentifier(caseId);
             }
 
             if(org.apache.commons.lang3.StringUtils.isNotBlank(sex)) {
@@ -231,10 +236,13 @@ public class MedicMobileDataExchange {
             Patient patient = SHRUtils.checkIfPatientExists(idNumber, passportNumber, alienNumber);
             if (patient == null) {
                 patient = SHRUtils.createPatient(fName, mName, lName, dob, sex, idNumber, passportNumber, alienNumber);
+                if (caseIdentifier != null) {
+                    patient.addIdentifier(caseIdentifier);
+                }
                 patient = SHRUtils.savePatient(patient);
                 patient.setUuid(contactUuid);
-                patient = SHRUtils.addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
-                patient = SHRUtils.addPersonAttributes(patient, phoneNumber, null, null);
+                patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);
+                patient = SHRUtils.addPersonAttributes(patient, phoneNumber, nokName, nokPhoneNo);
             }
 
             if (patient != null) {
@@ -255,6 +263,7 @@ public class MedicMobileDataExchange {
 
         return "There were no case information provided";
     }
+
 
     private void enrollForCovidCaseInvestigation(Patient patient, ObjectNode cif) {
 
