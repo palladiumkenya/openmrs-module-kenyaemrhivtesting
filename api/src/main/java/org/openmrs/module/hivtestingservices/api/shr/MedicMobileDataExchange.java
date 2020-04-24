@@ -97,7 +97,7 @@ public class MedicMobileDataExchange {
             String uuid = contactNode.get("_id").textValue();
             String nationalID = contactNode.get("national_id").textValue();
             String passportNo = contactNode.get("passport_number").textValue();
-            String alienNo = contactNode.get("alien_id").textValue();
+            String alienNo = contactNode.get("alien_number").textValue();
 
             PatientContact c = null;
             Patient patient = null;
@@ -122,55 +122,80 @@ public class MedicMobileDataExchange {
                 contactRegistered = patient;
             }
 
+            String fName = contactNode.get("f_name").textValue();
+            String mName = contactNode.get("o_name").textValue();
+            String lName = contactNode.get("s_name").textValue();
+            String county = contactNode.get("county").textValue();
+            String nationality = contactNode.get("nationality").textValue();
+            String subCounty = contactNode.get("subcounty").textValue();
+            String postalAddress = contactNode.get("postal_address").textValue();
+            String location = contactNode.get("location").textValue();
+            String sublocation = contactNode.get("sub_location").textValue();
+            String phoneNumber = contactNode.get("phone").textValue();
+            String dobString = contactNode.get("date_of_birth").textValue();
+            String nokName = contactNode.get("kin_name").textValue();
+            String nokPhoneNo = contactNode.get("kin_phone_number").textValue();
+            Integer typeOfContact = contactNode.get("type_of_contact").intValue();
+            String relationToCase = contactNode.get("relation_to_case").textValue();
+            Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
+
             ObjectNode traceReport = (ObjectNode) jsonNode.get("trace");
-            String encDateStr = traceReport.get("date_last_contacted").textValue();
+            if (traceReport != null && !traceReport.isEmpty()) {
+                String encDateStr = traceReport.get("date_last_contacted").textValue();
 
-            Date encounterdate = SHRUtils.parseDateString(encDateStr, "yyyy-MM-dd");
-            Double followupSequence = traceReport.get("follow_up_count").doubleValue();
-            Double temp = traceReport.get("temperature").doubleValue();
-            String cough = traceReport.get("cough").textValue();
-            String fever = traceReport.get("fever").textValue();
-            String soreThroat = traceReport.get("sore_throat").textValue();
-            String difficultyBreathing = traceReport.get("difficulty_breathing").textValue();
+                Date encounterdate = SHRUtils.parseDateString(encDateStr, "yyyy-MM-dd");
+                Double followupSequence = traceReport.get("follow_up_count").doubleValue();
+                Double temp = traceReport.get("temperature").doubleValue();
+                String cough = traceReport.get("cough").textValue();
+                String fever = traceReport.get("fever").textValue();
+                String soreThroat = traceReport.get("sore_throat").textValue();
+                String difficultyBreathing = traceReport.get("difficulty_breathing").textValue();
 
-            if (contactRegistered != null) {
-                saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
-            } else {
+                if (contactRegistered != null && traceReport != null) {
+                    saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
+                } else {
 
-                String fName = null;
-                String mName = null;
 
-                String lName = contactNode.get("family_name").textValue();
-                String givenNames = contactNode.get("given_names").textValue();
-                String county = contactNode.get("county").textValue();
-                String subCounty = contactNode.get("subcounty").textValue();
-                String postalAddress = contactNode.get("postal_address").textValue();
-                String phoneNumber = contactNode.get("phone").textValue();
-                String dobString = contactNode.get("date_of_birth").textValue();
-                Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
 
-                String arrGivenNames[] = givenNames.split(" ");
-                if (arrGivenNames.length > 1) {
-                    fName = arrGivenNames[0];
-                    mName = arrGivenNames[1];
-                } else if (arrGivenNames.length > 0) {
-                    fName = arrGivenNames[0];
+                    patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
+                    patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);
+                    patient = SHRUtils.addPersonAttributes(patient, phoneNumber, nokName, nokPhoneNo);
+                    patient = SHRUtils.savePatient(patient);
+
+                    saveContactFollowupReport(patient, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
+                    c.setPatient(patient); // link contact to the created person
+                    Context.getService(HTSService.class).savePatientContact(c);
+                    //establish relationship between new person and case
+                    Patient covidCase = c.getPatientRelatedTo();
+                    addRelationship(covidCase, patient, c.getPnsApproach());
+                }
+            } else { // it is a case of contact listing
+                String casePatientUuid = contactNode.get("parent_uuid").textValue();
+
+                Patient p = Context.getPatientService().getPatientByUuid(casePatientUuid);
+                PatientContact pc = new PatientContact();
+                pc.setFirstName(fName);
+                pc.setMiddleName(mName);
+                pc.setLastName(lName);
+                pc.setBirthDate(dob);
+                pc.setPhysicalAddress(postalAddress);
+                pc.setTown(subCounty);
+                pc.setPhoneContact(phoneNumber);
+                pc.setPatientRelatedTo(p);
+                if (StringUtils.isNotBlank(relationToCase) && getContactRelationConcept(relationToCase) != null) {
+                    pc.setRelationType(getContactRelationConcept(relationToCase));
+
                 }
 
-                patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
-                patient = SHRUtils.addPersonAddresses(patient, null, county, subCounty, null, postalAddress);
-                patient = SHRUtils.addPersonAttributes(patient, phoneNumber, null, null);
-                patient = SHRUtils.savePatient(patient);
+                if (typeOfContact != null && getContactTypeConcept(typeOfContact) != null) {
+                    pc.setPnsApproach(getContactTypeConcept(typeOfContact));
+                }
+                pc.setBirthDate(dob);
 
-                saveContactFollowupReport(patient, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
-                c.setPatient(patient); // link contact to the created person
-                Context.getService(HTSService.class).savePatientContact(c);
-                //establish relationship between new person and case
-                Patient covidCase = c.getPatientRelatedTo();
-                addRelationship(covidCase, patient, c.getPnsApproach());
+                htsService.savePatientContact(pc);
             }
         }
-        return "Contact followup created successfully";
+        return "Contact details updated successfully";
     }
 
 
@@ -194,7 +219,6 @@ public class MedicMobileDataExchange {
         ObjectNode contactNode = (ObjectNode) contactObject.get("contact");
 
         if (contactNode != null) {
-
 
             String contactUuid = contactNode.get("_id").textValue();
             String fName = contactNode.get("f_name").textValue();
@@ -913,6 +937,34 @@ public class MedicMobileDataExchange {
         return options;
     }
 
+    private Integer getContactRelationConcept(String code) {
+        Integer concept = null;
+        if (code == null) {
+            return null;
+        }
+
+        if (code.equals("co-worker")) {
+            concept = 160237;
+        } else if (code.equals("mother")) {
+            concept = 970;
+        } else if (code.equals("father")) {
+            concept = 971;
+        } else if (code.equals("sibling")) {
+            concept = 972;
+        } else if (code.equals("child")) {
+            concept = 1528;
+        } else if (code.equals("spouse")) {
+            concept = 5617;
+        } else if (code.equals("partner")) {
+            concept = 163565;
+        } else { // map everything to traveled together
+            concept = 165656;
+        }
+
+
+        return concept;
+    }
+
     private Map<Integer, String> getContactType() {
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(160237,"Working together with a nCoV patient");
@@ -920,6 +972,25 @@ public class MedicMobileDataExchange {
         options.put(1060,"Living together with a nCoV patient");
         options.put(117163,"Health care associated exposure");
         return options;
+
+    }
+
+    private Integer getContactTypeConcept(Integer code) {
+        if (code == null) {
+            return null;
+        }
+        Integer concept = null;
+        if (code.equals(1)) {
+            concept = 117163;
+        } else if (code.equals(2)) {
+            concept = 160237;
+        } else if (code.equals(3)) {
+            concept = 165656;
+        } else if (code.equals(4)) {
+            concept = 1060;
+        }
+
+        return concept;
 
     }
 
