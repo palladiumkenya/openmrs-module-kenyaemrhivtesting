@@ -356,8 +356,10 @@ public class MhealthDataExchange {
         for (int i=0; i < reports.size(); i++) {
             ObjectNode report = (ObjectNode) reports.get(i);
             String followupDate = report.get("FOLLOWUP_DATE").textValue();
-            Double sequenceNumber = report.get("DAY_OF_FOLLOWUP").doubleValue();
-            Double temp = report.get("TEMPERATURE").doubleValue();
+            String sequenceNumberStr = report.get("DAY_OF_FOLLOWUP").textValue();
+            Double sequenceNumber = Double.parseDouble(sequenceNumberStr);
+            String tempStr = report.get("TEMPERATURE").textValue();
+            Double temp = Double.parseDouble(tempStr);
             String cough = report.get("COUGH").textValue();
             String fever = report.get("FEVER").textValue();
             String difficultyBreathing = report.get("DIFFICULTY_BREATHING").textValue();
@@ -432,8 +434,10 @@ public class MhealthDataExchange {
         for (int i=0; i < reports.size(); i++) {
             ObjectNode report = (ObjectNode) reports.get(i);
             String followupDate = report.get("FOLLOWUP_DATE").textValue();
-            Double sequenceNumber = report.get("DAY_OF_FOLLOWUP").doubleValue();
-            Double temp = report.get("TEMPERATURE").doubleValue();
+            String sequenceNumberStr = report.get("DAY_OF_FOLLOWUP").textValue();
+            Double sequenceNumber = Double.parseDouble(sequenceNumberStr);
+            String tempStr = report.get("TEMPERATURE").textValue();
+            Double temp = Double.parseDouble(tempStr);
             String cough = report.get("COUGH").textValue();
             String fever = report.get("FEVER").textValue();
             String difficultyBreathing = report.get("DIFFICULTY_BREATHING").textValue();
