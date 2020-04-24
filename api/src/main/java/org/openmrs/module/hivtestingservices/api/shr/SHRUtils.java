@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Attributable;
 import org.openmrs.Encounter;
@@ -51,7 +52,15 @@ public class SHRUtils {
     public static final String NATIONAL_ID = "49af6cdc-7968-4abb-bf46-de10d7f4859f";
     public static final String ALIEN_NUMBER = "e1e80b5c-6d7e-11ea-bc55-0242ac130003";
     public static final String PASSPORT_NUMBER = "e1e80daa-6d7e-11ea-bc55-0242ac130003";
+    public static final String CASE_id = "e1e80daa-6d7e-11ea-bc55-0242ac130003";
     public static final String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
+
+
+    public static PatientIdentifierType NATIONAL_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.NATIONAL_ID);
+    public static PatientIdentifierType ALIEN_NUMBER_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.ALIEN_NUMBER);
+    public static PatientIdentifierType PASSPORT_NUMBER_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.PASSPORT_NUMBER);
+    public static PatientIdentifierType CASE_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.PATIENT_CLINIC_NUMBER);
+    public static PatientIdentifierType OPENMRS_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.MEDICAL_RECORD_NUMBER);
 
 
     public static SHR getSHR(String SHRStr) {
@@ -494,5 +503,57 @@ public class SHRUtils {
         ProgramWorkflowService service = Context.getProgramWorkflowService();
         List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(programUUID), null, null, null,null, true);
         return programs.size() > 0;
+    }
+
+    public static ObjectNode getPatientAddress(Patient patient) {
+        Set<PersonAddress> addresses = patient.getAddresses();
+        //patient address
+        ObjectNode patientAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
+        ObjectNode physicalAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
+        String nationality = "";
+        String postalAddress = "";
+        String county = "";
+        String sub_county = "";
+        String ward = "";
+        String landMark = "";
+
+
+        for (PersonAddress address : addresses) {
+            if (address.getCountry() != null) {
+                nationality = address.getCountry();
+            }
+            if (address.getAddress1() != null) {
+                postalAddress = address.getAddress1();
+            }
+
+            if (address.getCountyDistrict() != null) {
+                county = address.getCountyDistrict();
+            }
+
+            if (address.getStateProvince() != null) {
+                sub_county = address.getStateProvince();
+            }
+
+            if (address.getAddress4() != null) {
+                ward = address.getAddress4();
+            }
+            if (address.getAddress2() != null) {
+                landMark = address.getAddress2();
+            }
+
+        }
+
+        physicalAddressNode.put("NATIONALITY", nationality);
+        physicalAddressNode.put("COUNTY", county);
+        physicalAddressNode.put("SUB_COUNTY", sub_county);
+        physicalAddressNode.put("WARD", ward);
+        physicalAddressNode.put("NEAREST_LANDMARK", landMark);
+        physicalAddressNode.put("POSTAL_ADDRESS", postalAddress);
+
+        //combine all addresses
+/*        patientAddressNode.put("PHYSICAL_ADDRESS", physicalAddressNode);
+        patientAddressNode.put("POSTAL_ADDRESS", postalAddress);*/
+
+        return physicalAddressNode;
     }
 }
