@@ -99,6 +99,26 @@ public class MedicMobileDataExchange {
             String passportNo = contactNode.get("passport_number").textValue();
             String alienNo = contactNode.get("alien_number").textValue();
 
+            String fName = contactNode.get("f_name").textValue();
+            String mName = contactNode.get("o_name").textValue();
+            String lName = contactNode.get("s_name").textValue();
+            String county = contactNode.get("county").textValue();
+            String nationality = contactNode.get("nationality").textValue();
+            String subCounty = contactNode.get("subcounty").textValue();
+            String postalAddress = contactNode.get("postal_address").textValue();
+            String location = contactNode.get("location").textValue();
+            String sublocation = contactNode.get("sub_location").textValue();
+            String sex = contactNode.get("sex").textValue();
+            String phoneNumber = contactNode.get("phone").textValue();
+            String dobString = contactNode.get("date_of_birth").textValue();
+            String nokName = contactNode.get("kin_name").textValue();
+            String nokPhoneNo = contactNode.get("kin_phone_number").textValue();
+            String typeOfContact = contactNode.get("type_of_contact").textValue();
+            String relationToCase = contactNode.get("relation_to_case").textValue();
+            Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
+            ObjectNode traceReport = (ObjectNode) jsonNode.get("trace");
+
+
             PatientContact c = null;
             Patient patient = null;
 
@@ -111,8 +131,60 @@ public class MedicMobileDataExchange {
 
             patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
 
-            if (c == null && patient == null) {
-                return "The payload could not be associated with any individual in the system. Please countercheck the identifying information";
+            if (c == null && patient == null && (traceReport == null || traceReport.isEmpty())) {
+
+                String casePatientUuid = contactNode.get("parent_uuid").textValue();
+                String dateOfLastContactStr = contactNode.get("date_of_last_contact").textValue();
+
+                Date dateOfLastContact = null;
+                if (StringUtils.isNotBlank(dateOfLastContactStr)) {
+                    dateOfLastContact = SHRUtils.parseDateString(dateOfLastContactStr, "yyyy-MM-dd");
+                }
+                if (StringUtils.isNotBlank(casePatientUuid)) {
+                    Patient p = Context.getPatientService().getPatientByUuid(casePatientUuid);
+                    if (p != null) {
+                        PatientContact pc = new PatientContact();
+                        pc.setFirstName(fName);
+                        pc.setMiddleName(mName);
+                        pc.setLastName(lName);
+                        pc.setBirthDate(dob);
+                        pc.setPhysicalAddress(postalAddress);
+                        pc.setSubcounty(subCounty);
+                        pc.setTown(subCounty);
+                        pc.setPhoneContact(phoneNumber);
+                        pc.setPatientRelatedTo(p);
+                        if (sex != null) {
+                            sex = sex.equals("male") ? "M" : "F";
+                        } else {
+                            sex = "U";
+                        }
+                        pc.setSex(sex);
+                        if (StringUtils.isNotBlank(relationToCase) && getContactRelationConcept(relationToCase) != null) {
+                            pc.setRelationType(getContactRelationConcept(relationToCase));
+
+                        }
+
+                        if (dateOfLastContact !=null) {
+                            pc.setAppointmentDate(dateOfLastContact);
+                        }
+
+                        pc.setIpvOutcome("CHT");// using this to store record source. We should not push back contacts sent from CHT
+
+                        if (StringUtils.isNotBlank(typeOfContact) && getContactTypeConcept(Integer.parseInt(typeOfContact)) != null) {
+                            pc.setPnsApproach(getContactTypeConcept(Integer.parseInt(typeOfContact)));
+                        }
+                        pc.setBirthDate(dob);
+                        pc.setVoided(false);
+                        pc.setUuid(uuid);
+
+                        htsService.savePatientContact(pc);
+                        return "Contact information was successfully added";
+                    } else {
+                        return "Could not find a case for the contact provided";
+                    }
+                }
+
+
             }
 
             Patient contactRegistered = null;
@@ -122,30 +194,15 @@ public class MedicMobileDataExchange {
                 contactRegistered = patient;
             }
 
-            String fName = contactNode.get("f_name").textValue();
-            String mName = contactNode.get("o_name").textValue();
-            String lName = contactNode.get("s_name").textValue();
-            String county = contactNode.get("county").textValue();
-            String nationality = contactNode.get("nationality").textValue();
-            String subCounty = contactNode.get("subcounty").textValue();
-            String postalAddress = contactNode.get("postal_address").textValue();
-            String location = contactNode.get("location").textValue();
-            String sublocation = contactNode.get("sub_location").textValue();
-            String phoneNumber = contactNode.get("phone").textValue();
-            String dobString = contactNode.get("date_of_birth").textValue();
-            String nokName = contactNode.get("kin_name").textValue();
-            String nokPhoneNo = contactNode.get("kin_phone_number").textValue();
-            Integer typeOfContact = contactNode.get("type_of_contact").intValue();
-            String relationToCase = contactNode.get("relation_to_case").textValue();
-            Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
 
-            ObjectNode traceReport = (ObjectNode) jsonNode.get("trace");
+
             if (traceReport != null && !traceReport.isEmpty()) {
                 String encDateStr = traceReport.get("date_last_contacted").textValue();
 
                 Date encounterdate = SHRUtils.parseDateString(encDateStr, "yyyy-MM-dd");
                 Double followupSequence = traceReport.get("follow_up_count").doubleValue();
-                Double temp = traceReport.get("temperature").doubleValue();
+                String tempStr = traceReport.get("temperature").textValue();
+                Double temp = Double.parseDouble(tempStr);
                 String cough = traceReport.get("cough").textValue();
                 String fever = traceReport.get("fever").textValue();
                 String soreThroat = traceReport.get("sore_throat").textValue();
@@ -169,30 +226,6 @@ public class MedicMobileDataExchange {
                     Patient covidCase = c.getPatientRelatedTo();
                     addRelationship(covidCase, patient, c.getPnsApproach());
                 }
-            } else { // it is a case of contact listing
-                String casePatientUuid = contactNode.get("parent_uuid").textValue();
-
-                Patient p = Context.getPatientService().getPatientByUuid(casePatientUuid);
-                PatientContact pc = new PatientContact();
-                pc.setFirstName(fName);
-                pc.setMiddleName(mName);
-                pc.setLastName(lName);
-                pc.setBirthDate(dob);
-                pc.setPhysicalAddress(postalAddress);
-                pc.setTown(subCounty);
-                pc.setPhoneContact(phoneNumber);
-                pc.setPatientRelatedTo(p);
-                if (StringUtils.isNotBlank(relationToCase) && getContactRelationConcept(relationToCase) != null) {
-                    pc.setRelationType(getContactRelationConcept(relationToCase));
-
-                }
-
-                if (typeOfContact != null && getContactTypeConcept(typeOfContact) != null) {
-                    pc.setPnsApproach(getContactTypeConcept(typeOfContact));
-                }
-                pc.setBirthDate(dob);
-
-                htsService.savePatientContact(pc);
             }
         }
         return "Contact details updated successfully";
@@ -309,6 +342,7 @@ public class MedicMobileDataExchange {
         String latitude = geolocation.has("latitude") ? geolocation.get("latitude").textValue() : null;
 
         String labRequest = labInfo.has("was_specimen_collected") ? labInfo.get("was_specimen_collected").textValue() : null;
+        String testingLab = labInfo.has("testing_lab") ? labInfo.get("testing_lab").textValue() : null;
 
 
         // reporting info
@@ -324,7 +358,8 @@ public class MedicMobileDataExchange {
         //String caseIdentifier = patientInfo.get("case_identifier").textValue();
 
         String symptoms = symptomsInfo.has("patient_symptoms") ? symptomsInfo.get("patient_symptoms").textValue() : null;
-        Double temperature = signsInfo.has("temperature") ? signsInfo.get("temperature").doubleValue() : null;
+        String tempStr = signsInfo.has("temperature") ? signsInfo.get("temperature").textValue() : null;
+        Double temperature = Double.parseDouble(tempStr);
         String signs = signsInfo.has("reported_patient_signs") ? signsInfo.get("reported_patient_signs").textValue() : null;
 
         // clinical information
@@ -602,7 +637,7 @@ public class MedicMobileDataExchange {
             anOrder.setCareSetting(new CareSetting());
             anOrder.setConcept(conceptService.getConceptByUuid(ObsUtils.COVID_19_LAB_TEST_CONCEPT));
             anOrder.setDateActivated(encDate);
-            anOrder.setCommentToFulfiller("Kenyatta National Hospial Lab Nairobi"); //place holder for now
+            anOrder.setCommentToFulfiller(testingLab != null ? testingLab : "Kenyatta National Hospial Lab Nairobi"); //place holder for now
             anOrder.setInstructions("OP and NP Swabs");
             anOrder.setOrderer(provider);
             anOrder.setEncounter(savedEnc);
@@ -980,16 +1015,15 @@ public class MedicMobileDataExchange {
             return null;
         }
         Integer concept = null;
-        if (code.equals(1)) {
+        if (code == 1) {
             concept = 117163;
-        } else if (code.equals(2)) {
+        } else if (code == 2) {
             concept = 160237;
-        } else if (code.equals(3)) {
+        } else if (code == 3) {
             concept = 165656;
-        } else if (code.equals(4)) {
+        } else if (code == 4) {
             concept = 1060;
         }
-
         return concept;
 
     }
@@ -1004,9 +1038,9 @@ public class MedicMobileDataExchange {
         Set<Integer> eligibleList = new HashSet<Integer>();
         String sql = "";
         if (lastContactEntry != null && lastContactEntry > 0) {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0;"; // get contacts not registered
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0 and ipv_outcome !='CHT';"; // get contacts not registered
         } else {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0;";
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0 and ipv_outcome !='CHT';";
 
         }
 
