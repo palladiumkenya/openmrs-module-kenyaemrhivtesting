@@ -61,7 +61,8 @@ public class MedicMobileDataExchange {
     public static final String FOLLOWUP_SEQUENCE_CONCEPT = "165416AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     public static final String COVID_19_CONTACT_TRACING_FORM = "37ef8f3c-6cd2-11ea-bc55-0242ac130003";
     public static final String COVID_19_CONTACT_TRACING_ENCOUNTER = "6dd1ace2-6ce2-11ea-bc55-0242ac130003";
-
+    public static final String COVID_19_COMORBIDITY_ENCOUNTER = "dbe0e608-853d-11ea-bc55-0242ac130003";
+    public static final String COVID_19_COMORBIDITY_FORM = "dbe0ebd0-853d-11ea-bc55-0242ac130003";
 
 
     ConceptService conceptService = Context.getConceptService();
@@ -387,6 +388,7 @@ public class MedicMobileDataExchange {
 
         // comorbidity
         String comorbidities = comorbidityInfo.has("conditions_comorbidity") ? comorbidityInfo.get("conditions_comorbidity").textValue() : null;
+        String trimester = comorbidityInfo.has("trimester") ? comorbidityInfo.get("trimester").textValue() : null;
 
         EncounterType encType = Context.getEncounterService().getEncounterTypeByUuid(HTSMetadata.COVID_19_CASE_INVESTIGATION_ENCOUNTER);
         Form form = Context.getFormService().getFormByUuid(HTSMetadata.COVID_19_CASE_INVESTIGATION_FORM);
@@ -580,6 +582,16 @@ public class MedicMobileDataExchange {
             if (comorbitiesArr.length > 0) {
                 encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.YES_CONCEPT, encDate));
 
+                // set up comorbidities encounter. we split this from the CIF for ease of use in the EMR
+                EncounterType comorbidEncType = Context.getEncounterService().getEncounterTypeByUuid(COVID_19_COMORBIDITY_ENCOUNTER);
+                Form comorbidForm = Context.getFormService().getFormByUuid(COVID_19_COMORBIDITY_FORM);
+
+                Encounter eComorbid = new Encounter();
+                eComorbid.setEncounterType(comorbidEncType);
+                eComorbid.setPatient(patient);
+                eComorbid.setEncounterDatetime(encDate);
+                eComorbid.setForm(comorbidForm);
+
                 for (int i = 0; i < comorbitiesArr.length; i++) {
                     String condition = comorbitiesArr[i];
                     if (condition == null || condition.equals("")) {
@@ -587,25 +599,37 @@ public class MedicMobileDataExchange {
                     }
 
                     if (condition.equals("diabetes")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DIABETES, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DIABETES, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("liver_disease")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.LIVER_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.LIVER_DISEASE, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("renal_disease")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.RENAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.RENAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("hypertension")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HYPERTENSION, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HYPERTENSION, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("chronic_neurological_disease")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_NEUROLOGICAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_NEUROLOGICAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("post_partum_less_than_6_weeks")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.POST_PARTUM_LESS_THAN_6_WEEKS, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.POST_PARTUM_LESS_THAN_6_WEEKS, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("chronic_lung_disease")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_LUNG_DISEASE, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_LUNG_DISEASE, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("immunodeficiency")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.IMMUNODEFICIENCY, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.IMMUNODEFICIENCY, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("malignancy")) {
-                        encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.MALIGNANCY, ObsUtils.YES_CONCEPT, encDate));
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.MALIGNANCY, ObsUtils.YES_CONCEPT, encDate));
+                    } else if (condition.equals("pregnancy")) {
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_PREGNANT, ObsUtils.YES_CONCEPT, encDate));
                     }
                 }
+                if (StringUtils.isNotBlank(trimester)) {
+                    if (trimester.equals("first")) {
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PREGNANCY_TRIMESTER, ObsUtils.PREGNANCY_FIRST_TRIMESTER, encDate));
+                    } else if (trimester.equals("second")) {
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PREGNANCY_TRIMESTER, ObsUtils.PREGNANCY_SECOND_TRIMESTER, encDate));
+                    } else if (trimester.equals("third")) {
+                        eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PREGNANCY_TRIMESTER, ObsUtils.PREGNANCY_THIRD_TRIMESTER, encDate));
+                    }
+                }
+                encounterService.saveEncounter(eComorbid);
             } else {
                 encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.NO_CONCEPT, encDate));
             }
@@ -1038,9 +1062,9 @@ public class MedicMobileDataExchange {
         Set<Integer> eligibleList = new HashSet<Integer>();
         String sql = "";
         if (lastContactEntry != null && lastContactEntry > 0) {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0 and ipv_outcome !='CHT';"; // get contacts not registered
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0 and (ipv_outcome !='CHT' or ipv_outcome is null);"; // get contacts not registered
         } else {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0 and ipv_outcome !='CHT';";
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0 and (ipv_outcome !='CHT' or ipv_outcome is null);";
 
         }
 
