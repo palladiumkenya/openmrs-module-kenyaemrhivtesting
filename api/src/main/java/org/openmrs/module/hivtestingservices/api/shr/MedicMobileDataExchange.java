@@ -127,11 +127,18 @@ public class MedicMobileDataExchange {
             if (uuid == null && nationalID == null && passportNo == null && alienNo == null) {
                 return "The payload has no identification information! Nothing has been processed";
             }
+
             if (StringUtils.isNotBlank(uuid)) {
                 c = htsService.getPatientContactByUuid(uuid);
             }
 
-            patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
+            if (StringUtils.isNotBlank(uuid)) {
+                patient = Context.getPatientService().getPatientByUuid(uuid);
+            }
+
+            if (patient == null) {
+                patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
+            }
 
             if (c == null && patient == null && (traceReport == null || traceReport.isEmpty())) {
 
@@ -248,6 +255,7 @@ public class MedicMobileDataExchange {
 
 
                     patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
+                    patient.setUuid(c.getUuid());
                     patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);
                     patient = SHRUtils.addPersonAttributes(patient, phoneNumber, nokName, nokPhoneNo);
                     patient = SHRUtils.savePatient(patient);
@@ -322,17 +330,24 @@ public class MedicMobileDataExchange {
                 sex = "U";
             }
 
+            Patient patient = null;
+            //try searching by provided uuid
+            if (StringUtils.isNotBlank(contactUuid)) {
+                patient = Context.getPatientService().getPatientByUuid(contactUuid);
+            }
 
-            Patient patient = SHRUtils.checkIfPatientExists(idNumber, passportNumber, alienNumber);
+            if (patient == null) {
+                patient = SHRUtils.checkIfPatientExists(idNumber, passportNumber, alienNumber);
+            }
             if (patient == null) {
                 patient = SHRUtils.createPatient(fName, mName, lName, dob, sex, idNumber, passportNumber, alienNumber);
                 if (caseIdentifier != null) {
                     patient.addIdentifier(caseIdentifier);
                 }
-                patient = SHRUtils.savePatient(patient);
                 patient.setUuid(contactUuid);
                 patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);
                 patient = SHRUtils.addPersonAttributes(patient, phoneNumber, nokName, nokPhoneNo);
+                patient = SHRUtils.savePatient(patient);
             }
 
             if (patient != null) {
