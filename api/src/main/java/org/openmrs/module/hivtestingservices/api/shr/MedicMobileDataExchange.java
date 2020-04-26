@@ -28,6 +28,7 @@ import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
@@ -198,10 +199,41 @@ public class MedicMobileDataExchange {
 
 
             if (traceReport != null && !traceReport.isEmpty()) {
-                String encDateStr = traceReport.get("date_last_contacted").textValue();
 
+                String encDateStr = traceReport.get("date_last_contacted").textValue();
+                String followUpType = traceReport.get("follow_up_type").textValue();
+                String isAvailable = traceReport.get("is_available").textValue();
                 Date encounterdate = SHRUtils.parseDateString(encDateStr, "yyyy-MM-dd");
-                Double followupSequence = traceReport.get("follow_up_count").doubleValue();
+
+                if (StringUtils.isNotBlank(isAvailable) && StringUtils.isNotBlank(followUpType) && isAvailable.equals("no")) { // record non successful trace
+                    String isNotAvailableReason = traceReport.get("is_not_available_reason").textValue();
+                    String isNotAvailableReasonOther = traceReport.get("is_not_available_reason_other").textValue();
+
+                    if (StringUtils.isNotBlank(isNotAvailableReason) && isNotAvailableReason.equals("phone_off")) {
+                        isNotAvailableReason = "Calls not going through";
+                    } else if (StringUtils.isNotBlank(isNotAvailableReason) && isNotAvailableReason.equals("moved_away")) {
+                        isNotAvailableReason = "Migrated";
+                    } else if (StringUtils.isNotBlank(isNotAvailableReason) && isNotAvailableReason.equals("person_not_found")) {
+                        isNotAvailableReason = "Not found at home";
+                    } else if (StringUtils.isNotBlank(isNotAvailableReason) && isNotAvailableReason.equals("deceased")) {
+                        isNotAvailableReason = "Died";
+                    } else if (StringUtils.isNotBlank(isNotAvailableReasonOther)) {
+                        isNotAvailableReason = isNotAvailableReasonOther;
+                    }
+
+                    ContactTrace trace = new ContactTrace();
+                    trace.setPatientContact(c);
+                    trace.setDate(encounterdate);
+                    trace.setContactType(followUpType.equals("phone") ? "Phone" : "Physical");
+                    trace.setStatus("Not Contacted");
+                    trace.setReasonUncontacted(isNotAvailableReason);
+                    htsService.saveClientTrace(trace);
+                    return "Contact trace details updated successfully";
+                }
+
+
+                String followupSequenceStr = traceReport.get("follow_up_count").textValue();
+                Double followupSequence = Double.parseDouble(followupSequenceStr);
                 String tempStr = traceReport.get("temperature").textValue();
                 Double temp = Double.parseDouble(tempStr);
                 String cough = traceReport.get("cough").textValue();
@@ -329,7 +361,7 @@ public class MedicMobileDataExchange {
         ObjectNode fields = (ObjectNode) cif.get("fields");
         ObjectNode geolocation = (ObjectNode) cif.get("geolocation");
         ObjectNode reportingInfo = (ObjectNode) fields.get("group_reporting_info");
-        ObjectNode patientInfo = (ObjectNode) fields.get("group_patient_information");
+        //ObjectNode patientInfo = (ObjectNode) fields.get("group_patient_information");
         ObjectNode clinicalInfo = (ObjectNode) fields.get("group_clinical_information");
         ObjectNode symptomsInfo = (ObjectNode) fields.get("group_patient_symptoms");
         ObjectNode signsInfo = (ObjectNode) fields.get("group_patient_signs");
@@ -449,7 +481,7 @@ public class MedicMobileDataExchange {
         }
         if(StringUtils.isNotBlank(patientHealthStatus) && patientHealthStatus.equals("stable")) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.PATIENT_STATUS_STABLE, encDate));
-        } else if(StringUtils.isNotBlank(patientHealthStatus) && patientHealthStatus.equals("severely ill")) {
+        } else if(StringUtils.isNotBlank(patientHealthStatus) && patientHealthStatus.equals("severely_ill")) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.PATIENT_STATUS_SEVERELY_ILL, encDate));
         } else if(StringUtils.isNotBlank(patientHealthStatus) && patientHealthStatus.equals("dead")) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_STATUS_AT_REPORTING, ObsUtils.PATIENT_STATUS_DEAD, encDate));
@@ -577,7 +609,7 @@ public class MedicMobileDataExchange {
         }
 
 
-        if (StringUtils.isNotBlank(comorbidities)) {
+        if (StringUtils.isNotBlank(comorbidities) && !comorbidities.equals("none")) {
             String comorbitiesArr[] = comorbidities.split(" ");
             if (comorbitiesArr.length > 0) {
                 encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.YES_CONCEPT, encDate));
@@ -604,15 +636,15 @@ public class MedicMobileDataExchange {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.LIVER_DISEASE, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("renal_disease")) {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.RENAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
-                    } else if (condition.equals("hypertension")) {
+                    } else if (condition.equals("cardiovascular_disease_including_hypertension")) {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HYPERTENSION, ObsUtils.YES_CONCEPT, encDate));
-                    } else if (condition.equals("chronic_neurological_disease")) {
+                    } else if (condition.equals("chronic_neurological_or_neuromuscular_disease")) {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_NEUROLOGICAL_DISEASE, ObsUtils.YES_CONCEPT, encDate));
-                    } else if (condition.equals("post_partum_less_than_6_weeks")) {
+                    } else if (condition.equals("postpartum_less_than_6_weeks")) {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.POST_PARTUM_LESS_THAN_6_WEEKS, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("chronic_lung_disease")) {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.CHRONIC_LUNG_DISEASE, ObsUtils.YES_CONCEPT, encDate));
-                    } else if (condition.equals("immunodeficiency")) {
+                    } else if (condition.equals("immunodeficiency_including_HIV")) {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.IMMUNODEFICIENCY, ObsUtils.YES_CONCEPT, encDate));
                     } else if (condition.equals("malignancy")) {
                         eComorbid.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.MALIGNANCY, ObsUtils.YES_CONCEPT, encDate));
@@ -633,6 +665,8 @@ public class MedicMobileDataExchange {
             } else {
                 encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.NO_CONCEPT, encDate));
             }
+        } else  if (StringUtils.isNotBlank(comorbidities) && comorbidities.equals("none")) {
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.NO_CONCEPT, encDate));
         } else {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.HAS_COMORBIDITIES, ObsUtils.UNKNOWN, encDate));
         }
@@ -764,7 +798,6 @@ public class MedicMobileDataExchange {
             enc.addObs(dbObs);
         }
             encounterService.saveEncounter(enc);
-
     }
 
     /**
