@@ -30,6 +30,7 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.PrivilegeConstants;
 
@@ -61,6 +62,7 @@ public class SHRUtils {
     public static PatientIdentifierType PASSPORT_NUMBER_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.PASSPORT_NUMBER);
     public static PatientIdentifierType CASE_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.PATIENT_CLINIC_NUMBER);
     public static PatientIdentifierType OPENMRS_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.MEDICAL_RECORD_NUMBER);
+    public static PatientIdentifierType CHT_REFERENCE_UUID = Context.getPatientService().getPatientIdentifierTypeByUuid(HTSMetadata._PatientIdentifierType.CHT_RECORD_UUID);
 
 
     public static SHR getSHR(String SHRStr) {
