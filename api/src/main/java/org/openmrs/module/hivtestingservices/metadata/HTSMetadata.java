@@ -14,11 +14,14 @@
 
 package org.openmrs.module.hivtestingservices.metadata;
 
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.springframework.stereotype.Component;
 
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.globalProperty;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.patientIdentifierType;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.relationshipType;
 
 /**
@@ -68,6 +71,10 @@ public class HTSMetadata extends AbstractMetadataBundle {
 
 	}
 
+	public static final class _PatientIdentifierType {
+		public static final String CHT_RECORD_UUID = "c6552b22-f191-4557-a432-1f4df872d473";
+	}
+
 	@Override
 	public void install() throws Exception {
 		// doing this in the scheduled task so that previous value set is preserved
@@ -98,6 +105,10 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(globalProperty(LAB_SERVER_URL, "Lab server url", null));
 		install(globalProperty(LAB_API_TOKEN, "Lab Api token", null));
 		install(globalProperty(LAST_LAB_ORDER_ENTRY, "Lab last order entry id", null));
+
+		install(patientIdentifierType("CHT Record Reference UUID", "Record reference UUID from CHT",
+				null, null, null,
+				PatientIdentifierType.LocationBehavior.NOT_USED, false, _PatientIdentifierType.CHT_RECORD_UUID));
 	}
 
 }

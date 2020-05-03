@@ -34,7 +34,6 @@ import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -324,7 +323,7 @@ public class MedicMobileDataExchange {
                 caseIdentifier.setIdentifier(caseId);
             }
 
-            if(org.apache.commons.lang3.StringUtils.isNotBlank(sex)) {
+            if(StringUtils.isNotBlank(sex)) {
                 sex = sex.equals("male") ? "M" : sex.equals("female") ? "F" : "U";
             } else {
                 sex = "U";
@@ -344,7 +343,9 @@ public class MedicMobileDataExchange {
                 if (caseIdentifier != null) {
                     patient.addIdentifier(caseIdentifier);
                 }
-                patient.setUuid(contactUuid);
+                if (StringUtils.isNotBlank(contactUuid)) {
+                    patient = addCHTRecordUuid(patient, contactUuid);
+                }
                 patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);
                 patient = SHRUtils.addPersonAttributes(patient, phoneNumber, nokName, nokPhoneNo);
                 patient = SHRUtils.savePatient(patient);
@@ -369,6 +370,24 @@ public class MedicMobileDataExchange {
         return "There were no case information provided";
     }
 
+    /**
+     * Adds CHT record uuid
+     * This is returned back to CHT
+     * @param patient
+     * @param uuid
+     * @return
+     */
+    private Patient addCHTRecordUuid(Patient patient, String uuid) {
+        PatientIdentifier recordUuid = null;
+        if (StringUtils.isNotBlank(uuid)) {
+            recordUuid = new PatientIdentifier();
+            recordUuid.setIdentifierType(SHRUtils.CHT_REFERENCE_UUID);
+            recordUuid.setIdentifier(uuid);
+            patient.addIdentifier(recordUuid);
+        }
+        return patient;
+
+    }
 
     private void enrollForCovidCaseInvestigation(Patient patient, ObjectNode cif) {
 
@@ -983,6 +1002,7 @@ public class MedicMobileDataExchange {
         PatientIdentifier nationalId = patient.getPatientIdentifier(SHRUtils.NATIONAL_ID_TYPE);
         PatientIdentifier passportNumber = patient.getPatientIdentifier(SHRUtils.PASSPORT_NUMBER_TYPE);
         PatientIdentifier alienNumber = patient.getPatientIdentifier(SHRUtils.ALIEN_NUMBER_TYPE);
+        PatientIdentifier chtReference = patient.getPatientIdentifier(SHRUtils.CHT_REFERENCE_UUID);
 
         // get address
 
@@ -997,6 +1017,7 @@ public class MedicMobileDataExchange {
 
         fields.put("needs_sign_off",true);
         fields.put("case_id",caseId != null ? caseId.getIdentifier() : "");
+        fields.put("cht_ref_uuid",chtReference != null ? chtReference.getIdentifier() : "");
         fields.put("national_id", nationalId != null ? nationalId.getIdentifier() : "");
         fields.put("passport_number", passportNumber != null ? passportNumber.getIdentifier() : "");
         fields.put("alien_number", alienNumber != null ? alienNumber.getIdentifier() : "");
