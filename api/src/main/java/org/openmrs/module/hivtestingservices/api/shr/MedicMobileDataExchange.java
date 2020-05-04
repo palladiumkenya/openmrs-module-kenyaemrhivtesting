@@ -479,9 +479,9 @@ public class MedicMobileDataExchange {
             encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_SUB_COUNTY, reportingSubCounty, encDate));
         }
 
-        if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("yes")) {
+        if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("point_of_entry")) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.POE, encDate));
-        } if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("no")) {
+        } if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("detected_in_community")) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.COMMUNITY, encDate));
         } else {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.UNKNOWN, encDate));
@@ -491,7 +491,7 @@ public class MedicMobileDataExchange {
             encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_DETECTED, SHRUtils.parseDateString(poeDetectionDate, dateFormat), encDate));
         }
         if(StringUtils.isNotBlank(symptomatic)) {
-            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_SYMPTOMATIC, symptomatic.equals("symptomatic") ? ObsUtils.YES_CONCEPT : ObsUtils.NO_CONCEPT, encDate));
+            encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.PATIENT_SYMPTOMATIC, symptomatic.equals("yes") ? ObsUtils.YES_CONCEPT : symptomatic.equals("no") ? ObsUtils.NO_CONCEPT : ObsUtils.UNKNOWN, encDate));
         }
         if(StringUtils.isNotBlank(symptomsOnsetDate)) {
             encounter.addObs(ObsUtils.setupDatetimeObs(patient, ObsUtils.DATE_OF_ONSET_OF_SYMPTOMS, SHRUtils.parseDateString(symptomsOnsetDate, dateFormat), encDate));
