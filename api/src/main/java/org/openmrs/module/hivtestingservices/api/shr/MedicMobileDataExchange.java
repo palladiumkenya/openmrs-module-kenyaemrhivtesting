@@ -838,16 +838,18 @@ public class MedicMobileDataExchange {
      * Get a list of contacts for tracing
      * @return
      * @param lastContactEntry
-     * @param lastId
+     * @param lastContactId
+     * @param gpLastPatient
+     * @param lastPatientId
      */
-    public ObjectNode getContacts(Integer lastContactEntry, Integer lastId) {
+    public ObjectNode getContacts(Integer lastContactEntry, Integer lastContactId, Integer gpLastPatient, Integer lastPatientId) {
 
         JsonNodeFactory factory = OutgoingPatientSHR.getJsonNodeFactory();
         ArrayNode patientContactNode = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
         ObjectNode responseWrapper = factory.objectNode();
 
         HTSService htsService = Context.getService(HTSService.class);
-        Set<Integer> listedContacts = getListedContacts(lastContactEntry, lastId);
+        Set<Integer> listedContacts = getListedContacts(lastContactEntry, lastContactId);
         Map<Integer, ArrayNode> contactMap = new HashMap<Integer, ArrayNode>();
 
         if (listedContacts != null && listedContacts.size() > 0) {
@@ -953,6 +955,18 @@ public class MedicMobileDataExchange {
                 contactWrapper.put("contacts", contacts);
                 patientContactNode.add(contactWrapper);
 
+            }
+        }
+
+        // add for cases under investigation but with no contacts
+        ArrayNode emptyContactNode = factory.arrayNode();
+        Set<Integer> patientList = getContactsInCovidProgramProgram(gpLastPatient, lastPatientId);
+        if (patientList.size() > 0) {
+            for (Integer ptId : patientList) {
+                Patient patient = Context.getPatientService().getPatient(ptId);
+                ObjectNode contactWrapper = buildPatientNode(patient);
+                contactWrapper.put("contacts", emptyContactNode);
+                patientContactNode.add(contactWrapper);
             }
         }
 
@@ -1144,6 +1158,34 @@ public class MedicMobileDataExchange {
                 eligibleList.add(patientId);
             }
         }
+        return eligibleList;
+    }
+
+    protected Set<Integer> getContactsInCovidProgramProgram(Integer lastPatientEntry, Integer lastId) {
+
+        Set<Integer> eligibleList = new HashSet<Integer>();
+
+        String sql = "";
+        if (lastPatientEntry != null && lastPatientEntry > 0) {
+            sql = "select pp.patient_id from patient_program pp \n" +
+                    "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
+                    "where pp.patient_program_id >" + lastPatientEntry + " and pp.voided=0;";
+        } else {
+
+            sql = "select pp.patient_id from patient_program pp \n" +
+                    "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
+                    "where pp.patient_program_id <= " + lastId + " and pp.voided=0;";
+
+        }
+
+        List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
+        if (!activeList.isEmpty()) {
+            for (List<Object> res : activeList) {
+                Integer patientId = (Integer) res.get(0);
+                eligibleList.add(patientId);
+            }
+        }
+
         return eligibleList;
     }
 

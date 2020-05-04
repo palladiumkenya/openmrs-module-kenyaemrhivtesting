@@ -47,6 +47,13 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
                 authenticate();
             }
 
+            GlobalProperty lastPatientEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_ENTRY);
+            String lastQuarantineIdsql = "select max(patient_program_id) last_id from patient_program where voided=0;";
+            List<List<Object>> lastQuarantineRs = Context.getAdministrationService().executeSQL(lastQuarantineIdsql, true);
+            Integer lastPatientId = (Integer) lastQuarantineRs.get(0).get(0);
+            lastPatientId = lastPatientId != null ? lastPatientId : 0;
+
+
             GlobalProperty lastContactEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY);
             GlobalProperty chtServerName = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_SERVER_URL);
             GlobalProperty chtUser = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_USER);
@@ -59,6 +66,10 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
 
             String lastContactIdStr = lastContactEntry != null && lastContactEntry.getValue() != null ? lastContactEntry.getValue().toString() : "";
             Integer gpLastContactId = StringUtils.isNotBlank(lastContactIdStr) ? Integer.parseInt(lastContactIdStr) : 0;
+
+            String lastPatientIdStr = lastPatientEntry != null && lastPatientEntry.getValue() != null ? lastPatientEntry.getValue().toString() : "";
+            Integer gpLastPatientId = StringUtils.isNotBlank(lastPatientIdStr) ? Integer.parseInt(lastPatientIdStr) : 0;
+
             boolean hasData = false;
 
             String serverUrl = chtServerName.getPropertyValue();
@@ -75,7 +86,7 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
 
 
             // check if there are item(s) to post
-            ObjectNode contactWrapper = e.getContacts(gpLastContactId, lastId);
+            ObjectNode contactWrapper = e.getContacts(gpLastContactId, lastId, gpLastPatientId, lastPatientId);
             ArrayNode docs = (ArrayNode) contactWrapper.get("docs");
 
 
@@ -119,7 +130,10 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
 
                     // save this at the end just so that we take care of instances when there is no connectivity
                     lastContactEntry.setPropertyValue(lastId.toString());
+                    lastPatientEntry.setPropertyValue(lastPatientId.toString());
+
                     Context.getAdministrationService().saveGlobalProperty(lastContactEntry);
+                    Context.getAdministrationService().saveGlobalProperty(lastPatientEntry);
 
                     System.out.println("Successfully pushed contacts to Medic Mobile CHT");
                     log.info("Successfully pushed contacts to Medic Mobile CHT");

@@ -47,11 +47,10 @@ public class HTSMetadata extends AbstractMetadataBundle {
 	public static final String COVID_19_CASE_INVESTIGATION_FORM = "0fe60b26-8648-438b-afea-8841dcd993c6";
 	public static final String COVID_19_CASE_INVESTIGATION_ENCOUNTER = "a4414aee-6832-11ea-bc55-0242ac130003";
 	public static final String COVID_19_CASE_INVESTIGATION_PROGRAM = "e7ee7548-6958-4361-bed9-ee2614423947";
+    public static final String MEDIC_MOBILE_LAST_PATIENT_ENTRY = "medicMobile.lastCaseInvestigationEnrollmentUpdate";
 
 
-
-
-	public static final class _EncounterType {
+    public static final class _EncounterType {
 		public static final String HTS = "9c0a7a57-62ff-4f75-babe-5835b0e921b7";
 	}
 	public static final class _Form {
