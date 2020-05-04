@@ -481,7 +481,7 @@ public class MedicMobileDataExchange {
 
         if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("point_of_entry")) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.POE, encDate));
-        } if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("detected_in_community")) {
+        } else if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("detected_in_community")) {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.COMMUNITY, encDate));
         } else {
             encounter.addObs(ObsUtils.setupCodedObs(patient, ObsUtils.DETECTION_POINT, ObsUtils.UNKNOWN, encDate));
