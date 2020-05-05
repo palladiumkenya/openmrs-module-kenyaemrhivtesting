@@ -95,6 +95,7 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
             }
 
             System.out.println("CHT Post request. Records found: " + docs.size());
+            //System.out.println("CHT Post request : " + docs.toString());
 
             if (serverUrl != null && username != null && pwd != null && hasData) {
                 String payload = contactWrapper.toString();

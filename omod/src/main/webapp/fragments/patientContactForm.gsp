@@ -15,7 +15,7 @@
             [
                     [object: command, property: "physicalAddress", label: "Address"],
                     [object: command, property: "subcounty", label: "Sub county"],
-                    [object: command, property: "town", label: "Town"],
+                    [object: command, property: "town", label: "Residence"],
                     [object: command, property: "phoneContact", label: "Phone number."]
 
             ]

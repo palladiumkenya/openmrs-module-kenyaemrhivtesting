@@ -924,9 +924,9 @@ public class MedicMobileDataExchange {
                 contact.put("ward", "");
                 contact.put("location", "");
                 contact.put("sub_location","");
-                contact.put("village", c.getTown() != null ? c.getTown() : "");
+                contact.put("village", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
                 contact.put("landmark", "");
-                contact.put("residence", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
+                contact.put("residence", c.getTown() != null ? c.getTown() : "");
                 contact.put("nearest_health_center", "");
                 contact.put("kin_name", "");
                 contact.put("kin_relationship", "");
@@ -963,10 +963,12 @@ public class MedicMobileDataExchange {
         Set<Integer> patientList = getContactsInCovidProgramProgram(gpLastPatient, lastPatientId);
         if (patientList.size() > 0) {
             for (Integer ptId : patientList) {
-                Patient patient = Context.getPatientService().getPatient(ptId);
-                ObjectNode contactWrapper = buildPatientNode(patient);
-                contactWrapper.put("contacts", emptyContactNode);
-                patientContactNode.add(contactWrapper);
+                if (!contactMap.keySet().contains(ptId)) {
+                    Patient patient = Context.getPatientService().getPatient(ptId);
+                    ObjectNode contactWrapper = buildPatientNode(patient);
+                    contactWrapper.put("contacts", emptyContactNode);
+                    patientContactNode.add(contactWrapper);
+                }
             }
         }
 

@@ -90,6 +90,7 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(relationshipType("Road passenger", "Road passenger", "Travel by road together", _RelationshipType.ROAD_PASSENGER));
 
 		install(globalProperty(MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY, "Id for the last case contact entry for CHT", null));
+		install(globalProperty(MEDIC_MOBILE_LAST_PATIENT_ENTRY, "Medic last patient entry ID", null));
 		install(globalProperty(MEDIC_MOBILE_SERVER_URL, "Server URL for Medic Mobile CHT", null));
 		install(globalProperty(MEDIC_MOBILE_USER, "Medic Mobile CHT user", null));
 		install(globalProperty(MEDIC_MOBILE_PWD, "Medic Mobile CHT pwd", null));
