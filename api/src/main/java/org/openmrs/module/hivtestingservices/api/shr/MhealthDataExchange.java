@@ -614,12 +614,12 @@ public class MhealthDataExchange {
         if (lastPatientEntry != null && lastPatientEntry > 0) {
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='9a5d555e-739a-11ea-bc55-0242ac130003') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_id >" + lastPatientEntry + " and pp.voided=0;";
+                    "where pp.patient_program_id >" + lastPatientEntry + " and pp.voided=0;";
         } else {
 
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='9a5d555e-739a-11ea-bc55-0242ac130003') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_id <= " + lastId + " and pp.voided=0;";
+                    "where pp.patient_program_id <= " + lastId + " and pp.voided=0;";
 
         }
 
