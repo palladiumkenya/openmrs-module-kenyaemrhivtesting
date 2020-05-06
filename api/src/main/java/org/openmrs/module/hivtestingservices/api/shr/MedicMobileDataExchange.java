@@ -34,6 +34,7 @@ import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -149,7 +150,13 @@ public class MedicMobileDataExchange {
                     dateOfLastContact = SHRUtils.parseDateString(dateOfLastContactStr, "yyyy-MM-dd");
                 }
                 if (StringUtils.isNotBlank(casePatientUuid)) {
-                    Patient p = Context.getPatientService().getPatientByUuid(casePatientUuid);
+                    Patient p = Context.getPatientService().getPatientByUuid(casePatientUuid);// check if the uuid is in OpenMRS
+                    if (p == null) { // check if case originated from CHT
+                        List<Patient> existingPatients = Context.getPatientService().getPatients(null, casePatientUuid, Arrays.asList(SHRUtils.CHT_REFERENCE_UUID), false);
+                        if (existingPatients.size() > 0) {
+                            p = existingPatients.get(0);
+                        }
+                    }
                     if (p != null) {
                         PatientContact pc = new PatientContact();
                         pc.setFirstName(fName);
