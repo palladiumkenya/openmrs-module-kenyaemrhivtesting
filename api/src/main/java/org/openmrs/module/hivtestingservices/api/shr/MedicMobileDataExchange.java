@@ -402,7 +402,6 @@ public class MedicMobileDataExchange {
         ObjectNode fields = (ObjectNode) cif.get("fields");
         ObjectNode geolocation = (ObjectNode) cif.get("geolocation");
         ObjectNode reportingInfo = (ObjectNode) fields.get("group_reporting_info");
-        //ObjectNode patientInfo = (ObjectNode) fields.get("group_patient_information");
         ObjectNode clinicalInfo = (ObjectNode) fields.get("group_clinical_information");
         ObjectNode symptomsInfo = (ObjectNode) fields.get("group_patient_symptoms");
         ObjectNode signsInfo = (ObjectNode) fields.get("group_patient_signs");
@@ -424,6 +423,7 @@ public class MedicMobileDataExchange {
         String reportingFacility = reportingInfo.has("reporting_facility") ? reportingInfo.get("reporting_facility").textValue() : null;
         String reportingCounty = reportingInfo.has("county") ? reportingInfo.get("county").textValue() : null;
         String reportingSubCounty = reportingInfo.has("subcounty") ? reportingInfo.get("subcounty").textValue() : null;
+        String reportingWard = reportingInfo.has("ward") ? reportingInfo.get("ward").textValue() : null;
         String poeDetection = reportingInfo.has("poe_detected") ? reportingInfo.get("poe_detected").textValue() : null;
         String poeDetectionDate = reportingInfo.has("poe_detection_date") ? reportingInfo.get("poe_detection_date").textValue() : null;
 
@@ -484,6 +484,14 @@ public class MedicMobileDataExchange {
         }
         if(StringUtils.isNotBlank(reportingSubCounty)) {
             encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_SUB_COUNTY, reportingSubCounty, encDate));
+        }
+
+        if(StringUtils.isNotBlank(reportingWard)) {
+            encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_WARD, reportingWard, encDate));
+        }
+
+        if(StringUtils.isNotBlank(reportingFacility)) {
+            encounter.addObs(ObsUtils.setupTextObs(patient, ObsUtils.REPORTING_HEALTH_FACILITY, reportingFacility, encDate));
         }
 
         if (StringUtils.isNotBlank(poeDetection) && poeDetection.equals("point_of_entry")) {
