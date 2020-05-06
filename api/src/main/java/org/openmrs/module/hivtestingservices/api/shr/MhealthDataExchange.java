@@ -585,9 +585,9 @@ public class MhealthDataExchange {
 
         String sql = "";
         if (lastContactEntry != null) {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0;"; // get contacts not registered
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and phone_contact is not null and patient_id is null and voided=0;"; // get contacts not registered
         } else {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastContactId + " and patient_id is null and voided=0;";
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastContactId + " and phone_contact is not null and patient_id is null and voided=0;";
         }
 
         List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
