@@ -261,7 +261,8 @@ public class MedicMobileDataExchange {
 
 
                     patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
-                    patient.setUuid(c.getUuid());
+                    patient = addCHTRecordUuid(patient,uuid);
+                    //patient.setUuid(c.getUuid());
                     patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);
                     patient = SHRUtils.addPersonAttributes(patient, phoneNumber, nokName, nokPhoneNo);
                     patient = SHRUtils.savePatient(patient);
