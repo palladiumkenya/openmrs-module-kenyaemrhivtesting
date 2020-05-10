@@ -129,7 +129,7 @@
                     </td>
                     <td></td>
                     <td>
-                        <textarea class ="facility" name="facility"  rows="0" cols="15">${(command.facility != null)? command.facility : ""}</textarea>
+                        <input type="text" size="60" class ="facility" name="facility"  rows="0" cols="15" value="${(command.facility != null)? command.facility : ""}"/>
                     </td>
                 </tr>
             </table>
@@ -140,7 +140,8 @@
             <legend>Contact type</legend>
             <table>
                 <tr>
-                    <td class="ke-field-label">Type of contact</td>
+                    <td class="ke-field-label">Contact with case</td>
+                    <td class="ke-field-label">Contact type</td>
                 </tr>
                 <tr>
                     <td style="width: 260px">
@@ -150,6 +151,16 @@
                             <option ${
                                     (command.pnsApproach == null) ? "" : it.value == command.pnsApproach ? "selected" : ""}
                                     value="${it.value}">${it.label}</option>
+                            <% } %>
+                        </select>
+                    </td>
+                    <td style="width: 260px">
+                        <select name="contactListingDeclineReason" id="contactListingDeclineReason">
+                            <option></option>
+                            <% primarySecondaryContactOptions.each { %>
+                            <option ${
+                                    (command.contactListingDeclineReason == null) ? "" : it == command.contactListingDeclineReason ? "selected" : ""}
+                                    value="${it}">${it}</option>
                             <% } %>
                         </select>
                     </td>

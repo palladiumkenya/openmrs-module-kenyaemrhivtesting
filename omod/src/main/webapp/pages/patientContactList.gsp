@@ -134,7 +134,7 @@ div.section-title {
 
     <div class="column-three col-header">Sub County</div>
 
-    <div class="column-three col-header">Town</div>
+    <div class="column-three col-header">Residence</div>
 
     <div class="column-four col-header">Phone</div>
 

@@ -36,6 +36,7 @@ public class PatientContactFormFragmentController {
         model.addAttribute("livingWithPatientOptions", getLivingWithPatientOptions());
         model.addAttribute("preferredPNSApproachOptions", getPreferredPNSApproachOptions());
         model.addAttribute("maritalStatusOptions", getMaritalStatusOptions());
+        model.addAttribute("primarySecondaryContactOptions", primarySecondaryContactOptions());
 
     }
 
@@ -71,6 +72,10 @@ public class PatientContactFormFragmentController {
 
     private List<String> ipvOutcomeOptions() {
         return Arrays.asList("True", "False");
+    }
+
+    private List<String> primarySecondaryContactOptions() {
+        return Arrays.asList("Primary", "Secondary");
     }
 
     protected List<SimpleObject> getRelationshipTypeOptions() {
