@@ -138,13 +138,13 @@ div.section-title {
 
                         <div class="column-two">${rel.contactType}</div>
 
-                        <div class="column-three">${rel.status}</div>
+                        <div class="column-three">${rel.status ?: ""}</div>
 
-                        <div class="column-four">${rel.reasonUncontacted}</div>
+                        <div class="column-four">${rel.reasonUncontacted ?: ""}</div>
 
-                        <div class="column-five">${rel.facilityLinkedTo}</div>
+                        <div class="column-five">${rel.facilityLinkedTo ?: ""}</div>
 
-                        <div class="column-six">${rel.remarks}</div>
+                        <div class="column-six">${rel.remarks ?: ""}</div>
 
                         <% if (patientContact.patient == null) { %>
 

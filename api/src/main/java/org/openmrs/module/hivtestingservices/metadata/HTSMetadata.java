@@ -72,6 +72,7 @@ public class HTSMetadata extends AbstractMetadataBundle {
 
 	public static final class _PatientIdentifierType {
 		public static final String CHT_RECORD_UUID = "c6552b22-f191-4557-a432-1f4df872d473";
+		public static final String CHT_SPECIMEN_REFERENCE = "f9d4d5d4-1d30-43bb-b362-801b3fc73566";
 	}
 
 	@Override
@@ -109,6 +110,10 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(patientIdentifierType("CHT Record Reference UUID", "Record reference UUID from CHT",
 				null, null, null,
 				PatientIdentifierType.LocationBehavior.NOT_USED, false, _PatientIdentifierType.CHT_RECORD_UUID));
+
+		/*install(patientIdentifierType("CHT Lab specimen reference", "Lab reference from CHT covid case investigation form",
+				null, null, null,
+				PatientIdentifierType.LocationBehavior.NOT_USED, false, _PatientIdentifierType.CHT_SPECIMEN_REFERENCE));*/
 	}
 
 }
