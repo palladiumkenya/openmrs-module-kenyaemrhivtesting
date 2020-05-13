@@ -116,6 +116,7 @@ public class MedicMobileDataExchange {
             String nokName = contactNode.get("kin_name").textValue();
             String nokPhoneNo = contactNode.get("kin_phone_number").textValue();
             String typeOfContact = contactNode.get("type_of_contact").textValue();
+            String typeOfExposure = contactNode.get("type_of_exposure").textValue();
             String relationToCase = contactNode.get("relation_to_case").textValue();
             Date dob = SHRUtils.parseDateString(dobString, "yyyy-MM-dd");
             ObjectNode traceReport = (ObjectNode) jsonNode.get("trace");
@@ -185,8 +186,12 @@ public class MedicMobileDataExchange {
 
                         pc.setIpvOutcome("CHT");// using this to store record source. We should not push back contacts sent from CHT
 
-                        if (StringUtils.isNotBlank(typeOfContact) && getContactTypeConcept(Integer.parseInt(typeOfContact)) != null) {
-                            pc.setPnsApproach(getContactTypeConcept(Integer.parseInt(typeOfContact)));
+                        if (StringUtils.isNotBlank(typeOfExposure) && getContactTypeConcept(Integer.parseInt(typeOfExposure)) != null) {
+                            pc.setPnsApproach(getContactTypeConcept(Integer.parseInt(typeOfExposure)));
+                        }
+
+                        if (StringUtils.isNotBlank(typeOfContact)) { // has been edited to primary/secondary
+                            pc.setContactListingDeclineReason(typeOfContact.equals("primary")? "Primary" : "Secondary");
                         }
                         pc.setBirthDate(dob);
                         pc.setVoided(false);
@@ -397,6 +402,25 @@ public class MedicMobileDataExchange {
 
     }
 
+    /**
+     * Adds CHT Lab speciment id
+     * This is returned back to CHT
+     * @param patient
+     * @param uuid
+     * @return
+     */
+    private Patient addCHTSpecimenId(Patient patient, String uuid) {
+        PatientIdentifier recordUuid = null;
+        if (StringUtils.isNotBlank(uuid)) {
+            recordUuid = new PatientIdentifier();
+            recordUuid.setIdentifierType(SHRUtils.CHT_LAB_REFERENCE);
+            recordUuid.setIdentifier(uuid);
+            patient.addIdentifier(recordUuid);
+        }
+        return patient;
+
+    }
+
     private void enrollForCovidCaseInvestigation(Patient patient, ObjectNode cif) {
 
         String dateFormat = "yyyy-MM-dd";
@@ -417,6 +441,7 @@ public class MedicMobileDataExchange {
 
         String labRequest = labInfo.has("was_specimen_collected") ? labInfo.get("was_specimen_collected").textValue() : null;
         String testingLab = labInfo.has("testing_lab") ? labInfo.get("testing_lab").textValue() : null;
+        String specimenId = labInfo.has("specimen_id") ? labInfo.get("specimen_id").textValue() : null;
 
 
         // reporting info
@@ -752,6 +777,12 @@ public class MedicMobileDataExchange {
             anOrder.setCareSetting(Context.getOrderService().getCareSetting(1));
             anOrder.setOrderReason(conceptService.getConceptByUuid(ObsUtils.COVID_19_BASELINE_TEST_CONCEPT));
             Context.getOrderService().saveOrder(anOrder, null);
+
+            // add specimen reference from cht
+            /*if (StringUtils.isNotBlank(specimenId)) {
+                patient = addCHTSpecimenId(patient, specimenId);
+                Context.getPatientService().savePatient(patient);
+            }*/
         }
 
     }

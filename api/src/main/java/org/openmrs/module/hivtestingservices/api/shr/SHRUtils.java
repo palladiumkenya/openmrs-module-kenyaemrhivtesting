@@ -63,6 +63,7 @@ public class SHRUtils {
     public static PatientIdentifierType CASE_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.PATIENT_CLINIC_NUMBER);
     public static PatientIdentifierType OPENMRS_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.MEDICAL_RECORD_NUMBER);
     public static PatientIdentifierType CHT_REFERENCE_UUID = Context.getPatientService().getPatientIdentifierTypeByUuid(HTSMetadata._PatientIdentifierType.CHT_RECORD_UUID);
+    public static PatientIdentifierType CHT_LAB_REFERENCE = Context.getPatientService().getPatientIdentifierTypeByUuid(HTSMetadata._PatientIdentifierType.CHT_SPECIMEN_REFERENCE);
 
 
     public static SHR getSHR(String SHRStr) {
