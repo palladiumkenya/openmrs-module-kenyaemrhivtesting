@@ -21,8 +21,10 @@ import org.openmrs.Provider;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.TestOrder;
+import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
+import org.openmrs.api.OrderContext;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.ProviderService;
@@ -766,6 +768,7 @@ public class MedicMobileDataExchange {
         }
         if (StringUtils.isNotBlank(labRequest) && labRequest.equals("yes") && provider != null) {
             Order anOrder = new TestOrder();
+
             anOrder.setPatient(patient);
             anOrder.setCareSetting(new CareSetting());
             anOrder.setConcept(conceptService.getConceptByUuid(ObsUtils.COVID_19_LAB_TEST_CONCEPT));
@@ -776,18 +779,19 @@ public class MedicMobileDataExchange {
             anOrder.setEncounter(savedEnc);
             anOrder.setCareSetting(Context.getOrderService().getCareSetting(1));
             anOrder.setOrderReason(conceptService.getConceptByUuid(ObsUtils.COVID_19_BASELINE_TEST_CONCEPT));
-            Context.getOrderService().saveOrder(anOrder, null);
-
+            OrderContext orderContext = null;
             // add specimen reference from cht
-            /*if (StringUtils.isNotBlank(specimenId)) {
-                patient = addCHTSpecimenId(patient, specimenId);
-                Context.getPatientService().savePatient(patient);
-            }*/
+            if (StringUtils.isNotBlank(specimenId)) {
+                orderContext = new OrderContext();
+                orderContext.setAttribute("orderNumber", specimenId);
+            } else {
+                orderContext = new OrderContext();
+                orderContext.setAttribute("orderNumber", null);
+            }
+            Context.getOrderService().saveOrder(anOrder, orderContext);
         }
 
     }
-
-
 
     private void addRelationship(Person patient, Person contact, Integer relationshipType) {
 
@@ -937,7 +941,8 @@ public class MedicMobileDataExchange {
                 contact.put("_id", c.getUuid());
                 contact.put("case_id", covidCase.getPatientIdentifier(SHRUtils.CASE_ID_TYPE) != null ? covidCase.getPatientIdentifier(SHRUtils.CASE_ID_TYPE).getIdentifier() : "");
                 contact.put("case_name", covidCase.getGivenName());
-                contact.put("type_of_contact", c.getPnsApproach() != null ? getContactType().get(c.getPnsApproach()) : "");
+                contact.put("type_of_contact", c.getContactListingDeclineReason() != null ? c.getContactListingDeclineReason() : "");
+                contact.put("type_of_exposure", c.getPnsApproach() != null ? getContactType().get(c.getPnsApproach()) : "");
                 contact.put("relation_to_case", c.getRelationType() != null ? getContactRelation().get(c.getRelationType()) : "");
 
                 contact.put("national_id", "");
