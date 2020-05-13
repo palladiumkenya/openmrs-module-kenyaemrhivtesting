@@ -300,7 +300,7 @@ public class CovidLabDataExchange {
                     test.put("health_status", cifInfo.get("healthStatus"));
                     test.put("date_symptoms", "");
                     test.put("date_admission", "");
-                    test.put("specimen_id", o.getOrderId());
+                    test.put("specimen_id", o.getOrderNumber());
                     test.put("patient_id", patient.getPatientId());
                     test.put("date_isolation", "");
                     test.put("date_death", deathDate);
@@ -537,7 +537,7 @@ public class CovidLabDataExchange {
         if (resultsObj.size() > 0) {
             for (int i = 0; i < resultsObj.size(); i++) {
                 ObjectNode o = (ObjectNode) resultsObj.get(i);
-                Integer specimenId = o.get("specimen_id").intValue();
+                String specimenId = o.get("specimen_id").textValue();
                 Integer specimenReceivedStatus = o.get("receivedstatus").intValue();// 1-received, 2-rejected
                 String specimenRejectedReason = o.get("rejectedreason").textValue();
                 Integer results = o.get("result").intValue(); //1 - negative, 2 - positive, 5 - inconclusive
@@ -592,9 +592,11 @@ public class CovidLabDataExchange {
     }
 
 
-    private void updateOrder(Integer orderId, Integer result, Integer receivedStatus, String rejectedReason) {
+    private void updateOrder(String orderId, Integer result, Integer receivedStatus, String rejectedReason) {
 
-        Order od = Context.getOrderService().getOrder(orderId);
+        //Order od = Context.getOrderService().getOrder(orderId);
+        Order od = Context.getOrderService().getOrderByOrderNumber(orderId);
+
         if (od != null && od.isActive()) {
 
             if (receivedStatus == 2 || StringUtils.isNotBlank(rejectedReason)) {
