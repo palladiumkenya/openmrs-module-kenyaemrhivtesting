@@ -327,33 +327,33 @@ public class CovidLabDataExchange {
             return "";
         }
         Integer code= null;
-        if (lab.equals("KEMRI Nairobi")) {
+        if (lab.equalsIgnoreCase("KEMRI Nairobi")) {
             code = 1;
-        } else if (lab.equals("KEMRI CDC Kisumu")) {
+        } else if (lab.equalsIgnoreCase("KEMRI CDC Kisumu")) {
             code = 2;
-        } else if (lab.equals("KEMRI Alupe HIV Lab")) {
+        } else if (lab.equalsIgnoreCase("KEMRI Alupe HIV Lab")) {
             code = 3;
-        } else if (lab.equals("KEMRI Walter Reed Kericho")) {
+        } else if (lab.equalsIgnoreCase("KEMRI Walter Reed Kericho")) {
             code = 4;
-        } else if (lab.equals("AMPATH Care Lab Eldoret")) {
+        } else if (lab.equalsIgnoreCase("AMPATH Care Lab Eldoret")) {
             code = 5;
-        } else if (lab.equals("Coast Provincial General Hospital Molecular Lab")) {
+        } else if (lab.equalsIgnoreCase("Coast Provincial General Hospital Molecular Lab")) {
             code = 6;
-        } else if (lab.equals("NPHL")) {
+        } else if (lab.equalsIgnoreCase("NPHL")) {
             code = 7;
-        } else if (lab.equals("Nyumbani Diagnostic Lab")) {
+        } else if (lab.equalsIgnoreCase("Nyumbani Diagnostic Lab")) {
             code = 8;
-        } else if (lab.equals("Kenyatta National Hospial Lab Nairobi")) {
+        } else if (lab.equalsIgnoreCase("Kenyatta National Hospial Lab Nairobi")) {
             code = 9;
-        } else if (lab.equals("EDARP Nairobi")) {
+        } else if (lab.equalsIgnoreCase("EDARP Nairobi")) {
             code = 10;
-        } else if (lab.equals("NIC")) {
+        } else if (lab.equalsIgnoreCase("NIC")) {
             code = 11;
-        }  else if (lab.equals("KEMRI Kilifi")) {
+        }  else if (lab.equalsIgnoreCase("KEMRI Kilifi")) {
             code = 12;
-        } else if (lab.equals("Aga Khan")) {
+        } else if (lab.equalsIgnoreCase("Aga Khan")) {
             code = 13;
-        } else if (lab.equals("Lancet")) {
+        } else if (lab.equalsIgnoreCase("Lancet")) {
             code = 14;
         }
 
@@ -496,9 +496,9 @@ public class CovidLabDataExchange {
         Set<Integer> patientWithActiveLabs = new HashSet<Integer>();
         String sql = "";
         if (lastLabEntry != null && lastLabEntry > 0) {
-            sql = "select patient_id from orders where order_id >" + lastLabEntry + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+            sql = "select patient_id from orders where order_id >" + lastLabEntry + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0 and date_stopped is null;";
         } else {
-            sql = "select patient_id from orders where order_id <= " + lastId + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0;";
+            sql = "select patient_id from orders where order_id <= " + lastId + " and order_action='NEW' and instructions is not null and comment_to_fulfiller is not null and voided=0 and date_stopped is null;";
 
         }
 
