@@ -306,7 +306,7 @@ public class CovidLabDataExchange {
                     test.put("date_death", deathDate);
                     test.put("dob", dob);
                     test.put("lab_id", getRequestLab(o.getCommentToFulfiller()));
-                    test.put("test_type_id",o.getOrderReason() != null ? getOrderReasonCode(o.getOrderReason().getConceptId()) : "");
+                    test.put("test_type",o.getOrderReason() != null ? getOrderReasonCode(o.getOrderReason().getConceptId()) : "");
                     test.put("occupation", "");
                     test.put("temperature", cifInfo.get("temp"));
                     test.put("sample_type", o.getInstructions() != null ? getSampleTypeCode(o.getInstructions()) : "");
@@ -357,7 +357,7 @@ public class CovidLabDataExchange {
             code = 14;
         }
 
-        return code.toString();
+        return code != null ? code.toString() : "";
     }
     private String getSampleTypeCode(String type) {
 
@@ -378,7 +378,7 @@ public class CovidLabDataExchange {
         } else {
             code = 6;
         }
-       return code.toString();
+       return code != null ? code.toString() : "";
     }
 
     /**
