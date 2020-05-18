@@ -167,7 +167,7 @@ div.section-title {
 
         <div class="column-five">${rel.relationType}</div>
 
-        <div class="column-seven">${rel.appointmentDate ?: ''}</div>
+        <div class="column-six">${rel.appointmentDate ?: ''}</div>
 
         <div class="column-seven">${rel.pnsApproach ?: ''}</div>
 

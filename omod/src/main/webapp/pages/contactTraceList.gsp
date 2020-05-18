@@ -180,13 +180,14 @@ div.section-title {
             <img src="${ui.resourceLink("kenyaui", "images/glyphs/add.png")}"/> Add Trace
         </button>
 
-
+    <% if (patientContact.pnsApproach != null) { %>
             <button type="button"
                     onclick="ui.navigate('${ ui.pageLink("hivtestingservices", "registerContact", [ patientContact: patientContact.id, returnUrl: ui.pageLink("hivtestingservices", "patientContactList", [patient: currentPatient, patientId: currentPatient.patientId]) ])}')">
                 <img src="${ui.resourceLink("kenyaui", "images/glyphs/patient_m.png")}"/> Register and Followup
             </button>
+    <% } %>
 
-    </div>
+</div>
     <% } %>
 
 </div>

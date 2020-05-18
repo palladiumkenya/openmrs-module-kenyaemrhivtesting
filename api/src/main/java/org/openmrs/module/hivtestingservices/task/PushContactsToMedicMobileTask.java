@@ -48,7 +48,7 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
             }
 
             GlobalProperty lastPatientEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_ENTRY);
-            String lastQuarantineIdsql = "select max(patient_program_id) last_id from patient_program where voided=0;";
+            String lastQuarantineIdsql = "select max(obs_id) last_id from obs where voided=0;";
             List<List<Object>> lastQuarantineRs = Context.getAdministrationService().executeSQL(lastQuarantineIdsql, true);
             Integer lastPatientId = (Integer) lastQuarantineRs.get(0).get(0);
             lastPatientId = lastPatientId != null ? lastPatientId : 0;

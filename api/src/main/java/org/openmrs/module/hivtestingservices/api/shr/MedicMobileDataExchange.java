@@ -1223,12 +1223,14 @@ public class MedicMobileDataExchange {
         if (lastPatientEntry != null && lastPatientEntry > 0) {
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_program_id >" + lastPatientEntry + " and pp.voided=0;";
+                    "inner join obs o on o.person_id = pp.patient_id and o.concept_id=165611 and o.value_coded=703\n" +
+                    "where o.obs_id >" + lastPatientEntry + " and pp.voided=0 and o.voided=0;";
         } else {
 
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_program_id <= " + lastId + " and pp.voided=0;";
+                    "inner join obs o on o.person_id = pp.patient_id and o.concept_id=165611 and o.value_coded=703\n" +
+                    "where o.obs_id <= " + lastId + " and pp.voided=0 and o.voided=0;";
 
         }
 

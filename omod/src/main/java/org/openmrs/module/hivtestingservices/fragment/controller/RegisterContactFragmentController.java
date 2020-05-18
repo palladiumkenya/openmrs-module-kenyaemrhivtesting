@@ -464,9 +464,11 @@ public class RegisterContactFragmentController {
 			}
 
 			// add relationship and update PatientContact record
-			addRelationship(patientRelatedTo, ret, patientContact.getPnsApproach());
-			patientContact.setPatient(ret);
-			Context.getService(HTSService.class).savePatientContact(patientContact);
+			if (patientContact.getPnsApproach() != null && ret != null) {
+				addRelationship(patientRelatedTo, ret, patientContact.getPnsApproach());
+				patientContact.setPatient(ret);
+				Context.getService(HTSService.class).savePatientContact(patientContact);
+			}
 
 
 			return ret;
