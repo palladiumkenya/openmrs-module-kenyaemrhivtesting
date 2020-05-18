@@ -154,6 +154,8 @@
                             <% } %>
                         </select>
                     </td>
+                    <span id="pnsApproach-error" class="error" style="display: none"></span>
+
                     <td style="width: 260px">
                         <select name="contactListingDeclineReason" id="contactListingDeclineReason">
                             <option></option>

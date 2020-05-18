@@ -257,6 +257,7 @@ public class PatientContactFormFragmentController {
         public void validate(Object o, Errors errors) {
             require(errors, "sex");
             require(errors, "birthDate");
+            require(errors, "pnsApproach");
             if (birthDate != null) {
                 if (birthDate.after(new Date())) {
                     errors.rejectValue("birthDate", "Cannot be a future date");
