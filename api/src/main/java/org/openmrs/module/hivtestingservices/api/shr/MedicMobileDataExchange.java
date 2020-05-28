@@ -205,8 +205,6 @@ public class MedicMobileDataExchange {
                         return "Could not find a case for the contact provided";
                     }
                 }
-
-
             }
 
             Patient contactRegistered = null;
@@ -215,8 +213,6 @@ public class MedicMobileDataExchange {
             } else if (patient != null) {
                 contactRegistered = patient;
             }
-
-
 
             if (traceReport != null && !traceReport.isEmpty()) {
 
@@ -264,8 +260,6 @@ public class MedicMobileDataExchange {
                 if (contactRegistered != null && traceReport != null) {
                     saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
                 } else {
-
-
 
                     patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
                     patient = addCHTRecordUuid(patient,uuid);
@@ -353,11 +347,13 @@ public class MedicMobileDataExchange {
             if (patient == null) {
                 patient = SHRUtils.checkIfPatientExists(idNumber, passportNumber, alienNumber);
             }
+
             if (patient == null) {
                 patient = SHRUtils.createPatient(fName, mName, lName, dob, sex, idNumber, passportNumber, alienNumber);
                 if (caseIdentifier != null) {
                     patient.addIdentifier(caseIdentifier);
                 }
+
                 if (StringUtils.isNotBlank(contactUuid)) {
                     patient = addCHTRecordUuid(patient, contactUuid);
                 }

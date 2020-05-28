@@ -203,7 +203,7 @@ public class SHRUtils {
             PatientIdentifier openMRSID = generateOpenMRSID();
             boolean hasPreferredId = false;
 
-            if (ppNumber != null && !ppNumber.equals("")) {
+            if (StringUtils.isNotBlank(ppNumber)) {
                 PatientIdentifierType ppType = Context.getPatientService().getPatientIdentifierTypeByUuid(PASSPORT_NUMBER);
 
                 PatientIdentifier pno = new PatientIdentifier();
@@ -214,19 +214,19 @@ public class SHRUtils {
                 hasPreferredId = true;
             }
 
-            if (alienNumber != null && !alienNumber.equals("")) {
+            if (StringUtils.isNotBlank(alienNumber)) {
                 PatientIdentifierType alienType = Context.getPatientService().getPatientIdentifierTypeByUuid(ALIEN_NUMBER);
 
                 PatientIdentifier alienNo = new PatientIdentifier();
                 alienNo.setIdentifierType(alienType);
-                alienNo.setIdentifier(idNo);
+                alienNo.setIdentifier(alienNumber);
                 if (!hasPreferredId) {
                     alienNo.setPreferred(true);
                 }
                 patient.addIdentifier(alienNo);
             }
 
-            if (idNo != null && !idNo.equals("")) {
+            if (StringUtils.isNotBlank(idNo)) {
                 PatientIdentifierType upnType = Context.getPatientService().getPatientIdentifierTypeByUuid(NATIONAL_ID);
 
                 PatientIdentifier upn = new PatientIdentifier();
