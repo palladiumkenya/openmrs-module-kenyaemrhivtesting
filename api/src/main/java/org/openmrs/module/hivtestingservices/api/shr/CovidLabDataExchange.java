@@ -56,6 +56,7 @@ public class CovidLabDataExchange {
     String TEST_ORDER_TYPE_UUID = "52a447d3-a64a-11e3-9aeb-50e549534c5e";
     String LAB_ENCOUNTER_TYPE_UUID = "e1406e88-e9a9-11e8-9f32-f2801f1b9fd1";
     String COVID_19_CASE_INVESTIGATION = "a4414aee-6832-11ea-bc55-0242ac130003";
+    String COVID_19_QUARANTINE_ENROLLMENT = "33a3a55c-73ae-11ea-bc55-0242ac130003";
     Concept covidTestConcept = conceptService.getConcept(165611);
     Concept covidPosConcept = conceptService.getConcept(703);
     Concept covidNegConcept = conceptService.getConcept(664);
@@ -132,6 +133,7 @@ public class CovidLabDataExchange {
         ObjectNode patientAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
         ObjectNode physicalAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
         String postalAddress = "";
+        String nationality = "";
         String county = "";
         String sub_county = "";
         String ward = "";
@@ -142,7 +144,7 @@ public class CovidLabDataExchange {
                 postalAddress = address.getAddress1();
             }
             if (address.getCountry() != null) {
-                county = address.getCountry() != null ? address.getCountry() : "";
+                nationality = address.getCountry() != null ? address.getCountry() : "";
             }
 
             if (address.getCountyDistrict() != null) {
@@ -162,6 +164,7 @@ public class CovidLabDataExchange {
 
         }
 
+        physicalAddressNode.put("NATIONALITY", nationality);
         physicalAddressNode.put("COUNTY", county);
         physicalAddressNode.put("SUB_COUNTY", sub_county);
         physicalAddressNode.put("WARD", ward);
@@ -256,7 +259,9 @@ public class CovidLabDataExchange {
     protected ArrayNode getActiveLabRequestsForPatient(Patient patient, ArrayNode labTests) {
 
         ObjectNode cifInfo = getCovidEnrollmentDetails(patient);
+        ObjectNode quarantineInfo = getQuarantineEnrollmentDetails(patient);
         ObjectNode address = getPatientAddress(patient);
+        ObjectNode physicalAddress = (ObjectNode) address.get("PHYSICAL_ADDRESS");
         ArrayNode blankArray = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
         OrderService orderService = Context.getOrderService();
         Integer caseId = patient.getPatientId();
@@ -267,6 +272,37 @@ public class CovidLabDataExchange {
         String deathDate = patient.getDeathDate() != null ? OutgoingPatientSHR.getSimpleDateFormat("yyyy-MM-dd").format(patient.getDeathDate()) : "";
 
         String fullName = "";
+        Integer justification = null;
+        String poe = cifInfo.get("poe").textValue();
+        String contactWithCase = cifInfo.get("contactWithCase").textValue();
+        String quarantineCenter = quarantineInfo.get("quarantineCenter").textValue();
+        String nationality = physicalAddress.get("NATIONALITY").textValue();
+        Integer nationalityCode = null;
+        if (StringUtils.isNotBlank(nationality)) {
+            if (nationality.toLowerCase().contains("kenya")) {
+                nationalityCode = 1;
+            } else {
+                nationalityCode = 6;
+            }
+        }
+        if (StringUtils.isNotBlank(contactWithCase)) {
+            if (contactWithCase.equalsIgnoreCase("Yes")) {
+                justification = 1;//"Contact with a case";
+            }
+        }
+
+        if (justification == null && StringUtils.isNotBlank(poe)) {
+            if (poe.equalsIgnoreCase("Point of entry")) {
+                justification = 4; // point of entry
+            } else if (poe.equalsIgnoreCase("Detected in Community")) {
+                justification = 7; // surveillance and quarantine
+            }
+        }
+
+        if (justification == null) {
+            justification = 6;// other
+        }
+
 
         if (patient.getGivenName() != null) {
             fullName += patient.getGivenName();
@@ -291,25 +327,33 @@ public class CovidLabDataExchange {
                     test.put("identifier_type", idMap.get("type"));
                     test.put("identifier", idMap.get("identifier"));
                     test.put("patient_name", fullName);
-                    test.put("justification", "");
+                    test.put("justification", justification);
+                    if (nationalityCode != null) {
+                        test.put("nationality", nationalityCode);
+                    } else {
+                        test.put("nationality", "");
+                    }
                     test.put("county", cifInfo.get("county"));
                     test.put("subcounty", cifInfo.get("subCounty"));
-                    test.put("ward", "");
+                    test.put("ward", cifInfo.get("ward"));
                     test.put("residence", address.get("POSTAL_ADDRESS"));
                     test.put("sex", patient.getGender());
                     test.put("health_status", cifInfo.get("healthStatus"));
                     test.put("date_symptoms", "");
-                    test.put("date_admission", "");
+                    test.put("date_admission", cifInfo.get("admissionDate"));
                     test.put("specimen_id", o.getOrderNumber());
                     test.put("patient_id", patient.getPatientId());
                     test.put("date_isolation", "");
+                    test.put("isolation_center", StringUtils.isNotBlank(quarantineCenter) ? quarantineCenter : cifInfo.get("healthFacility").textValue());
                     test.put("date_death", deathDate);
                     test.put("dob", dob);
-                    test.put("lab_id", getRequestLab(o.getCommentToFulfiller()));
+                    test.put("lab_id", "");
+                    //test.put("lab_id", getRequestLab(o.getCommentToFulfiller()));
                     test.put("test_type",o.getOrderReason() != null ? getOrderReasonCode(o.getOrderReason().getConceptId()) : "");
-                    test.put("occupation", "");
+                    test.put("occupation", cifInfo.get("occupation"));
                     test.put("temperature", cifInfo.get("temp"));
                     test.put("sample_type", o.getInstructions() != null ? getSampleTypeCode(o.getInstructions()) : "");
+                    test.put("datecollected", OutgoingPatientSHR.getSimpleDateFormat("yyyy-MM-dd").format(o.getDateActivated()));
                     test.put("symptoms", blankArray);
                     test.put("observed_signs", blankArray);
                     test.put("underlying_conditions", blankArray);
@@ -413,20 +457,29 @@ public class CovidLabDataExchange {
 
         Concept countyConcept = conceptService.getConcept(165197);
         Concept subCountyConcept = conceptService.getConcept(161551);
+        Concept wardConcept = conceptService.getConcept(165195);
         Concept healthStatusConcept = conceptService.getConcept(159640);
         Concept tempConcept = conceptService.getConcept(5088);
+        Concept admissionDateConcept = conceptService.getConcept(1640);
+        Concept poeConcept = conceptService.getConcept(161010);
+        Concept contactWithCaseConcept = conceptService.getConcept(162633);
+        Concept occupationConcept = conceptService.getConcept(1542);
+        Concept occupationOtherConcept = conceptService.getConcept(161011);
+        Concept healthFacilityConcept = conceptService.getConcept(161550);
         ObjectNode enrollmentObj = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
 
 
-        String county = "", subCounty = "";
+        String county = "", subCounty = "", ward = "", poe = "", contactWithCase = "", occupation = "", healthFacility = "";
         Integer healthStatus = null;
         Double temp = null;
+        Date admissionDate = null;
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
 
         EncounterType covid_enc_type = encounterService.getEncounterTypeByUuid(COVID_19_CASE_INVESTIGATION);
         Encounter lastEncounter = lastEncounter(patient, covid_enc_type);
 
-        List<Concept> questionConcepts = Arrays.asList(countyConcept, subCountyConcept, healthStatusConcept, tempConcept);
+        List<Concept> questionConcepts = Arrays.asList(countyConcept, wardConcept, healthFacilityConcept, admissionDateConcept, poeConcept, subCountyConcept, healthStatusConcept, tempConcept, occupationConcept, occupationOtherConcept);
         List<Obs> enrollmentData = obsService.getObservations(
                 Collections.singletonList(patient.getPerson()),
                 Collections.singletonList(lastEncounter),
@@ -447,20 +500,49 @@ public class CovidLabDataExchange {
                 county = o.getValueText();
             } else if (o.getConcept().equals(subCountyConcept)) {
                 subCounty = o.getValueText();
+            } else if (o.getConcept().equals(wardConcept)) {
+                ward = o.getValueText();
+            } else if (o.getConcept().equals(healthFacilityConcept)) {
+                healthFacility = o.getValueText();
+            } else if (o.getConcept().equals(admissionDateConcept)) {
+                admissionDate = o.getValueDate();
+            } else if (o.getConcept().equals(occupationOtherConcept)) {
+                occupation = StringUtils.isNotBlank(occupation) ? occupation + "," + o.getValueText() : o.getValueText();
             } else if (o.getConcept().equals(healthStatusConcept)) {
                 if (o.getValueCoded().getConceptId().equals(159405)) {
-                    //healthStatus = "Stable";
                     healthStatus =1;
                 } else if (o.getValueCoded().getConceptId().equals(159407)) {
-                    //healthStatus = "Severely ill";
                     healthStatus = 2;
-
                 } else if (o.getValueCoded().getConceptId().equals(160432)) {
-                    //healthStatus = "Dead";
                     healthStatus = 3;
                 } else if (o.getValueCoded().getConceptId().equals(1067)) {
-                    //healthStatus = "Unknown";
                     healthStatus =4;
+                }
+            } else if (o.getConcept().equals(poeConcept)) {
+                if (o.getValueCoded().getConceptId().equals(165651)) {
+                    poe ="Point of entry";
+                } else if (o.getValueCoded().getConceptId().equals(163488)) {
+                    poe = "Detected in Community";
+                } else if (o.getValueCoded().getConceptId().equals(1067)) {
+                    poe = "Unknown";
+                }
+            } else if (o.getConcept().equals(contactWithCaseConcept)) {
+                if (o.getValueCoded().getConceptId().equals(1065)) {
+                    contactWithCase ="Yes";
+                } else if (o.getValueCoded().getConceptId().equals(1066)) {
+                    contactWithCase = "No";
+                } else if (o.getValueCoded().getConceptId().equals(1067)) {
+                    contactWithCase = "Unknown";
+                }
+            } else if (o.getConcept().equals(occupationConcept)) {
+                if (o.getValueCoded().getConceptId().equals(159465)) {
+                    occupation = StringUtils.isNotBlank(occupation) ? occupation + ",Student" : "Student";
+                } else if (o.getValueCoded().getConceptId().equals(165834)) {
+                    occupation = StringUtils.isNotBlank(occupation) ? occupation + ",Working with animals" : "Working with animals";
+                } else if (o.getValueCoded().getConceptId().equals(5619)) {
+                    occupation = StringUtils.isNotBlank(occupation) ? occupation + ",Health care worker" : "Health care worker";
+                } else if (o.getValueCoded().getConceptId().equals(164831)) {
+                    occupation = StringUtils.isNotBlank(occupation) ? occupation + ",Health laboratory worker" : "Health laboratory worker";
                 }
             } else if (o.getConcept().equals(tempConcept)) {
                 temp = o.getValueNumeric();
@@ -469,8 +551,52 @@ public class CovidLabDataExchange {
 
         enrollmentObj.put("county", county);
         enrollmentObj.put("subCounty", subCounty);
+        enrollmentObj.put("ward", ward);
+        enrollmentObj.put("healthFacility", healthFacility);
+        enrollmentObj.put("poe", poe);
+        enrollmentObj.put("contactWithCase", contactWithCase);
+        enrollmentObj.put("occupation", occupation);
+        enrollmentObj.put("admissionDate", admissionDate != null ? df.format(admissionDate) : "");
         enrollmentObj.put("healthStatus", healthStatus != null ? healthStatus.toString() : "");
         enrollmentObj.put("temp", temp != null ? temp.toString() : "");
+        return enrollmentObj;
+    }
+
+    private ObjectNode getQuarantineEnrollmentDetails(Patient patient) {
+
+        Concept quarantineCenterConcept = conceptService.getConcept(162724);
+        ObjectNode enrollmentObj = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
+
+
+        String quarantineCenter = "";
+
+
+        EncounterType covid_enc_type = encounterService.getEncounterTypeByUuid(COVID_19_QUARANTINE_ENROLLMENT);
+        Encounter lastEncounter = lastEncounter(patient, covid_enc_type);
+
+        List<Concept> questionConcepts = Arrays.asList(quarantineCenterConcept);
+        List<Obs> enrollmentData = obsService.getObservations(
+                Collections.singletonList(patient.getPerson()),
+                Collections.singletonList(lastEncounter),
+                questionConcepts,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false
+        );
+
+        for(Obs o: enrollmentData) {
+            if (o.getConcept().equals(quarantineCenterConcept) ) {
+                quarantineCenter = o.getValueText();
+            }
+        }
+
+        enrollmentObj.put("quarantineCenter", quarantineCenter);
         return enrollmentObj;
     }
     /**
@@ -540,7 +666,9 @@ public class CovidLabDataExchange {
                 String specimenId = o.get("specimen_id").textValue();
                 Integer specimenReceivedStatus = o.get("receivedstatus").intValue();// 1-received, 2-rejected
                 String specimenRejectedReason = o.get("rejectedreason").textValue();
+                //String testingLab = o.has("lab_name") ? o.get("lab_name").textValue() : null;
                 Integer results = o.get("result").intValue(); //1 - negative, 2 - positive, 5 - inconclusive
+                //updateOrder(specimenId, results, specimenReceivedStatus, specimenRejectedReason, testingLab);
                 updateOrder(specimenId, results, specimenReceivedStatus, specimenRejectedReason);
             }
         }

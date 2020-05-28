@@ -68,6 +68,7 @@ public class PushLabRequestsTask extends AbstractTask {
 			CovidLabDataExchange e = new CovidLabDataExchange();
 			ObjectNode samplesWrapper = e.getCovidLabRequests(gpLastOrderId, lastId);
 			ArrayNode samples = (ArrayNode) samplesWrapper.get("samples");
+			System.out.println("Lab payload::: " + samples.toString());
 
 			if (samples.size() < 1) {
 				System.out.println("Found no lab requests to post. Skipping the post operation");
