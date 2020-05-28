@@ -666,9 +666,7 @@ public class CovidLabDataExchange {
                 String specimenId = o.get("specimen_id").textValue();
                 Integer specimenReceivedStatus = o.get("receivedstatus").intValue();// 1-received, 2-rejected
                 String specimenRejectedReason = o.get("rejectedreason").textValue();
-                //String testingLab = o.has("lab_name") ? o.get("lab_name").textValue() : null;
                 Integer results = o.get("result").intValue(); //1 - negative, 2 - positive, 5 - inconclusive
-                //updateOrder(specimenId, results, specimenReceivedStatus, specimenRejectedReason, testingLab);
                 updateOrder(specimenId, results, specimenReceivedStatus, specimenRejectedReason);
             }
         }
