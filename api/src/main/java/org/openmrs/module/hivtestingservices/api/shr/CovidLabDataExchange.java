@@ -56,7 +56,6 @@ public class CovidLabDataExchange {
     String TEST_ORDER_TYPE_UUID = "52a447d3-a64a-11e3-9aeb-50e549534c5e";
     String LAB_ENCOUNTER_TYPE_UUID = "e1406e88-e9a9-11e8-9f32-f2801f1b9fd1";
     String COVID_19_CASE_INVESTIGATION = "a4414aee-6832-11ea-bc55-0242ac130003";
-    String COVID_19_QUARANTINE_ENROLLMENT = "33a3a55c-73ae-11ea-bc55-0242ac130003";
     Concept covidTestConcept = conceptService.getConcept(165611);
     Concept covidPosConcept = conceptService.getConcept(703);
     Concept covidNegConcept = conceptService.getConcept(664);
@@ -122,60 +121,7 @@ public class CovidLabDataExchange {
         return patient.getAttribute(phoneNumberAttrType) != null ? patient.getAttribute(phoneNumberAttrType).getValue() : "";
     }
 
-    /**
-     * Returns a patient's address
-     * @param patient
-     * @return
-     */
-    public static ObjectNode getPatientAddress(Patient patient) {
-        Set<PersonAddress> addresses = patient.getAddresses();
-        //patient address
-        ObjectNode patientAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
-        ObjectNode physicalAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
-        String postalAddress = "";
-        String nationality = "";
-        String county = "";
-        String sub_county = "";
-        String ward = "";
-        String landMark = "";
 
-        for (PersonAddress address : addresses) {
-            if (address.getAddress1() != null) {
-                postalAddress = address.getAddress1();
-            }
-            if (address.getCountry() != null) {
-                nationality = address.getCountry() != null ? address.getCountry() : "";
-            }
-
-            if (address.getCountyDistrict() != null) {
-                county = address.getCountyDistrict() != null ? address.getCountyDistrict() : "";
-            }
-
-            if (address.getStateProvince() != null) {
-                sub_county = address.getStateProvince() != null ? address.getStateProvince() : "";
-            }
-
-            if (address.getAddress4() != null) {
-                ward = address.getAddress4() != null ? address.getAddress4() : "";
-            }
-            if (address.getAddress2() != null) {
-                landMark = address.getAddress2() != null ? address.getAddress2() : "";
-            }
-
-        }
-
-        physicalAddressNode.put("NATIONALITY", nationality);
-        physicalAddressNode.put("COUNTY", county);
-        physicalAddressNode.put("SUB_COUNTY", sub_county);
-        physicalAddressNode.put("WARD", ward);
-        physicalAddressNode.put("NEAREST_LANDMARK", landMark);
-
-        //combine all addresses
-        patientAddressNode.put("PHYSICAL_ADDRESS", physicalAddressNode);
-        patientAddressNode.put("POSTAL_ADDRESS", postalAddress);
-
-        return patientAddressNode;
-    }
 
     /**
      * Returns patient name
@@ -260,7 +206,8 @@ public class CovidLabDataExchange {
 
         ObjectNode cifInfo = getCovidEnrollmentDetails(patient);
         ObjectNode quarantineInfo = getQuarantineEnrollmentDetails(patient);
-        ObjectNode address = getPatientAddress(patient);
+        //ObjectNode address = getPatientAddress(patient);
+        ObjectNode address = SHRUtils.getPatientAddress(patient);
         ObjectNode physicalAddress = (ObjectNode) address.get("PHYSICAL_ADDRESS");
         ArrayNode blankArray = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
         OrderService orderService = Context.getOrderService();
@@ -477,7 +424,7 @@ public class CovidLabDataExchange {
 
 
         EncounterType covid_enc_type = encounterService.getEncounterTypeByUuid(COVID_19_CASE_INVESTIGATION);
-        Encounter lastEncounter = lastEncounter(patient, covid_enc_type);
+        Encounter lastEncounter = SHRUtils.lastEncounter(patient, covid_enc_type);
 
         List<Concept> questionConcepts = Arrays.asList(countyConcept, wardConcept, healthFacilityConcept, admissionDateConcept, poeConcept, subCountyConcept, healthStatusConcept, tempConcept, occupationConcept, occupationOtherConcept);
         List<Obs> enrollmentData = obsService.getObservations(
@@ -571,8 +518,8 @@ public class CovidLabDataExchange {
         String quarantineCenter = "";
 
 
-        EncounterType covid_enc_type = encounterService.getEncounterTypeByUuid(COVID_19_QUARANTINE_ENROLLMENT);
-        Encounter lastEncounter = lastEncounter(patient, covid_enc_type);
+        EncounterType covid_enc_type = encounterService.getEncounterTypeByUuid(SHRUtils.COVID_19_QUARANTINE_ENROLLMENT);
+        Encounter lastEncounter = SHRUtils.lastEncounter(patient, covid_enc_type);
 
         List<Concept> questionConcepts = Arrays.asList(quarantineCenterConcept);
         List<Obs> enrollmentData = obsService.getObservations(

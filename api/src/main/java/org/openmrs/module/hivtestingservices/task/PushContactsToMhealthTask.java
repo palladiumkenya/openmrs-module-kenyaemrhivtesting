@@ -161,8 +161,8 @@ public class PushContactsToMhealthTask extends AbstractTask {
                     if (statusCode != 200) {
                         throw new RuntimeException("Failed with HTTP error code : " + statusCode);
                     }
-                    System.out.println("Successfully executed the task that pushes lab requests");
-                    log.info("Successfully executed the task that pushes lab requests");
+                    System.out.println("Successfully executed the task that pushes Mhealth data");
+                    log.info("Successfully executed the task that pushes Mhealth data");
                 } finally {
                     //Important: Close the connect
                     httpClient.close();

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -25,6 +26,7 @@ import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
+import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
@@ -35,6 +37,8 @@ import org.openmrs.util.PrivilegeConstants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -514,9 +518,14 @@ public class MhealthDataExchange {
 
         HTSService htsService = Context.getService(HTSService.class);
         PersonService personService = Context.getPersonService();
+        PatientService patientService = Context.getPatientService();
 
         Set<Integer> listedContacts = getListedContacts(gpLastContactId, lastContactId);
         Set<Integer> quarantinedContacts = getContactsInQuarantineProgram(gpLastPatientId, lastPatientId);
+
+        PatientIdentifierType NATIONAL_ID_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.NATIONAL_ID);
+        PatientIdentifierType ALIEN_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.ALIEN_NUMBER);
+        PatientIdentifierType PASSPORT_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(SHRConstants.PASSPORT_NUMBER);
 
         if (listedContacts != null && listedContacts.size() > 0) {
 
@@ -530,8 +539,14 @@ public class MhealthDataExchange {
                 contact.put("LAST_NAME", c.getLastName() != null ? c.getLastName() : "");
                 contact.put("DATE_OF_BIRTH", c.getBirthDate() != null ? OutgoingPatientSHR.getSimpleDateFormat(OutgoingPatientSHR.getSHRDateFormat()).format(c.getBirthDate()) : "");
                 contact.put("SEX", c.getSex() != null ? c.getSex() : "");
+                contact.put("IDENTIFIER", "");
+                contact.put("NATIONALITY", "");
                 contact.put("PHYSICAL_ADDRESS", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
                 contact.put("PHONE_NUMBER", c.getPhoneContact() != null ? c.getPhoneContact() : "");
+                contact.put("QUARANTINE_FACILITY", "");
+                contact.put("COUNTRY_OF_ORIGIN", "");
+
+
                 patientContactNode.add(contact);
 
             }
@@ -540,8 +555,14 @@ public class MhealthDataExchange {
         if (quarantinedContacts != null && quarantinedContacts.size() > 0) {
 
             for (Integer pc : quarantinedContacts) {
+                String patientIdentifier = "";
                 Patient c = Context.getPatientService().getPatient(pc);
-                ObjectNode address = CovidLabDataExchange.getPatientAddress(c);
+                //ObjectNode address = CovidLabDataExchange.getPatientAddress(c);
+                ObjectNode address = SHRUtils.getPatientAddress(c);
+                ObjectNode physicalAddress = (ObjectNode) address.get("PHYSICAL_ADDRESS");
+                String postalAddress = address.get("POSTAL_ADDRESS").textValue();
+                String nationality = physicalAddress.get("NATIONALITY").textValue();
+
 
                 ObjectNode contact = factory.objectNode();
                 contact.put("CONTACT_UUID", c.getUuid());
@@ -551,14 +572,105 @@ public class MhealthDataExchange {
                 contact.put("LAST_NAME", c.getFamilyName() != null ? c.getFamilyName() : "");
                 contact.put("DATE_OF_BIRTH", c.getBirthdate() != null ? OutgoingPatientSHR.getSimpleDateFormat(OutgoingPatientSHR.getSHRDateFormat()).format(c.getBirthdate()) : "");
                 contact.put("SEX", c.getGender() != null ? c.getGender() : "");
-                contact.put("PHYSICAL_ADDRESS", address.get("POSTAL_ADDRESS"));
+                contact.put("PHYSICAL_ADDRESS", StringUtils.isNotBlank(postalAddress) ? postalAddress : "");
+                if (c.getPatientIdentifier(NATIONAL_ID_TYPE) != null && c.getPatientIdentifier(NATIONAL_ID_TYPE).getIdentifier() != null) {
+                    patientIdentifier = c.getPatientIdentifier(NATIONAL_ID_TYPE).getIdentifier();
+                } else if (c.getPatientIdentifier(PASSPORT_NUMBER_TYPE) != null && c.getPatientIdentifier(PASSPORT_NUMBER_TYPE).getIdentifier() != null) {
+                    patientIdentifier = c.getPatientIdentifier(PASSPORT_NUMBER_TYPE).getIdentifier();
+                } else if (c.getPatientIdentifier(ALIEN_NUMBER_TYPE) != null && c.getPatientIdentifier(ALIEN_NUMBER_TYPE).getIdentifier() != null) {
+                    patientIdentifier = c.getPatientIdentifier(ALIEN_NUMBER_TYPE).getIdentifier();
+                }/* else if (c.getPatientIdentifier(OPENMRS_ID_TYPE) != null && c.getPatientIdentifier(OPENMRS_ID_TYPE).getIdentifier() != null) {
+                    patientIdentifier = c.getPatientIdentifier(OPENMRS_ID_TYPE).getIdentifier();
+                }*/
+                contact.put("IDENTIFIER", patientIdentifier);
+                contact.put("NATIONALITY", StringUtils.isNotBlank(nationality) ? nationality : "");
                 contact.put("PHONE_NUMBER", getContactPhoneNumber(c,personService) != null ? getContactPhoneNumber(c,personService) : "");
+                ObjectNode quarantineInfo = getQuarantineEnrollmentDetails(c);
+                ObjectNode travelInfo = getTravelDetails(c);
+                String quarantineCenter = quarantineInfo.get("quarantineCenter").textValue();
+                String countryOfOrigin = travelInfo.get("countryOfOrigin").textValue();
+                contact.put("QUARANTINE_FACILITY", StringUtils.isNotBlank(quarantineCenter) ? quarantineCenter : "");
+                contact.put("COUNTRY_OF_ORIGIN", StringUtils.isNotBlank(countryOfOrigin) ? countryOfOrigin : "");
+
                 patientContactNode.add(contact);
 
             }
         }
         responseWrapper.put("contacts", patientContactNode);
         return responseWrapper;
+    }
+
+    private ObjectNode getQuarantineEnrollmentDetails(Patient patient) {
+
+        Concept quarantineCenterConcept = conceptService.getConcept(162724);
+        ObjectNode enrollmentObj = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
+
+
+        String quarantineCenter = "";
+
+
+        EncounterType covid_enc_type = encounterService.getEncounterTypeByUuid(SHRUtils.COVID_19_QUARANTINE_ENROLLMENT);
+        Encounter lastEncounter = SHRUtils.lastEncounter(patient, covid_enc_type);
+
+        List<Concept> questionConcepts = Arrays.asList(quarantineCenterConcept);
+        List<Obs> enrollmentData = Context.getObsService().getObservations(
+                Collections.singletonList(patient.getPerson()),
+                Collections.singletonList(lastEncounter),
+                questionConcepts,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false
+        );
+
+        for(Obs o: enrollmentData) {
+            if (o.getConcept().equals(quarantineCenterConcept) ) {
+                quarantineCenter = o.getValueText();
+            }
+        }
+
+        enrollmentObj.put("quarantineCenter", quarantineCenter);
+        return enrollmentObj;
+    }
+
+    private ObjectNode getTravelDetails(Patient patient) {
+
+        Concept countryOfOriginConcept = conceptService.getConcept(165198);
+        ObjectNode travelHistoryObj = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
+
+        String countryOfOrigin = "";
+        EncounterType travelHistoryEncounterType = encounterService.getEncounterTypeByUuid(SHRUtils.COVID_19_TRAVEL_HISTORY_ENCOUNTER_TYPE);
+        Encounter lastEncounter = SHRUtils.lastEncounter(patient, travelHistoryEncounterType);
+
+        List<Concept> questionConcepts = Arrays.asList(countryOfOriginConcept);
+        List<Obs> travelHistoryData = Context.getObsService().getObservations(
+                Collections.singletonList(patient.getPerson()),
+                Collections.singletonList(lastEncounter),
+                questionConcepts,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false
+        );
+
+        for(Obs o: travelHistoryData) {
+            if (o.getConcept().equals(countryOfOriginConcept) ) {
+                countryOfOrigin = o.getValueText();
+            }
+        }
+
+        travelHistoryObj.put("countryOfOrigin", countryOfOrigin);
+        return travelHistoryObj;
     }
 
     /**
@@ -614,12 +726,12 @@ public class MhealthDataExchange {
         if (lastPatientEntry != null && lastPatientEntry > 0) {
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='9a5d555e-739a-11ea-bc55-0242ac130003') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_program_id >" + lastPatientEntry + " and pp.voided=0;";
+                    "where pp.patient_program_id >" + lastPatientEntry + " and pp.voided=0 and pp.date_completed is NULL ;";
         } else {
 
             sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='9a5d555e-739a-11ea-bc55-0242ac130003') p on pp.program_id = p.program_id\n" +
-                    "where pp.patient_program_id <= " + lastId + " and pp.voided=0;";
+                    "where pp.patient_program_id <= " + lastId + " and pp.voided=0 and pp.date_completed is NULL ;";
 
         }
 
