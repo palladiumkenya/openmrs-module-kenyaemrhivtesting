@@ -1071,12 +1071,14 @@ public class MedicMobileDataExchange {
         // get address
 
         ObjectNode address = SHRUtils.getPatientAddress(patient);
-        String nationality = address.get("NATIONALITY").textValue();
+        ObjectNode physicalAddress = (ObjectNode) address.get("PHYSICAL_ADDRESS");
+        String nationality = physicalAddress.get("NATIONALITY").textValue();
+
         String postalAddress = address.get("POSTAL_ADDRESS").textValue();
-        String county = address.get("COUNTY").textValue();
-        String subCounty = address.get("SUB_COUNTY").textValue();
-        String ward = address.get("WARD").textValue();
-        String landMark = address.get("NEAREST_LANDMARK").textValue();
+        String county = physicalAddress.get("COUNTY").textValue();
+        String subCounty = physicalAddress.get("SUB_COUNTY").textValue();
+        String ward = physicalAddress.get("WARD").textValue();
+        String landMark = physicalAddress.get("NEAREST_LANDMARK").textValue();
 
 
         fields.put("needs_sign_off",true);

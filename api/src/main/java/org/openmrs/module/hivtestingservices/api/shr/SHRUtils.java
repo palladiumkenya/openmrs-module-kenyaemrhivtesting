@@ -55,6 +55,10 @@ public class SHRUtils {
     public static final String PASSPORT_NUMBER = "e1e80daa-6d7e-11ea-bc55-0242ac130003";
     public static final String CASE_id = "e1e80daa-6d7e-11ea-bc55-0242ac130003";
     public static final String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
+    public static final String COVID_19_QUARANTINE_ENROLLMENT = "33a3a55c-73ae-11ea-bc55-0242ac130003";
+    public static final String COVID_19_TRAVEL_HISTORY_ENCOUNTER_TYPE = "50a59411-921b-435a-9109-42aa68ee7aa7";
+
+
 
 
     public static PatientIdentifierType NATIONAL_ID_TYPE = Context.getPatientService().getPatientIdentifierTypeByUuid(SHRConstants.NATIONAL_ID);
@@ -508,40 +512,56 @@ public class SHRUtils {
         return programs.size() > 0;
     }
 
+    /**
+     * Finds the last encounter during the program enrollment with the given encounter type
+     *
+     * @param type the encounter type
+     *
+     * @return the encounter
+     */
+    public static Encounter lastEncounter(Patient patient, EncounterType type) {
+        List<Encounter> encounters = Context.getEncounterService().getEncounters(patient, null, null, null, null, Collections.singleton(type), null, null, null, false);
+        return encounters.size() > 0 ? encounters.get(encounters.size() - 1) : null;
+    }
+
+    /**
+     * Returns a patient's address
+     * @param patient
+     * @return
+     */
     public static ObjectNode getPatientAddress(Patient patient) {
         Set<PersonAddress> addresses = patient.getAddresses();
         //patient address
         ObjectNode patientAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
         ObjectNode physicalAddressNode = OutgoingPatientSHR.getJsonNodeFactory().objectNode();
-        String nationality = "";
         String postalAddress = "";
+        String nationality = "";
         String county = "";
         String sub_county = "";
         String ward = "";
         String landMark = "";
 
-
         for (PersonAddress address : addresses) {
-            if (address.getCountry() != null) {
-                nationality = address.getCountry();
-            }
             if (address.getAddress1() != null) {
                 postalAddress = address.getAddress1();
             }
+            if (address.getCountry() != null) {
+                nationality = address.getCountry() != null ? address.getCountry() : "";
+            }
 
             if (address.getCountyDistrict() != null) {
-                county = address.getCountyDistrict();
+                county = address.getCountyDistrict() != null ? address.getCountyDistrict() : "";
             }
 
             if (address.getStateProvince() != null) {
-                sub_county = address.getStateProvince();
+                sub_county = address.getStateProvince() != null ? address.getStateProvince() : "";
             }
 
             if (address.getAddress4() != null) {
-                ward = address.getAddress4();
+                ward = address.getAddress4() != null ? address.getAddress4() : "";
             }
             if (address.getAddress2() != null) {
-                landMark = address.getAddress2();
+                landMark = address.getAddress2() != null ? address.getAddress2() : "";
             }
 
         }
@@ -551,12 +571,11 @@ public class SHRUtils {
         physicalAddressNode.put("SUB_COUNTY", sub_county);
         physicalAddressNode.put("WARD", ward);
         physicalAddressNode.put("NEAREST_LANDMARK", landMark);
-        physicalAddressNode.put("POSTAL_ADDRESS", postalAddress);
 
         //combine all addresses
-/*        patientAddressNode.put("PHYSICAL_ADDRESS", physicalAddressNode);
-        patientAddressNode.put("POSTAL_ADDRESS", postalAddress);*/
+        patientAddressNode.put("PHYSICAL_ADDRESS", physicalAddressNode);
+        patientAddressNode.put("POSTAL_ADDRESS", postalAddress);
 
-        return physicalAddressNode;
+        return patientAddressNode;
     }
 }
