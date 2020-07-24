@@ -37,7 +37,7 @@
 						<ref bean="transactionManager" />
 					</property>
 					<property name="target">
-						<bean class="org.openmrs.module.hivtestingservices.api.impl.HTSServiceImpl">
+						<bean class="org.openmrs.module.hivtestingservices.api.service.impl.HTSServiceImpl">
 							<property name="patientContactDAO">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO">
 									<property name="sessionFactory">
@@ -104,6 +104,163 @@
 		</property>
 	</bean>
 
+	<!-- Medic services  -->
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list merge="true">
+				<value>org.openmrs.module.hivtestingservices.api.service.DataService</value>
+				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager"/>
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.api.service.impl.DataServiceImpl">
+							<property name="errorDataDao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateErrorDataDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory"/>
+									</property>
+								</bean>
+							</property>
+							<property name="queueDataDao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateQueueDataDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory"/>
+									</property>
+								</bean>
+							</property>
+							<property name="archiveDataDao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateArchiveDataDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory"/>
+									</property>
+								</bean>
+							</property>
+							<property name="dataSourceDao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateDataSourceDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory"/>
+									</property>
+								</bean>
+							</property>
+							<property name="notificationDataDao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateNotificationDataDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory"/>
+									</property>
+								</bean>
+							</property>
+							<property name="errorMessageDao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateErrorMessageDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory"/>
+									</property>
+								</bean>
+							</property>
+						</bean>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors"/>
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list merge="true">
+				<value>org.openmrs.module.hivtestingservices.api.service.CoreService</value>
+				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager"/>
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.api.service.impl.CoreServiceImpl">
+							<property name="coreDao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateCoreDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory"/>
+									</property>
+								</bean>
+							</property>
+						</bean>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors"/>
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.hivtestingservices.api.service.MuzimaTagService</value>
+				<bean
+						class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager"/>
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.api.service.impl.MuzimaTagServiceImpl">
+							<constructor-arg>
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateTagDAO">
+									<constructor-arg ref="dbSessionFactory"/>
+								</bean>
+							</constructor-arg>
+						</bean>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors"/>
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.hivtestingservices.api.service.RegistrationDataService</value>
+				<bean
+						class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager">
+						<ref bean="transactionManager" />
+					</property>
+					<property name="target">
+						<bean class="org.openmrs.module.hivtestingservices.api.service.impl.RegistrationDataServiceImpl">
+							<property name="dao">
+								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateRegistrationDataDao">
+									<property name="sessionFactory">
+										<ref bean="dbSessionFactory" />
+									</property>
+								</bean>
+							</property>
+						</bean>
+					</property>
+					<property name="preInterceptors">
+						<ref bean="serviceInterceptors" />
+					</property>
+					<property name="transactionAttributeSource">
+						<ref bean="transactionAttributeSource" />
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+<!-- End Services accessible via Context.getService() -->
 	<bean id="hivtesting.hts.config.report" class="org.openmrs.module.kenyacore.report.ReportConfiguration">
 		<property name="commonReports">
 			<set>

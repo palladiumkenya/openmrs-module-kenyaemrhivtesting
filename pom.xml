@@ -50,6 +50,7 @@
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
 		<idgenVersion>2.6</idgenVersion>
 		<jacksonVersion>2.10.1</jacksonVersion>
+		<jsonPathVersion>0.8.1</jsonPathVersion>
 		<apacheHttpClientVersion>4.5.10</apacheHttpClientVersion>
 		<webservicesRestVersion>2.1</webservicesRestVersion>
 
@@ -281,6 +282,37 @@
 				<version>${apacheHttpClientVersion}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.jayway.jsonpath</groupId>
+				<artifactId>json-path</artifactId>
+				<version>${jsonPathVersion}</version>
+				<type>jar</type>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jayway.jsonpath</groupId>
+				<artifactId>json-path-assert</artifactId>
+				<version>0.8.1</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>net.sf.kxml</groupId>
+				<artifactId>kxml2</artifactId>
+				<version>2.3.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>jakarta-regexp</groupId>
+				<artifactId>jakarta-regexp</artifactId>
+				<version>1.4</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>1.9.2</version>
+			</dependency>
 			<!-- End external libraries -->
 
 		</dependencies>

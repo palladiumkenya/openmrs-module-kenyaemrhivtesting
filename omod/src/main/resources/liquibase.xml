@@ -774,7 +774,7 @@
     </changeSet>
 
     <!--Inserting Medic Queue Data Processor into schedule_task_config table-->
-    <changeSet id="${project.parent.artifactId}-20180802-1220" author="aojwang">
+    <changeSet id="${project.parent.artifactId}-20200724-1320" author="pwangoo">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM scheduler_task_config
@@ -786,15 +786,15 @@
         <insert tableName="scheduler_task_config">
             <column name="name" value="Medic Queue Data Processor" />
             <column name="description" value="Processes Medic Queue Data Processor" />
-            <column name="schedulable_class" value="org.openmrs.module.muzima.task.ProcessQueueDataTask" />
+            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ProcessQueueDataTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
-            <column name="start_time" valueDate="2017-11-28T23:59:59" />
+            <column name="start_time" valueDate="2020-07-23T23:59:59" />
             <column name="repeat_interval" value="180" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
             <column name="start_on_startup" value="1" />
             <column name="started" value="1" />
-            <column name="uuid" value="b82736c2-9651-11e8-9eb6-529269fb1459" />
+            <column name="uuid" value="ba4fb987-47ae-45f7-a2f4-98d1c707c4c5" />
         </insert>
     </changeSet>
 
