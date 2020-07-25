@@ -261,7 +261,7 @@ public class MedicMobileDataExchange {
                     saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
                 } else {
 
-                    patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
+                    patient = SHRUtils.createPatient(fName, mName, lName, dob, c != null ? c.getSex() : null, nationalID, passportNo, alienNo);
                     patient = addCHTRecordUuid(patient,uuid);
                     //patient.setUuid(c.getUuid());
                     patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);
