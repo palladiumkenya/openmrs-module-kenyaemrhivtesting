@@ -450,7 +450,7 @@ public class SHRUtils {
      * @param personService
      * @return
      */
-    private static String getContactPhoneNumber(Patient patient, PersonService personService) {
+    public static String getContactPhoneNumber(Patient patient, PersonService personService) {
         PersonAttributeType phoneNumberAttrType = personService.getPersonAttributeTypeByUuid(TELEPHONE_CONTACT);
         return patient.getAttribute(phoneNumberAttrType) != null ? patient.getAttribute(phoneNumberAttrType).getValue() : "";
     }
@@ -578,4 +578,6 @@ public class SHRUtils {
 
         return patientAddressNode;
     }
+
+
 }
