@@ -14,6 +14,7 @@
 package org.openmrs.module.hivtestingservices.api.db.hibernate;
 
 import org.hibernate.Criteria;
+import org.hibernate.SessionFactory;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.hivtestingservices.api.db.SingleClassDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import java.util.List;
 public class HibernateSingleClassDao<T> implements SingleClassDao<T> {
 
     @Autowired
-    protected DbSessionFactory sessionFactory;
+    protected SessionFactory sessionFactory;
 
     protected Class<T> mappedClass;
 
@@ -49,7 +50,7 @@ public class HibernateSingleClassDao<T> implements SingleClassDao<T> {
         this.mappedClass = mappedClass;
     }
 
-    public void setSessionFactory(DbSessionFactory sessionFactory) {
+    public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

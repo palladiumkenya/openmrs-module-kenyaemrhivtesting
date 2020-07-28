@@ -44,6 +44,13 @@
 		ContactTrace.hbm.xml
 		HTSObject.hbm.xml
 		AOPEncounterEntry.hbm.xml
+		RegistrationData.hbm.xml
+		QueueData.hbm.xml
+		NotificationData.hbm.xml
+		ErrorData.hbm.xml
+		DataSource.hbm.xml
+		ArchiveData.hbm.xml
+		ErrorMessage.hbm.xml
 
 	</mappingFiles>
 

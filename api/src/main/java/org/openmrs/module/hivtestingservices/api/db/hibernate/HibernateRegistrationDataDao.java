@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
@@ -25,6 +26,7 @@ import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.hivtestingservices.api.db.RegistrationDataDao;
 import org.openmrs.module.hivtestingservices.model.RegistrationData;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -36,6 +38,8 @@ public class HibernateRegistrationDataDao extends HibernateSingleClassDao<Regist
 
     private final Log log = LogFactory.getLog(this.getClass());
 
+    @Autowired
+    protected SessionFactory sessionFactory;
     public HibernateRegistrationDataDao() {
         super(RegistrationData.class);
     }
@@ -43,7 +47,7 @@ public class HibernateRegistrationDataDao extends HibernateSingleClassDao<Regist
     /**
      * @return the sessionFactory
      */
-    protected DbSessionFactory getSessionFactory() {
+    protected SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 

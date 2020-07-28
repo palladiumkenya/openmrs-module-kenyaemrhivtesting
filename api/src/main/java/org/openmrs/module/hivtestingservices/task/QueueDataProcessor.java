@@ -54,6 +54,7 @@ public class QueueDataProcessor {
     }
 
     private void processAllQueueData() {
+        Context.openSession();
         try {
             isRunning = true;
             log.info("Starting up queue data processor ...");

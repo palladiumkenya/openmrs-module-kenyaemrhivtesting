@@ -15,6 +15,7 @@ package org.openmrs.module.hivtestingservices.api.db.hibernate;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -23,6 +24,7 @@ import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.hivtestingservices.api.db.DataSourceDao;
 import org.openmrs.module.hivtestingservices.model.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -33,11 +35,12 @@ public class HibernateDataSourceDao extends HibernateSingleClassDao<DataSource> 
     public HibernateDataSourceDao() {
         super(DataSource.class);
     }
-
+    @Autowired
+    protected SessionFactory sessionFactory;
     /**
      * @return the sessionFactory
      */
-    protected DbSessionFactory getSessionFactory() {
+    protected SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 

@@ -32,6 +32,9 @@ public class ProcessQueueDataTask extends AbstractTask {
     @Override
     public void execute() {
         Context.openSession();
+        if (!Context.isAuthenticated()) {
+            authenticate();
+        }
         processor.processQueueData();
         Context.closeSession();
     }

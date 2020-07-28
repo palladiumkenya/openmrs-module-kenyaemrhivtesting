@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.hivtestingservices.api.db.hibernate;
 
+import org.hibernate.SessionFactory;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.hivtestingservices.api.db.TagDAO;
 import org.openmrs.module.hivtestingservices.model.MuzimaFormTag;
@@ -20,9 +21,9 @@ import org.openmrs.module.hivtestingservices.model.MuzimaFormTag;
 import java.util.List;
 
 public class HibernateTagDAO implements TagDAO {
-    private DbSessionFactory factory;
+    private SessionFactory factory;
 
-    public HibernateTagDAO(DbSessionFactory factory) {
+    public HibernateTagDAO(SessionFactory factory) {
         this.factory = factory;
     }
 

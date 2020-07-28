@@ -17,17 +17,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.openmrs.api.db.hibernate.DbSessionFactory;
+import org.hibernate.SessionFactory;
 import org.openmrs.module.hivtestingservices.api.db.DataDao;
 import org.openmrs.module.hivtestingservices.model.Data;
 import org.openmrs.module.hivtestingservices.model.handler.DataHandler;
 import org.openmrs.util.HandlerUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -36,6 +38,9 @@ import java.util.List;
 /**
  */
 public abstract class HibernateDataDao<T extends Data> extends HibernateSingleClassDao<T> implements DataDao<T> {
+
+    @Autowired
+    protected SessionFactory sessionFactory;
 
     private final Log log = LogFactory.getLog(HibernateDataDao.class);
 
@@ -51,9 +56,7 @@ public abstract class HibernateDataDao<T extends Data> extends HibernateSingleCl
     /**
      * @return the sessionFactory
      */
-    protected DbSessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
+    protected SessionFactory getSessionFactory() { return sessionFactory; }
 
     /**
      * Return the data with the given id.

@@ -118,42 +118,42 @@
 							<property name="errorDataDao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateErrorDataDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory"/>
+										<ref bean="sessionFactory"/>
 									</property>
 								</bean>
 							</property>
 							<property name="queueDataDao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateQueueDataDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory"/>
+										<ref bean="sessionFactory"/>
 									</property>
 								</bean>
 							</property>
 							<property name="archiveDataDao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateArchiveDataDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory"/>
+										<ref bean="sessionFactory"/>
 									</property>
 								</bean>
 							</property>
 							<property name="dataSourceDao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateDataSourceDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory"/>
+										<ref bean="sessionFactory"/>
 									</property>
 								</bean>
 							</property>
 							<property name="notificationDataDao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateNotificationDataDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory"/>
+										<ref bean="sessionFactory"/>
 									</property>
 								</bean>
 							</property>
 							<property name="errorMessageDao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateErrorMessageDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory"/>
+										<ref bean="sessionFactory"/>
 									</property>
 								</bean>
 							</property>
@@ -183,7 +183,7 @@
 							<property name="coreDao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateCoreDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory"/>
+										<ref bean="sessionFactory"/>
 									</property>
 								</bean>
 							</property>
@@ -213,7 +213,7 @@
 						<bean class="org.openmrs.module.hivtestingservices.api.service.impl.MuzimaTagServiceImpl">
 							<constructor-arg>
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateTagDAO">
-									<constructor-arg ref="dbSessionFactory"/>
+									<constructor-arg ref="sessionFactory"/>
 								</bean>
 							</constructor-arg>
 						</bean>
@@ -243,7 +243,7 @@
 							<property name="dao">
 								<bean class="org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateRegistrationDataDao">
 									<property name="sessionFactory">
-										<ref bean="dbSessionFactory" />
+										<ref bean="sessionFactory" />
 									</property>
 								</bean>
 							</property>

@@ -16,6 +16,7 @@ package org.openmrs.module.hivtestingservices.api.db.hibernate;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
@@ -43,13 +44,13 @@ import java.util.List;
 public class HibernateCoreDao implements CoreDao {
 
     @Autowired
-    protected DbSessionFactory sessionFactory;
+    protected SessionFactory sessionFactory;
 
-    public DbSessionFactory getSessionFactory() {
+    public SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 
-    public void setSessionFactory(final DbSessionFactory sessionFactory) {
+    public void setSessionFactory(final SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
