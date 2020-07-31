@@ -19,6 +19,7 @@ import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.reporting.common.DurationUnit;
 
 import java.util.Date;
@@ -35,6 +36,7 @@ public interface HTSDAO {
     public List<PatientContact> searchPatientContact(String searchName);
     public PatientContact getPatientContactByID (Integer patientContactId);
     public ContactTrace saveClientTrace(ContactTrace contactTrace);
+    public MedicQueData saveQueData(MedicQueData medicQueData);
     public ContactTrace getPatientContactTraceById(Integer patientContactTraceId);
     public ContactTrace getLastTraceForPatientContact (PatientContact patientContact);
     List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact);

@@ -36,6 +36,7 @@ import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.reporting.common.DurationUnit;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -155,6 +156,13 @@ public class HibernateHTSDAO implements HTSDAO {
 
         sessionFactory.getCurrentSession().saveOrUpdate(contactTrace);
         return contactTrace;
+    }
+
+    @Override
+    public MedicQueData saveQueData(MedicQueData medicQueData) throws DAOException {
+
+        sessionFactory.getCurrentSession().saveOrUpdate(medicQueData);
+        return medicQueData;
     }
 
     public ContactTrace getPatientContactTraceById(Integer patientContactTraceId) {
