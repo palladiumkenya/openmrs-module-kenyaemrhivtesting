@@ -798,4 +798,35 @@
         </insert>
     </changeSet>
 
+    <changeSet id="medic_form-20200723-1335" author="pwangoo">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="medic_form" schemaName="openmrs"/>
+            </not>
+        </preConditions>
+        <comment>
+            Table for forms
+        </comment>
+        <createTable tableName="medic_form">
+            <column name="form_id" type="int"> <constraints nullable="true"/></column>
+            <column name="model_xml" type="${clob.type}"/>
+            <column name="form_html" type="${clob.type}"/>
+            <column name="model_json" type="${clob.type}"/>
+            <column name="meta_json" type="${clob.type}"/>
+            <column name="discriminator" type="varchar(255)"/>
+            <column name="form" type="char(38)"/>
+            <column name="creator" valueNumeric="1" type="int"/>
+            <column name="date_created" valueDate="2007-05-04" type="date"/>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="date"/>
+            <column name="retired" valueBoolean="false" type="boolean"/>
+            <column name="retired_by" type="int"/>
+            <column name="date_retired" type="date"/>
+            <column name="retire_reason" type="text"/>
+            <column name="uuid" type="char(38)"/>
+        </createTable>
+        <addPrimaryKey columnNames="form_id" constraintName="medic_form_id_pk" tableName="medic_form"/>
+         <addUniqueConstraint constraintName="unique-medicform-form-uuid" tableName="medic_form" columnNames="uuid"/>
+    </changeSet>
+
 </databaseChangeLog>

@@ -51,6 +51,7 @@
 		DataSource.hbm.xml
 		ArchiveData.hbm.xml
 		ErrorMessage.hbm.xml
+		MedicForm.hbm.xml
 
 	</mappingFiles>
 
