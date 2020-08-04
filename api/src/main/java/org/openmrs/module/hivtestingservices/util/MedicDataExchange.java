@@ -66,7 +66,6 @@ public class MedicDataExchange {
         medicQueData.setPayload(payload);
         medicQueData.setDiscriminator(discriminator);
         medicQueData.setPatientUuid(patientUuid);
-        medicQueData.setFormName(form.getName());
         medicQueData.setFormDataUuid(formUuid);
         medicQueData.setProvider(provider);
         medicQueData.setLocation(location);
