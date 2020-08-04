@@ -59,7 +59,7 @@ public class MedicDataExchange {
         Form form = Context.getFormService().getFormByUuid(formUuid);
 
         MedicQueData medicQueData = new MedicQueData();
-        if(form.getName() !=null) { medicQueData.setFormName(form.getName());
+        if(form !=null && form.getName() !=null) { medicQueData.setFormName(form.getName());
         }else {
             medicQueData.setFormName("Unknown name");
         }
