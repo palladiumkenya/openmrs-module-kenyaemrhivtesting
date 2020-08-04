@@ -7,6 +7,9 @@ import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.ui.framework.fragment.action.SuccessResult;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 public class Utils {
     /**
      * Lifted from KenyaEMR common metadata
@@ -32,5 +35,24 @@ public class Utils {
     public static final String PATIENT_CLINIC_NUMBER = "b4d66522-11fc-45c7-83e3-39a1af21ae0d";
     public static final String UNIQUE_PATIENT_NUMBER = "05ee9cf4-7242-4a17-b4d4-00f707265c8a";
     public static final String NATIONAL_UNIQUE_PATIENT_IDENTIFIER = "f85081e2-b4be-4e48-b3a4-7994b69bb101";
+
+    public static String fetchRequestBody(BufferedReader reader) {
+        String requestBodyJsonStr = "";
+        try {
+
+            BufferedReader br = new BufferedReader(reader);
+            String output = "";
+            while ((output = reader.readLine()) != null) {
+                requestBodyJsonStr += output;
+            }
+
+
+        } catch (IOException e) {
+
+            System.out.println("IOException: " + e.getMessage());
+
+        }
+        return requestBodyJsonStr;
+    }
 
 }

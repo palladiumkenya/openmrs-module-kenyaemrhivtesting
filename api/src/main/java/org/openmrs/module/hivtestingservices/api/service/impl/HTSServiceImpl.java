@@ -23,6 +23,7 @@ import org.openmrs.module.hivtestingservices.api.ContactTrace;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
+import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.reporting.common.DurationUnit;
 
 import java.util.Date;
@@ -37,6 +38,7 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     protected final Log log = LogFactory.getLog(this.getClass());
 
     private HibernateHTSDAO patientContactDAO;
+    private HibernateHTSDAO queueDataDao;
 
     @Override
     public List<PatientContact> getPatientContacts() {
@@ -51,6 +53,15 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     public void setPatientContactDAO(HibernateHTSDAO patientContactDAO) {
         this.patientContactDAO = patientContactDAO;
     }
+
+    public void setQueueDataDao(HibernateHTSDAO queueDataDao) {
+        this.queueDataDao = queueDataDao;
+    }
+    public HibernateHTSDAO getQueueDataDao() {
+        return queueDataDao;
+    }
+
+
 
     public HibernateHTSDAO getPatientContactDAO() {
         return patientContactDAO;
@@ -85,6 +96,11 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     public ContactTrace saveClientTrace(ContactTrace contactTrace) {
 
         return patientContactDAO.saveClientTrace(contactTrace);
+    }
+
+    @Override
+    public MedicQueData saveQueData(MedicQueData medicQueData) {
+        return patientContactDAO.saveQueData(medicQueData);
     }
 
     @Override

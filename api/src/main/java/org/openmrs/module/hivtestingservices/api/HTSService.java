@@ -17,6 +17,7 @@ import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
+import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ public interface HTSService extends OpenmrsService {
     public PatientContact getPatientContactByID (Integer patientContactId);
     public List<PatientContact> getPatientContactByPatient(Patient patient);
     public ContactTrace saveClientTrace(ContactTrace contactTrace);
+    public MedicQueData saveQueData(MedicQueData medicQueData);
     public List<ContactTrace> getContactTraceByPatientContact(PatientContact patientContact);
     public ContactTrace getPatientContactTraceById (Integer patientContactId);
     public ContactTrace getLastTraceForPatientContact (PatientContact patientContact);

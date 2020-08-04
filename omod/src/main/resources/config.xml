@@ -42,6 +42,7 @@
 
 		PatientContact.hbm.xml
 		ContactTrace.hbm.xml
+		MedicQueData.hbm.xml
 		HTSObject.hbm.xml
 		AOPEncounterEntry.hbm.xml
 		RegistrationData.hbm.xml
