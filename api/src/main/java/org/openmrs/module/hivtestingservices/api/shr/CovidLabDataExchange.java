@@ -263,6 +263,8 @@ public class CovidLabDataExchange {
             fullName += " " + patient.getFamilyName();
         }
 
+        String phoneNumber = SHRUtils.getContactPhoneNumber(patient, personService);
+
         //ArrayNode labTests = OutgoingPatientSHR.getJsonNodeFactory().arrayNode();
         if (patientLabOrders != null) {
             //Get active lab orders
@@ -291,6 +293,7 @@ public class CovidLabDataExchange {
                     test.put("specimen_id", o.getOrderNumber());
                     test.put("patient_id", patient.getPatientId());
                     test.put("date_isolation", "");
+                    test.put("phone_no", phoneNumber);
                     test.put("isolation_center", StringUtils.isNotBlank(quarantineCenter) ? quarantineCenter : cifInfo.get("healthFacility").textValue());
                     test.put("date_death", deathDate);
                     test.put("dob", dob);

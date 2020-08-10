@@ -140,10 +140,19 @@ public class MedicMobileDataExchange {
             }
 
             if (patient == null) {
-                patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
+                patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo, uuid);
+
             }
 
-            if (c == null && patient == null && (traceReport == null || traceReport.isEmpty())) {
+            if (c != null && patient != null && c.getPatient() == null) { // link contact to the created person in the system
+                c.setPatient(patient);
+                htsService.savePatientContact(c);
+
+                patient.setGender(c.getSex());
+                personService.savePerson(patient);
+            }
+
+            if (c == null && patient == null && (traceReport == null || traceReport.isEmpty())) { // this handles contact listing. No trace segment is expected
 
                 String casePatientUuid = contactNode.get("parent_uuid").textValue();
                 String dateOfLastContactStr = contactNode.get("date_of_last_contact").textValue();
@@ -205,14 +214,85 @@ public class MedicMobileDataExchange {
                         return "Could not find a case for the contact provided";
                     }
                 }
+            } else if (c == null && patient != null ) { // fix for followups processed before contact listing
+                if (patient.getGender().equalsIgnoreCase("U") && sex != null) { // save the correct gender
+                    patient.setGender(sex.equals("male") ? "M" : "F");
+                    personService.savePerson(patient);
+                }
+
+                // add patient contact and create relationship
+
+                String casePatientUuid = contactNode.get("parent_uuid").textValue();
+                String dateOfLastContactStr = contactNode.get("date_of_last_contact").textValue();
+
+                Date dateOfLastContact = null;
+                if (StringUtils.isNotBlank(dateOfLastContactStr)) {
+                    dateOfLastContact = SHRUtils.parseDateString(dateOfLastContactStr, "yyyy-MM-dd");
+                }
+                if (StringUtils.isNotBlank(casePatientUuid)) {
+                    Patient p = Context.getPatientService().getPatientByUuid(casePatientUuid);// check if the uuid is in OpenMRS
+                    if (p == null) { // check if case originated from CHT
+                        List<Patient> existingPatients = Context.getPatientService().getPatients(null, casePatientUuid, Arrays.asList(SHRUtils.CHT_REFERENCE_UUID), false);
+                        if (existingPatients.size() > 0) {
+                            p = existingPatients.get(0);
+                        }
+                    }
+                    if (p != null) {
+                        PatientContact pc = new PatientContact();
+                        pc.setFirstName(fName);
+                        pc.setMiddleName(mName);
+                        pc.setLastName(lName);
+                        pc.setBirthDate(dob);
+                        pc.setPhysicalAddress(postalAddress);
+                        pc.setSubcounty(subCounty);
+                        pc.setTown(subCounty);
+                        pc.setPhoneContact(phoneNumber);
+                        pc.setPatientRelatedTo(p);
+                        pc.setPatient(patient);
+                        if (sex != null) {
+                            sex = sex.equals("male") ? "M" : "F";
+                        } else {
+                            sex = "U";
+                        }
+                        pc.setSex(sex);
+                        if (StringUtils.isNotBlank(relationToCase) && getContactRelationConcept(relationToCase) != null) {
+                            pc.setRelationType(getContactRelationConcept(relationToCase));
+
+                        }
+
+                        if (dateOfLastContact !=null) {
+                            pc.setAppointmentDate(dateOfLastContact);
+                        }
+
+                        pc.setIpvOutcome("CHT");// using this to store record source. We should not push back contacts sent from CHT
+
+                        if (StringUtils.isNotBlank(typeOfExposure) && getContactTypeConcept(Integer.parseInt(typeOfExposure)) != null) {
+                            pc.setPnsApproach(getContactTypeConcept(Integer.parseInt(typeOfExposure)));
+                        }
+
+                        if (StringUtils.isNotBlank(typeOfContact)) { // has been edited to primary/secondary
+                            pc.setContactListingDeclineReason(typeOfContact.equals("primary")? "Primary" : "Secondary");
+                        }
+                        pc.setBirthDate(dob);
+                        pc.setVoided(false);
+                        pc.setUuid(uuid);
+
+                        c = htsService.savePatientContact(pc); // assign the saved PatientContact
+                    } else {
+                        return "Could not find a case for the contact provided";
+                    }
+                }
+
             }
 
-            Patient contactRegistered = null;
+            // check if the contact is already registered in KenyaEMR
+            Patient registeredPatientContact = null;
             if (c != null && c.getPatient() != null) {
-                contactRegistered = c.getPatient();
+                registeredPatientContact = c.getPatient();
             } else if (patient != null) {
-                contactRegistered = patient;
+                registeredPatientContact = patient;
             }
+
 
             if (traceReport != null && !traceReport.isEmpty()) {
 
@@ -257,11 +337,16 @@ public class MedicMobileDataExchange {
                 String soreThroat = traceReport.get("sore_throat").textValue();
                 String difficultyBreathing = traceReport.get("difficulty_breathing").textValue();
 
-                if (contactRegistered != null && traceReport != null) {
-                    saveContactFollowupReport(contactRegistered, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
+                if (registeredPatientContact != null && traceReport != null) {
+                    saveContactFollowupReport(registeredPatientContact, encounterdate, temp, fever, cough, difficultyBreathing, followupSequence, soreThroat);
                 } else {
 
-                    patient = SHRUtils.createPatient(fName, mName, lName, dob, c.getSex(), nationalID, passportNo, alienNo);
+                    if (sex != null) {
+                        sex = sex.equals("male") ? "M" : "F";
+                    } else {
+                        sex = "U";
+                    }
+                    patient = SHRUtils.createPatient(fName, mName, lName, dob, sex, nationalID, passportNo, alienNo);
                     patient = addCHTRecordUuid(patient,uuid);
                     //patient.setUuid(c.getUuid());
                     patient = SHRUtils.addPersonAddresses(patient, nationality, county, subCounty, null, postalAddress);

@@ -450,7 +450,7 @@ public class SHRUtils {
      * @param personService
      * @return
      */
-    private static String getContactPhoneNumber(Patient patient, PersonService personService) {
+    public static String getContactPhoneNumber(Patient patient, PersonService personService) {
         PersonAttributeType phoneNumberAttrType = personService.getPersonAttributeTypeByUuid(TELEPHONE_CONTACT);
         return patient.getAttribute(phoneNumberAttrType) != null ? patient.getAttribute(phoneNumberAttrType).getValue() : "";
     }
@@ -577,5 +577,42 @@ public class SHRUtils {
         patientAddressNode.put("POSTAL_ADDRESS", postalAddress);
 
         return patientAddressNode;
+    }
+
+
+    public static Patient checkIfPatientExists(String idNumber, String passportNumber, String alienId, String uuid) {
+
+        PatientService patientService = Context.getPatientService();
+        PatientIdentifierType ALIEN_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(ALIEN_NUMBER);
+        PatientIdentifierType PP_NUMBER_TYPE = patientService.getPatientIdentifierTypeByUuid(PASSPORT_NUMBER);
+        PatientIdentifierType NATIONAL_ID_TYPE = patientService.getPatientIdentifierTypeByUuid(NATIONAL_ID);
+
+        List<String> ids = new ArrayList<String>();
+        if (StringUtils.isNotBlank(idNumber)) {
+            ids.add(idNumber);
+        }
+
+        if (StringUtils.isNotBlank(passportNumber)) {
+            ids.add(passportNumber);
+        }
+
+        if (StringUtils.isNotBlank(alienId)) {
+            ids.add(alienId);
+        }
+
+        if (StringUtils.isNotBlank(uuid)) {
+            ids.add(uuid);
+        }
+
+        for (String identifier : ids) {
+            if (identifier != null) {
+                List<Patient> patientsAlreadyAssigned = patientService.getPatients(null, identifier.trim(), Arrays.asList(ALIEN_NUMBER_TYPE, PP_NUMBER_TYPE, NATIONAL_ID_TYPE, SHRUtils.CHT_REFERENCE_UUID), false);
+                if (patientsAlreadyAssigned.size() > 0) {
+                    return patientsAlreadyAssigned.get(0);
+                }
+            }
+        }
+
+        return null;
     }
 }
