@@ -140,7 +140,16 @@ public class MedicMobileDataExchange {
             }
 
             if (patient == null) {
-                patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo);
+                patient = SHRUtils.checkIfPatientExists(nationalID, passportNo, alienNo, uuid);
+
+            }
+
+            if (c != null && patient != null && c.getPatient() == null) { // link contact to the created person in the system
+                c.setPatient(patient);
+                htsService.savePatientContact(c);
+
+                patient.setGender(c.getSex());
+                personService.savePerson(patient);
             }
 
             if (c == null && patient == null && (traceReport == null || traceReport.isEmpty())) { // this handles contact listing. No trace segment is expected
@@ -283,6 +292,7 @@ public class MedicMobileDataExchange {
             } else if (patient != null) {
                 registeredPatientContact = patient;
             }
+
 
             if (traceReport != null && !traceReport.isEmpty()) {
 
