@@ -302,6 +302,10 @@ public class MedicMobileDataExchange {
                 Date encounterdate = SHRUtils.parseDateString(encDateStr, "yyyy-MM-dd");
 
                 if (StringUtils.isNotBlank(isAvailable) && StringUtils.isNotBlank(followUpType) && isAvailable.equals("no")) { // record non successful trace
+
+                    if (c == null) {
+                        return "The trace report could not be saved! Please check to confirm that the parent record is valid!";
+                    }
                     String isNotAvailableReason = traceReport.get("is_not_available_reason").textValue();
                     String isNotAvailableReasonOther = traceReport.get("is_not_available_reason_other").textValue();
 
