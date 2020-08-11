@@ -27,7 +27,19 @@ public class MobileApplicationRestController extends BaseRestController {
     @ResponseBody
     public Object receiveSHR(HttpServletRequest request) {
 
-        return new SimpleObject().add("Response", "it is hitting here");
+        String requestBody = null;
+        try {
+            requestBody = Utils.fetchRequestBody(request.getReader());
+        } catch (IOException e) {
+            return new SimpleObject().add("ServerResponse", "Error extracting request body");
+        }
+
+        if (requestBody != null) {
+            MedicDataExchange shr = new MedicDataExchange();
+            return shr.processIncomingRegistration(requestBody);
+
+        }
+        return new SimpleObject().add("Report", "The request could not be interpreted properly");
     }
 
     /**
