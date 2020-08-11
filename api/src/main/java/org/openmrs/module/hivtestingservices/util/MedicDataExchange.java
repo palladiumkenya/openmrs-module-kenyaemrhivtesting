@@ -141,9 +141,9 @@ public class MedicDataExchange {
         patientNode.put("patient.otheridentifier",identifier);
 
         obs.put("identifier_type_name","National ID");
-        obs.put("1054^CIVIL STATUS^99DCT",jsonNode.get("_1054_maritalStatus_99DCT").getTextValue().replace("_","^").substring(1));
-        obs.put("1542^OCCUPATION^99DCT",jsonNode.get("_1542_occupation_99DCT").getTextValue().replace("_","^").substring(1));
-        obs.put("1712^HIGHEST EDUCATION LEVEL^99DCT",jsonNode.get("_1712_education_99DCT").getTextValue().replace("_","^").substring(1));
+        obs.put("1054^CIVIL STATUS^99DCT",jsonNode.get("patient_marital_status").getTextValue().replace("_","^").substring(1));
+        obs.put("1542^OCCUPATION^99DCT",jsonNode.get("patient_occupation").getTextValue().replace("_","^").substring(1));
+        obs.put("1712^HIGHEST EDUCATION LEVEL^99DCT",jsonNode.get("patient_education_level").getTextValue().replace("_","^").substring(1));
 
         tmp.put("tmp.birthdate_type","age");
         tmp.put("tmp.age_in_years",jsonNode.get("patient_ageYears").getTextValue());
