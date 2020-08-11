@@ -47,7 +47,7 @@ public class MobileApplicationRestController extends BaseRestController {
      * @param request
      * @return
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/medicqueuedata") // end point for medic queue data
+    @RequestMapping(method = RequestMethod.POST, value = "/medicformsdata") // end point for medic queue data
     @ResponseBody
     public Object processMedicQueueData(HttpServletRequest request) {
         String requestBody = null;
@@ -59,7 +59,7 @@ public class MobileApplicationRestController extends BaseRestController {
 
         if (requestBody != null) {
             MedicDataExchange shr = new MedicDataExchange();
-            return shr.processIncomingMedicDataQueue(requestBody);
+            return shr.processIncomingFormData(requestBody);
 
         }
         return new SimpleObject().add("Report", "The request could not be interpreted properly");

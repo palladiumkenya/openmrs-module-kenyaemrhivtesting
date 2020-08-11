@@ -70,8 +70,7 @@ public class JsonEncounterQueueDataHandler implements QueueDataHandler {
 
     private static final String DISCRIMINATOR_VALUE = "json-encounter";
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private static final DateFormat dateTimeFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
     private final Log log = LogFactory.getLog(JsonEncounterQueueDataHandler.class);
