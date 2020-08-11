@@ -104,8 +104,9 @@ public class MedicDataExchange {
 
     }
 
-    private ObjectNode processRegistrationPayload (ObjectNode jsonNode) {
+    private ObjectNode processRegistrationPayload (ObjectNode jNode) {
 
+        ObjectNode jsonNode = (ObjectNode) jNode.get("registration");
         ObjectNode patientNode = JsonNodeFactory.instance.objectNode();
         ObjectNode obs = JsonNodeFactory.instance.objectNode();
         ObjectNode tmp = JsonNodeFactory.instance.objectNode();
@@ -146,7 +147,7 @@ public class MedicDataExchange {
         obs.put("1712^HIGHEST EDUCATION LEVEL^99DCT",jsonNode.get("patient_education_level").getTextValue().replace("_","^").substring(1));
 
         tmp.put("tmp.birthdate_type","age");
-        tmp.put("tmp.age_in_years",jsonNode.get("patient_ageYears").getTextValue());
+        tmp.put("tmp.age_in_years", jsonNode.get("patient_ageYears") != null ? jsonNode.get("patient_ageYears").getTextValue() : "");
         discriminator.put("discriminator","json-registration");
 
         encounter.put("encounter.location_id","7185");
