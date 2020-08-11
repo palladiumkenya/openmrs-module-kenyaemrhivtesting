@@ -193,10 +193,10 @@ public class MedicDataExchange {
         encounter.put("encounter.provider_id_select","admin");
         encounter.put("encounter.provider_id","admin");
         encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
-        encounter.put("encounter.form_uuid","402dc5d7-46da-42d4-b2be-f43ea4ad87b0"); // should be fetch dynamically
+        encounter.put("encounter.form_uuid",jsonNode.path("fields").path("form_uuid").getTextValue());
         encounter.put("encounter.user_system_id","admin");
         encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
-        encounter.put("encounter.setup_config_uuid","9c0a7a57-62ff-4f75-babe-5835b0e921b7"); //should be fetch dynamically
+        encounter.put("encounter.setup_config_uuid",jsonNode.path("fields").path("encounter_type_uuid").getTextValue());
         patientNode.put("patient.uuid",jsonNode.path("fields").path("inputs").path("contact").path("_id").getTextValue());
 
         if(obsNodes != null){
