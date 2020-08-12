@@ -115,8 +115,9 @@ public class MedicDataExchange {
         ObjectNode identifier = JsonNodeFactory.instance.objectNode();
         ObjectNode registrationWrapper = JsonNodeFactory.instance.objectNode();
         identifier.put("identifier_type_name","National ID");
-        identifier.put("identifier_value",jsonNode.get("patient_nationalIdnumber").getTextValue());
-        identifier.put("confirm_other_identifier_value",jsonNode.get("patient_nationalIdnumber").getTextValue());
+        identifier.put("identifier_value",jsonNode.get("patient_nationalIdnumber") != null ? jsonNode.get("patient_nationalIdnumber").getTextValue() : null);
+        identifier.put("confirm_other_identifier_value","");
+        //identifier.put("confirm_other_identifier_value",jsonNode.get("patient_nationalIdnumber").getTextValue());
 
         patientNode.put("patient.uuid",jsonNode.get("_id").getTextValue());
         patientNode.put("patient.family_name",jsonNode.get("patient_familyName").getTextValue());
@@ -168,7 +169,8 @@ public class MedicDataExchange {
         return registrationWrapper;
     }
 
-    private ObjectNode processFormPayload (ObjectNode jsonNode) {
+    private ObjectNode processFormPayload (ObjectNode jNode) {
+        ObjectNode jsonNode = (ObjectNode) jNode.get("encData");
         ObjectNode formsNode = JsonNodeFactory.instance.objectNode();
         ObjectNode discriminator = JsonNodeFactory.instance.objectNode();
         ObjectNode encounter = JsonNodeFactory.instance.objectNode();
