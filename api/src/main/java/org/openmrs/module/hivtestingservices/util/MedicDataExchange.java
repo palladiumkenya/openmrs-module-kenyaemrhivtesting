@@ -114,8 +114,11 @@ public class MedicDataExchange {
         ObjectNode encounter = JsonNodeFactory.instance.objectNode();
         ObjectNode identifier = JsonNodeFactory.instance.objectNode();
         ObjectNode registrationWrapper = JsonNodeFactory.instance.objectNode();
+
+        String identifierProvided = jsonNode.get("patient_nationalIdnumber") != null ? jsonNode.get("patient_nationalIdnumber").getTextValue() : jsonNode.get("patient_passportNumber") != null ? jsonNode.get("patient_passportNumber").getTextValue() : "";
+
         identifier.put("identifier_type_name","National ID");
-        identifier.put("identifier_value",jsonNode.get("patient_nationalIdnumber") != null ? jsonNode.get("patient_nationalIdnumber").getTextValue() : null);
+        identifier.put("identifier_value", identifierProvided);
         identifier.put("confirm_other_identifier_value","");
         //identifier.put("confirm_other_identifier_value",jsonNode.get("patient_nationalIdnumber").getTextValue());
 
