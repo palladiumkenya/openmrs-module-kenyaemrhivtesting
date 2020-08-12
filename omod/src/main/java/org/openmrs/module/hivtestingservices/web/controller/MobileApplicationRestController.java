@@ -82,7 +82,7 @@ public class MobileApplicationRestController extends BaseRestController {
 
         if (requestBody != null) {
             MedicDataExchange shr = new MedicDataExchange();
-            return shr.processIncomingContactsData(requestBody);
+            return shr.addContactListToDataqueue(requestBody);
 
         }
         return new SimpleObject().add("Report", "The request could not be interpreted properly");
