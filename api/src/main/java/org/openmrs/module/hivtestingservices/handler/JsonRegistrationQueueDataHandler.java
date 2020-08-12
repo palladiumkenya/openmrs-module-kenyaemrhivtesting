@@ -358,7 +358,7 @@ public class JsonRegistrationQueueDataHandler implements QueueDataHandler {
     private void setAsAttributeByUUID(String uuid, String value){
         PersonService personService = Context.getPersonService();
         PersonAttributeType attributeType = personService.getPersonAttributeTypeByUuid(uuid);
-        if(attributeType !=null && value != null){
+        if(attributeType !=null && value != null && org.apache.commons.lang3.StringUtils.isNotBlank(value)){
             PersonAttribute personAttribute = new PersonAttribute(attributeType, value);
             personAttributes.add(personAttribute);
         } else if(attributeType ==null){
@@ -371,7 +371,7 @@ public class JsonRegistrationQueueDataHandler implements QueueDataHandler {
     private void setAsAttribute(String attributeTypeName, String value){
         PersonService personService = Context.getPersonService();
         PersonAttributeType attributeType = personService.getPersonAttributeTypeByName(attributeTypeName);
-        if(attributeType !=null && value != null){
+        if(attributeType !=null && value != null && org.apache.commons.lang3.StringUtils.isNotBlank(value)){
             PersonAttribute personAttribute = new PersonAttribute(attributeType, value);
             personAttributes.add(personAttribute);
         } else if(attributeType ==null){
