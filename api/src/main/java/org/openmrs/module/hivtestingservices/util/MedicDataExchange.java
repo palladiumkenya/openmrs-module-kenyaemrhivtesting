@@ -226,53 +226,26 @@ public class MedicDataExchange {
 
     }
 
-    public String processIncomingContactsData(String resultPayload) {
-        PatientContact contact = new PatientContact();
-
-         // Contacts details
-        String givenName = JsonUtils.readAsString(resultPayload, "$['s_name']");
-        String middleName = JsonUtils.readAsString(resultPayload, "$['f_name']");
-        String familyName = JsonUtils.readAsString(resultPayload, "$['o_name']");
-        Integer relType = relationshipTypeConverter(JsonUtils.readAsString(resultPayload, "$['contact_relationship']"));
-        String baselineStatus = JsonUtils.readAsString(resultPayload, "$['baseline_hiv_status']");
-        Date nextTestDate = JsonUtils.readAsDate(resultPayload, "$['booking_date']");
-        Date birthDate = JsonUtils.readAsDate(resultPayload, "$['date_of_birth']");
-        String sex = gender(JsonUtils.readAsString(resultPayload, "$['sex']"));
-        String phoneNumber = JsonUtils.readAsString(resultPayload, "$['phone']");
-        Integer maritalStatus = maritalStatusConverter(JsonUtils.readAsString(resultPayload, "$['marital_status']"));
-        Integer livingWithPatient = livingWithPartnerConverter(JsonUtils.readAsString(resultPayload, "$['living_with_client']"));
-        Integer pnsApproach = pnsApproachConverter(JsonUtils.readAsString(resultPayload, "$['pns_approach']"));
-        //String consentedContactListing = JsonUtils.readAsString(resultPayload, "$['sex']");
-        String physicalAddress = JsonUtils.readAsString(resultPayload, "$['physical_address']");
-        Integer patientRelatedTo = Integer.parseInt(JsonUtils.readAsString(resultPayload, "$['patient_id']"));
-        Boolean voided= false;
-
-        contact.setFirstName(givenName);
-        contact.setMiddleName(middleName);
-        contact.setLastName(familyName);
-        contact.setRelationType(relType);
-        contact.setBaselineHivStatus(baselineStatus);
-        contact.setAppointmentDate(nextTestDate);
-        contact.setBirthDate(birthDate);
-        contact.setSex(sex);
-        contact.setPhoneContact(phoneNumber);
-        contact.setMaritalStatus(maritalStatus);
-        contact.setLivingWithPatient(livingWithPatient);
-        contact.setPnsApproach(pnsApproach);
-        contact.setConsentedContactListing(1065);
-        contact.setPhysicalAddress(physicalAddress);
-        contact.setPatientRelatedTo(Context.getPatientService().getPatient(patientRelatedTo));
-        contact.setVoided(voided);
-
-
+    public String addContactListToDataqueue(String resultPayload) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = null;
         try {
-            htsService.savePatientContact(contact);
-        } catch (Exception e) {
+            jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (jsonNode != null) {
+            String discriminator = "json-patientcontact";
+            String patientContactUuid = jsonNode.get("_id").getTextValue();
+            Integer locationId = 715;
+            String providerString = "admin";
+
+            saveMedicDataQueue(resultPayload,locationId,providerString,patientContactUuid,discriminator,"");
 
         }
-        return "Contacts Data saved successfully";
+        return "Data queue contact created successfully";
     }
-
 
     private ArrayNode handleMultiSelectFields(String listOfItems){
         ArrayNode arrNode = JsonNodeFactory.instance.arrayNode();
@@ -323,65 +296,5 @@ public class MedicDataExchange {
         return DATE_FORMAT.format(date);
     }
 
-    private Integer relationshipTypeConverter(String relType) {
-        Integer relTypeConverter = null;
-        if(relType.equalsIgnoreCase("partner")){
-            relTypeConverter =163565;
-        }else if(relType.equalsIgnoreCase("parent")){
-            relTypeConverter =970;
-        }else if(relType.equalsIgnoreCase("sibling")){
-            relTypeConverter =972;
-        }else if(relType.equalsIgnoreCase("child")){
-            relTypeConverter =1528;
-        }else if(relType.equalsIgnoreCase("spouse")){
-            relTypeConverter =5617;
-        }else if(relType.equalsIgnoreCase("co-wife")){
-            relTypeConverter =162221;
-        }else if(relType.equalsIgnoreCase("Injectable drug user")){
-            relTypeConverter =157351;
-        }
-        return relTypeConverter;
-    }
-    private Integer maritalStatusConverter(String marital_status) {
-        Integer civilStatusConverter = null;
-        if(marital_status.equalsIgnoreCase("Single")){
-            civilStatusConverter =1057;
-        }else if(marital_status.equalsIgnoreCase("Divorced")){
-            civilStatusConverter =1058;
-        }else if(marital_status.equalsIgnoreCase("Widowed")){
-            civilStatusConverter =1059;
-        }else if(marital_status.equalsIgnoreCase("Married Monogamous")){
-            civilStatusConverter =5555;
-        }else if(marital_status.equalsIgnoreCase("Married Polygamous")){
-            civilStatusConverter =159715;
-        }else if(marital_status.equalsIgnoreCase("cohabiting")){
-            civilStatusConverter =1060;
-        }
-        return civilStatusConverter;
-    }
-    private Integer livingWithPartnerConverter(String livingWithPatient) {
-        Integer livingWithPatientConverter = null;
-        if(livingWithPatient.equalsIgnoreCase("no")){
-            livingWithPatientConverter =1066;
-        }else if(livingWithPatient.equalsIgnoreCase("yes")){
-            livingWithPatientConverter =1065;
-        }else if(livingWithPatient.equalsIgnoreCase("Declined to answer")){
-            livingWithPatientConverter =162570;
-        }
-        return livingWithPatientConverter;
-    }
 
-    private Integer pnsApproachConverter(String pns_approach) {
-        Integer pnsApproach = null;
-        if(pns_approach.equalsIgnoreCase("dual_referral")){
-            pnsApproach =162284;
-        }else if(pns_approach.equalsIgnoreCase("provider_referral")){
-            pnsApproach =163096;
-        }else if(pns_approach.equalsIgnoreCase("contract_referral")){
-            pnsApproach =161642;
-        } else if(pns_approach.equalsIgnoreCase("passive_referral")){
-            pnsApproach =160551;
-        }
-        return pnsApproach;
-    }
 }
