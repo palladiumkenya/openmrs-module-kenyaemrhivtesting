@@ -36,7 +36,7 @@ import java.util.Date;
 /**
  * TODO: Write brief description about the class here.
  */
-@Handler(supports = QueueData.class, order = 11)
+@Handler(supports = QueueData.class, order = 12)
 public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
 
 
@@ -58,7 +58,7 @@ public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
         queueProcessorException = new QueueProcessorException();
         try {
             if (validate(queueData)) {
-
+                registerUnsavedContactTrace();
             }
         } catch (Exception e) {
             if (!e.getClass().equals(QueueProcessorException.class)) {
@@ -126,14 +126,26 @@ public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
         unsavedContactTrace.setVoided(voided);
     }
 
+    private void registerUnsavedContactTrace() {
+        HTSService htsService = Context.getService(HTSService.class);
+        try {
+            htsService.saveClientTrace(unsavedContactTrace);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+
+        }
+    }
+
     private String getPatientContactUuidFromPayload(){
         return JsonUtils.readAsString(payload, "$['_id']");
     }
 
     private Integer getContactId(String uuid) {
         Integer contactId = null;
-        HTSService contact = Context.getService(HTSService.class);
-        PatientContact patientContact = contact.getPatientContactByUuid(uuid);
+        HTSService htsService = Context.getService(HTSService.class);
+        PatientContact patientContact = htsService.getPatientContactByUuid(uuid);
+
         if(patientContact != null) {
             contactId= patientContact.getId();
             }
