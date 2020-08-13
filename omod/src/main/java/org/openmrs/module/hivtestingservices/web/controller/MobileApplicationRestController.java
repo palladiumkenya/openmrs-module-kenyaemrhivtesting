@@ -87,4 +87,27 @@ public class MobileApplicationRestController extends BaseRestController {
         }
         return new SimpleObject().add("Report", "The request could not be interpreted properly");
     }
+
+    /**
+     * processes incoming medic contacts trace data
+     * @param request
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/medicContactTracedata") // end point for medic contact trace data
+    @ResponseBody
+    public Object processMedicContactTraceData(HttpServletRequest request) {
+        String requestBody = null;
+        try {
+            requestBody = Utils.fetchRequestBody(request.getReader());
+        } catch (IOException e) {
+            return new SimpleObject().add("ServerResponse", "Error extracting request body");
+        }
+
+        if (requestBody != null) {
+            MedicDataExchange shr = new MedicDataExchange();
+            return shr.addContactTraceToDataqueue(requestBody);
+
+        }
+        return new SimpleObject().add("Report", "The request could not be interpreted properly");
+    }
 }

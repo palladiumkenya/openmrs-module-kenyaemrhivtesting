@@ -118,6 +118,7 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         //String consentedContactListing = JsonUtils.readAsString(resultPayload, "$['sex']");
         String physicalAddress = JsonUtils.readAsString(payload, "$['physical_address']");
         Integer patientRelatedTo = getPatientRelatedToContact(JsonUtils.readAsString(payload, "$['parent']['_id']"));
+        String uuid = JsonUtils.readAsString(payload, "$['_id']");
         Boolean voided= false;
 
         unsavedPatientContact.setFirstName(givenName);
@@ -135,6 +136,7 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         unsavedPatientContact.setConsentedContactListing(1065);
         unsavedPatientContact.setPhysicalAddress(physicalAddress);
         unsavedPatientContact.setPatientRelatedTo(Context.getPatientService().getPatient(patientRelatedTo));
+        unsavedPatientContact.setUuid(uuid);
         unsavedPatientContact.setVoided(voided);
     }
 
