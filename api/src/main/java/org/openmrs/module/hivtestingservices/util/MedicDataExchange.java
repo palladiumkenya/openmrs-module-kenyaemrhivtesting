@@ -247,6 +247,27 @@ public class MedicDataExchange {
         return "Data queue contact created successfully";
     }
 
+    public String addContactTraceToDataqueue(String resultPayload) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = null;
+        try {
+            jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (jsonNode != null) {
+            String discriminator = "json-contacttrace";
+            String patientContactUuid = jsonNode.get("_id").getTextValue();
+            Integer locationId = 715;
+            String providerString = "admin";
+
+            saveMedicDataQueue(resultPayload,locationId,providerString,patientContactUuid,discriminator,"");
+
+        }
+        return "Data queue contact trace created successfully";
+    }
+
     private ArrayNode handleMultiSelectFields(String listOfItems){
         ArrayNode arrNode = JsonNodeFactory.instance.arrayNode();
         if (listOfItems !=null) {
