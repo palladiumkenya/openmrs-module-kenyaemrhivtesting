@@ -43,7 +43,7 @@ import java.util.*;
 public class JsonContactListQueueDataHandler implements QueueDataHandler {
 
 
-    private static final String DISCRIMINATOR_VALUE = "json-contactlist";
+    private static final String DISCRIMINATOR_VALUE = "json-patientcontact";
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 

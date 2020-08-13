@@ -236,7 +236,7 @@ public class MedicDataExchange {
             e.printStackTrace();
         }
         if (jsonNode != null) {
-            String discriminator = "json-contactlist";
+            String discriminator = "json-patientcontact";
             String patientContactUuid = jsonNode.get("_id").getTextValue();
             Integer locationId = 715;
             String providerString = "admin";
