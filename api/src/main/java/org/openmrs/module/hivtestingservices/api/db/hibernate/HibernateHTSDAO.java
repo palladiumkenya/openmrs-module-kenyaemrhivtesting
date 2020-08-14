@@ -151,10 +151,19 @@ public class HibernateHTSDAO implements HTSDAO {
         return (PatientContact) this.sessionFactory.getCurrentSession().get(PatientContact.class, patientContactId);
     }
 
+
     @Override
     public PatientContact getPatientContactByUuid(String uuid) {
-        return (PatientContact) this.sessionFactory.getCurrentSession().get(PatientContact.class, uuid);
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(ContactTrace.class);
+        criteria.add(Restrictions.eq("uuid", uuid));
+        criteria.add(Restrictions.eq("voided", false));
+        if(!CollectionUtils.isEmpty(criteria.list())){
+            return (PatientContact) criteria.list().get(0);
+        }
+        return null;
     }
+
+
     @Override
     public ContactTrace saveClientTrace(ContactTrace contactTrace) throws DAOException {
 
