@@ -237,12 +237,13 @@ public class MedicDataExchange {
             e.printStackTrace();
         }
         if (jsonNode != null) {
+            String payload = jsonNode.toString();
             String discriminator = "json-patientcontact";
             String patientContactUuid = jsonNode.get("_id").getTextValue();
             Integer locationId = 715;
             String providerString = "admin";
 
-            saveMedicDataQueue(resultPayload,locationId,providerString,patientContactUuid,discriminator,"");
+            saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");
 
         }
         return "Data queue contact created successfully";
