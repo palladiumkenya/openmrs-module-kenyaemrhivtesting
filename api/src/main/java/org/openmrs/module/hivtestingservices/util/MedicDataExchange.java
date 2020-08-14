@@ -231,6 +231,7 @@ public class MedicDataExchange {
         ObjectNode jsonNode = null;
         try {
             jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+            jsonNode = (ObjectNode) jsonNode.get("formData");
 
         } catch (IOException e) {
             e.printStackTrace();
