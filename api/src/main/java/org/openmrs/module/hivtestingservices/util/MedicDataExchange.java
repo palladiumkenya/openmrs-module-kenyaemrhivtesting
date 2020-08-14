@@ -254,17 +254,21 @@ public class MedicDataExchange {
         ObjectNode jsonNode = null;
         try {
             jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+            jsonNode = (ObjectNode) jsonNode.get("traceData");
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
         if (jsonNode != null) {
             String discriminator = "json-contacttrace";
+            String payload = jsonNode.toString();
             String patientContactUuid = jsonNode.get("_id").getTextValue();
             Integer locationId = 715;
             String providerString = "admin";
 
-            saveMedicDataQueue(resultPayload,locationId,providerString,patientContactUuid,discriminator,"");
+            saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");
 
         }
         return "Data queue contact trace created successfully";
