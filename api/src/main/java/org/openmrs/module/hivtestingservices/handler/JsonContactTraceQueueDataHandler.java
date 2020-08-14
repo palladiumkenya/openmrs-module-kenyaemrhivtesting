@@ -73,7 +73,7 @@ public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
 
     @Override
     public boolean validate(QueueData queueData) {
-        log.info("Processing contact list form data: " + queueData.getUuid());
+        log.info("Processing contact trace form data: " + queueData.getUuid());
         queueProcessorException = new QueueProcessorException();
         try {
             payload = queueData.getPayload();
@@ -110,7 +110,7 @@ public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
         String facilityLinkedTo = JsonUtils.readAsString(payload, "$['fields']['group_follow_up']['facility_linked_to']");
         String healthWorkerHandedTo = JsonUtils.readAsString(payload, "$['fields']['group_follow_up']['health_care_worker_handed_to']");
         String remarks = JsonUtils.readAsString(payload, "$['fields']['group_follow_up']['remarks']");
-        //String appointmentDate = JsonUtils.readAsString(payload, "$['group_follow_up']['remarks']");
+        String uuid = JsonUtils.readAsString(payload, "$['_id']");
         Integer contactId = getContactId(JsonUtils.readAsString(payload, "$['fields']['inputs']['contact']['_id']"));
         Boolean voided= false;
 
@@ -123,6 +123,7 @@ public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
         unsavedContactTrace.setHealthWorkerHandedTo(healthWorkerHandedTo);
         unsavedContactTrace.setRemarks(remarks);
         unsavedContactTrace.setPatientContact(contact.getPatientContactByID(contactId));
+        unsavedContactTrace.setUuid(uuid);
         unsavedContactTrace.setVoided(voided);
     }
 
@@ -137,15 +138,10 @@ public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
         }
     }
 
-    private String getPatientContactUuidFromPayload(){
-        return JsonUtils.readAsString(payload, "$['_id']");
-    }
-
     private Integer getContactId(String uuid) {
         Integer contactId = null;
         HTSService htsService = Context.getService(HTSService.class);
         PatientContact patientContact = htsService.getPatientContactByUuid(uuid);
-
         if(patientContact != null) {
             contactId= patientContact.getId();
             }
