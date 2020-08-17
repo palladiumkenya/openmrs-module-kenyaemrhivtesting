@@ -195,12 +195,14 @@ public class MedicDataExchange {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        String encounterDate = jsonNode.path("fields").path("encounter_date").getTextValue() != null && !jsonNode.path("fields").path("encounter_date").getTextValue().equalsIgnoreCase("") ? formatStringDate(jsonNode.path("fields").path("encounter_date").getTextValue()) : convertTime(jsonNode.get("reported_date").getLongValue());
 
         discriminator.put("discriminator","json-encounter");
         encounter.put("encounter.location_id","7185");
         encounter.put("encounter.provider_id_select","admin");
         encounter.put("encounter.provider_id","admin");
-        encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
+        encounter.put("encounter.encounter_datetime",encounterDate);
         encounter.put("encounter.form_uuid",jsonNode.path("fields").path("form_uuid").getTextValue());
         encounter.put("encounter.user_system_id","admin");
         encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
