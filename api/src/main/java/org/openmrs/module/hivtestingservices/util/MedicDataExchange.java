@@ -117,6 +117,20 @@ public class MedicDataExchange {
         ObjectNode identifier = JsonNodeFactory.instance.objectNode();
         ObjectNode registrationWrapper = JsonNodeFactory.instance.objectNode();
 
+        String patientDobKnown = jsonNode.get("patient_dobKnown") !=null ? jsonNode.get("patient_dobKnown").getTextValue():"";
+        String dateOfBirth= null;
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("_1066_No_99DCT") && jsonNode.get("patient_birthDate") != null) {
+            dateOfBirth = jsonNode.get("patient_birthDate").getTextValue();
+            patientNode.put("patient.birthdate_estimated", "true");
+            patientNode.put("patient.birth_date", formatStringDate(dateOfBirth));
+
+        }
+
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("_1065_Yes_99DCT") && jsonNode.get("patient_dateOfBirth") != null) {
+            dateOfBirth = jsonNode.get("patient_dateOfBirth").getTextValue();
+            patientNode.put("patient.birth_date", formatStringDate(dateOfBirth));
+        }
+
         String identifierProvided = jsonNode.get("patient_nationalIdnumber") != null ? jsonNode.get("patient_nationalIdnumber").getTextValue() : jsonNode.get("patient_passportNumber") != null ? jsonNode.get("patient_passportNumber").getTextValue() : "";
 
         identifier.put("identifier_type_name","National ID");
@@ -125,32 +139,30 @@ public class MedicDataExchange {
         //identifier.put("confirm_other_identifier_value",jsonNode.get("patient_nationalIdnumber").getTextValue());
 
         patientNode.put("patient.uuid",jsonNode.get("_id").getTextValue());
-        patientNode.put("patient.family_name",jsonNode.get("patient_familyName").getTextValue());
-        patientNode.put("patient.given_name",jsonNode.get("patient_firstName").getTextValue());
-        patientNode.put("patient.middle_name",jsonNode.get("patient_middleName").getTextValue());
+        patientNode.put("patient.family_name",jsonNode.get("patient_familyName") != null ? jsonNode.get("patient_familyName").getTextValue():"");
+        patientNode.put("patient.given_name",jsonNode.get("patient_firstName") != null ? jsonNode.get("patient_firstName").getTextValue():"");
+        patientNode.put("patient.middle_name",jsonNode.get("patient_middleName") != null ? jsonNode.get("patient_middleName").getTextValue(): "");
         // patientNode.put("patient.mothers_name",jsonNode.get("patient_familyName").getTextValue());
         // patientNode.put("patient.medical_record_number","337");
         patientNode.put("patient.sex",gender(jsonNode.get("patient_sex").getTextValue()));
-        patientNode.put("patient.birth_date",formatStringDate(jsonNode.get("patient_birthDate").getTextValue()));
-        // patientNode.put("patient.birthdate_estimated",jsonNode.get("patient_familyName").getTextValue());
-        patientNode.put("patient.county",jsonNode.get("patient_county").getTextValue());
-        patientNode.put("patient.sub_county",jsonNode.get("patient_subcounty").getTextValue());
-        patientNode.put("patient.ward",jsonNode.get("patient_ward").getTextValue());
-        patientNode.put("patient.village",jsonNode.get("patient_village").getTextValue());
-        patientNode.put("patient.landmark",jsonNode.get("patient_landmark").getTextValue());
-        patientNode.put("patient.phone_number",jsonNode.get("patient_telephone").getTextValue());
+        patientNode.put("patient.county",jsonNode.get("patient_county") != null ? jsonNode.get("patient_county").getTextValue():"");
+        patientNode.put("patient.sub_county",jsonNode.get("patient_subcounty") != null ? jsonNode.get("patient_subcounty").getTextValue():"");
+        patientNode.put("patient.ward",jsonNode.get("patient_ward") !=null ? jsonNode.get("patient_ward").getTextValue():"");
+        patientNode.put("patient.village",jsonNode.get("patient_village") != null ? jsonNode.get("patient_village").getTextValue() :"");
+        patientNode.put("patient.landmark",jsonNode.get("patient_landmark") != null ? jsonNode.get("patient_landmark").getTextValue():"");
+        patientNode.put("patient.phone_number",jsonNode.get("patient_telephone") != null ? jsonNode.get("patient_telephone").getTextValue():"");
         patientNode.put("patient.alternate_phone_contact",jsonNode.get("patient_alternatePhone").getTextValue());
-        patientNode.put("patient.postal_address",jsonNode.get("patient_alternatePhone").getTextValue());
-        patientNode.put("patient.next_of_kin_name",jsonNode.get("patient_nextofkin").getTextValue());
+        patientNode.put("patient.postal_address",jsonNode.get("patient_alternatePhone") != null ? jsonNode.get("patient_alternatePhone").getTextValue():"");
+        patientNode.put("patient.next_of_kin_name",jsonNode.get("patient_nextofkin") != null ? jsonNode.get("patient_nextofkin").getTextValue() : "");
         patientNode.put("patient.next_of_kin_relationship",jsonNode.get("patient_nextofkinRelationship").getTextValue());
-        patientNode.put("patient.next_of_kin_contact",jsonNode.get("patient_nextOfKinPhonenumber").getTextValue());
-        patientNode.put("patient.next_of_kin_address",jsonNode.get("patient_nextOfKinPostaladdress").getTextValue());
+        patientNode.put("patient.next_of_kin_contact",jsonNode.get("patient_nextOfKinPhonenumber") != null ? jsonNode.get("patient_nextOfKinPhonenumber").getTextValue():"");
+        patientNode.put("patient.next_of_kin_address",jsonNode.get("patient_nextOfKinPostaladdress") !=  null ? jsonNode.get("patient_nextOfKinPostaladdress").getTextValue():"");
         patientNode.put("patient.otheridentifier",identifier);
 
         obs.put("identifier_type_name","National ID");
-        obs.put("1054^CIVIL STATUS^99DCT",jsonNode.get("patient_marital_status").getTextValue().replace("_","^").substring(1));
-        obs.put("1542^OCCUPATION^99DCT",jsonNode.get("patient_occupation").getTextValue().replace("_","^").substring(1));
-        obs.put("1712^HIGHEST EDUCATION LEVEL^99DCT",jsonNode.get("patient_education_level").getTextValue().replace("_","^").substring(1));
+        obs.put("1054^CIVIL STATUS^99DCT",jsonNode.get("patient_marital_status") != null && !jsonNode.get("patient_marital_status").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_marital_status").getTextValue().replace("_","^").substring(1):"");
+        obs.put("1542^OCCUPATION^99DCT",jsonNode.get("patient_occupation") != null && !jsonNode.get("patient_occupation").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_occupation").getTextValue().replace("_","^").substring(1): "");
+        obs.put("1712^HIGHEST EDUCATION LEVEL^99DCT",jsonNode.get("patient_education_level") !=null && !jsonNode.get("patient_education_level").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_education_level").getTextValue().replace("_","^").substring(1):"");
 
         tmp.put("tmp.birthdate_type","age");
         tmp.put("tmp.age_in_years", jsonNode.get("patient_ageYears") != null ? jsonNode.get("patient_ageYears").getTextValue() : "");
@@ -161,7 +173,7 @@ public class MedicDataExchange {
         encounter.put("encounter.provider_id","admin");
         encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
         encounter.put("encounter.form_uuid","8898c6e1-5df1-409f-b8ed-c88e6e0f24e9");
-        encounter.put("encounter.user_system_id",jsonNode.path("meta").path("created_by").getTextValue());
+        encounter.put("encounter.user_system_id","admin");
         encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
         encounter.put("encounter.setup_config_uuid","2107eab5-5b3a-4de8-9e02-9d97bce635d2");
 
