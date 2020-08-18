@@ -118,6 +118,14 @@ public class MedicDataExchange {
         ObjectNode registrationWrapper = JsonNodeFactory.instance.objectNode();
 
         String identifierProvided = jsonNode.get("patient_nationalIdnumber") != null ? jsonNode.get("patient_nationalIdnumber").getTextValue() : jsonNode.get("patient_passportNumber") != null ? jsonNode.get("patient_passportNumber").getTextValue() : "";
+        String patientDobKnown = jsonNode.get("patient_dobKnown").getTextValue();
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("no")) {
+             patientNode.put("patient.birthdate_estimated",formatStringDate(jsonNode.get("patient_birthDate").getTextValue()));
+        }
+
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("yes")) {
+            patientNode.put("patient.birth_date",formatStringDate(jsonNode.get("patient_birthDate").getTextValue()));
+        }
 
         identifier.put("identifier_type_name","National ID");
         identifier.put("identifier_value", identifierProvided);
@@ -131,8 +139,6 @@ public class MedicDataExchange {
         // patientNode.put("patient.mothers_name",jsonNode.get("patient_familyName").getTextValue());
         // patientNode.put("patient.medical_record_number","337");
         patientNode.put("patient.sex",gender(jsonNode.get("patient_sex").getTextValue()));
-        patientNode.put("patient.birth_date",formatStringDate(jsonNode.get("patient_birthDate").getTextValue()));
-        // patientNode.put("patient.birthdate_estimated",jsonNode.get("patient_familyName").getTextValue());
         patientNode.put("patient.county",jsonNode.get("patient_county").getTextValue());
         patientNode.put("patient.sub_county",jsonNode.get("patient_subcounty").getTextValue());
         patientNode.put("patient.ward",jsonNode.get("patient_ward").getTextValue());
