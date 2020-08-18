@@ -228,6 +228,10 @@ public class JsonEncounterQueueDataHandler implements QueueDataHandler {
                 String[] conceptElements = StringUtils.split(conceptQuestion, "\\^");
                 if (conceptElements.length < 3)
                     continue;
+
+                if (!StringUtils.isNumeric(conceptElements[0])) // skip if the element is not a concept id
+                    continue;
+
                 int conceptId = Integer.parseInt(conceptElements[0]);
                 Concept concept = Context.getConceptService().getConcept(conceptId);
                 if (concept == null) {

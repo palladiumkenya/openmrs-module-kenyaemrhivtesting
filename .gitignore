@@ -13,3 +13,5 @@ test/target
 
 target/checkout/
 /target
+
+javarosa/target
