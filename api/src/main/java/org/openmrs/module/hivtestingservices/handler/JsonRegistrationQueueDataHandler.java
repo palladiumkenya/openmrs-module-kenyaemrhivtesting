@@ -14,6 +14,9 @@
 package org.openmrs.module.hivtestingservices.handler;
 
 import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import com.jayway.jsonpath.InvalidPathException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +49,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static org.openmrs.module.hivtestingservices.utils.JsonUtils.getElementFromJsonObject;
 
 /**
  * TODO: Write brief description about the class here.
@@ -177,39 +182,74 @@ public class JsonRegistrationQueueDataHandler implements QueueDataHandler {
 
     private List<PatientIdentifier> getOtherPatientIdentifiersFromPayload() {
         List<PatientIdentifier> otherIdentifiers = new ArrayList<PatientIdentifier>();
-        Object identifierTypeNameObject = JsonUtils.readAsObject(payload, "$['observation']['other_identifier_type']");
-        Object identifierValueObject = JsonUtils.readAsObject(payload, "$['observation']['other_identifier_value']");
-
-        if (identifierTypeNameObject instanceof JSONArray) {
-            JSONArray identifierTypeName = (JSONArray) identifierTypeNameObject;
-            JSONArray identifierValue = (JSONArray) identifierValueObject;
-            for (int i = 0; i < identifierTypeName.size(); i++) {
-                PatientIdentifier identifier = createPatientIdentifier(identifierTypeName.get(i).toString(),
-                        identifierValue.get(i).toString());
+        try {
+            Object otheridentifierObject = JsonUtils.readAsObject(payload, "$['patient']['patient.otheridentifier']");
+            if (JsonUtils.isJSONArrayObject(otheridentifierObject)) {
+                for (Object otherIdentifier : (JSONArray) otheridentifierObject) {
+                    PatientIdentifier identifier = createPatientIdentifier((JSONObject) otherIdentifier);
+                    if (identifier != null) {
+                        otherIdentifiers.add(identifier);
+                    }
+                }
+            } else {
+                PatientIdentifier identifier = createPatientIdentifier((JSONObject) otheridentifierObject);
                 if (identifier != null) {
                     otherIdentifiers.add(identifier);
                 }
             }
-        } else if (identifierTypeNameObject instanceof String) {
-            String identifierTypeName = (String) identifierTypeNameObject;
-            String identifierValue = (String) identifierValueObject;
-            PatientIdentifier identifier = createPatientIdentifier(identifierTypeName, identifierValue);
-            if (identifier != null) {
-                otherIdentifiers.add(identifier);
+
+            JSONObject patientObject = (JSONObject) JsonUtils.readAsObject(payload, "$['patient']");
+            Set keys = patientObject.keySet();
+            for(Object key:keys){
+                if(((String)key).startsWith("patient.otheridentifier^")){
+                    PatientIdentifier identifier = createPatientIdentifier((JSONObject) patientObject.get(key));
+                    if (identifier != null) {
+                        otherIdentifiers.add(identifier);
+                    }
+                }
             }
+        } catch (InvalidPathException e) {
+            log.error( "Error while parsing other identifiers ",e);
         }
         return otherIdentifiers;
     }
 
-    private PatientIdentifier createPatientIdentifier(String identifierTypeName, String identifierValue) {
-        PatientIdentifierType identifierType = Context.getPatientService()
-                .getPatientIdentifierTypeByName(identifierTypeName);
+    private PatientIdentifier createPatientIdentifier(JSONObject identifierObject) {
+        if(identifierObject == null){
+            return null;
+        }
+
+        String identifierTypeName = (String) getElementFromJsonObject(identifierObject,"identifier_type_name");
+        String identifierUuid = (String) getElementFromJsonObject(identifierObject,"identifier_type_uuid");
+        String identifierValue = (String) getElementFromJsonObject(identifierObject,"identifier_value");
+
+        return createPatientIdentifier(identifierUuid,identifierTypeName, identifierValue);
+    }
+
+    private PatientIdentifier createPatientIdentifier(String identifierTypeUuid, String identifierTypeName, String identifierValue) {
+        if(StringUtils.isBlank(identifierTypeUuid) && StringUtils.isBlank(identifierTypeName)) {
+            queueProcessorException.addException(
+                    new Exception("Cannot create identifier. Identifier type name or uuid must be supplied"));
+        }
+
+        if(StringUtils.isBlank(identifierValue)) {
+            queueProcessorException.addException(
+                    new Exception("Cannot create identifier. Supplied identifier value is blank for identifier type name:'"
+                            + identifierTypeName + "', uuid:'" + identifierTypeUuid + "'"));
+        }
+        PatientIdentifierType identifierType = null;
+        if (StringUtils.isNotBlank(identifierTypeUuid)) {
+            identifierType = Context.getPatientService()
+                    .getPatientIdentifierTypeByUuid(identifierTypeUuid);
+        }
+        if (identifierType == null && StringUtils.isNotBlank(identifierTypeName)) {
+            identifierType = Context.getPatientService()
+                    .getPatientIdentifierTypeByName(identifierTypeName);
+        }
         if (identifierType == null) {
             queueProcessorException.addException(
-                    new Exception("Unable to find identifier type with name: " + identifierTypeName));
-        } else if (identifierValue == null) {
-            queueProcessorException.addException(
-                    new Exception("Identifier value can't be null type: " + identifierTypeName));
+                    new Exception("Unable to find identifier type with name:'"
+                            + identifierTypeName + "', uuid:'" + identifierTypeUuid + "'"));
         } else {
             PatientIdentifier patientIdentifier = new PatientIdentifier();
             patientIdentifier.setIdentifierType(identifierType);
