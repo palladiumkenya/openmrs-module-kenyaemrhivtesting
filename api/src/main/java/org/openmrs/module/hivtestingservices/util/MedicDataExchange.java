@@ -1,5 +1,6 @@
 package org.openmrs.module.hivtestingservices.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
@@ -7,6 +8,7 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.openmrs.Form;
 import org.openmrs.Location;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -137,7 +139,6 @@ public class MedicDataExchange {
         identifier.put("identifier_value", identifierProvided);
         identifier.put("confirm_other_identifier_value","");
         //identifier.put("confirm_other_identifier_value",jsonNode.get("patient_nationalIdnumber").getTextValue());
-
         patientNode.put("patient.uuid",jsonNode.get("_id").getTextValue());
         patientNode.put("patient.family_name",jsonNode.get("patient_familyName") != null ? jsonNode.get("patient_familyName").getTextValue():"");
         patientNode.put("patient.given_name",jsonNode.get("patient_firstName") != null ? jsonNode.get("patient_firstName").getTextValue():"");
@@ -157,7 +158,8 @@ public class MedicDataExchange {
         patientNode.put("patient.next_of_kin_relationship",jsonNode.get("patient_nextofkinRelationship").getTextValue());
         patientNode.put("patient.next_of_kin_contact",jsonNode.get("patient_nextOfKinPhonenumber") != null ? jsonNode.get("patient_nextOfKinPhonenumber").getTextValue():"");
         patientNode.put("patient.next_of_kin_address",jsonNode.get("patient_nextOfKinPostaladdress") !=  null ? jsonNode.get("patient_nextOfKinPostaladdress").getTextValue():"");
-        patientNode.put("patient.otheridentifier",identifier);
+        patientNode.put("patient.otheridentifier",getIdentifierTypes(jsonNode));
+
 
         obs.put("identifier_type_name","National ID");
         obs.put("1054^CIVIL STATUS^99DCT",jsonNode.get("patient_marital_status") != null && !jsonNode.get("patient_marital_status").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_marital_status").getTextValue().replace("_","^").substring(1):"");
@@ -183,6 +185,10 @@ public class MedicDataExchange {
         registrationWrapper.put("discriminator",discriminator);
         registrationWrapper.put("encounter",encounter);
 
+
+
+
+
         return registrationWrapper;
     }
 
@@ -207,7 +213,7 @@ public class MedicDataExchange {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         String encounterDate = jsonNode.path("fields").path("encounter_date").getTextValue() != null && !jsonNode.path("fields").path("encounter_date").getTextValue().equalsIgnoreCase("") ? formatStringDate(jsonNode.path("fields").path("encounter_date").getTextValue()) : convertTime(jsonNode.get("reported_date").getLongValue());
 
         discriminator.put("discriminator","json-encounter");
@@ -296,6 +302,46 @@ public class MedicDataExchange {
             }
         }
         return arrNode;
+    }
+    private ArrayNode getIdentifierTypes(ObjectNode jsonNode) {
+        ArrayNode identifierTypes = JsonNodeFactory.instance.arrayNode();
+
+        Iterator<Map.Entry<String,JsonNode>> iterator = jsonNode.getFields();
+        ObjectNode iden = null;
+        while (iterator.hasNext()) {
+            Map.Entry<String, JsonNode> entry = iterator.next();
+            if(entry.getKey().contains("patient_identifierType")) {
+                iden = handleMultipleIdentifiers(entry.getKey(),entry.getValue().getTextValue());
+                if(iden !=null && iden.size() !=0 ) {
+                    identifierTypes.add(iden);
+                }
+            }
+        }
+        return identifierTypes;
+
+    }
+
+    private ObjectNode handleMultipleIdentifiers(String identifierName,String identifierValue) {
+        ArrayNode arrNodeName = JsonNodeFactory.instance.arrayNode();
+        ObjectNode identifiers = JsonNodeFactory.instance.objectNode();
+        if (identifierName !=null) {
+
+            for (String s : identifierName.split("_")) {
+                arrNodeName.add(s);
+            }
+            PatientIdentifierType identifierTypeName = null;
+            if (arrNodeName.get(arrNodeName.size()-1) != null) {
+                identifierTypeName = Context.getPatientService()
+                        .getPatientIdentifierTypeByUuid(arrNodeName.get(arrNodeName.size()-1).getTextValue());
+            }
+            if(identifierTypeName != null && !identifierTypeName.getName().equalsIgnoreCase("") && !identifierValue.equalsIgnoreCase("")) {
+                identifiers.put("identifier_type_uuid", arrNodeName.get(arrNodeName.size() - 1));
+                identifiers.put("identifier_value", identifierValue);
+                identifiers.put("identifier_type_name", identifierTypeName.getName());
+            }
+        }
+
+        return  identifiers;
     }
 
     private String gender(String gender) {
