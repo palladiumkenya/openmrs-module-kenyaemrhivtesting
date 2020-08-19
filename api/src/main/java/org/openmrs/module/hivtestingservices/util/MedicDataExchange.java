@@ -1,6 +1,7 @@
 package org.openmrs.module.hivtestingservices.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
@@ -227,15 +228,28 @@ public class MedicDataExchange {
         encounter.put("encounter.setup_config_uuid",jsonNode.path("fields").path("encounter_type_uuid").getTextValue());
         patientNode.put("patient.uuid",jsonNode.path("fields").path("inputs").path("contact").path("_id").getTextValue());
 
+        List<String> keysToRemove = new ArrayList<String>();
         if(obsNodes != null){
             Iterator<Map.Entry<String,JsonNode>> iterator = obsNodes.getFields();
             while (iterator.hasNext()) {
                 Map.Entry<String, JsonNode> entry = iterator.next();
                 if(entry.getKey().contains("MULTISELECT")) {
-                    obsNodes.put(entry.getKey(), handleMultiSelectFields(entry.getValue().toString().replace(" ",",")));
+                    if (entry.getValue() != null && !"".equals(entry.getValue().toString()) && !"".equals(entry.getValue().toString())) {
+                        obsNodes.put(entry.getKey(), handleMultiSelectFields(entry.getValue().toString().replace(" ",",")));
+                    } else {
+                        //obsNodes.remove(entry.getKey());
+                        keysToRemove.add(entry.getKey());
+                        System.out.println("Removing: " + entry.getKey());
+                    }
                 }
             }
 
+        }
+
+        if (keysToRemove.size() > 0) {
+            for (String key : keysToRemove) {
+                obsNodes.remove(key);
+            }
         }
         formsNode.put("patient", patientNode);
         formsNode.put("observation", obsNodes);
@@ -266,7 +280,7 @@ public class MedicDataExchange {
             saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");
 
         }
-        return "Data queue contact created successfully";
+        return "Queue data for contact created successfully";
     }
 
     public String addContactTraceToDataqueue(String resultPayload) {
@@ -291,12 +305,12 @@ public class MedicDataExchange {
             saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");
 
         }
-        return "Data queue contact trace created successfully";
+        return "Queue data for contact trace created successfully";
     }
 
     private ArrayNode handleMultiSelectFields(String listOfItems){
         ArrayNode arrNode = JsonNodeFactory.instance.arrayNode();
-        if (listOfItems !=null) {
+        if (listOfItems !=null && org.apache.commons.lang3.StringUtils.isNotBlank(listOfItems)) {
             for (String s : listOfItems.split(",")) {
                 arrNode.add(s.substring(1,s.length()-1));
             }
