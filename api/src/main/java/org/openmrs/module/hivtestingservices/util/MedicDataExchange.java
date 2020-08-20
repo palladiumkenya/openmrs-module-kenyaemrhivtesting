@@ -12,6 +12,8 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.kenyaemr.api.KenyaEmrService;
+
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.service.DataService;
@@ -28,6 +30,9 @@ public class MedicDataExchange {
     HTSService htsService = Context.getService(HTSService.class);
     DataService dataService = Context.getService(DataService.class);
     static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+    private Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
+
+
 
 
     /**
@@ -150,6 +155,8 @@ public class MedicDataExchange {
         patientNode.put("patient.county",jsonNode.get("patient_county") != null ? jsonNode.get("patient_county").getTextValue():"");
         patientNode.put("patient.sub_county",jsonNode.get("patient_subcounty") != null ? jsonNode.get("patient_subcounty").getTextValue():"");
         patientNode.put("patient.ward",jsonNode.get("patient_ward") !=null ? jsonNode.get("patient_ward").getTextValue():"");
+        patientNode.put("patient.sub_location",jsonNode.get("patient_sublocation") !=null ? jsonNode.get("patient_sublocation").getTextValue():"");
+        patientNode.put("patient.location",jsonNode.get("patient_location") !=null ? jsonNode.get("patient_location").getTextValue():"");
         patientNode.put("patient.village",jsonNode.get("patient_village") != null ? jsonNode.get("patient_village").getTextValue() :"");
         patientNode.put("patient.landmark",jsonNode.get("patient_landmark") != null ? jsonNode.get("patient_landmark").getTextValue():"");
         patientNode.put("patient.phone_number",jsonNode.get("patient_telephone") != null ? jsonNode.get("patient_telephone").getTextValue():"");
@@ -161,8 +168,6 @@ public class MedicDataExchange {
         patientNode.put("patient.next_of_kin_address",jsonNode.get("patient_nextOfKinPostaladdress") !=  null ? jsonNode.get("patient_nextOfKinPostaladdress").getTextValue():"");
         patientNode.put("patient.otheridentifier",getIdentifierTypes(jsonNode));
 
-
-        obs.put("identifier_type_name","National ID");
         obs.put("1054^CIVIL STATUS^99DCT",jsonNode.get("patient_marital_status") != null && !jsonNode.get("patient_marital_status").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_marital_status").getTextValue().replace("_","^").substring(1):"");
         obs.put("1542^OCCUPATION^99DCT",jsonNode.get("patient_occupation") != null && !jsonNode.get("patient_occupation").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_occupation").getTextValue().replace("_","^").substring(1): "");
         obs.put("1712^HIGHEST EDUCATION LEVEL^99DCT",jsonNode.get("patient_education_level") !=null && !jsonNode.get("patient_education_level").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_education_level").getTextValue().replace("_","^").substring(1):"");
@@ -171,7 +176,7 @@ public class MedicDataExchange {
         tmp.put("tmp.age_in_years", jsonNode.get("patient_ageYears") != null ? jsonNode.get("patient_ageYears").getTextValue() : "");
         discriminator.put("discriminator","json-registration");
 
-        encounter.put("encounter.location_id","7185");
+        encounter.put("encounter.location_id",locationId != null ? locationId.toString() : "1");
         encounter.put("encounter.provider_id_select","admin");
         encounter.put("encounter.provider_id","admin");
         encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
@@ -218,7 +223,7 @@ public class MedicDataExchange {
         String encounterDate = jsonNode.path("fields").path("encounter_date").getTextValue() != null && !jsonNode.path("fields").path("encounter_date").getTextValue().equalsIgnoreCase("") ? formatStringDate(jsonNode.path("fields").path("encounter_date").getTextValue()) : convertTime(jsonNode.get("reported_date").getLongValue());
 
         discriminator.put("discriminator","json-encounter");
-        encounter.put("encounter.location_id","7185");
+        encounter.put("encounter.location_id",locationId != null ? locationId.toString(): "1");
         encounter.put("encounter.provider_id_select","admin");
         encounter.put("encounter.provider_id","admin");
         encounter.put("encounter.encounter_datetime",encounterDate);
@@ -239,7 +244,6 @@ public class MedicDataExchange {
                     } else {
                         //obsNodes.remove(entry.getKey());
                         keysToRemove.add(entry.getKey());
-                        System.out.println("Removing: " + entry.getKey());
                     }
                 }
             }
@@ -274,7 +278,7 @@ public class MedicDataExchange {
             String payload = jsonNode.toString();
             String discriminator = "json-patientcontact";
             String patientContactUuid = jsonNode.get("_id").getTextValue();
-            Integer locationId = 715;
+            Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
             String providerString = "admin";
 
             saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");
@@ -299,7 +303,7 @@ public class MedicDataExchange {
             String discriminator = "json-contacttrace";
             String payload = jsonNode.toString();
             String patientContactUuid = jsonNode.get("_id").getTextValue();
-            Integer locationId = 715;
+            Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
             String providerString = "admin";
 
             saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");

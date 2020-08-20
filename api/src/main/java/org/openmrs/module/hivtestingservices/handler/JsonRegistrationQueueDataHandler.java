@@ -29,9 +29,18 @@ import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.User;
+import org.openmrs.Obs;
+
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 import org.openmrs.annotation.Handler;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.service.DataService;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.hivtestingservices.api.service.RegistrationDataService;
 import org.openmrs.module.hivtestingservices.exception.QueueProcessorException;
@@ -41,6 +50,7 @@ import org.openmrs.module.hivtestingservices.model.handler.QueueDataHandler;
 import org.openmrs.module.hivtestingservices.utils.JsonUtils;
 import org.openmrs.module.hivtestingservices.utils.PatientSearchUtils;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,6 +59,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Map;
 
 import static org.openmrs.module.hivtestingservices.utils.JsonUtils.getElementFromJsonObject;
 
@@ -88,6 +99,11 @@ public class JsonRegistrationQueueDataHandler implements QueueDataHandler {
         try {
             if (validate(queueData)) {
                 registerUnsavedPatient();
+
+                Object obsObject = JsonUtils.readAsObject(queueData.getPayload(), "$['observation']");
+                if (obsObject != null) {
+                    registerUnsavedObs(obsObject, queueData);
+                }
             }
         } catch (Exception e) {
             /*Custom exception thrown by the validate function should not be added again into @queueProcessorException.
@@ -475,5 +491,87 @@ public class JsonRegistrationQueueDataHandler implements QueueDataHandler {
         String generated = Context.getService(IdentifierSourceService.class).generateIdentifier(openmrsIDType, "Registration");
         PatientIdentifier identifier = new PatientIdentifier(generated, openmrsIDType, location);
         return identifier;
+    }
+
+    private void registerUnsavedObs(Object obsObject,QueueData queueData) {
+        ObjectNode obNode = null;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            obNode = (ObjectNode) mapper.readTree(obsObject.toString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(obNode != null) {
+            ConceptService cs = Context.getConceptService();
+            RegistrationDataService regDataService = Context.getService(RegistrationDataService.class);
+            RegistrationData regData = regDataService.getRegistrationDataByTemporaryUuid(queueData.getPatientUuid());
+            if(regData != null) {
+                Patient p = Context.getPatientService().getPatientByUuid(regData.getAssignedUuid());
+                Iterator<Map.Entry<String, JsonNode>> iterator = obNode.getFields();
+                Integer valueCoded = null;
+                while (iterator.hasNext()) {
+                    Map.Entry<String, JsonNode> entry = iterator.next();
+                    if (entry.getKey().equalsIgnoreCase("1712^HIGHEST EDUCATION LEVEL^99DCT") && !entry.getValue().getTextValue().equalsIgnoreCase("")) {
+                        valueCoded = handleObsValues(entry.getValue().getTextValue().replace("^", "_"));
+                        if (valueCoded != null && p != null) {
+                            Obs o = new Obs();
+                            o.setConcept(cs.getConcept(1712));
+                            o.setDateCreated(queueData.getDateCreated());
+                            o.setCreator(queueData.getCreator());
+                            o.setObsDatetime(queueData.getDateCreated());
+                            o.setPerson(p);
+                            o.setValueCoded(cs.getConcept(valueCoded));
+                            Context.getObsService().saveObs(o, null);
+
+                        }
+                    }
+
+                    if (entry.getKey().equalsIgnoreCase("1542^OCCUPATION^99DCT") && !entry.getValue().getTextValue().equalsIgnoreCase("")) {
+                        valueCoded = handleObsValues(entry.getValue().getTextValue().replace("^", "_"));
+                        if (valueCoded != null && p != null) {
+                            Obs o = new Obs();
+                            o.setConcept(cs.getConcept(1542));
+                            o.setDateCreated(queueData.getDateCreated());
+                            o.setCreator(queueData.getCreator());
+                            o.setObsDatetime(queueData.getDateCreated());
+                            o.setPerson(p);
+                            o.setValueCoded(cs.getConcept(valueCoded));
+                            Context.getObsService().saveObs(o, null);
+
+                        }
+                    }
+
+                    if (entry.getKey().equalsIgnoreCase("1054^CIVIL STATUS^99DCT") && !entry.getValue().getTextValue().equalsIgnoreCase("")) {
+                        valueCoded = handleObsValues(entry.getValue().getTextValue().replace("^", "_"));
+                        if (valueCoded != null && p != null) {
+                            Obs o = new Obs();
+                            o.setConcept(cs.getConcept(1054));
+                            o.setDateCreated(queueData.getDateCreated());
+                            o.setCreator(queueData.getCreator());
+                            o.setObsDatetime(queueData.getDateCreated());
+                            o.setPerson(p);
+                            o.setValueCoded(cs.getConcept(valueCoded));
+                            Context.getObsService().saveObs(o, null);
+
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+    private Integer handleObsValues(String obsValue) {
+        ArrayNode arrNodeValues = JsonNodeFactory.instance.arrayNode();
+        Integer conceptValue = null;
+        if (obsValue !=null) {
+            for (String s : obsValue.split("_")) {
+                arrNodeValues.add(s);
+            }
+            if (arrNodeValues != null) {
+                conceptValue = Integer.parseInt(arrNodeValues.get(0).getTextValue()) ;
+            }
+        }
+        return conceptValue;
     }
 }
