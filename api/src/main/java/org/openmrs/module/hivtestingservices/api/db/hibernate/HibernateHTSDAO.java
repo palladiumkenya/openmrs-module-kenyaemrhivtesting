@@ -273,6 +273,12 @@ public class HibernateHTSDAO implements HTSDAO {
     }
 
 
-
-
+    public List<PatientContact> getPatientContactListForRegistration() {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+        criteria.add(Restrictions.isNull("patient"));
+        criteria.add(Restrictions.isNotNull("appointmentDate"));
+        criteria.add(Restrictions.eq("voided", false));
+        criteria.setMaxResults(20);
+        return criteria.list();
+    }
 }

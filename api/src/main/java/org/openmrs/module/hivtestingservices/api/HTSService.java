@@ -54,6 +54,7 @@ public interface HTSService extends OpenmrsService {
     public PatientContact getPatientContactEntryForPatient(Patient patient);
     public Cohort getPatientsWithGender(boolean includeMales, boolean includeFemales, boolean includeUnknownGender);
     public Cohort getPatientsWithAgeRange(Integer minAge, DurationUnit minAgeUnit, Integer maxAge, DurationUnit maxAgeUnit, boolean unknownAgeIncluded, Date effectiveDate);
+    public List<PatientContact> getPatientContactListForRegistration();
 
 
 }

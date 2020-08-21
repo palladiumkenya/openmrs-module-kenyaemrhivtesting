@@ -12,7 +12,7 @@ package org.openmrs.module.hivtestingservices.task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.hivtestingservices.advice.model.HTSContactListingFormProcessor;
+import org.openmrs.module.hivtestingservices.advice.model.HTSPatientContactRegistrar;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
 /**
@@ -32,8 +32,8 @@ public class ContactListingFormProcessorTask extends AbstractTask {
 			if (!Context.isAuthenticated()) {
 				authenticate();
 			}
-			HTSContactListingFormProcessor processor = new HTSContactListingFormProcessor();
-			processor.processAOPEncounterEntries();
+			HTSPatientContactRegistrar processor = new HTSPatientContactRegistrar();
+			processor.registerBookedPatientContacts();
 
 		}
 		catch (Exception e) {

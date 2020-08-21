@@ -15,6 +15,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyaemr.api.KenyaEmrService;
 
 import org.openmrs.module.hivtestingservices.api.HTSService;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.service.DataService;
 import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.hivtestingservices.model.DataSource;
@@ -414,14 +415,14 @@ public class MedicDataExchange {
         ObjectNode responseWrapper = factory.objectNode();
 
         HTSService htsService = Context.getService(HTSService.class);
-        //Set<Integer> listedContacts = getListedContacts(lastContactEntry, lastContactId);
+        Set<Integer> listedContacts = getListedContacts(lastContactEntry, lastContactId);
         Map<Integer, ArrayNode> contactMap = new HashMap<Integer, ArrayNode>();
 
-/*        if (listedContacts != null && listedContacts.size() > 0) {
+        if (listedContacts != null && listedContacts.size() > 0) {
 
             for (Integer pc : listedContacts) {
                 PatientContact c = htsService.getPatientContactByID(pc);
-                Patient covidCase = c.getPatientRelatedTo();
+                Patient indexClient = c.getPatientRelatedTo();
                 ArrayNode contacts = null;
 
                 ObjectNode contact = factory.objectNode();
@@ -451,60 +452,33 @@ public class MedicDataExchange {
                         sex = "female";
                     }
                 }
-                contact.put("role", "covid_contact");
+                contact.put("role", "person");
                 contact.put("_id", c.getUuid());
-                //contact.put("case_id", covidCase.getPatientIdentifier(SHRUtils.CASE_ID_TYPE) != null ? covidCase.getPatientIdentifier(SHRUtils.CASE_ID_TYPE).getIdentifier() : "");
-                contact.put("case_name", covidCase.getGivenName());
-                contact.put("type_of_contact", c.getContactListingDeclineReason() != null ? c.getContactListingDeclineReason() : "");
-                contact.put("type_of_exposure", c.getPnsApproach() != null ? getContactType().get(c.getPnsApproach()) : "");
-                contact.put("relation_to_case", c.getRelationType() != null ? getContactRelation().get(c.getRelationType()) : "");
-
-                contact.put("national_id", "");
-                contact.put("passport_number", "");
-                contact.put("alien_number", "");
+                contact.put("index_client_uuid", indexClient.getUuid());
                 contact.put("s_name",c.getLastName() != null ? c.getLastName() : "");
                 contact.put("f_name",c.getFirstName() != null ? c.getFirstName() : "");
                 contact.put("o_name",c.getMiddleName() != null ? c.getMiddleName() : "");
                 contact.put("name", fullName);
                 contact.put("sex",sex);
                 contact.put("date_of_birth", c.getBirthDate() != null ? MedicDataExchange.getSimpleDateFormat(dateFormat).format(c.getBirthDate()) : "");
-                contact.put("dob_known", "no");
-                contact.put("marital_status", "");
-
-                contact.put("occupation", "");
-                contact.put("occupation_other", "");
-                contact.put("healthcare_worker", c.getMaritalStatus() != null && c.getMaritalStatus().equals(1065) ? "yes" : "no");
-                contact.put("education", "");
-                contact.put("deceased", "");
-                contact.put("nationality", "");
+                contact.put("marital_status", c.getMaritalStatus() != null ? getMaritalStatusOptions(c.getMaritalStatus()) : "");
                 contact.put("phone", c.getPhoneContact() != null ? c.getPhoneContact() : "");
-                contact.put("alternate_phone", "");
-                contact.put("postal_address", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
-                contact.put("email_address", "");
-                contact.put("county", "");
-                //contact.put("subcounty", c.getSubcounty() != null ? c.getSubcounty() : "");
-                contact.put("ward", "");
-                contact.put("location", "");
-                contact.put("sub_location","");
-                contact.put("village", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
-                contact.put("landmark", "");
-                //contact.put("residence", c.getTown() != null ? c.getTown() : "");
-                contact.put("nearest_health_center", "");
-                contact.put("kin_name", "");
-                contact.put("kin_relationship", "");
-                contact.put("kin_phone_number", "");
-                contact.put("kin_postal_address", "");
-
+                contact.put("physical_address", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
+                contact.put("contact_relationship", c.getRelationType() != null ? getContactRelation(c.getRelationType()) : "");
+                contact.put("living_with_client", c.getLivingWithPatient() != null ? getLivingWithPatientOptions(c.getLivingWithPatient()) : "");
+                contact.put("ipv_outcome", c.getIpvOutcome());
+                contact.put("baseline_hiv_status", c.getBaselineHivStatus());
+                contact.put("booking_date", c.getAppointmentDate() != null ? MedicDataExchange.getSimpleDateFormat(dateFormat).format(c.getAppointmentDate()) : "");
+                contact.put("pns_approach", c.getPnsApproach() != null ? getPreferredPNSApproachOptions(c.getPnsApproach()) : "");
                 contact.put("reported_date", c.getDateCreated().getTime());
-                contact.put("patient_id", covidCase.getPatientId().toString());
 
-                if (contactMap.keySet().contains(covidCase.getPatientId())) {
-                    contacts = contactMap.get(covidCase.getPatientId());
+                if (contactMap.keySet().contains(indexClient.getPatientId())) {
+                    contacts = contactMap.get(indexClient.getPatientId());
                     contacts.add(contact);
                 } else {
                     contacts = factory.arrayNode();
                     contacts.add(contact);
-                    contactMap.put(covidCase.getPatientId(), contacts);
+                    contactMap.put(indexClient.getPatientId(), contacts);
                 }
             }
 
@@ -518,11 +492,11 @@ public class MedicDataExchange {
                 patientContactNode.add(contactWrapper);
 
             }
-        }*/
+        }
 
         // add for cases under investigation but with no contacts
         ArrayNode emptyContactNode = factory.arrayNode();
-        Set<Integer> patientList = getClientsForTestingAndContactListing(gpLastPatient, lastPatientId);
+        /*Set<Integer> patientList = getClientsForTestingAndContactListing(gpLastPatient, lastPatientId);
         if (patientList.size() > 0) {
             for (Integer ptId : patientList) {
                 if (!contactMap.keySet().contains(ptId)) {
@@ -532,7 +506,7 @@ public class MedicDataExchange {
                     patientContactNode.add(contactWrapper);
                 }
             }
-        }
+        }*/
 
         responseWrapper.put("docs", patientContactNode);
         return responseWrapper;
@@ -630,7 +604,10 @@ public class MedicDataExchange {
 
     }
 
-    private Map<Integer, String> getContactRelation() {
+    private String getContactRelation(Integer key) {
+        if (key == null) {
+            return "";
+        }
         Map<Integer, String> options = new HashMap<Integer, String>();
         options.put(160237, "Co-worker");
         options.put(165656,"Traveled together");
@@ -642,64 +619,60 @@ public class MedicDataExchange {
         options.put(163565, "Sexual partner");
         options.put(162221, "Co-wife");
 
-        return options;
+        if (options.keySet().contains(key)) {
+            return options.get(key);
+        }
+        return "";
     }
 
-    private Integer getContactRelationConcept(String code) {
-        Integer concept = null;
-        if (code == null) {
-            return null;
-        }
 
-        if (code.equals("co-worker")) {
-            concept = 160237;
-        } else if (code.equals("mother")) {
-            concept = 970;
-        } else if (code.equals("father")) {
-            concept = 971;
-        } else if (code.equals("sibling")) {
-            concept = 972;
-        } else if (code.equals("child")) {
-            concept = 1528;
-        } else if (code.equals("spouse")) {
-            concept = 5617;
-        } else if (code.equals("partner")) {
-            concept = 163565;
-        } else { // map everything to traveled together
-            concept = 165656;
-        }
-
-
-        return concept;
-    }
-
-    private Map<Integer, String> getContactType() {
+    private String getLivingWithPatientOptions(Integer key) {
+       if (key == null) {
+           return "";
+       }
         Map<Integer, String> options = new HashMap<Integer, String>();
-        options.put(160237,"Working together with a nCoV patient");
-        options.put(165656,"Traveling together with a nCoV patient");
-        options.put(1060,"Living together with a nCoV patient");
-        options.put(117163,"Health care associated exposure");
-        return options;
+        options.put(1065, "Yes");
+        options.put(1066, "No");
+        options.put(162570, "Declined to Answer");
+
+        if (options.keySet().contains(key)) {
+            return options.get(key);
+        }
+        return "";
+    }
+
+    private String getPreferredPNSApproachOptions(Integer key) {
+        if (key == null) {
+            return "";
+        }
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(162284,"Dual referral");
+        options.put(160551,"Passive referral");
+        options.put(161642,"Contract referral");
+        options.put(163096,"Provider referral");
+        if (options.keySet().contains(key)) {
+            return options.get(key);
+        }
+        return "";
 
     }
 
-    private Integer getContactTypeConcept(Integer code) {
-        if (code == null) {
-            return null;
+    private String getMaritalStatusOptions(Integer key) {
+        if (key == null) {
+            return "";
         }
-        Integer concept = null;
-        if (code == 1) {
-            concept = 117163;
-        } else if (code == 2) {
-            concept = 160237;
-        } else if (code == 3) {
-            concept = 165656;
-        } else if (code == 4) {
-            concept = 1060;
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1057, "Single");
+        options.put(5555, "Married Monogamous");
+        options.put(159715, "Married Polygamous");
+        options.put(1058, "Divorced");
+        options.put(1059, "Widowed");
+        if (options.keySet().contains(key)) {
+            return options.get(key);
         }
-        return concept;
-
+        return "";
     }
+
 
     /**
      * Retrieves contacts listed under a case and needs follow up
@@ -711,9 +684,9 @@ public class MedicDataExchange {
         Set<Integer> eligibleList = new HashSet<Integer>();
         String sql = "";
         if (lastContactEntry != null && lastContactEntry > 0) {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0 and (ipv_outcome !='CHT' or ipv_outcome is null);"; // get contacts not registered
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0;"; // get contacts not registered
         } else {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0 and (ipv_outcome !='CHT' or ipv_outcome is null);";
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0;";
 
         }
 
@@ -737,14 +710,14 @@ public class MedicDataExchange {
                     "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
                     "inner join obs o on o.person_id = pp.patient_id and o.concept_id=165611 and o.value_coded=703\n" +
                     "where o.obs_id >" + lastPatientEntry + " and pp.voided=0 and o.voided=0;";*/
-            sql = "select patient_id from patient where voided=0 limit 5";
+            sql = "select patient_id from patient where voided=0 and patient_id > 7";
         } else {
 
             /*sql = "select pp.patient_id from patient_program pp \n" +
                     "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
                     "inner join obs o on o.person_id = pp.patient_id and o.concept_id=165611 and o.value_coded=703\n" +
                     "where o.obs_id <= " + lastId + " and pp.voided=0 and o.voided=0;";*/
-            sql = "select patient_id from patient where voided=0 limit 5";
+            sql = "select patient_id from patient where voided=0 and patient_id > 7";
 
         }
 
