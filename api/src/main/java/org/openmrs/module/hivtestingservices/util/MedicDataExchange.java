@@ -169,7 +169,9 @@ public class MedicDataExchange {
         patientNode.put("patient.landmark",jsonNode.get("patient_landmark") != null ? jsonNode.get("patient_landmark").getTextValue():"");
         patientNode.put("patient.phone_number",jsonNode.get("patient_telephone") != null ? jsonNode.get("patient_telephone").getTextValue():"");
         patientNode.put("patient.alternate_phone_contact",jsonNode.get("patient_alternatePhone").getTextValue());
-        patientNode.put("patient.postal_address",jsonNode.get("patient_alternatePhone") != null ? jsonNode.get("patient_alternatePhone").getTextValue():"");
+        patientNode.put("patient.postal_address",jsonNode.get("patient_postalAddress") != null ? jsonNode.get("patient_postalAddress").getTextValue():"");
+        patientNode.put("patient.email_address",jsonNode.get("patient_emailAddress") != null ? jsonNode.get("patient_emailAddress").getTextValue():"");
+        patientNode.put("patient.nearest_health_center",jsonNode.get("patient_nearesthealthcentre") != null ? jsonNode.get("patient_nearesthealthcentre").getTextValue():"");
         patientNode.put("patient.next_of_kin_name",jsonNode.get("patient_nextofkin") != null ? jsonNode.get("patient_nextofkin").getTextValue() : "");
         patientNode.put("patient.next_of_kin_relationship",jsonNode.get("patient_nextofkinRelationship").getTextValue());
         patientNode.put("patient.next_of_kin_contact",jsonNode.get("patient_nextOfKinPhonenumber") != null ? jsonNode.get("patient_nextOfKinPhonenumber").getTextValue():"");
@@ -187,7 +189,7 @@ public class MedicDataExchange {
         String providerId = checkProviderNameExists(creator);
         String systemId = confirmUserNameExists(creator);
 
-        encounter.put("encounter.location_id",locationId != null ? locationId.toString() : "1");
+        encounter.put("encounter.location_id",locationId != null ? locationId.toString() : null);
         encounter.put("encounter.provider_id_select",providerId != null ? providerId: " ");
         encounter.put("encounter.provider_id",providerId != null ? providerId: " ");
         encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
@@ -236,7 +238,7 @@ public class MedicDataExchange {
         String providerIdentifier = checkProviderNameExists(creator);
         String systemId = confirmUserNameExists(creator);
         discriminator.put("discriminator","json-encounter");
-        encounter.put("encounter.location_id",locationId != null ? locationId.toString(): "1");
+        encounter.put("encounter.location_id",locationId != null ? locationId.toString(): null);
         encounter.put("encounter.provider_id_select",providerIdentifier != null ? providerIdentifier: " ");
         encounter.put("encounter.provider_id",providerIdentifier != null ? providerIdentifier: " ");
         encounter.put("encounter.encounter_datetime",encounterDate);
