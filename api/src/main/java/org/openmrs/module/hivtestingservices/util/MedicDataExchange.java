@@ -12,6 +12,7 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.kenyaemr.api.KenyaEmrService;
 
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -190,10 +191,6 @@ public class MedicDataExchange {
         registrationWrapper.put("discriminator",discriminator);
         registrationWrapper.put("encounter",encounter);
 
-
-
-
-
         return registrationWrapper;
     }
 
@@ -323,6 +320,9 @@ public class MedicDataExchange {
     private ArrayNode getIdentifierTypes(ObjectNode jsonNode) {
         ArrayNode identifierTypes = JsonNodeFactory.instance.arrayNode();
 
+        String chtContactUuid = jsonNode.get("_id").getTextValue();
+        ObjectNode assignedCHTReference = assignCHTReferenceUUID(chtContactUuid);
+        identifierTypes.add(assignedCHTReference);
         Iterator<Map.Entry<String,JsonNode>> iterator = jsonNode.getFields();
         ObjectNode iden = null;
         while (iterator.hasNext()) {
@@ -357,6 +357,15 @@ public class MedicDataExchange {
                 identifiers.put("identifier_type_name", identifierTypeName.getName());
             }
         }
+
+        return  identifiers;
+    }
+
+    private ObjectNode assignCHTReferenceUUID(String chtContactUuid) {
+        ObjectNode identifiers = JsonNodeFactory.instance.objectNode();
+        identifiers.put("identifier_type_uuid", HTSMetadata._PatientIdentifierType.CHT_RECORD_UUID);
+        identifiers.put("identifier_value", chtContactUuid);
+        identifiers.put("identifier_type_name", "CHT Record Reference UUID");
 
         return  identifiers;
     }
@@ -684,9 +693,9 @@ public class MedicDataExchange {
         Set<Integer> eligibleList = new HashSet<Integer>();
         String sql = "";
         if (lastContactEntry != null && lastContactEntry > 0) {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0;"; // get contacts not registered
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0 and appointment_date is null;"; // get contacts not registered
         } else {
-            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0;";
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0 and appointment_date is null;";
 
         }
 

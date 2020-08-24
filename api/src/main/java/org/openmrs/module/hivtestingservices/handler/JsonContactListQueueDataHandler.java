@@ -108,18 +108,30 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         String familyName = JsonUtils.readAsString(payload, "$['o_name']");
         Integer relType = relationshipTypeConverter(JsonUtils.readAsString(payload, "$['contact_relationship']"));
         String baselineStatus = JsonUtils.readAsString(payload, "$['baseline_hiv_status']");
-        Date nextTestDate = JsonUtils.readAsDate(payload, "$['booking_date']");
-        Date birthDate = JsonUtils.readAsDate(payload, "$['date_of_birth']");
+        Date nextTestDate = JsonUtils.readAsDate(payload, "$['booking_date']", JsonUtils.DATE_PATTERN_MEDIC);
+        Date birthDate = JsonUtils.readAsDate(payload, "$['date_of_birth']", JsonUtils.DATE_PATTERN_MEDIC);
         String sex = gender(JsonUtils.readAsString(payload, "$['sex']"));
         String phoneNumber = JsonUtils.readAsString(payload, "$['phone']");
         Integer maritalStatus = maritalStatusConverter(JsonUtils.readAsString(payload, "$['marital_status']"));
         Integer livingWithPatient = livingWithPartnerConverter(JsonUtils.readAsString(payload, "$['living_with_client']"));
         Integer pnsApproach = pnsApproachConverter(JsonUtils.readAsString(payload, "$['pns_approach']"));
-        //String consentedContactListing = JsonUtils.readAsString(resultPayload, "$['sex']");
         String physicalAddress = JsonUtils.readAsString(payload, "$['physical_address']");
         Integer patientRelatedTo = getPatientRelatedToContact(JsonUtils.readAsString(payload, "$['parent']['_id']"));
         String uuid = JsonUtils.readAsString(payload, "$['_id']");
         Boolean voided= false;
+
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(baselineStatus)) {
+
+            if (baselineStatus.equals("unknown")) {
+                baselineStatus = "Unknown";
+            } else if (baselineStatus.equals("positive")) {
+                baselineStatus = "Positive";
+            } else if (baselineStatus.equals("negative")) {
+                baselineStatus = "Negative";
+            } else if (baselineStatus.equals("exposed_infant")) {
+                baselineStatus = "Exposed Infant";
+            }
+        }
 
         unsavedPatientContact.setFirstName(givenName);
         unsavedPatientContact.setMiddleName(middleName);
@@ -133,7 +145,7 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         unsavedPatientContact.setMaritalStatus(maritalStatus);
         unsavedPatientContact.setLivingWithPatient(livingWithPatient);
         unsavedPatientContact.setPnsApproach(pnsApproach);
-        unsavedPatientContact.setConsentedContactListing(1065);
+        unsavedPatientContact.setContactListingDeclineReason("CHT");// using this to identify contact pushed from CHT
         unsavedPatientContact.setPhysicalAddress(physicalAddress);
         unsavedPatientContact.setPatientRelatedTo(Context.getPatientService().getPatient(patientRelatedTo));
         unsavedPatientContact.setUuid(uuid);
@@ -186,7 +198,7 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         Integer relTypeConverter = null;
         if(relType.equalsIgnoreCase("partner")){
             relTypeConverter =163565;
-        }else if(relType.equalsIgnoreCase("parent")){
+        }else if(relType.equalsIgnoreCase("parent") || relType.equalsIgnoreCase("guardian") || relType.equalsIgnoreCase("mother") || relType.equalsIgnoreCase("father")){
             relTypeConverter =970;
         }else if(relType.equalsIgnoreCase("sibling")){
             relTypeConverter =972;
