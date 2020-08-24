@@ -13,13 +13,11 @@
  */
 package org.openmrs.module.hivtestingservices.handler;
 
-import net.minidev.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.*;
+import org.openmrs.Patient;
 import org.openmrs.annotation.Handler;
-import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
@@ -29,27 +27,20 @@ import org.openmrs.module.hivtestingservices.model.QueueData;
 import org.openmrs.module.hivtestingservices.model.RegistrationData;
 import org.openmrs.module.hivtestingservices.model.handler.QueueDataHandler;
 import org.openmrs.module.hivtestingservices.utils.JsonUtils;
-import org.openmrs.module.hivtestingservices.utils.PatientSearchUtils;
-import org.openmrs.module.idgen.service.IdentifierSourceService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
 
 /**
- * TODO: Write brief description about the class here.
+ * Processes contact list from CHT
  */
 @Handler(supports = QueueData.class, order = 11)
 public class JsonContactListQueueDataHandler implements QueueDataHandler {
 
 
     private static final String DISCRIMINATOR_VALUE = "json-patientcontact";
-
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
     private final Log log = LogFactory.getLog(JsonContactListQueueDataHandler.class);
-
-
     private PatientContact unsavedPatientContact;
     private String payload;
     private QueueProcessorException queueProcessorException;
@@ -164,8 +155,6 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
                 htsService.savePatientContact(unsavedPatientContact);
             } catch (Exception e) {
                 e.printStackTrace();
-
-
             }
             String assignedUuid = unsavedPatientContact.getUuid();
             registrationData.setAssignedUuid(assignedUuid);
@@ -188,10 +177,8 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
             if (p !=null){
                  patientId= p.getPatientId();
             }
-
         }
         return patientId;
-
     }
 
     private Integer relationshipTypeConverter(String relType) {
@@ -272,8 +259,5 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
     public boolean accept(final QueueData queueData) {
         return StringUtils.equals(DISCRIMINATOR_VALUE, queueData.getDiscriminator());
     }
-    /**
-     * Can't save patients unless they have required OpenMRS IDs
-     */
 
 }
