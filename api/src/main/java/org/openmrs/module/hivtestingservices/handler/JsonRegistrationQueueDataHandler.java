@@ -355,6 +355,11 @@ public class JsonRegistrationQueueDataHandler implements QueueDataHandler {
 
         String location = JsonUtils.readAsString(payload, "$['patient']['patient.location']");
         patientAddress.setAddress6(location);
+        String postalAddress = JsonUtils.readAsString(payload, "$['patient']['patient.postal_address']");
+        patientAddress.setAddress1(postalAddress);
+
+        String landMark = JsonUtils.readAsString(payload, "$['patient']['patient.landmark']");
+        patientAddress.setAddress2(landMark);
 
         String sub_location = JsonUtils.readAsString(payload, "$['patient']['patient.sub_location']");
         patientAddress.setAddress5(sub_location);
