@@ -1,7 +1,5 @@
 package org.openmrs.module.hivtestingservices.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
@@ -9,24 +7,34 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.openmrs.Form;
 import org.openmrs.Location;
-import org.openmrs.User;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Provider;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.kenyaemr.api.KenyaEmrService;
 
 import org.openmrs.module.hivtestingservices.api.HTSService;
-import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.service.DataService;
 import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.hivtestingservices.model.DataSource;
-import org.openmrs.module.hivtestingservices.utils.JsonUtils;
+import org.openmrs.module.kenyaemr.api.KenyaEmrService;
 import org.openmrs.module.kenyaemr.util.EmrUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MedicDataExchange {
     HTSService htsService = Context.getService(HTSService.class);
@@ -204,10 +212,6 @@ public class MedicDataExchange {
         registrationWrapper.put("discriminator",discriminator);
         registrationWrapper.put("encounter",encounter);
 
-
-
-
-
         return registrationWrapper;
     }
 
@@ -344,6 +348,9 @@ public class MedicDataExchange {
     private ArrayNode getIdentifierTypes(ObjectNode jsonNode) {
         ArrayNode identifierTypes = JsonNodeFactory.instance.arrayNode();
 
+        String chtContactUuid = jsonNode.get("_id").getTextValue();
+        ObjectNode assignedCHTReference = assignCHTReferenceUUID(chtContactUuid);
+        identifierTypes.add(assignedCHTReference);
         Iterator<Map.Entry<String,JsonNode>> iterator = jsonNode.getFields();
         ObjectNode iden = null;
         while (iterator.hasNext()) {
@@ -378,6 +385,15 @@ public class MedicDataExchange {
                 identifiers.put("identifier_type_name", identifierTypeName.getName());
             }
         }
+
+        return  identifiers;
+    }
+
+    private ObjectNode assignCHTReferenceUUID(String chtContactUuid) {
+        ObjectNode identifiers = JsonNodeFactory.instance.objectNode();
+        identifiers.put("identifier_type_uuid", HTSMetadata._PatientIdentifierType.CHT_RECORD_UUID);
+        identifiers.put("identifier_value", chtContactUuid);
+        identifiers.put("identifier_type_name", "CHT Record Reference UUID");
 
         return  identifiers;
     }
@@ -468,6 +484,347 @@ public class MedicDataExchange {
     }
 
 
+
+    /**
+     * Get a list of contacts for tracing
+     * @return
+     * @param lastContactEntry
+     * @param lastContactId
+     * @param gpLastPatient
+     * @param lastPatientId
+     */
+    public ObjectNode getContacts(Integer lastContactEntry, Integer lastContactId, Integer gpLastPatient, Integer lastPatientId) {
+
+        JsonNodeFactory factory = getJsonNodeFactory();
+        ArrayNode patientContactNode = getJsonNodeFactory().arrayNode();
+        ObjectNode responseWrapper = factory.objectNode();
+
+        HTSService htsService = Context.getService(HTSService.class);
+        Set<Integer> listedContacts = getListedContacts(lastContactEntry, lastContactId);
+        Map<Integer, ArrayNode> contactMap = new HashMap<Integer, ArrayNode>();
+
+        if (listedContacts != null && listedContacts.size() > 0) {
+
+            for (Integer pc : listedContacts) {
+                PatientContact c = htsService.getPatientContactByID(pc);
+                Patient indexClient = c.getPatientRelatedTo();
+                ArrayNode contacts = null;
+
+                ObjectNode contact = factory.objectNode();
+
+                String sex = "";
+                String dateFormat = "yyyy-MM-dd";
+
+                String fullName = "";
+
+                if (c.getFirstName() != null) {
+                    fullName += c.getFirstName();
+                }
+
+                if (c.getMiddleName() != null) {
+                    fullName += " " + c.getMiddleName();
+                }
+
+                if (c.getLastName() != null) {
+                    fullName += " " + c.getLastName();
+                }
+
+
+                if (c.getSex() != null) {
+                    if (c.getSex().equals("M")) {
+                        sex = "male";
+                    } else {
+                        sex = "female";
+                    }
+                }
+                contact.put("role", "person");
+                contact.put("_id", c.getUuid());
+                contact.put("index_client_uuid", indexClient.getUuid());
+                contact.put("s_name",c.getLastName() != null ? c.getLastName() : "");
+                contact.put("f_name",c.getFirstName() != null ? c.getFirstName() : "");
+                contact.put("o_name",c.getMiddleName() != null ? c.getMiddleName() : "");
+                contact.put("name", fullName);
+                contact.put("sex",sex);
+                contact.put("date_of_birth", c.getBirthDate() != null ? MedicDataExchange.getSimpleDateFormat(dateFormat).format(c.getBirthDate()) : "");
+                contact.put("marital_status", c.getMaritalStatus() != null ? getMaritalStatusOptions(c.getMaritalStatus()) : "");
+                contact.put("phone", c.getPhoneContact() != null ? c.getPhoneContact() : "");
+                contact.put("physical_address", c.getPhysicalAddress() != null ? c.getPhysicalAddress() : "");
+                contact.put("contact_relationship", c.getRelationType() != null ? getContactRelation(c.getRelationType()) : "");
+                contact.put("living_with_client", c.getLivingWithPatient() != null ? getLivingWithPatientOptions(c.getLivingWithPatient()) : "");
+                contact.put("ipv_outcome", c.getIpvOutcome());
+                contact.put("baseline_hiv_status", c.getBaselineHivStatus());
+                contact.put("booking_date", c.getAppointmentDate() != null ? MedicDataExchange.getSimpleDateFormat(dateFormat).format(c.getAppointmentDate()) : "");
+                contact.put("pns_approach", c.getPnsApproach() != null ? getPreferredPNSApproachOptions(c.getPnsApproach()) : "");
+                contact.put("reported_date", c.getDateCreated().getTime());
+
+                if (contactMap.keySet().contains(indexClient.getPatientId())) {
+                    contacts = contactMap.get(indexClient.getPatientId());
+                    contacts.add(contact);
+                } else {
+                    contacts = factory.arrayNode();
+                    contacts.add(contact);
+                    contactMap.put(indexClient.getPatientId(), contacts);
+                }
+            }
+
+            for (Map.Entry<Integer, ArrayNode> entry : contactMap.entrySet()) {
+                Integer caseId = entry.getKey();
+                ArrayNode contacts = entry.getValue();
+
+                Patient patient = Context.getPatientService().getPatient(caseId);
+                ObjectNode contactWrapper = buildPatientNode(patient);
+                contactWrapper.put("contacts", contacts);
+                patientContactNode.add(contactWrapper);
+
+            }
+        }
+
+        // add for cases under investigation but with no contacts
+        ArrayNode emptyContactNode = factory.arrayNode();
+        /*Set<Integer> patientList = getClientsForTestingAndContactListing(gpLastPatient, lastPatientId);
+        if (patientList.size() > 0) {
+            for (Integer ptId : patientList) {
+                if (!contactMap.keySet().contains(ptId)) {
+                    Patient patient = Context.getPatientService().getPatient(ptId);
+                    ObjectNode contactWrapper = buildPatientNode(patient);
+                    contactWrapper.put("contacts", emptyContactNode);
+                    patientContactNode.add(contactWrapper);
+                }
+            }
+        }*/
+
+        responseWrapper.put("docs", patientContactNode);
+        return responseWrapper;
+    }
+
+    private ObjectNode buildPatientNode(Patient patient) {
+        JsonNodeFactory factory = getJsonNodeFactory();
+        ObjectNode objectWrapper = factory.objectNode();
+        ObjectNode fields = factory.objectNode();
+
+        String sex = "";
+        String dateFormat = "yyyy-MM-dd";
+
+        String fullName = "";
+
+        if (patient.getGivenName() != null) {
+            fullName += patient.getGivenName();
+        }
+
+        if (patient.getMiddleName() != null) {
+            fullName += " " + patient.getMiddleName();
+        }
+
+        if (patient.getFamilyName() != null) {
+            fullName += " " + patient.getFamilyName();
+        }
+
+
+
+        if (patient.getGender() != null) {
+            if (patient.getGender().equals("M")) {
+                sex = "male";
+            } else {
+                sex = "female";
+            }
+        }
+
+        objectWrapper.put("_id",patient.getUuid());
+        objectWrapper.put("type","data_record");
+        objectWrapper.put("form","case_information");
+        objectWrapper.put("content_type","xml");
+        objectWrapper.put("reported_date",patient.getDateCreated().getTime());
+
+
+        PatientIdentifier nationalId = patient.getPatientIdentifier(Utils.NATIONAL_ID);
+
+        /*PatientIdentifier caseId = patient.getPatientIdentifier(SHRUtils.CASE_ID_TYPE);
+        PatientIdentifier nationalId = patient.getPatientIdentifier(SHRUtils.NATIONAL_ID_TYPE);
+        PatientIdentifier passportNumber = patient.getPatientIdentifier(SHRUtils.PASSPORT_NUMBER_TYPE);
+        PatientIdentifier alienNumber = patient.getPatientIdentifier(SHRUtils.ALIEN_NUMBER_TYPE);
+        PatientIdentifier chtReference = patient.getPatientIdentifier(SHRUtils.CHT_REFERENCE_UUID);
+*/
+        // get address
+
+        /*ObjectNode address = SHRUtils.getPatientAddress(patient);
+        ObjectNode physicalAddress = (ObjectNode) address.get("PHYSICAL_ADDRESS");
+        String nationality = physicalAddress.get("NATIONALITY").textValue();
+
+        String postalAddress = address.get("POSTAL_ADDRESS").textValue();
+        String county = physicalAddress.get("COUNTY").textValue();
+        String subCounty = physicalAddress.get("SUB_COUNTY").textValue();
+        String ward = physicalAddress.get("WARD").textValue();
+        String landMark = physicalAddress.get("NEAREST_LANDMARK").textValue();*/
+
+
+        fields.put("needs_sign_off",false);
+        fields.put("case_id",patient.getUuid());
+        //fields.put("cht_ref_uuid",chtReference != null ? chtReference.getIdentifier() : "");
+        fields.put("patient_identifierType_nationalId_49af6cdc-7968-4abb-bf46-de10d7f4859f", nationalId != null ? nationalId.getIdentifier() : "");
+
+        fields.put("patient_familyName",patient.getFamilyName() != null ? patient.getFamilyName() : "");
+        fields.put("patient_firstName",patient.getGivenName() != null ? patient.getGivenName() : "");
+        fields.put("patient_middleName",patient.getMiddleName() != null ? patient.getMiddleName() : "");
+        fields.put("name", fullName);
+        fields.put("patient_name", fullName);
+        fields.put("sex",sex);
+        fields.put("date_of_birth", patient.getBirthdate() != null ? getSimpleDateFormat(dateFormat).format(patient.getBirthdate()) : "");
+        fields.put("patient_dobKnown", "_1066_No_99DCT");
+        fields.put("patient_telephone", "");
+        fields.put("patient_nationality", "");
+        fields.put("place_id", "3b1fc65e-ca03-473a-bd59-54c0104408f8");
+        fields.put("patient_county", "Nairobi");
+        fields.put("patient_subcounty","Westlands");
+        fields.put("patient_ward", "Mavoko");
+        fields.put("location", "");
+        fields.put("sub_location","");
+        fields.put("patient_village", "");
+        fields.put("patient_landmark", "");
+        fields.put("patient_residence", "");
+        fields.put("patient_nearesthealthcentre", "");
+        fields.put("assignee","");
+
+        objectWrapper.put("fields", fields);
+        return objectWrapper;
+
+    }
+
+    private String getContactRelation(Integer key) {
+        if (key == null) {
+            return "";
+        }
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(160237, "Co-worker");
+        options.put(165656,"Traveled together");
+        options.put(970, "Mother");
+        options.put(971, "Father");
+        options.put(972, "Sibling");
+        options.put(1528, "Child");
+        options.put(5617, "Spouse");
+        options.put(163565, "Sexual partner");
+        options.put(162221, "Co-wife");
+
+        if (options.keySet().contains(key)) {
+            return options.get(key);
+        }
+        return "";
+    }
+
+
+    private String getLivingWithPatientOptions(Integer key) {
+       if (key == null) {
+           return "";
+       }
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1065, "Yes");
+        options.put(1066, "No");
+        options.put(162570, "Declined to Answer");
+
+        if (options.keySet().contains(key)) {
+            return options.get(key);
+        }
+        return "";
+    }
+
+    private String getPreferredPNSApproachOptions(Integer key) {
+        if (key == null) {
+            return "";
+        }
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(162284,"Dual referral");
+        options.put(160551,"Passive referral");
+        options.put(161642,"Contract referral");
+        options.put(163096,"Provider referral");
+        if (options.keySet().contains(key)) {
+            return options.get(key);
+        }
+        return "";
+
+    }
+
+    private String getMaritalStatusOptions(Integer key) {
+        if (key == null) {
+            return "";
+        }
+        Map<Integer, String> options = new HashMap<Integer, String>();
+        options.put(1057, "Single");
+        options.put(5555, "Married Monogamous");
+        options.put(159715, "Married Polygamous");
+        options.put(1058, "Divorced");
+        options.put(1059, "Widowed");
+        if (options.keySet().contains(key)) {
+            return options.get(key);
+        }
+        return "";
+    }
+
+
+    /**
+     * Retrieves contacts listed under a case and needs follow up
+     * Filters out contacts who have been registered in the system as person/patient
+     * @return
+     */
+    protected Set<Integer> getListedContacts(Integer lastContactEntry, Integer lastId) {
+
+        Set<Integer> eligibleList = new HashSet<Integer>();
+        String sql = "";
+        if (lastContactEntry != null && lastContactEntry > 0) {
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id >" + lastContactEntry + " and patient_id is null and voided=0 and appointment_date is null;"; // get contacts not registered
+        } else {
+            sql = "select id from kenyaemr_hiv_testing_patient_contact where id <= " + lastId + " and patient_id is null and voided=0 and appointment_date is null;";
+
+        }
+
+        List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
+        if (!activeList.isEmpty()) {
+            for (List<Object> res : activeList) {
+                Integer patientId = (Integer) res.get(0);
+                eligibleList.add(patientId);
+            }
+        }
+        return eligibleList;
+    }
+
+    protected Set<Integer> getClientsForTestingAndContactListing(Integer lastPatientEntry, Integer lastId) {
+
+        Set<Integer> eligibleList = new HashSet<Integer>();
+
+        String sql = "";
+        if (lastPatientEntry != null && lastPatientEntry > 0) {
+            /*sql = "select pp.patient_id from patient_program pp \n" +
+                    "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
+                    "inner join obs o on o.person_id = pp.patient_id and o.concept_id=165611 and o.value_coded=703\n" +
+                    "where o.obs_id >" + lastPatientEntry + " and pp.voided=0 and o.voided=0;";*/
+            sql = "select patient_id from patient where voided=0 and patient_id > 7";
+        } else {
+
+            /*sql = "select pp.patient_id from patient_program pp \n" +
+                    "inner join (select program_id from program where uuid='e7ee7548-6958-4361-bed9-ee2614423947') p on pp.program_id = p.program_id\n" +
+                    "inner join obs o on o.person_id = pp.patient_id and o.concept_id=165611 and o.value_coded=703\n" +
+                    "where o.obs_id <= " + lastId + " and pp.voided=0 and o.voided=0;";*/
+            sql = "select patient_id from patient where voided=0 and patient_id > 7";
+
+        }
+
+        List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
+        if (!activeList.isEmpty()) {
+            for (List<Object> res : activeList) {
+                Integer patientId = (Integer) res.get(0);
+                eligibleList.add(patientId);
+            }
+        }
+
+        return eligibleList;
+    }
+
+    private JsonNodeFactory getJsonNodeFactory() {
+        final JsonNodeFactory factory = JsonNodeFactory.instance;
+        return factory;
+    }
+
+    public static SimpleDateFormat getSimpleDateFormat(String pattern) {
+        return new SimpleDateFormat(pattern);
+    }
 
 
 }

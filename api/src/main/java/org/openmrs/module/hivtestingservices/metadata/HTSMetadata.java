@@ -14,10 +14,13 @@
 
 package org.openmrs.module.hivtestingservices.metadata;
 
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.springframework.stereotype.Component;
 
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.globalProperty;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.patientIdentifierType;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.relationshipType;
 
 /**
@@ -27,6 +30,12 @@ import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.relation
 public class HTSMetadata extends AbstractMetadataBundle {
 
 	public static final String MODULE_ID = "hivtestingservices";
+	public static final String MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY = "medic.lastSavedPatientContact";
+	public static final String MEDIC_MOBILE_SERVER_URL = "medic.chtServerUrl";
+	public static final String MEDIC_MOBILE_LAST_PATIENT_ENTRY = "medic.lastSavedPersonId";
+	public static final String MEDIC_MOBILE_USER = "medic.chtUser";
+	public static final String MEDIC_MOBILE_PWD = "medic.chtPwd";
+
 
 	public static final class _EncounterType {
 		public static final String HTS = "9c0a7a57-62ff-4f75-babe-5835b0e921b7";
@@ -45,6 +54,10 @@ public class HTSMetadata extends AbstractMetadataBundle {
 
 	}
 
+	public static final class _PatientIdentifierType {
+		public static final String CHT_RECORD_UUID = "c6552b22-f191-4557-a432-1f4df872d473";
+	}
+
 	@Override
 	public void install() throws Exception {
 		// doing this in the scheduled task so that previous value set is preserved
@@ -56,6 +69,16 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(relationshipType("Partner", "Partner", "Someone I had sex with for fun without commitment to a relationship", _RelationshipType.PARTNER));
 		install(relationshipType("Co-wife", "Co-wife", "Female member spouse in a polygamist household", _RelationshipType.CO_WIFE));
 		install(relationshipType("Injectable-drug-user", "Injectable-druguser", "Those who share drug needles", _RelationshipType.INJECTABLE_DRUG_USER));
+
+		install(globalProperty(MEDIC_MOBILE_LAST_PATIENT_CONTACT_ENTRY, "Id for the last case contact entry for CHT", null));
+		install(globalProperty(MEDIC_MOBILE_LAST_PATIENT_ENTRY, "Medic last patient entry ID", null));
+		install(globalProperty(MEDIC_MOBILE_SERVER_URL, "Server URL for Medic Mobile CHT", null));
+		install(globalProperty(MEDIC_MOBILE_USER, "Medic Mobile CHT user", null));
+		install(globalProperty(MEDIC_MOBILE_PWD, "Medic Mobile CHT pwd", null));
+
+		install(patientIdentifierType("CHT Record Reference UUID", "Record reference UUID from CHT",
+				null, null, null,
+				PatientIdentifierType.LocationBehavior.NOT_USED, false, _PatientIdentifierType.CHT_RECORD_UUID));
 	}
 
 }

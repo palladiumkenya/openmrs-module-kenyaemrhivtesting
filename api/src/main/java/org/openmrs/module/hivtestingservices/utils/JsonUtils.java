@@ -42,6 +42,7 @@ public class JsonUtils {
     private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class.getSimpleName());
 
     private static final String DATE_PATTERN = "dd-MM-yyyy";
+    public static final String DATE_PATTERN_MEDIC = "yyyy-MM-dd";
 
     /**
      * Write boolean value into the json object. The method will only write the boolean value if the object passed
@@ -346,6 +347,21 @@ public class JsonUtils {
     public static Object getElementFromJsonObject(JSONObject jsonObject, String key){
         if(jsonObject.containsKey(key)) {
             return jsonObject.get(key);
+        }
+        return null;
+    }
+
+    public static Date readAsDate(String serialized, String path, String datePatternMedic) {
+        String dateAsString = readAsString(serialized, path);
+        if(dateAsString == null || dateAsString.length() == 0) {
+            return null;
+        }
+        try {
+            if(dateAsString.contains("/"))
+                return new SimpleDateFormat(datePatternMedic).parse(dateAsString.replace("/","-"));
+            return new SimpleDateFormat(datePatternMedic).parse(dateAsString);
+        } catch (ParseException e) {
+            logger.error("Unable to convert string value from path: " + path + " from: " + String.valueOf(serialized));
         }
         return null;
     }

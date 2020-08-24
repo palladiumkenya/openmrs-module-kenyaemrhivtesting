@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.hivtestingservices.advice.model.HTSContactListingFormProcessor;
 import org.openmrs.module.hivtestingservices.chore.MigrateFamilyHistoryFormContactListingChore;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
