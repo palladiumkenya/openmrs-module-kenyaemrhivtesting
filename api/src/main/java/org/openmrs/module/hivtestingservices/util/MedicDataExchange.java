@@ -9,6 +9,7 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.openmrs.Form;
 import org.openmrs.Location;
+import org.openmrs.User;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Provider;
 import org.openmrs.api.context.Context;
@@ -20,6 +21,7 @@ import org.openmrs.module.hivtestingservices.api.service.DataService;
 import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.hivtestingservices.model.DataSource;
 import org.openmrs.module.hivtestingservices.utils.JsonUtils;
+import org.openmrs.module.kenyaemr.util.EmrUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -60,8 +62,10 @@ public class MedicDataExchange {
             String patientUuid = formNode.path("patient").path("patient.uuid").getTextValue();
             Integer locationId = Integer.parseInt(formNode.path("encounter").path("encounter.location_id").getTextValue());
             String providerString = formNode.path("encounter").path("encounter.provider_id").getTextValue();
+            String userName = formNode.path("encounter").path("encounter.user_system_id").getTextValue();
 
-            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid);
+
+            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid, userName);
 
         }
         return "Data queue form created successfully";
@@ -84,17 +88,20 @@ public class MedicDataExchange {
             String patientUuid = registrationNode.path("patient").path("patient.uuid").getTextValue();
             Integer locationId = Integer.parseInt(registrationNode.path("encounter").path("encounter.location_id").getTextValue());
             String providerString = registrationNode.path("encounter").path("encounter.provider_id").getTextValue();
+            String userName = registrationNode.path("encounter").path("encounter.user_system_id").getTextValue();
 
-            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid);
+
+            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid,userName);
 
         }
         return "Data queue registration created successfully";
     }
 
     private void saveMedicDataQueue(String payload, Integer locationId, String providerString, String patientUuid, String discriminator,
-                                    String formUuid) {
+                                    String formUuid ,String userString) {
         DataSource dataSource = dataService.getDataSource(1);
         Provider provider = Context.getProviderService().getProviderByIdentifier(providerString);
+        User user = Context.getUserService().getUserByUsername(userString);
         Location location = Context.getLocationService().getLocation(locationId);
         Form form = Context.getFormService().getFormByUuid(formUuid);
 
@@ -110,6 +117,7 @@ public class MedicDataExchange {
         medicQueData.setProvider(provider);
         medicQueData.setLocation(location);
         medicQueData.setDataSource(dataSource);
+        medicQueData.setCreator(user);
         htsService.saveQueData(medicQueData);
 
     }
@@ -175,13 +183,16 @@ public class MedicDataExchange {
         tmp.put("tmp.birthdate_type","age");
         tmp.put("tmp.age_in_years", jsonNode.get("patient_ageYears") != null ? jsonNode.get("patient_ageYears").getTextValue() : "");
         discriminator.put("discriminator","json-registration");
+        String creator =   jsonNode.path("meta").path("created_by") != null ? jsonNode.path("meta").path("created_by").getTextValue() : "";
+        String providerId = checkProviderNameExists(creator);
+        String systemId = confirmUserNameExists(creator);
 
         encounter.put("encounter.location_id",locationId != null ? locationId.toString() : "1");
-        encounter.put("encounter.provider_id_select","admin");
-        encounter.put("encounter.provider_id","admin");
+        encounter.put("encounter.provider_id_select",providerId != null ? providerId: " ");
+        encounter.put("encounter.provider_id",providerId != null ? providerId: " ");
         encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
         encounter.put("encounter.form_uuid","8898c6e1-5df1-409f-b8ed-c88e6e0f24e9");
-        encounter.put("encounter.user_system_id","admin");
+        encounter.put("encounter.user_system_id",systemId);
         encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
         encounter.put("encounter.setup_config_uuid","2107eab5-5b3a-4de8-9e02-9d97bce635d2");
 
@@ -221,14 +232,16 @@ public class MedicDataExchange {
         }
 
         String encounterDate = jsonNode.path("fields").path("encounter_date").getTextValue() != null && !jsonNode.path("fields").path("encounter_date").getTextValue().equalsIgnoreCase("") ? formatStringDate(jsonNode.path("fields").path("encounter_date").getTextValue()) : convertTime(jsonNode.get("reported_date").getLongValue());
-
+        String creator = jsonNode.path("fields").path("audit_trail").path("created_by") != null && jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() != null ? jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() : "";
+        String providerIdentifier = checkProviderNameExists(creator);
+        String systemId = confirmUserNameExists(creator);
         discriminator.put("discriminator","json-encounter");
         encounter.put("encounter.location_id",locationId != null ? locationId.toString(): "1");
-        encounter.put("encounter.provider_id_select","admin");
-        encounter.put("encounter.provider_id","admin");
+        encounter.put("encounter.provider_id_select",providerIdentifier != null ? providerIdentifier: " ");
+        encounter.put("encounter.provider_id",providerIdentifier != null ? providerIdentifier: " ");
         encounter.put("encounter.encounter_datetime",encounterDate);
         encounter.put("encounter.form_uuid",jsonNode.path("fields").path("form_uuid").getTextValue());
-        encounter.put("encounter.user_system_id","admin");
+        encounter.put("encounter.user_system_id",systemId);
         encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
         encounter.put("encounter.setup_config_uuid",jsonNode.path("fields").path("encounter_type_uuid").getTextValue());
         patientNode.put("patient.uuid",jsonNode.path("fields").path("inputs").path("contact").path("_id").getTextValue());
@@ -279,9 +292,11 @@ public class MedicDataExchange {
             String discriminator = "json-patientcontact";
             String patientContactUuid = jsonNode.get("_id").getTextValue();
             Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
-            String providerString = "admin";
+            String creator =   jsonNode.path("meta").path("created_by") != null ? jsonNode.path("meta").path("created_by").getTextValue() : "";
+            String providerString = checkProviderNameExists(creator);
+            String userName = confirmUserNameExists(creator);
 
-            saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");
+            saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"", userName);
 
         }
         return "Queue data for contact created successfully";
@@ -304,9 +319,12 @@ public class MedicDataExchange {
             String payload = jsonNode.toString();
             String patientContactUuid = jsonNode.get("_id").getTextValue();
             Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
-            String providerString = "admin";
+            String creator = jsonNode.path("fields").path("audit_trail").path("created_by") != null && jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() != null ? jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() : "";
+            String providerString = checkProviderNameExists(creator);
+            String userName = confirmUserNameExists(creator);
 
-            saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"");
+
+            saveMedicDataQueue(payload,locationId,providerString,patientContactUuid,discriminator,"",userName);
 
         }
         return "Queue data for contact trace created successfully";
@@ -400,6 +418,54 @@ public class MedicDataExchange {
         Date date = new Date(time);
         return DATE_FORMAT.format(date);
     }
+    private String checkProviderNameExists(String username) {
+        String providerIdentifier = null;
+        User user = null;
+        if(username != null && !username.equalsIgnoreCase("")) {
+            user = Context.getUserService().getUserByUsername(username);
+        }
+
+        Provider unknownProvider = Context.getProviderService().getAllProviders().get(0);
+        User superUser = Context.getUserService().getUser(1);
+        if (user != null) {
+           Provider s = EmrUtils.getProvider(user);
+            // check if the user is a provider
+            if(s != null) {
+                providerIdentifier = s.getIdentifier();
+            } else {
+                providerIdentifier = unknownProvider.getIdentifier();
+            }
+        } else {
+            Provider p = EmrUtils.getProvider(superUser);
+            if (p != null) {
+                providerIdentifier = p.getIdentifier();
+
+            } else {
+                providerIdentifier = unknownProvider.getIdentifier();
+            }
+        }
+
+        return providerIdentifier;
+    }
+
+    private String confirmUserNameExists(String username) {
+        String systemUserName = null;
+        User user = null;
+        User superUser = Context.getUserService().getUser(1);
+        if(username != null && !username.equalsIgnoreCase("")) {
+            user = Context.getUserService().getUserByUsername(username);
+        }
+        if (user != null) {
+            systemUserName = user.getUsername();
+
+        } else {
+            systemUserName = superUser.getUsername();
+
+        }
+        return systemUserName;
+    }
+
+
 
 
 }
