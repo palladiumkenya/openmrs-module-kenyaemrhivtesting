@@ -351,7 +351,13 @@ public class JsonRegistrationQueueDataHandler implements QueueDataHandler {
         PersonAddress patientAddress = new PersonAddress();
 
         String county = JsonUtils.readAsString(payload, "$['patient']['patient.county']");
-        patientAddress.setStateProvince(county);
+        patientAddress.setCountyDistrict(county);
+
+        String subCounty = JsonUtils.readAsString(payload, "$['patient']['patient.sub_county']");
+        patientAddress.setStateProvince(subCounty);
+
+        String ward = JsonUtils.readAsString(payload, "$['patient']['patient.ward']");
+        patientAddress.setAddress4(ward);
 
         String location = JsonUtils.readAsString(payload, "$['patient']['patient.location']");
         patientAddress.setAddress6(location);
