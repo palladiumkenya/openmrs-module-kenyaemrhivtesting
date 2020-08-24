@@ -154,8 +154,8 @@ public class JsonEncounterQueueDataHandler implements QueueDataHandler {
         LocationService locationService = Context.getLocationService();
         PatientIdentifierType defaultIdentifierType = patientService.getPatientIdentifierType(1);
 
-        String identifier = JsonUtils.readAsString(patientPayload, "$['patient']['patient.medical_record_number']");
-        String identifierTypeUuid = JsonUtils.readAsString(patientPayload, "$['patient']['patient.identifier_type']");
+       // String identifier = JsonUtils.readAsString(patientPayload, "$['patient']['patient.medical_record_number']");
+        /*String identifierTypeUuid = JsonUtils.readAsString(patientPayload, "$['patient']['patient.identifier_type']");
         String locationUuid = JsonUtils.readAsString(patientPayload, "$['patient']['patient.identifier_location']");
 
         PatientIdentifier patientIdentifier = new PatientIdentifier();
@@ -165,28 +165,28 @@ public class JsonEncounterQueueDataHandler implements QueueDataHandler {
         PatientIdentifierType patientIdentifierType = StringUtils.isNotBlank(identifierTypeUuid) ?
                 patientService.getPatientIdentifierTypeByUuid(identifierTypeUuid) : defaultIdentifierType;
         patientIdentifier.setIdentifierType(patientIdentifierType);
-        patientIdentifier.setIdentifier(identifier);
-        unsavedPatient.addIdentifier(patientIdentifier);
+      //  patientIdentifier.setIdentifier(identifier);
+        unsavedPatient.addIdentifier(patientIdentifier);*/
 
-        Date birthdate = JsonUtils.readAsDate(patientPayload, "$['patient']['patient.birth_date']");
-        boolean birthdateEstimated = JsonUtils.readAsBoolean(patientPayload, "$['patient']['patient.birthdate_estimated']");
-        String gender = JsonUtils.readAsString(patientPayload, "$['patient']['patient.sex']");
+      //  Date birthdate = JsonUtils.readAsDate(patientPayload, "$['patient']['patient.birth_date']");
+      //  boolean birthdateEstimated = JsonUtils.readAsBoolean(patientPayload, "$['patient']['patient.birthdate_estimated']");
+      //  String gender = JsonUtils.readAsString(patientPayload, "$['patient']['patient.sex']");
 
-        unsavedPatient.setBirthdate(birthdate);
-        unsavedPatient.setBirthdateEstimated(birthdateEstimated);
-        unsavedPatient.setGender(gender);
+      //  unsavedPatient.setBirthdate(birthdate);
+      //  unsavedPatient.setBirthdateEstimated(birthdateEstimated);
+      //  unsavedPatient.setGender(gender);
 
-        String givenName = JsonUtils.readAsString(patientPayload, "$['patient']['patient.given_name']");
-        String middleName = JsonUtils.readAsString(patientPayload, "$['patient']['patient.middle_name']");
-        String familyName = JsonUtils.readAsString(patientPayload, "$['patient']['patient.family_name']");
+      //  String givenName = JsonUtils.readAsString(patientPayload, "$['patient']['patient.given_name']");
+      //  String middleName = JsonUtils.readAsString(patientPayload, "$['patient']['patient.middle_name']");
+      //  String familyName = JsonUtils.readAsString(patientPayload, "$['patient']['patient.family_name']");
 
-        PersonName personName = new PersonName();
-        personName.setGivenName(givenName);
-        personName.setMiddleName(middleName);
-        personName.setFamilyName(familyName);
+       // PersonName personName = new PersonName();
+      //  personName.setGivenName(givenName);
+      //  personName.setMiddleName(middleName);
+      //  personName.setFamilyName(familyName);
 
-        unsavedPatient.addName(personName);
-        unsavedPatient.addIdentifier(patientIdentifier);
+      //  unsavedPatient.addName(personName);
+       // unsavedPatient.addIdentifier(patientIdentifier);
 
         Patient candidatePatient;
         if (StringUtils.isNotEmpty(unsavedPatient.getUuid())) {
@@ -199,10 +199,12 @@ public class JsonEncounterQueueDataHandler implements QueueDataHandler {
                     candidatePatient = Context.getPatientService().getPatientByUuid(registrationData.getAssignedUuid());
                 }
             }
-        } else if (!StringUtils.isBlank(patientIdentifier.getIdentifier())) {
+        } /*else if (!StringUtils.isBlank(patientIdentifier.getIdentifier())) {
             List<Patient> patients = Context.getPatientService().getPatients(patientIdentifier.getIdentifier());
             candidatePatient = PatientSearchUtils.findSimilarPatientByNameAndGender(patients, unsavedPatient);
-        } else {
+        } */
+
+        else {
             List<Patient> patients = Context.getPatientService().getPatients(unsavedPatient.getPersonName().getFullName());
             candidatePatient = PatientSearchUtils.findSimilarPatientByNameAndGender(patients, unsavedPatient);
         }
