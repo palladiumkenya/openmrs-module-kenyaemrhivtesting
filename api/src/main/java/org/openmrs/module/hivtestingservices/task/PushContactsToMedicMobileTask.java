@@ -100,7 +100,7 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
             System.out.println("CHT Post request. Records found: " + docs.size());
             //System.out.println("CHT Post request : " + docs.toString());
 
-            if (serverUrl != null && username != null && pwd != null && hasData) {
+            /*if (serverUrl != null && username != null && pwd != null && hasData) {
                 String payload = contactWrapper.toString();
                 CloseableHttpClient httpClient = HttpClients.createDefault();
 
@@ -145,7 +145,7 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
                     //Important: Close the connect
                     httpClient.close();
                 }
-            }
+            }*/
         } catch (Exception e) {
             throw new IllegalArgumentException("Medic Mobile contact list POST task could not be executed!", e);
         }
