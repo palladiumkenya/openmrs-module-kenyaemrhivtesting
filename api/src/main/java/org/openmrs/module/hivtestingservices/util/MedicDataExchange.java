@@ -138,7 +138,6 @@ public class MedicDataExchange {
         ObjectNode tmp = JsonNodeFactory.instance.objectNode();
         ObjectNode discriminator = JsonNodeFactory.instance.objectNode();
         ObjectNode encounter = JsonNodeFactory.instance.objectNode();
-        ObjectNode identifier = JsonNodeFactory.instance.objectNode();
         ObjectNode registrationWrapper = JsonNodeFactory.instance.objectNode();
 
         String patientDobKnown = jsonNode.get("patient_dobKnown") !=null ? jsonNode.get("patient_dobKnown").getTextValue():"";
@@ -155,18 +154,10 @@ public class MedicDataExchange {
             patientNode.put("patient.birth_date", formatStringDate(dateOfBirth));
         }
 
-        String identifierProvided = jsonNode.get("patient_nationalIdnumber") != null ? jsonNode.get("patient_nationalIdnumber").getTextValue() : jsonNode.get("patient_passportNumber") != null ? jsonNode.get("patient_passportNumber").getTextValue() : "";
-
-        identifier.put("identifier_type_name","National ID");
-        identifier.put("identifier_value", identifierProvided);
-        identifier.put("confirm_other_identifier_value","");
-        //identifier.put("confirm_other_identifier_value",jsonNode.get("patient_nationalIdnumber").getTextValue());
         patientNode.put("patient.uuid",jsonNode.get("_id").getTextValue());
         patientNode.put("patient.family_name",jsonNode.get("patient_familyName") != null ? jsonNode.get("patient_familyName").getTextValue():"");
         patientNode.put("patient.given_name",jsonNode.get("patient_firstName") != null ? jsonNode.get("patient_firstName").getTextValue():"");
         patientNode.put("patient.middle_name",jsonNode.get("patient_middleName") != null ? jsonNode.get("patient_middleName").getTextValue(): "");
-        // patientNode.put("patient.mothers_name",jsonNode.get("patient_familyName").getTextValue());
-        // patientNode.put("patient.medical_record_number","337");
         patientNode.put("patient.sex",gender(jsonNode.get("patient_sex").getTextValue()));
         patientNode.put("patient.county",jsonNode.get("patient_county") != null ? jsonNode.get("patient_county").getTextValue():"");
         patientNode.put("patient.sub_county",jsonNode.get("patient_subcounty") != null ? jsonNode.get("patient_subcounty").getTextValue():"");
