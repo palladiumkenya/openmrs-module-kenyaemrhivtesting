@@ -1,5 +1,6 @@
 package org.openmrs.module.hivtestingservices.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
@@ -232,7 +233,9 @@ public class MedicDataExchange {
         encounter.put("encounter.user_system_id",systemId);
         encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
         encounter.put("encounter.setup_config_uuid",jsonNode.path("fields").path("encounter_type_uuid").getTextValue());
-        patientNode.put("patient.uuid",jsonNode.path("fields").path("inputs").path("contact").path("_id").getTextValue());
+        String kemrUuid = jsonNode.path("fields").path("inputs").path("contact").path("kemr_uuid").getTextValue();
+
+        patientNode.put("patient.uuid", StringUtils.isNotBlank(kemrUuid) ? kemrUuid : jsonNode.path("fields").path("inputs").path("contact").path("_id").getTextValue());
 
         List<String> keysToRemove = new ArrayList<String>();
         if(obsNodes != null){
@@ -556,7 +559,7 @@ public class MedicDataExchange {
             for (Integer ptId : patientList) {
                 if (!contactMap.keySet().contains(ptId)) {
                     Patient patient = Context.getPatientService().getPatient(ptId);
-                    ObjectNode contactWrapper = buildPatientNode(patient);
+                    ObjectNode contactWrapper = buildPatientNode(patient, true);
                     contactWrapper.put("contacts", emptyContactNode);
                     patientContactNode.add(contactWrapper);
                 }
@@ -567,7 +570,39 @@ public class MedicDataExchange {
         return responseWrapper;
     }
 
-    private ObjectNode buildPatientNode(Patient patient) {
+
+    /**
+     * Get a list of contacts for tracing
+     * @return
+     * @param gpLastPatient
+     * @param lastPatientId
+     */
+    public ObjectNode getLinkageList(Integer gpLastPatient, Integer lastPatientId) {
+
+        JsonNodeFactory factory = getJsonNodeFactory();
+        ArrayNode patientContactNode = getJsonNodeFactory().arrayNode();
+        ObjectNode responseWrapper = factory.objectNode();
+
+        Map<Integer, ArrayNode> contactMap = new HashMap<Integer, ArrayNode>();
+
+        // Get registered contacts in the EMR. These will potentially have no contacts
+        ArrayNode emptyContactNode = factory.arrayNode();
+        Set<Integer> patientList = getClientsTestedPositiveNotLinked(gpLastPatient, lastPatientId);
+        if (patientList.size() > 0) {
+            for (Integer ptId : patientList) {
+                if (!contactMap.keySet().contains(ptId)) {
+                    Patient patient = Context.getPatientService().getPatient(ptId);
+                    ObjectNode contactWrapper = buildPatientNode(patient, false);
+                    patientContactNode.add(contactWrapper);
+                }
+            }
+        }
+
+        responseWrapper.put("docs", patientContactNode);
+        return responseWrapper;
+    }
+
+    private ObjectNode buildPatientNode(Patient patient, boolean newRegistration) {
         JsonNodeFactory factory = getJsonNodeFactory();
         ObjectNode objectWrapper = factory.objectNode();
         ObjectNode fields = factory.objectNode();
@@ -600,6 +635,11 @@ public class MedicDataExchange {
         objectWrapper.put("_id",patient.getUuid());
         objectWrapper.put("type","data_record");
         objectWrapper.put("form","case_information");
+        if (newRegistration) {
+            objectWrapper.put("record_purpose","testing");
+        } else {
+            objectWrapper.put("record_purpose","linkage");
+        }
         objectWrapper.put("content_type","xml");
         objectWrapper.put("reported_date",patient.getDateCreated().getTime());
 
@@ -751,6 +791,60 @@ public class MedicDataExchange {
             sql = "select patient_id from kenyaemr_hiv_testing_patient_contact where patient_id <= " + lastId + " and patient_id is not null and voided=0 and contact_listing_decline_reason='CHT';";
 
         }
+
+        List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
+        if (!activeList.isEmpty()) {
+            for (List<Object> res : activeList) {
+                Integer patientId = (Integer) res.get(0);
+                eligibleList.add(patientId);
+            }
+        }
+        return eligibleList;
+    }
+
+    protected Set<Integer> getClientsTestedPositiveNotLinked(Integer lastPatientEntry, Integer lastId) {
+
+        Set<Integer> eligibleList = new HashSet<Integer>();
+        String sql = "select person_id from person where person_id in (7,8,9,10)";
+        /*if (lastPatientEntry != null && lastId > 0) {
+            sql = " select t.patient_id\n" +
+                    "from kenyaemr_etl.etl_hts_test t\n" +
+                    "  left join\n" +
+                    "((SELECT l.patient_id\n" +
+                    " from kenyaemr_etl.etl_hts_referral_and_linkage l\n" +
+                    "   inner join kenyaemr_etl.etl_patient_demographics pt on pt.patient_id=l.patient_id and pt.voided=0\n" +
+                    "   inner join kenyaemr_etl.etl_hts_test t on t.patient_id=l.patient_id and t.test_type in(1,2) and t.final_test_result='Positive' and t.visit_date <=l.visit_date and t.voided=0\n" +
+                    " where (l.ccc_number is not null or facility_linked_to is not null)\n" +
+                    ")\n" +
+                    "union\n" +
+                    "( SELECT t.patient_id\n" +
+                    "  FROM kenyaemr_etl.etl_hts_test t\n" +
+                    "    INNER JOIN kenyaemr_etl.etl_patient_demographics pt ON pt.patient_id=t.patient_id AND pt.voided=0\n" +
+                    "    INNER JOIN kenyaemr_etl.etl_hiv_enrollment e ON e.patient_id=t.patient_id AND e.voided=0\n" +
+                    "  WHERE t.test_type IN (1, 2) AND t.final_test_result='Positive' AND t.voided=0\n" +
+                    ")) l on l.patient_id = t.patient_id\n" +
+                    "where t.final_test_result = 'Positive' and t.voided = 0 and t.test_type=2 and l.patient_id is null\n" +
+                    ";";
+        } else {
+            sql = " select t.patient_id\n" +
+                    "from kenyaemr_etl.etl_hts_test t\n" +
+                    "  left join\n" +
+                    "((SELECT l.patient_id\n" +
+                    " from kenyaemr_etl.etl_hts_referral_and_linkage l\n" +
+                    "   inner join kenyaemr_etl.etl_patient_demographics pt on pt.patient_id=l.patient_id and pt.voided=0\n" +
+                    "   inner join kenyaemr_etl.etl_hts_test t on t.patient_id=l.patient_id and t.test_type in(1,2) and t.final_test_result='Positive' and t.visit_date <=l.visit_date and t.voided=0\n" +
+                    " where (l.ccc_number is not null or facility_linked_to is not null)\n" +
+                    ")\n" +
+                    "union\n" +
+                    "( SELECT t.patient_id\n" +
+                    "  FROM kenyaemr_etl.etl_hts_test t\n" +
+                    "    INNER JOIN kenyaemr_etl.etl_patient_demographics pt ON pt.patient_id=t.patient_id AND pt.voided=0\n" +
+                    "    INNER JOIN kenyaemr_etl.etl_hiv_enrollment e ON e.patient_id=t.patient_id AND e.voided=0\n" +
+                    "  WHERE t.test_type IN (1, 2) AND t.final_test_result='Positive' AND t.voided=0\n" +
+                    ")) l on l.patient_id = t.patient_id\n" +
+                    "where t.final_test_result = 'Positive' and t.voided = 0 and t.test_type=2 and l.patient_id is null\n" +
+                    ";";
+        }*/
 
         List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
         if (!activeList.isEmpty()) {

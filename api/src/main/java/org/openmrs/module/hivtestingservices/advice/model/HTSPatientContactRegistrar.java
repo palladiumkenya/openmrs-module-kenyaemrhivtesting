@@ -26,6 +26,7 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.hivtestingservices.wrapper.PatientWrapper;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
@@ -119,6 +120,8 @@ public class HTSPatientContactRegistrar {
                 }
             }
 
+            // assign CHT reference
+            toSave = addCHTRecordUuid(toSave, pc.getUuid());
             Patient ret = Context.getPatientService().savePatient(toSave);
 
             // Explicitly save all identifier objects including voided
@@ -269,6 +272,25 @@ public class HTSPatientContactRegistrar {
         options.put(162221, cowifeRelType);
         options.put(157351, injectableDrugUserRelType);
         return options.get(relType);
+    }
+
+    /**
+     * Adds CHT record uuid
+     * This will be returned back to CHT
+     * @param patient
+     * @param uuid
+     * @return
+     */
+    private Patient addCHTRecordUuid(Patient patient, String uuid) {
+        PatientIdentifier recordUuid = null;
+        if (StringUtils.isNotBlank(uuid)) {
+            recordUuid = new PatientIdentifier();
+            recordUuid.setIdentifierType(Context.getPatientService().getPatientIdentifierTypeByUuid(HTSMetadata._PatientIdentifierType.CHT_RECORD_UUID));
+            recordUuid.setIdentifier(uuid);
+            patient.addIdentifier(recordUuid);
+        }
+        return patient;
+
     }
 
 }
