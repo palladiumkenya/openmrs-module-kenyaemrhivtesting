@@ -49,9 +49,9 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
             }
 
             GlobalProperty lastPatientEntry = Context.getAdministrationService().getGlobalPropertyObject(HTSMetadata.MEDIC_MOBILE_LAST_PATIENT_ENTRY);
-            String lastQuarantineIdsql = "select max(obs_id) last_id from obs where voided=0;";
-            List<List<Object>> lastQuarantineRs = Context.getAdministrationService().executeSQL(lastQuarantineIdsql, true);
-            Integer lastPatientId = (Integer) lastQuarantineRs.get(0).get(0);
+            String lastContactRegistrationIdsql = "select max(patient_id) last_id from kenyaemr_hiv_testing_patient_contact where voided=0 and patient_id is not null and contact_listing_decline_reason='CHT';";
+            List<List<Object>> lastContactRegistrationRs = Context.getAdministrationService().executeSQL(lastContactRegistrationIdsql, true);
+            Integer lastPatientId = (Integer) lastContactRegistrationRs.get(0).get(0);
             lastPatientId = lastPatientId != null ? lastPatientId : 0;
 
 
@@ -88,9 +88,12 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
 
             // check if there are item(s) to post
             ObjectNode contactWrapper = e.getContacts(gpLastContactId, lastId, gpLastPatientId, lastPatientId);
+            //ObjectNode contactWrapper = e.getLinkageList(gpLastPatientId, lastPatientId);
+
             ArrayNode docs = (ArrayNode) contactWrapper.get("docs");
 
-            System.out.println("Data: " + contactWrapper.toString());
+            //System.out.println("Data: " + contactWrapper.toString());
+            //System.out.println("Linkage data: " + linkageWrapper.toString());
 
 
             if (contactWrapper != null && docs.size() > 0) {

@@ -35,6 +35,7 @@ public class HTSMetadata extends AbstractMetadataBundle {
 	public static final String MEDIC_MOBILE_LAST_PATIENT_ENTRY = "medic.lastSavedPersonId";
 	public static final String MEDIC_MOBILE_USER = "medic.chtUser";
 	public static final String MEDIC_MOBILE_PWD = "medic.chtPwd";
+	public static final String TELEPHONE_CONTACT = "b2c38640-2603-4629-aebd-3b54f33f1e3a";
 
 
 	public static final class _EncounterType {
