@@ -107,7 +107,10 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         Integer livingWithPatient = livingWithPartnerConverter(JsonUtils.readAsString(payload, "$['living_with_client']"));
         Integer pnsApproach = pnsApproachConverter(JsonUtils.readAsString(payload, "$['pns_approach']"));
         String physicalAddress = JsonUtils.readAsString(payload, "$['physical_address']");
-        Integer patientRelatedTo = getPatientRelatedToContact(JsonUtils.readAsString(payload, "$['parent']['_id']"));
+
+        Integer patientRelatedTo = null;
+        String indexKemrUuid = JsonUtils.readAsString(payload, "$['parent']['kemr_uuid']");
+        patientRelatedTo = org.apache.commons.lang3.StringUtils.isNotBlank(indexKemrUuid) ? getPatientRelatedToContact(indexKemrUuid) : getPatientRelatedToContact(JsonUtils.readAsString(payload, "$['parent']['_id']"));
         String uuid = JsonUtils.readAsString(payload, "$['_id']");
         Boolean voided= false;
 
