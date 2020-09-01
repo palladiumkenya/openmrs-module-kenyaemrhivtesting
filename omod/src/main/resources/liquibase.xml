@@ -751,7 +751,7 @@
     </changeSet>
 
     <!--Inserting Medic Queue Data Processor into schedule_task_config table-->
-    <changeSet id="${project.parent.artifactId}-20200724-1320" author="pwangoo">
+    <changeSet id="kenyaemr_hiv_testing_20200724-1320" author="pwangoo">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM scheduler_task_config
