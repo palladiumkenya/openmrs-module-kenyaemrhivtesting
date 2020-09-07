@@ -94,9 +94,9 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
     }
 
     private void setPatientContactFromPayload(){
-        String givenName = JsonUtils.readAsString(payload, "$['s_name']");
-        String middleName = JsonUtils.readAsString(payload, "$['f_name']");
-        String familyName = JsonUtils.readAsString(payload, "$['o_name']");
+        String givenName = JsonUtils.readAsString(payload, "$['f_name']");
+        String middleName = JsonUtils.readAsString(payload, "$['o_name']");
+        String familyName = JsonUtils.readAsString(payload, "$['s_name']");
         Integer relType = relationshipTypeConverter(JsonUtils.readAsString(payload, "$['contact_relationship']"));
         String baselineStatus = JsonUtils.readAsString(payload, "$['baseline_hiv_status']");
         Date nextTestDate = JsonUtils.readAsDate(payload, "$['booking_date']", JsonUtils.DATE_PATTERN_MEDIC);

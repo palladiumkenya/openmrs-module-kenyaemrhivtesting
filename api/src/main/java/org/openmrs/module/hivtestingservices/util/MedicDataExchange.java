@@ -667,8 +667,8 @@ public class MedicDataExchange {
         fields.put("patient_middleName",patient.getMiddleName() != null ? patient.getMiddleName() : "");
         fields.put("name", fullName);
         fields.put("patient_name", fullName);
-        fields.put("sex",sex);
-        fields.put("date_of_birth", patient.getBirthdate() != null ? getSimpleDateFormat(dateFormat).format(patient.getBirthdate()) : "");
+        fields.put("patient_sex",sex);
+        fields.put("patient_birthDate", patient.getBirthdate() != null ? getSimpleDateFormat(dateFormat).format(patient.getBirthdate()) : "");
         fields.put("patient_dobKnown", "_1066_No_99DCT");
         fields.put("patient_telephone", getPersonAttributeByType(patient, phoneNumberAttrType));
         fields.put("patient_nationality", nationality);
@@ -802,6 +802,12 @@ public class MedicDataExchange {
         return eligibleList;
     }
 
+    /**
+     * TODO: this logic is temporarily implemented in CHT. Should be completed once the workflow is clear
+     * @param lastPatientEntry
+     * @param lastId
+     * @return
+     */
     protected Set<Integer> getClientsTestedPositiveNotLinked(Integer lastPatientEntry, Integer lastId) {
 
         Set<Integer> eligibleList = new HashSet<Integer>();
