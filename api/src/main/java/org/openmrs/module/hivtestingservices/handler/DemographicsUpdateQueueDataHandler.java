@@ -19,16 +19,20 @@ import net.minidev.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Location;
-import org.openmrs.Patient;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAddress;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
+import org.openmrs.Patient;
+import org.openmrs.Location;
 import org.openmrs.User;
+import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.service.RegistrationDataService;
@@ -72,8 +76,11 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
         log.info("Processing demographics update form data: " + queueData.getUuid());
         try {
             if (validate(queueData)) {
+                updatePatientDemographicObs();
                 updateSavedPatientDemographics();
                 Context.getPatientService().savePatient(savedPatient);
+
+
                 String temporaryUuid = getTemporaryPatientUuidFromPayload();
                 if(StringUtils.isNotEmpty(temporaryUuid)) {
                     saveRegistrationData(temporaryUuid);
@@ -123,7 +130,10 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
             }
         }
         if(unsavedPatient.getPersonName() != null) {
-            savedPatient.addName(unsavedPatient.getPersonName());
+            savedPatient.getPersonName().setFamilyName(unsavedPatient.getPersonName().getFamilyName());
+            savedPatient.getPersonName().setGivenName(unsavedPatient.getPersonName().getGivenName());
+            savedPatient.getPersonName().setMiddleName(unsavedPatient.getPersonName().getMiddleName());
+           // savedPatient.addName(unsavedPatient.getPersonName().);
         }
         if(StringUtils.isNotBlank(unsavedPatient.getGender())) {
             savedPatient.setGender(unsavedPatient.getGender());
@@ -133,7 +143,16 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
             savedPatient.setBirthdateEstimated(unsavedPatient.getBirthdateEstimated());
         }
         if(unsavedPatient.getPersonAddress() != null) {
-            savedPatient.addAddress(unsavedPatient.getPersonAddress());
+            savedPatient.getPersonAddress().setStateProvince(unsavedPatient.getPersonAddress().getStateProvince());
+            savedPatient.getPersonAddress().setCountyDistrict(unsavedPatient.getPersonAddress().getCountyDistrict());
+            savedPatient.getPersonAddress().setAddress4(unsavedPatient.getPersonAddress().getAddress4());
+            savedPatient.getPersonAddress().setAddress2(unsavedPatient.getPersonAddress().getAddress2());
+            savedPatient.getPersonAddress().setAddress1(unsavedPatient.getPersonAddress().getAddress1());
+            savedPatient.getPersonAddress().setAddress6(unsavedPatient.getPersonAddress().getAddress6());
+            savedPatient.getPersonAddress().setAddress5(unsavedPatient.getPersonAddress().getAddress5());
+            savedPatient.getPersonAddress().setCityVillage(unsavedPatient.getPersonAddress().getCityVillage());
+
+            //savedPatient.addAddress(unsavedPatient.getPersonAddress());
         }
         if(unsavedPatient.getAttributes() != null) {
             Set<PersonAttribute> attributes = unsavedPatient.getAttributes();
@@ -145,6 +164,47 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
         if(unsavedPatient.getChangedBy() != null) {
             savedPatient.setChangedBy(unsavedPatient.getChangedBy());
         }
+
+
+    }
+    private  void updatePatientDemographicObs() {
+        Patient p = Context.getPatientService().getPatientByUuid(savedPatient.getUuid());
+        ConceptService cs = Context.getConceptService();
+        String occupation = JsonUtils.readAsString(payload, "$['observation']['1542^OCCUPATION^99DCT']");
+        String civilStatus = JsonUtils.readAsString(payload, "$['observation']['1054^CIVIL STATUS^99DCT']");
+        String educationLevel = JsonUtils.readAsString(payload, "$['observation']['1712^HIGHEST EDUCATION LEVEL^99DCT']");
+        Integer occupationConAns = handleEditObsValues(occupation.replace("^", "_"));
+        Integer civilStatusConAns = handleEditObsValues(civilStatus.replace("^", "_"));
+        Integer educationLevelConAns = handleEditObsValues(educationLevel.replace("^", "_"));
+
+        if(occupationConAns != null) {
+            Obs occupationObs = new Obs();
+            occupationObs.setPerson(p);
+            occupationObs.setObsDatetime(new Date());
+            occupationObs.setConcept(cs.getConcept(1542)); // occupation concept
+            occupationObs.setValueCoded(cs.getConcept(occupationConAns));
+            Context.getObsService().saveObs(occupationObs, null);
+        }
+
+        if(civilStatusConAns != null) {
+            Obs civilStatusObs = new Obs();
+            civilStatusObs.setPerson(p);
+            civilStatusObs.setObsDatetime(new Date());
+            civilStatusObs.setConcept(cs.getConcept(1054)); // civil status concept
+            civilStatusObs.setValueCoded(cs.getConcept(civilStatusConAns));
+            Context.getObsService().saveObs(civilStatusObs, null);
+        }
+
+        if(educationLevelConAns != null) {
+            Obs eduLevelObs = new Obs();
+            eduLevelObs.setPerson(p);
+            eduLevelObs.setObsDatetime(new Date());
+            eduLevelObs.setConcept(cs.getConcept(1712)); // education level concept
+            eduLevelObs.setValueCoded(cs.getConcept(educationLevelConAns));
+            Context.getObsService().saveObs(eduLevelObs, null);
+        }
+
+
     }
 
     @Override
@@ -425,14 +485,11 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
     private void setUnsavedPatientBirthDateFromPayload(){
         Date birthDate = JsonUtils.readAsDate(payload, "$['demographicsupdate']['demographicsupdate.birth_date']");
         if(birthDate != null){
-            if(isBirthDateChangeValidated()){
-                unsavedPatient.setBirthdate(birthDate);
-            }else{
-                queueProcessorException.addException(
-                        new Exception("Change of Birth Date requires manual review"));
-            }
+            unsavedPatient.setBirthdate(birthDate);
+
         }
     }
+
 
     private void setUnsavedPatientBirthDateEstimatedFromPayload(){
         boolean birthdateEstimated = JsonUtils.readAsBoolean(payload,
@@ -443,21 +500,18 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
     private void setUnsavedPatientGenderFromPayload(){
         String gender = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.sex']");
         if(StringUtils.isNotBlank(gender)){
-            if(isGenderChangeValidated()){
-                unsavedPatient.setGender(gender);
-            }else{
-                queueProcessorException.addException(
-                        new Exception("Change of Gender requires manual review"));
-            }
+            unsavedPatient.setGender(gender);
         }
     }
 
     private void setUnsavedPatientNameFromPayload(){
+
         PersonName personName = new PersonName();
         String givenName = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.given_name']");
         if(StringUtils.isNotBlank(givenName)){
             personName.setGivenName(givenName);
         }
+        
         String familyName = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.family_name']");
         if(StringUtils.isNotBlank(familyName)){
             personName.setFamilyName(familyName);
@@ -523,7 +577,31 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
         String county = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.county']");
         if(StringUtils.isNotEmpty(county)) {
             if(personAddress == null) personAddress = new PersonAddress();
-            personAddress.setStateProvince(county);
+            personAddress.setCountyDistrict(county);
+        }
+
+        String subCounty = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.sub_county']");
+        if(StringUtils.isNotEmpty(subCounty)) {
+            if(personAddress == null) personAddress = new PersonAddress();
+            personAddress.setStateProvince(subCounty);
+        }
+
+        String ward = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.ward']");
+        if(StringUtils.isNotEmpty(ward)) {
+            if(personAddress == null) personAddress = new PersonAddress();
+            personAddress.setAddress4(ward);
+        }
+
+        String landMark = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.landmark']");
+        if(StringUtils.isNotEmpty(landMark)) {
+            if(personAddress == null) personAddress = new PersonAddress();
+            personAddress.setAddress2(landMark);
+        }
+
+        String postalAddress = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.postal_address']");
+        if(StringUtils.isNotEmpty(postalAddress)) {
+            if(personAddress == null) personAddress = new PersonAddress();
+            personAddress.setAddress1(postalAddress);
         }
 
         String location = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.location']");
@@ -605,7 +683,39 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
 
         String phoneNumber = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.phone_number']");
         if(StringUtils.isNotEmpty(phoneNumber))
-            attributes.add(createPersonAttribute("Contact Phone Number",null, phoneNumber));
+            attributes.add(createPersonAttribute("Telephone contact",null, phoneNumber));
+
+        String nearestHealthFacility = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.nearest_health_center']");
+        if(StringUtils.isNotEmpty(nearestHealthFacility))
+            attributes.add(createPersonAttribute(null,JsonRegistrationQueueDataHandler.NEAREST_HEALTH_CENTER, nearestHealthFacility));
+
+        String alternativePhoneNumber = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.alternate_phone_contact']");
+        if(StringUtils.isNotEmpty(alternativePhoneNumber))
+            attributes.add(createPersonAttribute(null,JsonRegistrationQueueDataHandler.ALTERNATE_PHONE_CONTACT, alternativePhoneNumber));
+
+        String emailAddress = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.email_address']");
+        if(StringUtils.isNotEmpty(emailAddress))
+            attributes.add(createPersonAttribute(null,JsonRegistrationQueueDataHandler.EMAIL_ADDRESS, emailAddress));
+
+        String nxtOfKinName = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.next_of_kin_name']");
+        if(StringUtils.isNotEmpty(nxtOfKinName))
+            attributes.add(createPersonAttribute(null,JsonRegistrationQueueDataHandler.NEXT_OF_KIN_NAME, nxtOfKinName));
+
+        String nxtOfKinContact = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.next_of_kin_contact']");
+        if(StringUtils.isNotEmpty(nxtOfKinContact))
+            attributes.add(createPersonAttribute(null,JsonRegistrationQueueDataHandler.NEXT_OF_KIN_CONTACT, nxtOfKinContact));
+
+        String nxtOfKinAddress = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.next_of_kin_address']");
+        if(StringUtils.isNotEmpty(nxtOfKinAddress))
+            attributes.add(createPersonAttribute(null,JsonRegistrationQueueDataHandler.NEXT_OF_KIN_ADDRESS, nxtOfKinAddress));
+
+
+        String nxtOfKinRelationship = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.next_of_kin_relationship']");
+        if(StringUtils.isNotEmpty(nxtOfKinRelationship))
+            attributes.add(createPersonAttribute(null,JsonRegistrationQueueDataHandler.NEXT_OF_KIN_RELATIONSHIP, nxtOfKinRelationship));
+
+
+
         return attributes;
     }
 
@@ -656,6 +766,20 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
 
     private boolean isGenderChangeValidated(){
         return JsonUtils.readAsBoolean(payload, "$['demographicsupdate']['demographicsupdate.gender_change_validated']");
+    }
+
+    private Integer handleEditObsValues(String obsValue) {
+        ArrayNode arrNodeValues = JsonNodeFactory.instance.arrayNode();
+        Integer conceptValue = null;
+        if (obsValue !=null) {
+            for (String s : obsValue.split("_")) {
+                arrNodeValues.add(s);
+            }
+            if (arrNodeValues != null) {
+                conceptValue = Integer.parseInt(arrNodeValues.get(0).getTextValue()) ;
+            }
+        }
+        return conceptValue;
     }
 
     @Override

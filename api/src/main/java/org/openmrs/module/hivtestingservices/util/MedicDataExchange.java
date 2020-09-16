@@ -100,6 +100,33 @@ public class MedicDataExchange {
         return "Data queue registration created successfully";
     }
 
+    public String processDemographicsUpdate(String resultPayload) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = null;
+        try {
+            jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (jsonNode != null) {
+            ObjectNode demographicUpdateNode = processDemographicUpdatePayload(jsonNode);
+            String payload = demographicUpdateNode.toString();
+            String discriminator = demographicUpdateNode.path("discriminator").path("discriminator").getTextValue();
+            String formDataUuid = demographicUpdateNode.path("encounter").path("encounter.form_uuid").getTextValue();
+            String patientUuid = demographicUpdateNode.path("patient").path("patient.uuid").getTextValue();
+            Integer locationId = Integer.parseInt(demographicUpdateNode.path("encounter").path("encounter.location_id").getTextValue());
+            String providerString = demographicUpdateNode.path("encounter").path("encounter.provider_id").getTextValue();
+            String userName = demographicUpdateNode.path("encounter").path("encounter.user_system_id").getTextValue();
+            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid,userName);
+        }
+        return "Data queue demographics updates created successfully";
+    }
+
+
+
+
+
     private void saveMedicDataQueue(String payload, Integer locationId, String providerString, String patientUuid, String discriminator,
                                     String formUuid ,String userString) {
         DataSource dataSource = dataService.getDataSource(1);
@@ -134,6 +161,7 @@ public class MedicDataExchange {
         ObjectNode encounter = getJsonNodeFactory().objectNode();
         ObjectNode identifier = getJsonNodeFactory().objectNode();
         ObjectNode registrationWrapper = getJsonNodeFactory().objectNode();
+        Date date = new Date();
 
         String patientDobKnown = jsonNode.get("patient_dobKnown") !=null ? jsonNode.get("patient_dobKnown").getTextValue():"";
         String dateOfBirth= null;
@@ -148,12 +176,13 @@ public class MedicDataExchange {
             dateOfBirth = jsonNode.get("patient_dateOfBirth").getTextValue();
             patientNode.put("patient.birth_date", formatStringDate(dateOfBirth));
         }
+        String patientGender = jsonNode.get("patient_sex") != null ? jsonNode.get("patient_sex").getTextValue(): "";
 
-        patientNode.put("patient.uuid",jsonNode.get("_id").getTextValue());
+        patientNode.put("patient.uuid", jsonNode.get("_id") != null ? jsonNode.get("_id").getTextValue(): "");
         patientNode.put("patient.family_name",jsonNode.get("patient_familyName") != null ? jsonNode.get("patient_familyName").getTextValue():"");
         patientNode.put("patient.given_name",jsonNode.get("patient_firstName") != null ? jsonNode.get("patient_firstName").getTextValue():"");
         patientNode.put("patient.middle_name",jsonNode.get("patient_middleName") != null ? jsonNode.get("patient_middleName").getTextValue(): "");
-        patientNode.put("patient.sex",gender(jsonNode.get("patient_sex").getTextValue()));
+        patientNode.put("patient.sex",gender(patientGender));
         patientNode.put("patient.county",jsonNode.get("patient_county") != null ? jsonNode.get("patient_county").getTextValue():"");
         patientNode.put("patient.sub_county",jsonNode.get("patient_subcounty") != null ? jsonNode.get("patient_subcounty").getTextValue():"");
         patientNode.put("patient.ward",jsonNode.get("patient_ward") !=null ? jsonNode.get("patient_ward").getTextValue():"");
@@ -162,12 +191,12 @@ public class MedicDataExchange {
         patientNode.put("patient.village",jsonNode.get("patient_village") != null ? jsonNode.get("patient_village").getTextValue() :"");
         patientNode.put("patient.landmark",jsonNode.get("patient_landmark") != null ? jsonNode.get("patient_landmark").getTextValue():"");
         patientNode.put("patient.phone_number",jsonNode.get("patient_telephone") != null ? jsonNode.get("patient_telephone").getTextValue():"");
-        patientNode.put("patient.alternate_phone_contact",jsonNode.get("patient_alternatePhone").getTextValue());
+        patientNode.put("patient.alternate_phone_contact",jsonNode.get("patient_alternatePhone") !=null ? jsonNode.get("patient_alternatePhone").getTextValue():"");
         patientNode.put("patient.postal_address",jsonNode.get("patient_postalAddress") != null ? jsonNode.get("patient_postalAddress").getTextValue():"");
         patientNode.put("patient.email_address",jsonNode.get("patient_emailAddress") != null ? jsonNode.get("patient_emailAddress").getTextValue():"");
         patientNode.put("patient.nearest_health_center",jsonNode.get("patient_nearesthealthcentre") != null ? jsonNode.get("patient_nearesthealthcentre").getTextValue():"");
         patientNode.put("patient.next_of_kin_name",jsonNode.get("patient_nextofkin") != null ? jsonNode.get("patient_nextofkin").getTextValue() : "");
-        patientNode.put("patient.next_of_kin_relationship",jsonNode.get("patient_nextofkinRelationship").getTextValue());
+        patientNode.put("patient.next_of_kin_relationship",jsonNode.get("patient_nextofkinRelationship") != null ? jsonNode.get("patient_nextofkinRelationship").getTextValue(): "");
         patientNode.put("patient.next_of_kin_contact",jsonNode.get("patient_nextOfKinPhonenumber") != null ? jsonNode.get("patient_nextOfKinPhonenumber").getTextValue():"");
         patientNode.put("patient.next_of_kin_address",jsonNode.get("patient_nextOfKinPostaladdress") !=  null ? jsonNode.get("patient_nextOfKinPostaladdress").getTextValue():"");
         patientNode.put("patient.otheridentifier",getIdentifierTypes(jsonNode));
@@ -182,11 +211,12 @@ public class MedicDataExchange {
         String creator =   jsonNode.path("meta").path("created_by") != null ? jsonNode.path("meta").path("created_by").getTextValue() : "";
         String providerId = checkProviderNameExists(creator);
         String systemId = confirmUserNameExists(creator);
+        Long longDate = jsonNode.get("reported_date") !=null ? jsonNode.get("reported_date").getLongValue(): date.getTime();
 
         encounter.put("encounter.location_id",locationId != null ? locationId.toString() : null);
         encounter.put("encounter.provider_id_select",providerId != null ? providerId: " ");
         encounter.put("encounter.provider_id",providerId != null ? providerId: " ");
-        encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
+        encounter.put("encounter.encounter_datetime",convertTime(longDate));
         encounter.put("encounter.form_uuid","8898c6e1-5df1-409f-b8ed-c88e6e0f24e9");
         encounter.put("encounter.user_system_id",systemId);
         encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
@@ -277,7 +307,7 @@ public class MedicDataExchange {
         if (jsonNode != null) {
             String payload = jsonNode.toString();
             String discriminator = "json-patientcontact";
-            String patientContactUuid = jsonNode.get("_id").getTextValue();
+            String patientContactUuid = jsonNode.get("_id") != null ? jsonNode.get("_id").getTextValue() : "";
             Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
             String creator =   jsonNode.path("meta").path("created_by") != null ? jsonNode.path("meta").path("created_by").getTextValue() : "";
             String providerString = checkProviderNameExists(creator);
@@ -299,7 +329,7 @@ public class MedicDataExchange {
         if (jsonNode != null) {
             String discriminator = "json-contacttrace";
             String payload = jsonNode.toString();
-            String patientContactUuid = jsonNode.get("_id").getTextValue();
+            String patientContactUuid = jsonNode.get("_id") != null ? jsonNode.get("_id").getTextValue() : "";
             Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
             String creator = jsonNode.path("fields").path("audit_trail").path("created_by") != null && jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() != null ? jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() : "";
             String providerString = checkProviderNameExists(creator);
@@ -321,7 +351,7 @@ public class MedicDataExchange {
     private ArrayNode getIdentifierTypes(ObjectNode jsonNode) {
         ArrayNode identifierTypes = JsonNodeFactory.instance.arrayNode();
 
-        String chtContactUuid = jsonNode.get("_id").getTextValue();
+        String chtContactUuid = jsonNode.get("_id") != null ? jsonNode.get("_id").getTextValue():"";
         ObjectNode assignedCHTReference = assignCHTReferenceUUID(chtContactUuid);
         identifierTypes.add(assignedCHTReference);
         Iterator<Map.Entry<String,JsonNode>> iterator = jsonNode.getFields();
@@ -867,6 +897,103 @@ public class MedicDataExchange {
         return factory;
     }
 
+    private ObjectNode processDemographicUpdatePayload (ObjectNode jNode) {
+
+        ObjectNode jsonNode = (ObjectNode) jNode.get("demographicUpdate");
+        ObjectNode patientNode = getJsonNodeFactory().objectNode();
+        ObjectNode demographicsUpdateNode = getJsonNodeFactory().objectNode();
+        ObjectNode obs = getJsonNodeFactory().objectNode();
+        ObjectNode tmp = getJsonNodeFactory().objectNode();
+        ObjectNode discriminator = getJsonNodeFactory().objectNode();
+        ObjectNode encounter = getJsonNodeFactory().objectNode();
+        ObjectNode demographicUpdateWrapper = getJsonNodeFactory().objectNode();
+
+        String patientDobKnown = jsonNode.get("patient_dobKnown") !=null ? jsonNode.get("patient_dobKnown").getTextValue():"";
+        String dateOfBirth= null;
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("_1066_No_99DCT") && jsonNode.get("patient_birthDate") != null) {
+            dateOfBirth = jsonNode.get("patient_birthDate").getTextValue();
+            patientNode.put("patient.birthdate_estimated", "true");
+            patientNode.put("patient.birth_date", formatStringDate(dateOfBirth));
+
+        }
+
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("_1065_Yes_99DCT") && jsonNode.get("patient_dateOfBirth") != null) {
+            dateOfBirth = jsonNode.get("patient_dateOfBirth").getTextValue();
+            patientNode.put("patient.birth_date", formatStringDate(dateOfBirth));
+        }
+        String patientGender = jsonNode.get("patient_sex") != null ? jsonNode.get("patient_sex").getTextValue():"";
+
+        patientNode.put("patient.uuid",jsonNode.get("_id") != null ? jsonNode.get("_id").getTextValue():"");
+        patientNode.put("patient.family_name",jsonNode.get("patient_familyName") != null ? jsonNode.get("patient_familyName").getTextValue():"");
+        patientNode.put("patient.given_name",jsonNode.get("patient_firstName") != null ? jsonNode.get("patient_firstName").getTextValue():"");
+        patientNode.put("patient.middle_name",jsonNode.get("patient_middleName") != null ? jsonNode.get("patient_middleName").getTextValue(): "");
+        patientNode.put("patient.sex",gender(patientGender));
+
+
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("_1066_No_99DCT") && jsonNode.get("patient_birthDate") != null) {
+            dateOfBirth = jsonNode.get("patient_birthDate").getTextValue();
+            demographicsUpdateNode.put("demographicsupdate.birthdate_estimated", "true");
+            demographicsUpdateNode.put("demographicsupdate.birth_date", formatStringDate(dateOfBirth));
+
+        }
+
+        if(patientDobKnown !=null && patientDobKnown.equalsIgnoreCase("_1065_Yes_99DCT") && jsonNode.get("patient_dateOfBirth") != null) {
+            dateOfBirth = jsonNode.get("patient_dateOfBirth").getTextValue();
+            demographicsUpdateNode.put("demographicsupdate.birth_date", formatStringDate(dateOfBirth));
+        }
+
+        demographicsUpdateNode.put("demographicsupdate.temporal_patient_uuid",jsonNode.get("_id") !=null ? jsonNode.get("_id").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.family_name",jsonNode.get("patient_familyName") != null ? jsonNode.get("patient_familyName").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.given_name",jsonNode.get("patient_firstName") != null ? jsonNode.get("patient_firstName").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.middle_name",jsonNode.get("patient_middleName") != null ? jsonNode.get("patient_middleName").getTextValue(): "");
+        demographicsUpdateNode.put("demographicsupdate.sex",gender(patientGender));
+        demographicsUpdateNode.put("demographicsupdate.county",jsonNode.get("patient_county") != null ? jsonNode.get("patient_county").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.sub_county",jsonNode.get("patient_subcounty") != null ? jsonNode.get("patient_subcounty").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.ward",jsonNode.get("patient_ward") !=null ? jsonNode.get("patient_ward").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.sub_location",jsonNode.get("patient_sublocation") !=null ? jsonNode.get("patient_sublocation").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.location",jsonNode.get("patient_location") !=null ? jsonNode.get("patient_location").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.village",jsonNode.get("patient_village") != null ? jsonNode.get("patient_village").getTextValue() :"");
+        demographicsUpdateNode.put("demographicsupdate.landmark",jsonNode.get("patient_landmark") != null ? jsonNode.get("patient_landmark").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.phone_number",jsonNode.get("patient_telephone") != null ? jsonNode.get("patient_telephone").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.alternate_phone_contact",jsonNode.get("patient_alternatePhone") != null ? jsonNode.get("patient_alternatePhone").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.postal_address",jsonNode.get("patient_postalAddress") != null ? jsonNode.get("patient_postalAddress").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.email_address",jsonNode.get("patient_emailAddress") != null ? jsonNode.get("patient_emailAddress").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.nearest_health_center",jsonNode.get("patient_nearesthealthcentre") != null ? jsonNode.get("patient_nearesthealthcentre").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.next_of_kin_name",jsonNode.get("patient_nextofkin") != null ? jsonNode.get("patient_nextofkin").getTextValue() : "");
+        demographicsUpdateNode.put("demographicsupdate.next_of_kin_relationship",jsonNode.get("patient_nextofkinRelationship") != null ? jsonNode.get("patient_nextofkinRelationship").getTextValue(): "");
+        demographicsUpdateNode.put("demographicsupdate.next_of_kin_contact",jsonNode.get("patient_nextOfKinPhonenumber") != null ? jsonNode.get("patient_nextOfKinPhonenumber").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.next_of_kin_address",jsonNode.get("patient_nextOfKinPostaladdress") !=  null ? jsonNode.get("patient_nextOfKinPostaladdress").getTextValue():"");
+        demographicsUpdateNode.put("demographicsupdate.otheridentifier",getIdentifierTypes(jsonNode));
+
+        obs.put("1054^CIVIL STATUS^99DCT",jsonNode.get("patient_marital_status") != null && !jsonNode.get("patient_marital_status").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_marital_status").getTextValue().replace("_","^").substring(1):"");
+        obs.put("1542^OCCUPATION^99DCT",jsonNode.get("patient_occupation") != null && !jsonNode.get("patient_occupation").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_occupation").getTextValue().replace("_","^").substring(1): "");
+        obs.put("1712^HIGHEST EDUCATION LEVEL^99DCT",jsonNode.get("patient_education_level") !=null && !jsonNode.get("patient_education_level").getTextValue().equalsIgnoreCase("") ? jsonNode.get("patient_education_level").getTextValue().replace("_","^").substring(1):"");
+
+        tmp.put("tmp.birthdate_type","age");
+        tmp.put("tmp.age_in_years", jsonNode.get("patient_ageYears") != null ? jsonNode.get("patient_ageYears").getTextValue() : "");
+        discriminator.put("discriminator","json-demographics-update");
+        String creator =   jsonNode.path("meta").path("created_by") != null ? jsonNode.path("meta").path("created_by").getTextValue() : "";
+        String providerId = checkProviderNameExists(creator);
+        String systemId = confirmUserNameExists(creator);
+
+        encounter.put("encounter.location_id",locationId != null ? locationId.toString() : null);
+        encounter.put("encounter.provider_id_select",providerId != null ? providerId: " ");
+        encounter.put("encounter.provider_id",providerId != null ? providerId: " ");
+        encounter.put("encounter.encounter_datetime",convertTime(jsonNode.get("reported_date").getLongValue()));
+        encounter.put("encounter.form_uuid","8898c6e1-5df1-409f-b8ed-c88e6e0f24e9");
+        encounter.put("encounter.user_system_id",systemId);
+        encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
+        encounter.put("encounter.setup_config_uuid","2107eab5-5b3a-4de8-9e02-9d97bce635d2");
+
+        demographicUpdateWrapper.put("patient",patientNode);
+        demographicUpdateWrapper.put("demographicsupdate",demographicsUpdateNode);
+        demographicUpdateWrapper.put("observation",obs);
+        demographicUpdateWrapper.put("tmp",tmp);
+        demographicUpdateWrapper.put("discriminator",discriminator);
+        demographicUpdateWrapper.put("encounter",encounter);
+        return demographicUpdateWrapper;
+    }
+
     public static SimpleDateFormat getSimpleDateFormat(String pattern) {
         return new SimpleDateFormat(pattern);
     }
@@ -920,6 +1047,8 @@ public class MedicDataExchange {
 
         return addressNode;
     }
+
+
 
     /**
      * get a patient's phone contact

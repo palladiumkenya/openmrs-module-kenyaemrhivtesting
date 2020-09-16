@@ -110,4 +110,27 @@ public class MobileApplicationRestController extends BaseRestController {
         }
         return new SimpleObject().add("Report", "The request could not be interpreted properly");
     }
+
+    /**
+     * processes demographics updates
+     * @param request
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/medicDemographicUpdates") // end point for processing demographic updates
+    @ResponseBody
+    public Object processDemographicUpdates(HttpServletRequest request) {
+        String requestBody = null;
+        try {
+            requestBody = Utils.fetchRequestBody(request.getReader());
+        } catch (IOException e) {
+            return new SimpleObject().add("ServerResponse", "Error extracting request body");
+        }
+
+        if (requestBody != null) {
+            MedicDataExchange shr = new MedicDataExchange();
+            return shr.processDemographicsUpdate(requestBody);
+
+        }
+        return new SimpleObject().add("Report", "The request could not be interpreted properly");
+    }
 }
