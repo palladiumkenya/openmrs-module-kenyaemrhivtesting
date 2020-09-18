@@ -123,6 +123,30 @@ public class MedicDataExchange {
         return "Data queue demographics updates created successfully";
     }
 
+    public String processPeerCalenderFormData(String resultPayload) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonNode = null;
+        try {
+            jsonNode = (ObjectNode) mapper.readTree(resultPayload);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (jsonNode != null) {
+
+            ObjectNode formNode =  processPeerCalenderPayload(jsonNode);
+            String payload = formNode.toString();
+            String discriminator = formNode.path("discriminator").path("discriminator").getTextValue();
+            String formDataUuid = formNode.path("encounter").path("encounter.form_uuid").getTextValue();
+            String patientUuid = formNode.path("patient").path("patient.uuid").getTextValue();
+            Integer locationId = Integer.parseInt(formNode.path("encounter").path("encounter.location_id").getTextValue());
+            String providerString = formNode.path("encounter").path("encounter.provider_id").getTextValue();
+            String userName = formNode.path("encounter").path("encounter.user_system_id").getTextValue();
+            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid, userName);
+        }
+        return "Data queue form created successfully";
+    }
+
 
 
 
@@ -294,6 +318,71 @@ public class MedicDataExchange {
         formsNode.put("encounter",encounter);
         return   formsNode;
     }
+
+    private ObjectNode processPeerCalenderPayload (ObjectNode jNode) {
+        ObjectNode jsonNode = (ObjectNode) jNode.get("peerCalenderData");
+        ObjectNode formsNode = JsonNodeFactory.instance.objectNode();
+        ObjectNode discriminator = JsonNodeFactory.instance.objectNode();
+        ObjectNode encounter = JsonNodeFactory.instance.objectNode();
+        ObjectNode patientNode = JsonNodeFactory.instance.objectNode();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode obsNodes = null;
+        ObjectNode jsonNodes = null;
+        String json = null;
+        try {
+            jsonNodes = (ObjectNode) mapper.readTree(jsonNode.path("fields").path("observation").toString());
+            json = new ObjectMapper().writeValueAsString(jsonNodes);
+            if(json != null) {
+                obsNodes = (ObjectNode) mapper.readTree(json.replace("_","^"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String encounterDate = jsonNode.path("fields").path("encounter_date").getTextValue() != null && !jsonNode.path("fields").path("encounter_date").getTextValue().equalsIgnoreCase("") ? formatStringDate(jsonNode.path("fields").path("encounter_date").getTextValue()) : convertTime(jsonNode.get("reported_date").getLongValue());
+        String creator = jsonNode.path("fields").path("audit_trail").path("created_by") != null && jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() != null ? jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() : "";
+        String providerIdentifier = checkProviderNameExists(creator);
+        String systemId = confirmUserNameExists(creator);
+        discriminator.put("discriminator","json-peerCalender");
+        encounter.put("encounter.location_id",locationId != null ? locationId.toString(): null);
+        encounter.put("encounter.provider_id_select",providerIdentifier != null ? providerIdentifier: " ");
+        encounter.put("encounter.provider_id",providerIdentifier != null ? providerIdentifier: " ");
+        encounter.put("encounter.encounter_datetime",encounterDate);
+        encounter.put("encounter.form_uuid",jsonNode.path("fields").path("form_uuid").getTextValue());
+        encounter.put("encounter.user_system_id",systemId);
+        encounter.put("encounter.device_time_zone","Africa\\/Nairobi");
+        encounter.put("encounter.setup_config_uuid",jsonNode.path("fields").path("encounter_type_uuid").getTextValue());
+        String kemrUuid = jsonNode.path("fields").path("inputs").path("contact").path("kemr_uuid").getTextValue();
+
+        patientNode.put("patient.uuid", StringUtils.isNotBlank(kemrUuid) ? kemrUuid : jsonNode.path("fields").path("inputs").path("contact").path("_id").getTextValue());
+
+        List<String> keysToRemove = new ArrayList<String>();
+        if(obsNodes != null){
+            Iterator<Map.Entry<String,JsonNode>> iterator = obsNodes.getFields();
+            while (iterator.hasNext()) {
+                Map.Entry<String, JsonNode> entry = iterator.next();
+                if(entry.getKey().contains("MULTISELECT")) {
+                    if (entry.getValue() != null && !"".equals(entry.getValue().toString()) && !"".equals(entry.getValue().toString())) {
+                        obsNodes.put(entry.getKey(), handleMultiSelectFields(entry.getValue().toString().replace(" ",",")));
+                    } else {
+                        keysToRemove.add(entry.getKey());
+                    }
+                }
+            }
+        }
+
+        if (keysToRemove.size() > 0) {
+            for (String key : keysToRemove) {
+                obsNodes.remove(key);
+            }
+        }
+        formsNode.put("patient", patientNode);
+        formsNode.put("observation", obsNodes);
+        formsNode.put("discriminator",discriminator);
+        formsNode.put("encounter",encounter);
+        return   formsNode;
+    }
+
 
     public String addContactListToDataqueue(String resultPayload) {
         ObjectMapper mapper = new ObjectMapper();
