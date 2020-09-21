@@ -1,22 +1,27 @@
 package org.openmrs.module.hivtestingservices.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
-import org.openmrs.Form;
+
+import org.openmrs.PersonAttributeType;
+import org.openmrs.Provider;
 import org.openmrs.Location;
+import org.openmrs.User;
+import org.openmrs.Form;
+import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAddress;
-import org.openmrs.PersonAttributeType;
-import org.openmrs.Provider;
-import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
+
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.service.DataService;
 import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
@@ -45,6 +50,8 @@ public class MedicDataExchange {
 
     static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
     private Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
+    private final Log log = LogFactory.getLog(MedicDataExchange.class);
+
 
     /**
      * processes results from cht     *
@@ -357,10 +364,19 @@ public class MedicDataExchange {
         patientNode.put("patient.uuid", StringUtils.isNotBlank(kemrUuid) ? kemrUuid : jsonNode.path("fields").path("inputs").path("contact").path("_id").getTextValue());
 
         List<String> keysToRemove = new ArrayList<String>();
+        ObjectNode  jsonObsNodes = null;
+        ObjectNode  obsGroupNode = null;
+        String jsonObsGroup = null;
         if(obsNodes != null){
+
             Iterator<Map.Entry<String,JsonNode>> iterator = obsNodes.getFields();
             while (iterator.hasNext()) {
                 Map.Entry<String, JsonNode> entry = iterator.next();
+
+                if(entry.getValue() ==null || "".equals(entry.getValue().toString()) ) {
+                    keysToRemove.add(entry.getKey());
+                }
+
                 if(entry.getKey().contains("MULTISELECT")) {
                     if (entry.getValue() != null && !"".equals(entry.getValue().toString()) && !"".equals(entry.getValue().toString())) {
                         obsNodes.put(entry.getKey(), handleMultiSelectFields(entry.getValue().toString().replace(" ",",")));
@@ -368,6 +384,65 @@ public class MedicDataExchange {
                         keysToRemove.add(entry.getKey());
                     }
                 }
+
+
+                String[] conceptElements = org.apache.commons.lang.StringUtils.split(entry.getKey(), "\\^");
+                int conceptId = Integer.parseInt(conceptElements[0]);
+                Concept concept = Context.getConceptService().getConcept(conceptId);
+
+                if (concept == null) {
+                    log.info("Unable to find Concept for Question with ID:: " + conceptId);
+
+                }else {
+
+                    if (concept.isSet()) {
+
+                        try {
+                            if(entry.getValue().isObject()) {
+                                jsonObsNodes = (ObjectNode) mapper.readTree(entry.getValue().toString());
+                                jsonObsGroup = new ObjectMapper().writeValueAsString(jsonObsNodes);
+                                if (jsonObsGroup != null) {
+                                    obsGroupNode = (ObjectNode) mapper.readTree(jsonObsGroup);
+                                }
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        List<String> keysToRemoveForObsGroup = new ArrayList<String>();
+
+
+                        if(obsGroupNode != null) {
+                            Iterator<Map.Entry<String,JsonNode>> obsGroupIterator = obsGroupNode.getFields();
+                            while (obsGroupIterator.hasNext()) {
+                                Map.Entry<String, JsonNode> obsGroupEntry = obsGroupIterator.next();
+                                if(obsGroupEntry.getValue() ==null || "".equals(obsGroupEntry.getValue().toString()) ) {
+                                    keysToRemoveForObsGroup.add(obsGroupEntry.getKey());
+                                    if (keysToRemoveForObsGroup.size() > 0) {
+                                        for (String key : keysToRemoveForObsGroup) {
+                                            obsGroupNode.remove(key);
+                                        }
+                                    }
+                                }
+                                if(obsGroupEntry.getKey().contains("MULTISELECT")) {
+                                    if (obsGroupEntry.getValue() != null && !"".equals(obsGroupEntry.getValue().toString()) && !"".equals(obsGroupEntry.getValue().toString())) {
+                                        obsGroupNode.put(obsGroupEntry.getKey(), handleMultiSelectFields(obsGroupEntry.getValue().toString().replace(" ",",")));
+                                        obsNodes.put(entry.getKey(),obsGroupNode);
+                                    } else {
+                                        keysToRemoveForObsGroup.add(obsGroupEntry.getKey());
+                                        if (keysToRemoveForObsGroup.size() > 0) {
+                                            for (String key : keysToRemoveForObsGroup) {
+                                                obsGroupNode.remove(key);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+
             }
         }
 
@@ -437,6 +512,7 @@ public class MedicDataExchange {
         }
         return arrNode;
     }
+
     private ArrayNode getIdentifierTypes(ObjectNode jsonNode) {
         ArrayNode identifierTypes = JsonNodeFactory.instance.arrayNode();
 
