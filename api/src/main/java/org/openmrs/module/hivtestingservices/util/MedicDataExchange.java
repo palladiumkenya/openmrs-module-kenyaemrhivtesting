@@ -649,7 +649,6 @@ public class MedicDataExchange {
     }
 
 
-
     /**
      * Get a list of contacts for tracing
      * @return

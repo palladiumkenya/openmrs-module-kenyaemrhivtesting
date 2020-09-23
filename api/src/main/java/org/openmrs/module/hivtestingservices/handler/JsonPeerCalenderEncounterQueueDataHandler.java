@@ -270,29 +270,32 @@ public class JsonPeerCalenderEncounterQueueDataHandler implements QueueDataHandl
         }else{
             value = o.toString();
         }
-        // find the obs value :)
-        if (concept.getDatatype().isNumeric()) {
-            obs.setValueNumeric(Double.parseDouble(value));
-        } else if (concept.getDatatype().isDate()
-                || concept.getDatatype().isTime()
-                || concept.getDatatype().isDateTime()) {
-            obs.setValueDatetime(parseDate(value));
-        } else if (concept.getDatatype().isCoded() || concept.getDatatype().isBoolean()) {
-            String[] valueCodedElements = StringUtils.split(value, "\\^");
-            int valueCodedId = Integer.parseInt(valueCodedElements[0]);
-            Concept valueCoded = Context.getConceptService().getConcept(valueCodedId);
-            if (valueCoded == null) {
-                queueProcessorException.addException(new Exception("Unable to find concept for value coded with id: " + valueCodedId));
-            } else {
-                obs.setValueCoded(valueCoded);
+          // only process if value is not null/empty
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(value)) {
+            // find the obs value :)
+            if (concept.getDatatype().isNumeric()) {
+                obs.setValueNumeric(Double.parseDouble(value));
+            } else if (concept.getDatatype().isDate()
+                    || concept.getDatatype().isTime()
+                    || concept.getDatatype().isDateTime()) {
+                obs.setValueDatetime(parseDate(value));
+            } else if (concept.getDatatype().isCoded() || concept.getDatatype().isBoolean()) {
+                String[] valueCodedElements = StringUtils.split(value, "\\^");
+                int valueCodedId = Integer.parseInt(valueCodedElements[0]);
+                Concept valueCoded = Context.getConceptService().getConcept(valueCodedId);
+                if (valueCoded == null) {
+                    queueProcessorException.addException(new Exception("Unable to find concept for value coded with id: " + valueCodedId));
+                } else {
+                    obs.setValueCoded(valueCoded);
+                }
+            } else if (concept.getDatatype().isText()) {
+                obs.setValueText(value);
             }
-        } else if (concept.getDatatype().isText()) {
-            obs.setValueText(value);
-        }
-        // only add if the value is not empty :)
-        encounter.addObs(obs);
-        if (parentObs != null) {
-            parentObs.addGroupMember(obs);
+            // only add if the value is not empty :)
+            encounter.addObs(obs);
+            if (parentObs != null) {
+                parentObs.addGroupMember(obs);
+            }
         }
     }
 
