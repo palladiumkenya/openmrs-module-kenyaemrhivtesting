@@ -327,7 +327,7 @@ public class MedicDataExchange {
     }
 
     private ObjectNode processPeerCalenderPayload (ObjectNode jNode) {
-        ObjectNode jsonNode = (ObjectNode) jNode.get("peerCalenderData");
+        ObjectNode jsonNode = (ObjectNode) jNode.get("peerCalendarData");
         ObjectNode formsNode = JsonNodeFactory.instance.objectNode();
         ObjectNode discriminator = JsonNodeFactory.instance.objectNode();
         ObjectNode encounter = JsonNodeFactory.instance.objectNode();
@@ -350,7 +350,7 @@ public class MedicDataExchange {
         String creator = jsonNode.path("fields").path("audit_trail").path("created_by") != null && jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() != null ? jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() : "";
         String providerIdentifier = checkProviderNameExists(creator);
         String systemId = confirmUserNameExists(creator);
-        discriminator.put("discriminator","json-peerCalender");
+        discriminator.put("discriminator","json-peerCalendar");
         encounter.put("encounter.location_id",locationId != null ? locationId.toString(): null);
         encounter.put("encounter.provider_id_select",providerIdentifier != null ? providerIdentifier: " ");
         encounter.put("encounter.provider_id",providerIdentifier != null ? providerIdentifier: " ");

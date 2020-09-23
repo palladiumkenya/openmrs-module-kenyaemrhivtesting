@@ -64,7 +64,7 @@ import java.util.*;
 @Handler(supports = QueueData.class, order = 5)
 public class JsonPeerCalenderEncounterQueueDataHandler implements QueueDataHandler {
 
-    private static final String DISCRIMINATOR_VALUE = "json-peerCalender";
+    private static final String DISCRIMINATOR_VALUE = "json-peerCalendar";
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private static final DateFormat dateTimeFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
