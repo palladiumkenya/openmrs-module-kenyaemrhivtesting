@@ -70,7 +70,7 @@ public class MobileApplicationRestController extends BaseRestController {
      * @param request
      * @return
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/medicContactsdata") // end point for medic contacts data
+    @RequestMapping(method = RequestMethod.POST, value = "/mediccontactsdata") // end point for medic contacts data
     @ResponseBody
     public Object processMedicContactsData(HttpServletRequest request) {
         String requestBody = null;
@@ -93,7 +93,7 @@ public class MobileApplicationRestController extends BaseRestController {
      * @param request
      * @return
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/medicContactTracedata") // end point for medic contact trace data
+    @RequestMapping(method = RequestMethod.POST, value = "/mediccontacttracedata") // end point for medic contact trace data
     @ResponseBody
     public Object processMedicContactTraceData(HttpServletRequest request) {
         String requestBody = null;
@@ -116,7 +116,7 @@ public class MobileApplicationRestController extends BaseRestController {
      * @param request
      * @return
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/medicDemographicUpdates") // end point for processing demographic updates
+    @RequestMapping(method = RequestMethod.POST, value = "/medicdemographicupdates") // end point for processing demographic updates
     @ResponseBody
     public Object processDemographicUpdates(HttpServletRequest request) {
         String requestBody = null;
@@ -140,7 +140,7 @@ public class MobileApplicationRestController extends BaseRestController {
      * @param request
      * @return
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/medicPeerCalender") // end point for processing peer calender information
+    @RequestMapping(method = RequestMethod.POST, value = "/medicpeercalendar") // end point for processing peer calender information
     @ResponseBody
     public Object processPeerCalenderForm(HttpServletRequest request) {
         String requestBody = null;
