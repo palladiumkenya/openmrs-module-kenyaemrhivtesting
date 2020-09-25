@@ -408,32 +408,16 @@ public class MedicDataExchange {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        List<String> keysToRemoveForObsGroup = new ArrayList<String>();
-
 
                         if(obsGroupNode != null) {
                             Iterator<Map.Entry<String,JsonNode>> obsGroupIterator = obsGroupNode.getFields();
                             while (obsGroupIterator.hasNext()) {
                                 Map.Entry<String, JsonNode> obsGroupEntry = obsGroupIterator.next();
-                                if(obsGroupEntry.getValue() ==null || "".equals(obsGroupEntry.getValue().toString()) ) {
-                                    keysToRemoveForObsGroup.add(obsGroupEntry.getKey());
-                                    if (keysToRemoveForObsGroup.size() > 0) {
-                                        for (String key : keysToRemoveForObsGroup) {
-                                            obsGroupNode.remove(key);
-                                        }
-                                    }
-                                }
+
                                 if(obsGroupEntry.getKey().contains("MULTISELECT")) {
                                     if (obsGroupEntry.getValue() != null && !"".equals(obsGroupEntry.getValue().toString()) && !"".equals(obsGroupEntry.getValue().toString())) {
                                         obsGroupNode.put(obsGroupEntry.getKey(), handleMultiSelectFields(obsGroupEntry.getValue().toString().replace(" ",",")));
                                         obsNodes.put(entry.getKey(),obsGroupNode);
-                                    } else {
-                                        keysToRemoveForObsGroup.add(obsGroupEntry.getKey());
-                                        if (keysToRemoveForObsGroup.size() > 0) {
-                                            for (String key : keysToRemoveForObsGroup) {
-                                                obsGroupNode.remove(key);
-                                            }
-                                        }
                                     }
                                 }
                             }
