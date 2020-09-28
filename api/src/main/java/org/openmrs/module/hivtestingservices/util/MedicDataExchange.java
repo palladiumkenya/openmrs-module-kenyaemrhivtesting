@@ -9,17 +9,28 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 
-import org.openmrs.PersonAttributeType;
-import org.openmrs.Provider;
-import org.openmrs.Location;
-import org.openmrs.User;
-import org.openmrs.Form;
-import org.openmrs.Concept;
+import org.openmrs.Person;
 import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
+import org.openmrs.Provider;
+import org.openmrs.User;
+import org.openmrs.Location;
+import org.openmrs.Concept;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.Program;
+import org.openmrs.Relationship;
+import org.openmrs.PatientProgram;
+import org.openmrs.Obs;
+import org.openmrs.Encounter;
+import org.openmrs.Form;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonAddress;
+
+import org.openmrs.api.PatientService;
+import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.FormService;
+import org.openmrs.api.EncounterService;
 import org.openmrs.api.context.Context;
 
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -28,7 +39,9 @@ import org.openmrs.module.hivtestingservices.api.service.MedicQueData;
 import org.openmrs.module.hivtestingservices.metadata.HTSMetadata;
 import org.openmrs.module.hivtestingservices.model.DataSource;
 import org.openmrs.module.kenyaemr.api.KenyaEmrService;
+import org.openmrs.module.kenyaemr.metadata.HivMetadata;
 import org.openmrs.module.kenyaemr.util.EmrUtils;
+import org.openmrs.module.metadatadeploy.MetadataUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -183,6 +196,7 @@ public class MedicDataExchange {
     }
 
     private ObjectNode processRegistrationPayload (ObjectNode jNode) {
+
 
         ObjectNode jsonNode = (ObjectNode) jNode.get("registration");
         ObjectNode patientNode = getJsonNodeFactory().objectNode();
@@ -737,7 +751,7 @@ public class MedicDataExchange {
             for (Integer ptId : patientList) {
                 if (!contactMap.keySet().contains(ptId)) {
                     Patient patient = Context.getPatientService().getPatient(ptId);
-                    ObjectNode contactWrapper = buildPatientNode(patient, true);
+                    ObjectNode contactWrapper = buildPatientNode(patient, true, "");
                     contactWrapper.put("contacts", emptyContactNode);
                     patientContactNode.add(contactWrapper);
                 }
@@ -770,7 +784,7 @@ public class MedicDataExchange {
             for (Integer ptId : patientList) {
                 if (!contactMap.keySet().contains(ptId)) {
                     Patient patient = Context.getPatientService().getPatient(ptId);
-                    ObjectNode contactWrapper = buildPatientNode(patient, false);
+                    ObjectNode contactWrapper = buildPatientNode(patient, false, "");
                     patientContactNode.add(contactWrapper);
                 }
             }
@@ -780,7 +794,180 @@ public class MedicDataExchange {
         return responseWrapper;
     }
 
-    private ObjectNode buildPatientNode(Patient patient, boolean newRegistration) {
+
+    public ObjectNode getKpPeerPeerEductorList() {
+        String PREP_PROGRAM_UUID = "214cad1c-bb62-4d8e-b927-810a046daf62";
+        String KP_PROGRAM_UUID = "7447305a-18a7-11e9-ab14-d663bd873d93";
+        String CHTUSERNAME_ATTRIBUTETYPE_UUID ="1aaead2d-0e88-40b2-abcd-6bc3d20fa43c";
+        Program prepProgram = MetadataUtils.existing(Program.class, PREP_PROGRAM_UUID);
+        Program kpProgram = MetadataUtils.existing(Program.class, KP_PROGRAM_UUID);
+        Program hivProgram = MetadataUtils.existing(Program.class, HivMetadata._Program.HIV);
+        ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
+        PersonAttributeType chtPersonAttributeType = personService.getPersonAttributeTypeByUuid(CHTUSERNAME_ATTRIBUTETYPE_UUID);
+
+
+
+        JsonNodeFactory factory = getJsonNodeFactory();
+        ArrayNode peersNode = getJsonNodeFactory().arrayNode();
+        ObjectNode responseWrapper = factory.objectNode();
+
+        Set<Integer> peerEducatorList = getAllPeerEducatorsForKPProgram();
+        if (peerEducatorList.size() > 0) {
+
+            for (Integer ptId : peerEducatorList) {
+
+                ObjectNode peer = factory.objectNode();
+                ObjectNode peerEducator = factory.objectNode();;
+
+                List<PatientProgram> peerEducatorPrepPrograms = programWorkflowService.getPatientPrograms(Context.getPatientService().getPatient(ptId),
+                       prepProgram , null, null, null, null, true);
+
+                List<PatientProgram> peerEducatorHivPrograms = programWorkflowService.getPatientPrograms(Context.getPatientService().getPatient(ptId),
+                        hivProgram , null, null, null, null, true);
+                List<PatientProgram> kpPrograms = programWorkflowService.getPatientPrograms(Context.getPatientService().getPatient(ptId),
+                        kpProgram , null, null, null, null, true);
+                String peerEducatorHivStatus = getClientHIVStatusCapturedOnKpClinicalEnrollment(ptId);
+                Patient patient = Context.getPatientService().getPatient(ptId);
+                Person p = personService.getPerson(ptId);
+
+                String fullPeerEducatorName = "";
+                String peerEducatorAssignee = "";
+                if( p.getGivenName() != null){
+                    fullPeerEducatorName += p.getGivenName();
+                }
+
+                if(  p.getMiddleName() != null){
+                    fullPeerEducatorName += " " +  p.getMiddleName();
+                }
+
+                if( p.getFamilyName() != null){
+                    fullPeerEducatorName += " " + p.getFamilyName();
+                }
+
+                if(p.getAttribute(chtPersonAttributeType) != null && p.getAttribute(chtPersonAttributeType).getValue() != null ) {
+                    peerEducatorAssignee = p.getAttribute(chtPersonAttributeType).getValue();
+
+                }
+                if(!peerEducatorAssignee.equalsIgnoreCase("")) {
+                    peerEducator = buildPatientNode(patient, false, peerEducatorAssignee);
+
+                    if (peerEducatorHivPrograms.isEmpty() && peerEducatorPrepPrograms.isEmpty()
+                            && peerEducatorHivStatus.equalsIgnoreCase("NEGATIVE") && kpPrograms.size() > 0) {
+                        peerEducator.put("record_purpose", "prep_verification");
+                        peersNode.add(peerEducator);
+
+                    } else if (peerEducatorHivPrograms.isEmpty() && peerEducatorHivStatus.equalsIgnoreCase("POSITIVE") && kpPrograms.size() > 0) {
+                        peerEducator.put("record_purpose", "treatment_verification");
+                        peersNode.add(peerEducator);
+
+                    } else {
+                        if (kpPrograms.size() > 0) {
+                            peerEducator.put("record_purpose", "kp_followup");
+
+                            if (peerEducator.size() > 0) {
+                                peersNode.add(peerEducator);
+                            }
+                        }
+                    }
+                }
+
+                for (Relationship relationship : Context.getPersonService().getRelationshipsByPerson(Context.getPatientService().getPatient(ptId))) {
+
+                    if (relationship.getRelationshipType().getbIsToA().equals("Peer") &&  relationship.getEndDate() == null) {
+                        List<PatientProgram> peerPrepPrograms = programWorkflowService.getPatientPrograms(Context.getPatientService().getPatient(relationship.getPersonB().getId()),
+                                prepProgram , null, null, null, null, true);
+
+                        List<PatientProgram> peerHivPrograms = programWorkflowService.getPatientPrograms(Context.getPatientService().getPatient(relationship.getPersonB().getId()),
+                                hivProgram , null, null, null, null, true);
+                        List<PatientProgram> kpPeerPrograms = programWorkflowService.getPatientPrograms(Context.getPatientService().getPatient(relationship.getPersonB().getId()),
+                                kpProgram , null, null, null, null, true);
+                        String peerHivStatus = getClientHIVStatusCapturedOnKpClinicalEnrollment(relationship.getPersonB().getId());
+                        Patient peerPatient = Context.getPatientService().getPatient(relationship.getPersonB().getId());
+
+                        String fullName = "";
+                        String assignee = "";
+                        if( relationship.getPersonA().getGivenName() != null){
+                            fullName += relationship.getPersonA().getGivenName();
+                        }
+
+                        if( relationship.getPersonA().getMiddleName() != null){
+                            fullName += " " + relationship.getPersonA().getMiddleName();
+                        }
+
+                        if( relationship.getPersonA().getFamilyName() != null){
+                            fullName += " " + relationship.getPersonA().getFamilyName();
+                        }
+                        if(relationship.getPersonA().getAttribute(chtPersonAttributeType) != null && relationship.getPersonA().getAttribute(chtPersonAttributeType).getValue() != null) {
+                            assignee = relationship.getPersonA().getAttribute(chtPersonAttributeType).getValue();
+
+                        }
+
+                        if(peerPrepPrograms.isEmpty() && peerHivPrograms.isEmpty() && peerHivStatus.equalsIgnoreCase("NEGATIVE")
+                                && kpPeerPrograms.size() > 0 && !assignee.equalsIgnoreCase("")) {
+                            peer = buildPatientNode(peerPatient, false,assignee);
+                            peer.put("record_purpose","prep_verification");
+                        } else if(peerHivPrograms.isEmpty() && peerHivStatus.equalsIgnoreCase("POSITIVE")
+                                && kpPeerPrograms.size() > 0 && !assignee.equalsIgnoreCase("")) {
+                            peer = buildPatientNode(peerPatient, false,assignee);
+                            peer.put("record_purpose","treatment_verification");
+                        } else {
+                            if(kpPeerPrograms.size() > 0 && !assignee.equalsIgnoreCase("")) {
+                                peer = buildPatientNode(peerPatient, false,assignee);
+                                peer.put("record_purpose","kp_followup");
+                            }
+                        }
+
+                    }
+
+                }
+
+                if(peer.size() > 0) {
+                    peersNode.add(peer);
+                }
+
+            }
+
+        }
+
+        responseWrapper.put("docs", peersNode);
+        return responseWrapper;
+    }
+    private String getClientHIVStatusCapturedOnKpClinicalEnrollment(Integer patientId) {
+        EncounterService encounterService = Context.getEncounterService();
+        FormService formService = Context.getFormService();
+        PatientService patientService = Context.getPatientService();
+        Patient patient = patientService.getPatient(patientId);
+
+        String kpClinicalEnrolmentEncounterTypeUuid ="c7f47a56-207b-11e9-ab14-d663bd873d93";
+        String kpClinicalEnrolmentFormUuid = "c7f47cea-207b-11e9-ab14-d663bd873d93";
+        Encounter lastClinicalEnrolmentEncForPeers = EmrUtils.lastEncounter(patient,
+                encounterService.getEncounterTypeByUuid(kpClinicalEnrolmentEncounterTypeUuid),
+                formService.getFormByUuid(kpClinicalEnrolmentFormUuid));
+
+        String hivStatus = "";
+        int positiveConcept = 703;
+        int negativeConcept = 664;
+        int hivStatusQuestionConcept = 165153;
+        if (lastClinicalEnrolmentEncForPeers != null) {
+            for (Obs obs : lastClinicalEnrolmentEncForPeers.getObs()) {
+                if (obs.getConcept().getConceptId() == hivStatusQuestionConcept
+                        && obs.getValueCoded().getConceptId() == positiveConcept) {
+                    hivStatus = "POSITIVE";
+                }
+
+                if (obs.getConcept().getConceptId() == hivStatusQuestionConcept
+                        && obs.getValueCoded().getConceptId() == negativeConcept) {
+                      hivStatus = "NEGATIVE";
+                }
+
+            }
+        }
+
+        return hivStatus;
+
+    }
+
+    private ObjectNode buildPatientNode(Patient patient, boolean newRegistration, String assignee) {
         JsonNodeFactory factory = getJsonNodeFactory();
         ObjectNode objectWrapper = factory.objectNode();
         ObjectNode fields = factory.objectNode();
@@ -859,7 +1046,7 @@ public class MedicDataExchange {
         fields.put("patient_landmark", landMark);
         fields.put("patient_residence", postalAddress);
         fields.put("patient_nearesthealthcentre", "");
-        fields.put("assignee","");
+        fields.put("assignee",assignee);
         objectWrapper.put("fields", fields);
         return objectWrapper;
     }
@@ -979,6 +1166,35 @@ public class MedicDataExchange {
         }
         return eligibleList;
     }
+
+
+    /**
+     * List of peer educators enrolled in Key population program
+     *
+     * @return
+     *
+     */
+    protected Set<Integer> getAllPeerEducatorsForKPProgram() {
+
+        Set<Integer> kpList = new HashSet<Integer>();
+        String sql = "select patient_id from patient_program pp\n" +
+                "join program pr on pr.program_id = pp.program_id\n" +
+                "join relationship r on r.person_a = pp.patient_id\n" +
+                "where pr.uuid ='7447305a-18a7-11e9-ab14-d663bd873d93'";
+
+        List<List<Object>> activeList = Context.getAdministrationService().executeSQL(sql, true);
+        if (!activeList.isEmpty()) {
+            for (List<Object> res : activeList) {
+                Integer patientId = (Integer) res.get(0);
+                kpList.add(patientId);
+            }
+        }
+        return kpList;
+    }
+
+
+
+
 
     /**
      * TODO: this logic is temporarily implemented in CHT. Should be completed once the workflow is clear
