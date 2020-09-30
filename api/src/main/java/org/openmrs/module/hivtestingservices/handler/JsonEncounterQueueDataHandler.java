@@ -197,6 +197,9 @@ public class JsonEncounterQueueDataHandler implements QueueDataHandler {
                 RegistrationData registrationData = dataService.getRegistrationDataByTemporaryUuid(temporaryUuid);
                 if(registrationData!=null) {
                     candidatePatient = Context.getPatientService().getPatientByUuid(registrationData.getAssignedUuid());
+                }else {
+                    candidatePatient = Context.getPatientService().getPatientByUuid(uuid);
+
                 }
             }
         } /*else if (!StringUtils.isBlank(patientIdentifier.getIdentifier())) {
