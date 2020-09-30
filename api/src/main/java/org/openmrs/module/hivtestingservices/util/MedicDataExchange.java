@@ -758,6 +758,8 @@ public class MedicDataExchange {
             }
         }
 
+        // add peers list
+        patientContactNode.addAll(getKpPeerPeerEductorList());
         responseWrapper.put("docs", patientContactNode);
         return responseWrapper;
     }
@@ -795,7 +797,7 @@ public class MedicDataExchange {
     }
 
 
-    public ObjectNode getKpPeerPeerEductorList() {
+    public ArrayNode getKpPeerPeerEductorList() {
         String PREP_PROGRAM_UUID = "214cad1c-bb62-4d8e-b927-810a046daf62";
         String KP_PROGRAM_UUID = "7447305a-18a7-11e9-ab14-d663bd873d93";
         String CHTUSERNAME_ATTRIBUTETYPE_UUID ="1aaead2d-0e88-40b2-abcd-6bc3d20fa43c";
@@ -929,8 +931,8 @@ public class MedicDataExchange {
 
         }
 
-        responseWrapper.put("docs", peersNode);
-        return responseWrapper;
+        //responseWrapper.put("docs", peersNode);
+        return peersNode;
     }
     private String getClientHIVStatusCapturedOnKpClinicalEnrollment(Integer patientId) {
         EncounterService encounterService = Context.getEncounterService();
@@ -1150,7 +1152,7 @@ public class MedicDataExchange {
 
         Set<Integer> eligibleList = new HashSet<Integer>();
         String sql = "";
-        if (lastPatientEntry != null && lastId > 0) {
+        if (lastPatientEntry != null && lastPatientEntry > 0) {
             sql = "select patient_id from kenyaemr_hiv_testing_patient_contact where patient_id >" + lastPatientEntry + " and patient_id is not null and voided=0 and contact_listing_decline_reason='CHT';"; // get from CHT that have been registered in the EMR
         } else {
             sql = "select patient_id from kenyaemr_hiv_testing_patient_contact where patient_id <= " + lastId + " and patient_id is not null and voided=0 and contact_listing_decline_reason='CHT';";

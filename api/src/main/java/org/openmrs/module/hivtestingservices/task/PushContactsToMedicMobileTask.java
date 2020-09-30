@@ -88,13 +88,8 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
 
             // check if there are item(s) to post
             ObjectNode contactWrapper = e.getContacts(gpLastContactId, lastId, gpLastPatientId, lastPatientId);
-            //ObjectNode contactWrapper = e.getLinkageList(gpLastPatientId, lastPatientId);
-
             ArrayNode docs = (ArrayNode) contactWrapper.get("docs");
-
-            //System.out.println("Data: " + contactWrapper.toString());
-            //System.out.println("Linkage data: " + linkageWrapper.toString());
-
+            System.out.println("Data: " + contactWrapper.toString());
 
             if (contactWrapper != null && docs.size() > 0) {
                 hasData = true;
@@ -136,10 +131,10 @@ public class PushContactsToMedicMobileTask extends AbstractTask {
                     }
 
                     // save this at the end just so that we take care of instances when there is no connectivity
-                    lastContactEntry.setPropertyValue(lastId.toString());
+                    //lastContactEntry.setPropertyValue(lastId.toString());
                     lastPatientEntry.setPropertyValue(lastPatientId.toString());
 
-                    Context.getAdministrationService().saveGlobalProperty(lastContactEntry);
+                    //Context.getAdministrationService().saveGlobalProperty(lastContactEntry);
                     Context.getAdministrationService().saveGlobalProperty(lastPatientEntry);
 
                     System.out.println("Successfully pushed contacts to Medic Mobile CHT");
