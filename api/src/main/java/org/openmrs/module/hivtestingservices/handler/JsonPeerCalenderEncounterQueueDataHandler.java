@@ -179,6 +179,9 @@ public class JsonPeerCalenderEncounterQueueDataHandler implements QueueDataHandl
                 RegistrationData registrationData = dataService.getRegistrationDataByTemporaryUuid(temporaryUuid);
                 if(registrationData!=null) {
                     candidatePatient = Context.getPatientService().getPatientByUuid(registrationData.getAssignedUuid());
+                }else {
+                    candidatePatient = Context.getPatientService().getPatientByUuid(uuid);
+
                 }
             }
         }
@@ -421,6 +424,9 @@ public class JsonPeerCalenderEncounterQueueDataHandler implements QueueDataHandl
         RegistrationData regData = regDataService.getRegistrationDataByTemporaryUuid(uuid);
         if(regData != null) {
             patient = Context.getPatientService().getPatientByUuid(regData.getAssignedUuid());
+        }else {
+            patient = Context.getPatientService().getPatientByUuid(uuid);
+
         }
 
         lastPeerCalendarEncounter = EmrUtils.lastEncounter(patient,
