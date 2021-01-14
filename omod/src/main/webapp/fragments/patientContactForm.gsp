@@ -1,6 +1,11 @@
 <%
     ui.decorateWith("kenyaui", "panel", [heading: (command.original ? "Edit" : "Add") + " Patient Contact", frameOnly: true])
 
+    def listingDate = [
+            [
+                    [object: command, property:"listingDate", label: "Date"]
+            ],
+    ]
     def nameFields = [
             [
                     [object: command, property: "firstName", label: "First Name"],
@@ -45,7 +50,18 @@
         <div class="ke-form-instructions">
             <strong>*</strong> indicates a required field
         </div>
-
+    <fieldset>
+        <table>
+            <tr>
+                <td class="ke-field-label">Listing Date*</td>
+            </tr>
+            <tr>
+                <td style="width: 100px">
+                    ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "listingDate"])}
+                </td>
+            </tr>
+        </table>
+    </fieldset>
         <fieldset>
             <legend>Demographics</legend>
             <input type="hidden" name="patientRelatedTo" value="${currentPatient.id}"/>

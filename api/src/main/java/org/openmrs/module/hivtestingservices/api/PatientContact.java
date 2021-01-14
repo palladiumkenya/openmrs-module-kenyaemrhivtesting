@@ -24,6 +24,7 @@ public class PatientContact extends BaseOpenmrsData {
     private Patient patientRelatedTo;
     private Integer relationType;
     private Date appointmentDate;
+    private Date listingDate;
     private String baselineHivStatus;
     private String ipvOutcome;
     private Patient patient;
@@ -42,10 +43,11 @@ public class PatientContact extends BaseOpenmrsData {
     public PatientContact(String uuid, String firstName, String middleName,
                           String lastName, String sex, Date birthDate, String physicalAddress,
                           String phoneContact, Integer relationType, Date appointmentDate,
-                          String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,
+                          String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,Date listingDate,
                           String contactListingDeclineReason, Integer consentedContactListing,
                            boolean voided, User voidedBy, Date dateVoided, String voidedReason) {
         this.uuid = uuid;
+        this.listingDate = listingDate;
         // this.obsGroupId = obsGroupId;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -244,6 +246,14 @@ public class PatientContact extends BaseOpenmrsData {
 
     public void setConsentedContactListing(Integer consentedContactListing) {
         this.consentedContactListing = consentedContactListing;
+    }
+
+    public Date getListingDate() {
+        return listingDate;
+    }
+
+    public void setListingDate(Date listingDate) {
+        this.listingDate = listingDate;
     }
 
     @Override
