@@ -31,7 +31,7 @@
 		<property name="pnsApproach" type="java.lang.Integer" column="pns_approach" length="19"/>
 		<property name="contactListingDeclineReason" type="java.lang.String" column="contact_listing_decline_reason" length="255"/>
 		<property name="consentedContactListing" type="java.lang.Integer" column="consented_contact_listing" length="19"/>
-		<property name="dateCreated" type="java.util.Date" column="date_created" length="19"/>
+		<property name="listingDate" type="java.util.Date" column="date_created" length="19"/>
 		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
 		<property name="dateChanged" type="java.util.Date" column="date_changed" length="19"/>
 		<property name="voided" type="java.lang.Boolean" column="voided" length="1"/>
