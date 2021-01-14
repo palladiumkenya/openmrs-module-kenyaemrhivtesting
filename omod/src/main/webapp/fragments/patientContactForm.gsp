@@ -3,7 +3,7 @@
 
     def listingDate = [
             [
-                    [object: command, property:"dateCreated", label: "Date"]
+                    [object: command, property:"listingDate", label: "Date"]
             ],
     ]
     def nameFields = [
