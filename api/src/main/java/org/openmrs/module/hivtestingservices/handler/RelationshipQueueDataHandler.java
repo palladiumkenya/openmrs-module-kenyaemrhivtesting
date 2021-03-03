@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+
 import static org.openmrs.module.hivtestingservices.utils.PersonCreationUtils.getPersonAddressFromJsonObject;
 import static org.openmrs.module.hivtestingservices.utils.PersonCreationUtils.getPersonAttributeFromJsonObject;
 
@@ -74,13 +75,15 @@ public class RelationshipQueueDataHandler implements QueueDataHandler {
         log.info("Processing relationship data: " + queueData.getUuid());
         queueProcessorException = new QueueProcessorException();
         personService = Context.getPersonService();
-        try {
-            if (validate(queueData)) {
+        payload = queueData.getPayload();
+        createRelationship();
+        /*try {
+           // if (validate(queueData)) {
                 createRelationship();
-            }
+           // }
         } catch (Exception e) {
-            /*Custom exception thrown by the validate function should not be added again into @queueProcessorException.
-             It should add the runtime dao Exception while saving the data into @queueProcessorException collection */
+            *//*Custom exception thrown by the validate function should not be added again into @queueProcessorException.
+             It should add the runtime dao Exception while saving the data into @queueProcessorException collection *//*
             if (!e.getClass().equals(QueueProcessorException.class)) {
                 queueProcessorException.addException(new Exception("Exception while processing relationship payload ",e));
                 log.error(e);
@@ -89,7 +92,7 @@ public class RelationshipQueueDataHandler implements QueueDataHandler {
             if (queueProcessorException.anyExceptions()) {
                 throw queueProcessorException;
             }
-        }
+        }*/
     }
 
     @Override
@@ -127,8 +130,35 @@ public class RelationshipQueueDataHandler implements QueueDataHandler {
     }
 
     private void createRelationship() {
-        Person personA = validateOrCreate(getPersonUuidFromPayload("personA"), "personA");
-        Person personB = validateOrCreate(getPersonUuidFromPayload("personB"), "personB");
+        String personATemporaryUuid = JsonUtils.readAsString(payload, "['uuid']");
+        String personBTemporaryUuid = JsonUtils.readAsString(payload, "['personBUuid']");
+
+        Person p = personService.getPersonByUuid(personATemporaryUuid);
+        Person pb = personService.getPersonByUuid(personBTemporaryUuid);
+
+        //get person A details
+        if (p == null) {
+            RegistrationDataService registrationDataService = Context.getService(RegistrationDataService.class);
+            RegistrationData registrationData = registrationDataService.getRegistrationDataByTemporaryUuid(personATemporaryUuid);
+            if (registrationData != null) {
+                p = personService.getPersonByUuid(registrationData.getAssignedUuid());
+            }
+        }
+
+
+        //Get person B details
+        if (pb == null) {
+            RegistrationDataService registrationDataService = Context.getService(RegistrationDataService.class);
+            RegistrationData registrationData = registrationDataService.getRegistrationDataByTemporaryUuid(personBTemporaryUuid);
+            if (registrationData != null) {
+                pb = personService.getPersonByUuid(registrationData.getAssignedUuid());
+            }
+        }
+
+
+
+        Person personA = p;  //validateOrCreate(getPersonUuidFromPayload("personA"), "personA");
+        Person personB = pb; //validateOrCreate(getPersonUuidFromPayload("personB"), "personB");
         try {
             if (personA != null && personB !=null) {
                 RelationshipType relationshipType = personService.getRelationshipTypeByUuid(getRelationshipTypeUuidFromPayload());
@@ -151,7 +181,7 @@ public class RelationshipQueueDataHandler implements QueueDataHandler {
             RegistrationData registrationData = registrationDataService.getRegistrationDataByTemporaryUuid(personUuid);
             if(registrationData != null){
                 p = personService.getPersonByUuid(registrationData.getAssignedUuid());
-            }else {
+            } else {
                 Person person = new Person();
                 try {
                     person.addName(getPersonNameFromPayload(root));
@@ -179,7 +209,8 @@ public class RelationshipQueueDataHandler implements QueueDataHandler {
     }
 
     private String getRelationshipUuidFromPayload(){
-        return JsonUtils.readAsString(payload, "$['uuid']");
+        // add key relation uuid for testing
+        return JsonUtils.readAsString(payload, "$['relationUuid']['uuid']");
     }
 
     private String getRelationshipTypeUuidFromPayload(){
