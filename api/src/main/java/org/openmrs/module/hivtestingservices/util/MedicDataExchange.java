@@ -109,7 +109,7 @@ public class MedicDataExchange {
             e.printStackTrace();
         }
         if (jsonNode != null) {
-            ObjectNode registrationNode = processRegistrationPayload(jsonNode);
+            ObjectNode registrationNode = processRegistrationPayload(jsonNode, resultPayload);
             String payload = registrationNode.toString();
             String discriminator = registrationNode.path("discriminator").path("discriminator").getTextValue();
             String formDataUuid = registrationNode.path("encounter").path("encounter.form_uuid").getTextValue();
@@ -197,7 +197,7 @@ public class MedicDataExchange {
         htsService.saveQueData(medicQueData);
     }
 
-    private ObjectNode processRegistrationPayload (ObjectNode jNode) {
+    private ObjectNode processRegistrationPayload (ObjectNode jNode, String regPayload) {
 
 
         ObjectNode jsonNode = (ObjectNode) jNode.get("registration");
@@ -284,6 +284,10 @@ public class MedicDataExchange {
             String relationshipUuid = UUID.randomUUID().toString();
             String patientUuid = jsonNode.get("_id") != null ? jsonNode.get("_id").getTextValue(): "";
             addRelationshipToDataQueue(patientRelatedTo,relationshipTypeName,relationshipUuid,providerId,systemId,patientUuid);
+            if(!relationshipTypeName.equalsIgnoreCase("spouse") && !relationshipTypeName.equalsIgnoreCase("")) {
+                createPatientContactFromRelationship(regPayload,providerId,systemId, patientUuid);
+
+            }
         }
         return registrationWrapper;
     }
@@ -516,6 +520,16 @@ public class MedicDataExchange {
         saveMedicDataQueue(payload,locationId,providerId,patientRelatedTo,discriminator,"", systemId);
 
         return "Queue data for relationship created successfully";
+    }
+
+    public String createPatientContactFromRelationship(String payload, String providerId, String systemId,
+                                                       String patientUuid) {
+        String discriminator = "json-createpatientcontactusingrelatioship";
+        Integer locationId = Context.getService(KenyaEmrService.class).getDefaultLocation().getLocationId();
+        saveMedicDataQueue(payload,locationId,providerId,patientUuid,discriminator,"", systemId);
+
+        return "Queue data for creating contact from relationship created successfully";
+
     }
 
     public String addContactTraceToDataqueue(String resultPayload) {
