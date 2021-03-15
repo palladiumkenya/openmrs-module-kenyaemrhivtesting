@@ -24,7 +24,7 @@ public class PatientContact extends BaseOpenmrsData {
     private Patient patientRelatedTo;
     private Integer relationType;
     private Date appointmentDate;
-    private Date listingDate;
+    private Date listingDate = new Date();
     private String baselineHivStatus;
     private String ipvOutcome;
     private Patient patient;
@@ -46,6 +46,7 @@ public class PatientContact extends BaseOpenmrsData {
                           String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,Date listingDate,
                           String contactListingDeclineReason, Integer consentedContactListing,
                            boolean voided, User voidedBy, Date dateVoided, String voidedReason) {
+
         this.uuid = uuid;
         this.listingDate = listingDate;
         // this.obsGroupId = obsGroupId;
