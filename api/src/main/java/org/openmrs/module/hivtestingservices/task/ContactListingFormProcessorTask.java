@@ -29,9 +29,9 @@ public class ContactListingFormProcessorTask extends AbstractTask {
 		Context.openSession();
 		try {
 
-			if (!Context.isAuthenticated()) {
+			/*if (!Context.isAuthenticated()) {
 				authenticate();
-			}
+			}*/
 			HTSPatientContactRegistrar processor = new HTSPatientContactRegistrar();
 			processor.registerBookedPatientContacts();
 
