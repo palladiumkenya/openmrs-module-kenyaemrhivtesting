@@ -88,6 +88,7 @@ public class MedicDataExchange {
         if (jsonNode != null) {
 
             ObjectNode formNode =  processFormPayload(jsonNode);
+            String documentUUID = formNode.get("documentUUID").getTextValue();
             String payload = formNode.toString();
             String discriminator = formNode.path("discriminator").path("discriminator").getTextValue();
             String formDataUuid = formNode.path("encounter").path("encounter.form_uuid").getTextValue();
@@ -95,7 +96,7 @@ public class MedicDataExchange {
             Integer locationId = Integer.parseInt(formNode.path("encounter").path("encounter.location_id").getTextValue());
             String providerString = formNode.path("encounter").path("encounter.provider_id").getTextValue();
             String userName = formNode.path("encounter").path("encounter.user_system_id").getTextValue();
-            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid, userName);
+            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid, userName, documentUUID);
         }
         return "Data queue form created successfully";
     }
@@ -118,7 +119,7 @@ public class MedicDataExchange {
             Integer locationId = Integer.parseInt(registrationNode.path("encounter").path("encounter.location_id").getTextValue());
             String providerString = registrationNode.path("encounter").path("encounter.provider_id").getTextValue();
             String userName = registrationNode.path("encounter").path("encounter.user_system_id").getTextValue();
-            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid,userName);
+            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid,userName, patientUuid);
         }
         return "Data queue registration created successfully";
     }
@@ -141,7 +142,7 @@ public class MedicDataExchange {
             Integer locationId = Integer.parseInt(demographicUpdateNode.path("encounter").path("encounter.location_id").getTextValue());
             String providerString = demographicUpdateNode.path("encounter").path("encounter.provider_id").getTextValue();
             String userName = demographicUpdateNode.path("encounter").path("encounter.user_system_id").getTextValue();
-            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid,userName);
+            saveMedicDataQueue(payload,locationId,providerString,patientUuid,discriminator,formDataUuid,userName, patientUuid);
         }
         return "Data queue demographics updates created successfully";
     }
@@ -187,6 +188,35 @@ public class MedicDataExchange {
         }else {
             medicQueData.setFormName("Unknown name");
         }
+        medicQueData.setPayload(payload);
+        medicQueData.setDiscriminator(discriminator);
+        medicQueData.setPatientUuid(patientUuid);
+        medicQueData.setFormDataUuid(formUuid);
+        medicQueData.setProvider(provider);
+        medicQueData.setLocation(location);
+        medicQueData.setDataSource(dataSource);
+        medicQueData.setCreator(user);
+        htsService.saveQueData(medicQueData);
+    }
+
+    private void saveMedicDataQueue(String payload, Integer locationId, String providerString, String patientUuid, String discriminator,
+                                    String formUuid ,String userString, String queueUUID) {
+        DataSource dataSource = dataService.getDataSource(1);
+        Provider provider = Context.getProviderService().getProviderByIdentifier(providerString);
+        User user = Context.getUserService().getUserByUsername(userString);
+        Location location = Context.getLocationService().getLocation(locationId);
+        Form form = Context.getFormService().getFormByUuid(formUuid);
+
+        if (dataService.getQueueDataByUuid(queueUUID) != null) {
+            System.out.println("Afyastat attempted to send a duplicate record with uuid = " + queueUUID + ". The payload will be ignored");
+            return;
+        }
+        MedicQueData medicQueData = new MedicQueData();
+        if(form !=null && form.getName() !=null) { medicQueData.setFormName(form.getName());
+        }else {
+            medicQueData.setFormName("Unknown name");
+        }
+        medicQueData.setUuid(queueUUID);
         medicQueData.setPayload(payload);
         medicQueData.setDiscriminator(discriminator);
         medicQueData.setPatientUuid(patientUuid);
@@ -313,6 +343,7 @@ public class MedicDataExchange {
             e.printStackTrace();
         }
 
+        String documentUUID = jsonNode.get("_id") != null ? jsonNode.get("_id").getTextValue(): "";
         String encounterDate = jsonNode.path("fields").path("encounter_date").getTextValue() != null && !jsonNode.path("fields").path("encounter_date").getTextValue().equalsIgnoreCase("") ? formatStringDate(jsonNode.path("fields").path("encounter_date").getTextValue()) : convertTime(jsonNode.get("reported_date").getLongValue());
         String creator = jsonNode.path("fields").path("audit_trail").path("created_by") != null && jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() != null ? jsonNode.path("fields").path("audit_trail").path("created_by").getTextValue() : "";
         String providerIdentifier = checkProviderNameExists(creator);
@@ -355,6 +386,7 @@ public class MedicDataExchange {
         formsNode.put("observation", obsNodes);
         formsNode.put("discriminator",discriminator);
         formsNode.put("encounter",encounter);
+        formsNode.put("documentUUID", documentUUID);
         return   formsNode;
     }
 
@@ -542,6 +574,8 @@ public class MedicDataExchange {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
         if (jsonNode != null) {
             String discriminator = "json-contacttrace";
             String payload = jsonNode.toString();

@@ -677,9 +677,10 @@ public class DemographicsUpdateQueueDataHandler implements QueueDataHandler {
 
     private Set<PersonAttribute> getLegacyPersonAttributes(){
         Set<PersonAttribute> attributes = new TreeSet<PersonAttribute>();
-        String mothersName = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.mothers_name']");
+        // mothers name currently not implemented in Afyastat
+        /*String mothersName = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.mothers_name']");
         if(StringUtils.isNotEmpty(mothersName))
-            attributes.add(createPersonAttribute("Mother's Name",null,mothersName));
+            attributes.add(createPersonAttribute("Mother's Name",null,mothersName));*/
 
         String phoneNumber = JsonUtils.readAsString(payload, "$['demographicsupdate']['demographicsupdate.phone_number']");
         if(StringUtils.isNotEmpty(phoneNumber))
