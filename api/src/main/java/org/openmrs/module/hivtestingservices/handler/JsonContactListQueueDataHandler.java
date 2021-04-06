@@ -115,9 +115,6 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         String uuid = JsonUtils.readAsString(payload, "$['_id']");
         Boolean voided= false;
 
-        System.out.println(", kemr_uuid: " + kemrRef + ", patient related to: " + patientRelatedTo );
-        log.info( ", kemr_uuid: " + kemrRef + ", patient related to: " + patientRelatedTo );
-
         if (org.apache.commons.lang3.StringUtils.isNotBlank(baselineStatus)) {
 
             if (baselineStatus.equals("unknown")) {
