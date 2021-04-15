@@ -33,7 +33,7 @@
 	</modules>
 
 	<properties>
-		<openMRSVersion>2.1.2</openMRSVersion>
+		<openMRSVersion>2.4.0</openMRSVersion>
 		<!-- Module dependencies -->
 		<appframeworkVersion>2.2.1</appframeworkVersion>
 		<calculationVersion>1.2</calculationVersion>
