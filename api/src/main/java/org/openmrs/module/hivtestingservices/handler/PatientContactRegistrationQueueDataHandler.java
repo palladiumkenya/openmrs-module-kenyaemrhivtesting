@@ -98,7 +98,7 @@ public class PatientContactRegistrationQueueDataHandler implements QueueDataHand
         String middleName = JsonUtils.readAsString(payload, "$['patient_middleName']");
         String familyName = JsonUtils.readAsString(payload, "$['patient_familyName']");
         Integer relType = relationshipTypeConverter(JsonUtils.readAsString(payload, "$['relation_type']"));
-        Date birthDate = JsonUtils.readAsDate(payload, "$['patient_birthDate']", JsonUtils.DATE_PATTERN_MEDIC);
+        Date birthDate = JsonUtils.readAsDate(payload, "$['patient_birthDate']", JsonUtils.YYYY_MM_DD_DATE_PATTERN);
         String sex = gender(JsonUtils.readAsString(payload, "$['patient_sex']"));
         String phoneNumber = JsonUtils.readAsString(payload, "$['patient_telephone']");
         Integer maritalStatus = maritalStatusConverter(JsonUtils.readAsString(payload, "$['patient_marital_status']"));

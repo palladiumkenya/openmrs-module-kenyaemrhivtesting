@@ -16,16 +16,13 @@ package org.openmrs.module.hivtestingservices.handler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Patient;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
-import org.openmrs.module.hivtestingservices.api.service.RegistrationDataService;
 import org.openmrs.module.hivtestingservices.exception.QueueProcessorException;
 import org.openmrs.module.hivtestingservices.model.QueueData;
-import org.openmrs.module.hivtestingservices.model.RegistrationData;
 import org.openmrs.module.hivtestingservices.model.handler.QueueDataHandler;
 import org.openmrs.module.hivtestingservices.utils.JsonUtils;
 
@@ -102,7 +99,7 @@ public class JsonContactTraceQueueDataHandler implements QueueDataHandler {
     private void setContactTraceFromPayload(){
 
         HTSService contact = Context.getService(HTSService.class);
-        Date traceDate = JsonUtils.readAsDate(payload, "$['fields']['encounter_date']", JsonUtils.DATE_PATTERN_MEDIC);
+        Date traceDate = JsonUtils.readAsDate(payload, "$['fields']['encounter_date']", JsonUtils.YYYY_MM_DD_DATE_PATTERN);
         String contactType = contactTypeConverter(JsonUtils.readAsString(payload, "$['fields']['group_follow_up']['follow_up_type']"));
         String status = contactStatusConverter(JsonUtils.readAsString(payload, "$['fields']['group_follow_up']['contact_status']"));
         String reasonUncontacted = reasonUncontactedConverter(JsonUtils.readAsString(payload, "$['fields']['group_follow_up']['reasonUncontacted']"));

@@ -29,8 +29,6 @@ import org.openmrs.module.hivtestingservices.model.RegistrationData;
 import org.openmrs.module.hivtestingservices.model.handler.QueueDataHandler;
 import org.openmrs.module.hivtestingservices.utils.JsonUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -100,8 +98,8 @@ public class JsonContactListQueueDataHandler implements QueueDataHandler {
         String familyName = JsonUtils.readAsString(payload, "$['s_name']");
         Integer relType = relationshipTypeConverter(JsonUtils.readAsString(payload, "$['contact_relationship']"));
         String baselineStatus = JsonUtils.readAsString(payload, "$['baseline_hiv_status']");
-        Date nextTestDate = JsonUtils.readAsDate(payload, "$['booking_date']", JsonUtils.DATE_PATTERN_MEDIC);
-        Date birthDate = JsonUtils.readAsDate(payload, "$['date_of_birth']", JsonUtils.DATE_PATTERN_MEDIC);
+        Date nextTestDate = JsonUtils.readAsDate(payload, "$['booking_date']", JsonUtils.YYYY_MM_DD_DATE_PATTERN);
+        Date birthDate = JsonUtils.readAsDate(payload, "$['date_of_birth']", JsonUtils.YYYY_MM_DD_DATE_PATTERN);
         String sex = gender(JsonUtils.readAsString(payload, "$['sex']"));
         String phoneNumber = JsonUtils.readAsString(payload, "$['phone']");
         Integer maritalStatus = maritalStatusConverter(JsonUtils.readAsString(payload, "$['marital_status']"));
