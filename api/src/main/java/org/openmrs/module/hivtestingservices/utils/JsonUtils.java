@@ -41,8 +41,8 @@ public class JsonUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class.getSimpleName());
 
-    private static final String DATE_PATTERN = "dd-MM-yyyy";
-    public static final String DATE_PATTERN_MEDIC = "yyyy-MM-dd";
+    private static final String DD_MM_YYYY_DATE_PATTERN = "dd-MM-yyyy";
+    public static final String YYYY_MM_DD_DATE_PATTERN = "yyyy-MM-dd";
 
     /**
      * Write boolean value into the json object. The method will only write the boolean value if the object passed
@@ -136,7 +136,7 @@ public class JsonUtils {
         try {
             returnedString = JsonPath.read(jsonObject, path);
         } catch (Exception e) {
-            //logger.error("Unable to read string value with path: " + path + " from: " + String.valueOf(jsonObject)); TODO: enable this for debugging
+            //logger.error("Unable to read string value with path: " + path + " from: " + String.valueOf(jsonObject)); //TODO: enable this for debugging
             logger.error("Unable to read string value with path: " + path + " from Afyastat payload"); // trying to reduce log size
         }
         return returnedString;
@@ -293,7 +293,7 @@ public class JsonUtils {
     public static void writeAsDate(final Object object, final String path, final Date date) {
         if (object instanceof JSONObject && date != null) {
             JSONObject jsonObject = (JSONObject) object;
-            jsonObject.put(path, new SimpleDateFormat(DATE_PATTERN).format(date));
+            jsonObject.put(path, new SimpleDateFormat(DD_MM_YYYY_DATE_PATTERN).format(date));
         }
     }
 
@@ -312,8 +312,8 @@ public class JsonUtils {
         }
         try {
             if(dateAsString.contains("/"))
-                return new SimpleDateFormat(DATE_PATTERN).parse(dateAsString.replace("/","-"));
-            return new SimpleDateFormat(DATE_PATTERN).parse(dateAsString);
+                return new SimpleDateFormat(DD_MM_YYYY_DATE_PATTERN).parse(dateAsString.replace("/","-"));
+            return new SimpleDateFormat(DD_MM_YYYY_DATE_PATTERN).parse(dateAsString);
         } catch (ParseException e) {
             logger.error("Unable to convert string value from path: " + path + " from: " + String.valueOf(serialized));
         }
