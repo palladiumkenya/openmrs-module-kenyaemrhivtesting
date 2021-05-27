@@ -26,8 +26,7 @@
 
 	<!-- Adding encounter advice for family history form submitted by mUzima-->
 	<advice>
-		<point>org.openmrs.api.EncounterService</point>
-		<class>${project.parent.groupId}.${project.parent.artifactId}.advice.PatientContactListProcessor</class>
+
 	</advice>
 
 	<!-- Adds link to admin page -->
