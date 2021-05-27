@@ -46,5 +46,5 @@ public interface HTSDAO {
     public Cohort getPatientsWithAgeRange(Integer minAge, DurationUnit minAgeUnit, Integer maxAge, DurationUnit maxAgeUnit, boolean unknownAgeIncluded, Date effectiveDate);
     public PatientContact getPatientContactByUuid (String uuid);
     public List<PatientContact> getPatientContactListForRegistration();
-
+    List<PatientContact> getPatientContactsTracedAndBooked();
 }

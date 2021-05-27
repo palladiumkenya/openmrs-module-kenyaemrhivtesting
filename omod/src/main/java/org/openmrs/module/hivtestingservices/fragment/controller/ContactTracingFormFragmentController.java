@@ -38,11 +38,11 @@ public class ContactTracingFormFragmentController {
 
     private List<String> reasonsPhoneList() {
         return Arrays.asList(
-                new String("No locator information"),
-                new String("Incorrect locator information"),
+                new String("Incorrect phone number"),
                 new String("Calls not going through"),
+                new String("Calls not answered"),
                 new String("Died"),
-                new String("Others")
+                new String("Other")
                 );
     }
 
@@ -50,10 +50,10 @@ public class ContactTracingFormFragmentController {
         return Arrays.asList(
                 new String("No locator information"),
                 new String("Incorrect locator information"),
-                new String("Migrated"),
+                new String("Relocated"),
                 new String("Not found at home"),
                 new String("Died"),
-                new String("Others")
+                new String("Other")
         );
     }
 

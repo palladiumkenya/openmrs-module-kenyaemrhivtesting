@@ -144,6 +144,11 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
+    public List<PatientContact> getPatientContactsTracedAndBooked() {
+        return patientContactDAO.getPatientContactsTracedAndBooked();
+    }
+
+    @Override
     public void onStartup() {
 
     }
