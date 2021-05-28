@@ -84,6 +84,7 @@ div.section-title {
 
                     <div class="column-three col-header">Status</div>
 
+                    <div class="column-four col-header">Booking Date</div>
                     <div class="column-four col-header">Reason not Contacted</div>
 
                     <div class="column-five col-header">Facility Linked To</div>
@@ -107,6 +108,7 @@ div.section-title {
 
                         <div class="column-three">${rel.status ?: ""}</div>
 
+                        <div class="column-four">${rel.dateBooked ?: ""}</div>
                         <div class="column-four">${rel.reasonUncontacted ?: ""}</div>
 
                         <div class="column-five">${rel.facilityLinkedTo ?: ""}</div>

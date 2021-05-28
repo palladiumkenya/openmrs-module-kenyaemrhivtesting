@@ -56,6 +56,7 @@ public class ContactTraceListPageController {
                     "date", kenyaUi.formatDate(cTrace.getDate()),
                     "contactType", cTrace.getContactType(),
                     "status", cTrace.getStatus(),
+                    "dateBooked", cTrace.getAppointmentDate() != null ? kenyaUi.formatDate(cTrace.getAppointmentDate()) : "",
                     "reasonUncontacted", cTrace.getReasonUncontacted(),
                     "facilityLinkedTo", cTrace.getFacilityLinkedTo(),
                     "healthWorkerHandedTo", cTrace.getHealthWorkerHandedTo(),
