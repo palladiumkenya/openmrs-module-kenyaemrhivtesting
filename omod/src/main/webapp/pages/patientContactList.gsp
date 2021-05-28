@@ -36,7 +36,7 @@ div.column-two {
 }
 
 div.column-three {
-    width: 200px;
+    width: 130px;
 }
 
 div.column-four {
@@ -44,15 +44,15 @@ div.column-four {
 }
 
 div.column-five {
-    width: 160px;
+    width: 110px;
 }
 
 div.column-six {
-    width: 180px;
+    width: 120px;
 }
 
 div.column-seven {
-    width: 140px;
+    width: 130px;
 }
 
 div.column-eight {
@@ -60,7 +60,7 @@ div.column-eight {
 }
 
 div.column-eleven {
-    width: 200px;
+    width: 100px;
 }
 
 div.column-twelve {
@@ -146,9 +146,7 @@ div.section-title {
 
                         <div class="column-seven col-header">PNS Approach</div>
 
-                        <div class="column-seven col-header">Date Tested</div>
-
-                        <div class="column-seven col-header">Test Result</div>
+                        <div class="column-seven col-header">Date Tested/<br/>Result</div>
 
                         <div class="column-eight col-header"></div>
 
@@ -177,9 +175,7 @@ div.section-title {
 
                             <div class="column-seven">${rel.pnsApproach ?: ''}</div>
 
-                            <div class="column-seven">${rel.dateTested ?: ''}</div>
-
-                            <div class="column-seven">${rel.testResult ?: ''}</div>
+                            <div class="column-seven">${rel.dateTested ?: ''}<br/>${rel.testResult ?: ''}</div>
 
                             <div class="column-eight">
                                 <button type="button"
