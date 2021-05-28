@@ -362,4 +362,10 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="aojwang" id="kenyaemr_hiv_testing_019">
+        <delete tableName="scheduler_task_config">
+            <where>schedulable_class='org.openmrs.module.hivtestingservices.task.ContactListingOneTImeMigrationTask'</where>
+        </delete>
+    </changeSet>
+
 </databaseChangeLog>

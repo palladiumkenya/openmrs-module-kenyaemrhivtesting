@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -178,6 +179,48 @@ public class HibernateHTSDAO implements HTSDAO {
     }
 
     @Override
+    public PatientContact getPatientContactByUuid(String uuid) {
+        return (PatientContact)  this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class).add(Restrictions.eq("uuid", uuid))
+                .uniqueResult();
+    }
+
+    @Override
+    public List<PatientContact> getPatientContactListForRegistration() {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+        criteria.add(Restrictions.isNull("patient"));
+        criteria.add(Restrictions.isNotNull("appointmentDate"));
+        criteria.add(Restrictions.eq("voided", false));
+        criteria.setMaxResults(20);
+        return criteria.list();
+    }
+
+    /**
+     * Returns a list of patient contacts who have been traced and given appointments.
+     * This list is key in deciding which contacts should be registered as persons in the system for followup
+     * @return
+     */
+    @Override
+    public List<PatientContact> getPatientContactsTracedAndBooked() {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(ContactTrace.class);
+        criteria.add(Restrictions.eq("voided", false));
+        criteria.add(Restrictions.eq("status", "Contacted"));
+        criteria.add(Restrictions.isNotNull("appointmentDate"));
+        criteria.setMaxResults(20);
+
+        List<PatientContact> contacts = new ArrayList<PatientContact>();
+        //return result
+        if(!CollectionUtils.isEmpty(criteria.list())){
+            for (int i =0; i < criteria.list().size(); i++) {
+                ContactTrace trace = (ContactTrace) criteria.list().get(i);
+                if (trace.getPatientContact() != null && trace.getPatientContact().getPatient() == null) { // check that contact is not yet registered
+                    contacts.add(trace.getPatientContact());
+                }
+            }
+        }
+        return contacts;
+    }
+
+    @Override
     public Cohort getPatientsWithGender(boolean includeMales, boolean includeFemales, boolean includeUnknownGender) {
 
         if (!includeMales && !includeFemales && !includeUnknownGender) {
@@ -256,20 +299,7 @@ public class HibernateHTSDAO implements HTSDAO {
         return new Cohort(query.list());
     }
 
-    @Override
-    public PatientContact getPatientContactByUuid(String uuid) {
-        return (PatientContact)  this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class).add(Restrictions.eq("uuid", uuid))
-                .uniqueResult();
-    }
 
-    public List<PatientContact> getPatientContactListForRegistration() {
-        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
-        criteria.add(Restrictions.isNull("patient"));
-        criteria.add(Restrictions.isNotNull("appointmentDate"));
-        criteria.add(Restrictions.eq("voided", false));
-        criteria.setMaxResults(20);
-        return criteria.list();
-    }
 
 
 

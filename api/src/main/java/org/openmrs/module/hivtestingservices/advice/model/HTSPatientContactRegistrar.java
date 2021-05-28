@@ -6,11 +6,8 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.Period;
-import org.openmrs.Concept;
-import org.openmrs.Encounter;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
-import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
@@ -19,9 +16,6 @@ import org.openmrs.PersonAddress;
 import org.openmrs.PersonName;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
-import org.openmrs.api.ConceptService;
-import org.openmrs.api.EncounterService;
-import org.openmrs.api.ObsService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
@@ -32,10 +26,9 @@ import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.util.PrivilegeConstants;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,12 +47,19 @@ public class HTSPatientContactRegistrar {
     String cowifeRelType = "2ac0d501-eadc-4624-b982-563c70035d46";
     String injectableDrugUserRelType = "58da0d1e-9c89-42e9-9412-275cef1e0429";
 
+    /**
+     * Registers patient contacts who have been booked/traced
+     */
     public void registerBookedPatientContacts() {
 
 
         // Fetch entries
-        List<PatientContact> eligibleContacts = htsService.getPatientContactListForRegistration();
-        for(PatientContact pc : eligibleContacts) {
+        List<PatientContact> contactsBookedOnRegistration = htsService.getPatientContactListForRegistration();
+        List<PatientContact> contactsTracedAndBooked = htsService.getPatientContactsTracedAndBooked();
+        Set<PatientContact> registrationList = new HashSet<PatientContact>();
+        registrationList.addAll(contactsBookedOnRegistration);
+        registrationList.addAll(contactsTracedAndBooked);
+        for(PatientContact pc : registrationList) {
 
             String sex = pc.getSex();
             String fName = pc.getFirstName();
@@ -92,19 +92,6 @@ public class HTSPatientContactRegistrar {
             wrapper.getPerson();
 
             wrapper.getPerson().setTelephoneContact(pc.getPhoneContact());
-            /*wrapper.setNationalIdNumber(nationalIdNumber, location);
-            wrapper.setPatientClinicNumber(patientClinicNumber, location);
-            wrapper.setUniquePatientNumber(uniquePatientNumber, location);
-            wrapper.setNextOfKinName(nameOfNextOfKin);
-            wrapper.setNextOfKinRelationship(nextOfKinRelationship);
-            wrapper.setNextOfKinContact(nextOfKinContact);
-            wrapper.setNextOfKinAddress(nextOfKinAddress);
-            wrapper.setSubChiefName(subChiefName);
-            wrapper.setAlternativePhoneContact(alternatePhoneContact);
-            wrapper.setNearestHealthFacility(nearestHealthFacility);
-            wrapper.setEmailAddress(emailAddress);
-            wrapper.setGuardianFirstName(guardianFirstName);
-            wrapper.setGuardianLastName(guardianLastName);*/
 
             // Make sure everyone gets an OpenMRS ID
             PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, PatientWrapper.OPENMRS_ID);
@@ -121,7 +108,10 @@ public class HTSPatientContactRegistrar {
             }
 
             // assign CHT reference
-            toSave = addCHTRecordUuid(toSave, pc.getUuid());
+            if (pc.getContactListingDeclineReason() != null && pc.getContactListingDeclineReason().equalsIgnoreCase("CHT")) { // we temporarily used this field to indicate contacts originating from CHT
+                toSave = addCHTRecordUuid(toSave, pc.getUuid());
+            }
+
             Patient ret = Context.getPatientService().savePatient(toSave);
 
             // Explicitly save all identifier objects including voided
@@ -129,21 +119,6 @@ public class HTSPatientContactRegistrar {
                 Context.getPatientService().savePatientIdentifier(identifier);
             }
 
-            // Save remaining fields as obs
-            /*List<Obs> obsToSave = new ArrayList<Obs>();
-            List<Obs> obsToVoid = new ArrayList<Obs>();
-
-            handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(CIVIL_STATUS), null, maritalStatus);
-            handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(OCCUPATION), null, occupation);
-            handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(EDUCATION), null, education);
-            handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(IN_SCHOOL), null, inSchool);
-            handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(ORPHAN), null, orphan);
-
-
-            for (Obs o : obsToSave) {
-                Context.getObsService().saveObs(o, "KenyaEMR edit patient");
-            }
-*/
             // add relationship and update PatientContact record
             addRelationship(pc.getPatientRelatedTo(), ret, pc.getRelationType());
             pc.setPatient(ret);

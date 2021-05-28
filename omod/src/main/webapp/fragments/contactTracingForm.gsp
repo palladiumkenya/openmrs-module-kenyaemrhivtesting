@@ -8,6 +8,13 @@
             ]
     ]
 
+    def bookingDate = [
+            [
+                    [object: command, property: "appointmentDate", label: "Booking Date"]
+
+            ]
+    ]
+
     def patientContactTracing = [
             [
 
@@ -104,13 +111,19 @@
                 </tr>
             </table>
         </fieldset>
-     <fieldset id="linkageSection">
+        <fieldset id="linkageSection">
             <legend>Linkage Details</legend>
             <% linkageToCare.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
             <% } %>
         </fieldset>
 
+        <fieldset id="bookingSection">
+            <legend>Booking Details</legend>
+            <% bookingDate.each { %>
+            ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
+            <% } %>
+        </fieldset>
         <fieldset>
             <legend>Remarks</legend>
             <table>
@@ -147,11 +160,16 @@
        // jQuery("#phoneSection select").prop("disabled", true); //disable select section
         jQuery("#physicalSection").hide(); //hide physical section
         jQuery("#phoneSection").hide(); //hide phone section
+        jQuery("#bookingSection").hide();
 
         <% if (command.original != null  &&  command.status == "Contacted and Linked") { %>
             jQuery("#linkageSection").show(); //hide linkage section
             <% } else { %>
             jQuery("#linkageSection").hide(); //hide linkage section
+        <% } %>
+
+        <% if (command.original != null  &&  command.status == "Contacted") { %>
+        jQuery("#bookingSection").show(); //hide linkage section
         <% } %>
 
         jQuery('#patient-contact-trace-form .cancel-button').click(function () {
@@ -178,6 +196,10 @@
             if(contactType != "") {
                 if (selectedOutcome == "Contacted and Linked") {
                     jQuery("#linkageSection").show();
+                    jQuery("#bookingSection").hide();
+                } else if (selectedOutcome == "Contacted") {
+                    jQuery("#bookingSection").show();
+                    jQuery("#linkageSection").hide();
                 } else {
                     jQuery("#linkageSection input").val("");
                     jQuery("#linkageSection").hide();
@@ -193,6 +215,10 @@
             if(contactType != "" && outcome != "") {
                 if (outcome == "Contacted and Linked") {
                     jQuery("#linkageSection").show();
+                    jQuery("#bookingSection").hide();
+                } else if (outcome == "Contacted") {
+                    jQuery("#bookingSection").show();
+                    jQuery("#linkageSection").hide();
                 } else {
                     jQuery("#linkageSection input").val("");
                     jQuery("#linkageSection").hide();

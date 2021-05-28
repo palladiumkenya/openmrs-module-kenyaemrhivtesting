@@ -16,7 +16,7 @@ import org.openmrs.module.hivtestingservices.advice.model.HTSPatientContactRegis
 import org.openmrs.scheduler.tasks.AbstractTask;
 
 /**
- * Periodically refreshes ETL tables
+ * Periodically pushes contacts registered in the EMR back to Afyastat
  */
 public class ContactListingFormProcessorTask extends AbstractTask {
 

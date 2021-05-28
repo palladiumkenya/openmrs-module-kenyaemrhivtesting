@@ -53,6 +53,7 @@ public interface HTSService extends OpenmrsService {
     public Cohort getPatientsWithAgeRange(Integer minAge, DurationUnit minAgeUnit, Integer maxAge, DurationUnit maxAgeUnit, boolean unknownAgeIncluded, Date effectiveDate);
     public PatientContact getPatientContactByUuid (String uuid);
     public List<PatientContact> getPatientContactListForRegistration();
+    public List<PatientContact> getPatientContactsTracedAndBooked();
 
 
 }
