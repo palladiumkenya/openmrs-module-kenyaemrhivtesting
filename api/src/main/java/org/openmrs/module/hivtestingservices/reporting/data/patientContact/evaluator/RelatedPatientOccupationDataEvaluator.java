@@ -3,7 +3,6 @@ package org.openmrs.module.hivtestingservices.reporting.data.patientContact.eval
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientGenderDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientOccupationDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -16,7 +15,7 @@ import java.util.Map;
 /**
  * Evaluates a VisitIdDataDefinition to produce a VisitData
  */
-@Handler(supports=RelatedPatientOccupationDataDefinition.class, order=50)
+@Handler(supports = RelatedPatientOccupationDataDefinition.class, order = 50)
 public class RelatedPatientOccupationDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
@@ -25,8 +24,8 @@ public class RelatedPatientOccupationDataEvaluator implements PatientContactData
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, d.Gender as Gender \n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=c.patient_related_to where c.voided = 0; ";
+        String qry = "select c.id, d.occupation as occupation\n" +
+                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on c.patient_related_to = d.patient_id where c.voided = 0;\n";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
