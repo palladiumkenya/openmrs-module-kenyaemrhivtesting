@@ -5,24 +5,24 @@ import org.openmrs.module.reporting.definition.configuration.ConfigurationProper
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 /**
- * Visit ID Column
+ * Visit PNS Approach Column
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
-public class PatientContactScreenedForIpvDataDefinition extends BaseDataDefinition implements PatientContactDataDefinition {
+public class PatientContactPNSApproachDataDefinition extends BaseDataDefinition implements PatientContactDataDefinition {
 
     public static final long serialVersionUID = 1L;
 
     /**
      * Default Constructor
      */
-    public PatientContactScreenedForIpvDataDefinition() {
+    public PatientContactPNSApproachDataDefinition() {
         super();
     }
 
     /**
      * Constructor to populate name only
      */
-    public PatientContactScreenedForIpvDataDefinition(String name) {
+    public PatientContactPNSApproachDataDefinition(String name) {
         super(name);
     }
 

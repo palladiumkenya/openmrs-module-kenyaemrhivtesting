@@ -4,7 +4,6 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactBaselineHivStatusDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactSexDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.SqlQueryBuilder;
@@ -16,8 +15,8 @@ import java.util.Map;
 /**
  * Evaluates a VisitIdDataDefinition to produce a VisitData
  */
-@Handler(supports=PatientContactBaselineHivStatusDataDefinition.class, order=50)
-public class PatientContactBaselineHivStatusDataEvaluator implements PatientContactDataEvaluator {
+@Handler(supports=PatientContactPNSApproachDataEvaluator.class, order=50)
+public class PatientContactPNSApproachDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
     private EvaluationService evaluationService;
@@ -25,7 +24,7 @@ public class PatientContactBaselineHivStatusDataEvaluator implements PatientCont
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, baseline_hiv_status as baseline_hiv_status from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
+        String qry = "select c.id, case c.pns_approach when 162284 then 'D' when 160551 then 'Con' when 161642 then 'Cr' when 163096 then 'Pr' end as preferred_pns_approach from kenyaemr_hiv_testing_patient_contact c where c.voided=0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

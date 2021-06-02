@@ -2,8 +2,8 @@ package org.openmrs.module.hivtestingservices.reporting.data.patientContact.eval
 
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactConsentedTestingDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateOutcomeDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -16,8 +16,8 @@ import java.util.Map;
 /**
  * Evaluates a VisitIdDataDefinition to produce a VisitData
  */
-@Handler(supports=PatientContactLastTestDateOutcomeDefinition.class, order=50)
-public class PatientContactLastTestOutcomeDataEvaluator implements PatientContactDataEvaluator {
+@Handler(supports= PatientContactConsentedTestingDataDefinition.class, order=50)
+public class PatientContactConsentedTestingDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
     private EvaluationService evaluationService;
@@ -25,8 +25,9 @@ public class PatientContactLastTestOutcomeDataEvaluator implements PatientContac
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "SELECT c.id, mid(max(concat(t.visit_date, t.final_test_result)), 11) as last_test_result from kenyaemr_etl.etl_hts_test t inner join kenyaemr_hiv_testing_patient_contact c on t.patient_id=c.patient_id  \n" +
-                "where t.voided = 0 and c.voided = 0 GROUP BY c.id; ";
+        String qry = "select c.id, case mid(max(concat(t.visit_date,t.patient_consented)),11) when 'Yes' then 'Y' when 'No' then 'N' end as consented_testing from kenyaemr_etl.etl_patient_contact c\n" +
+                "inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id where c.voided=0\n" +
+                "group by c.id;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
