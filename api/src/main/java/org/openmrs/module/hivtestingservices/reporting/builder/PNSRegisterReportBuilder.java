@@ -127,7 +127,7 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("Contact Age", new PatientContactAgeDataDefinition(), "");
         dsd.addColumn("Contact Sex", new PatientContactSexDataDefinition(), "");
         dsd.addColumn("Contact Relationship", new PatientContactRelationshipDataDefinition(), "");
-        dsd.addColumn("Contact Occupation", new RelatedPatientOccupationDataDefinition(), null);
+        dsd.addColumn("Contact Occupation", new PatientContactOccupationDataDefinition(), null);
         dsd.addColumn("Contact Phone Number", new PatientContactPhoneContactDataDefinition(), "");
         dsd.addColumn("Contact Baseline Status", new PatientContactBaselineHivStatusDataDefinition(), "");
         dsd.addColumn("Contact Preferred PNS Approach", new PatientContactPNSApproachDataDefinition(), "");
