@@ -8,21 +8,21 @@ import org.openmrs.module.reporting.evaluation.caching.Caching;
  * Visit ID Column
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
-public class RelatedPatientKeyOrPriorityPopulationDataDefinition extends BaseDataDefinition implements PatientContactDataDefinition {
+public class PatientContactScreenedForIpvDataDefinition extends BaseDataDefinition implements PatientContactDataDefinition {
 
     public static final long serialVersionUID = 1L;
 
     /**
      * Default Constructor
      */
-    public RelatedPatientKeyOrPriorityPopulationDataDefinition() {
+    public PatientContactScreenedForIpvDataDefinition() {
         super();
     }
 
     /**
      * Constructor to populate name only
      */
-    public RelatedPatientKeyOrPriorityPopulationDataDefinition(String name) {
+    public PatientContactScreenedForIpvDataDefinition(String name) {
         super(name);
     }
 
