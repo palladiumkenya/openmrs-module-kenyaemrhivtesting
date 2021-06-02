@@ -65,18 +65,11 @@ public class HTSPatientContactRegistrar {
             String fName = pc.getFirstName();
             String mName = pc.getMiddleName();
             String lName = pc.getLastName();
-            /*if (pc.getSex() != null) {
-                sex = sex.equals("male") ? "M" : "F";
-            } else {
-                sex = "U";
-            }*/
+
             Patient toSave = new Patient(); // Creating a new patient and person
             toSave.setGender(sex);
             toSave.setBirthdate(pc.getBirthDate());
             toSave.setBirthdateEstimated(true);
-            //toSave.setDead(dead);
-            //toSave.setDeathDate(deathDate);
-            //toSave.setCauseOfDeath(dead ? conceptService.getConceptByUuid(CAUSE_OF_DEATH_PLACEHOLDER) : null);
             PersonName pn = new PersonName();
             pn.setGivenName(fName.replaceAll("[^A-Za-z]",""));
             pn.setFamilyName(lName.replaceAll("[^A-Za-z]",""));
@@ -126,6 +119,7 @@ public class HTSPatientContactRegistrar {
 
             } catch (Exception e) { // we don't want to block processing in case of any error
                 e.printStackTrace();
+                continue;
             }
         }
     }
