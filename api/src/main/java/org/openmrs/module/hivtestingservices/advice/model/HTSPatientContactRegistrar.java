@@ -59,13 +59,18 @@ public class HTSPatientContactRegistrar {
         Set<PatientContact> registrationList = new HashSet<PatientContact>();
         registrationList.addAll(contactsBookedOnRegistration);
         registrationList.addAll(contactsTracedAndBooked);
+        System.out.println("Total no of contacts to register: " + registrationList.size());
         for(PatientContact pc : registrationList) {
 
             String sex = pc.getSex();
             String fName = pc.getFirstName();
             String mName = pc.getMiddleName();
             String lName = pc.getLastName();
-
+            if (org.apache.commons.lang3.StringUtils.isBlank(fName) || org.apache.commons.lang3.StringUtils.isBlank(lName) || pc.getBirthDate() == null) {
+                System.out.println("A contact misses the mandatory first/last name or date of birth");
+                log.error("A contact for " + pc.getPatientRelatedTo().getNames().toString() + " misses the mandatory first/last name or date of birth for registration.");
+                continue;
+            }
             Patient toSave = new Patient(); // Creating a new patient and person
             toSave.setGender(sex);
             toSave.setBirthdate(pc.getBirthDate());
