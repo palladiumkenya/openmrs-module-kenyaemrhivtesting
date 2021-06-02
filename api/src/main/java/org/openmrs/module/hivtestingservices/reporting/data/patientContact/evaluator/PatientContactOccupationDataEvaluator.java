@@ -4,6 +4,7 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactConsentedTestingDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactOccupationDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.SqlQueryBuilder;
@@ -15,8 +16,8 @@ import java.util.Map;
 /**
  * Evaluates a VisitIdDataDefinition to produce a VisitData
  */
-@Handler(supports= PatientContactConsentedTestingDataDefinition.class, order=50)
-public class PatientContactTestedDataEvaluator implements PatientContactDataEvaluator {
+@Handler(supports= PatientContactOccupationDataDefinition.class, order=50)
+public class PatientContactOccupationDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
     private EvaluationService evaluationService;
@@ -24,10 +25,8 @@ public class PatientContactTestedDataEvaluator implements PatientContactDataEval
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, case mid(max(concat(t.visit_date,t.final_test_result)),11) when null then 'N' else 'Y' end as tested from kenyaemr_etl.etl_patient_contact c inner join\n" +
-                "kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id where c.voided=0\n" +
-                "group by c.patient_id;";
-
+        String qry = "select c.id, d.occupation from kenyaemr_etl.etl_patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on c.patient_id = d.patient_id\n" +
+                "where c.voided = 0;";
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
         Map<Integer, Object> data = evaluationService.evaluateToMap(queryBuilder, Integer.class, Object.class, context);

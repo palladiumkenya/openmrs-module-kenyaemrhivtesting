@@ -1,9 +1,10 @@
-package org.openmrs.module.hivtestingservices.reporting.data;
+package org.openmrs.module.hivtestingservices.reporting.data.converter;
 
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 /**
  * Created by Steve on 30 May, 2021
+ * Converter for KP types
  */
 public class KPTypeConverter implements DataConverter {
     @Override

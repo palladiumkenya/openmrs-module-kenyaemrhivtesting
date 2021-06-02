@@ -5,24 +5,24 @@ import org.openmrs.module.reporting.definition.configuration.ConfigurationProper
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 /**
- * Visit ID Column
+ * Index client Type Column
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
-public class RelatedPatientKeyOrPriorityPopulationDataDefinition extends BaseDataDefinition implements PatientContactDataDefinition {
+public class RelatedIndexClientTypeDataDefinition extends BaseDataDefinition implements PatientContactDataDefinition {
 
     public static final long serialVersionUID = 1L;
 
     /**
      * Default Constructor
      */
-    public RelatedPatientKeyOrPriorityPopulationDataDefinition() {
+    public RelatedIndexClientTypeDataDefinition() {
         super();
     }
 
     /**
      * Constructor to populate name only
      */
-    public RelatedPatientKeyOrPriorityPopulationDataDefinition(String name) {
+    public RelatedIndexClientTypeDataDefinition(String name) {
         super(name);
     }
 

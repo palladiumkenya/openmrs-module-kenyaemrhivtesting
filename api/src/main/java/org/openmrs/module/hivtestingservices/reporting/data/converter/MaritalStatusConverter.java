@@ -7,14 +7,14 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.kenyaemr.reporting.data.converter;
+package org.openmrs.module.hivtestingservices.reporting.data.converter;
 
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 /**
  * converter for HTS Marital status
  */
-public class HTSMaritalStatusConverter implements DataConverter {
+public class MaritalStatusConverter implements DataConverter {
 
     @Override
     public Object convert(Object obj) {
