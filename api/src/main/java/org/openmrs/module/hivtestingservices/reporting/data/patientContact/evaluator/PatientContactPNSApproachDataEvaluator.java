@@ -4,6 +4,7 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactBaselineHivStatusDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactPNSApproachDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.SqlQueryBuilder;
@@ -15,7 +16,7 @@ import java.util.Map;
 /**
  * Evaluates a VisitIdDataDefinition to produce a VisitData
  */
-@Handler(supports=PatientContactPNSApproachDataEvaluator.class, order=50)
+@Handler(supports= PatientContactPNSApproachDataDefinition.class, order=50)
 public class PatientContactPNSApproachDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
