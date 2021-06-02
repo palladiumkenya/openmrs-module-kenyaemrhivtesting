@@ -78,10 +78,10 @@ public class HTSPatientContactRegistrar {
             //toSave.setDeathDate(deathDate);
             //toSave.setCauseOfDeath(dead ? conceptService.getConceptByUuid(CAUSE_OF_DEATH_PLACEHOLDER) : null);
             PersonName pn = new PersonName();
-            pn.setGivenName(fName);
-            pn.setFamilyName(lName);
+            pn.setGivenName(fName.replaceAll("[^A-Za-z]",""));
+            pn.setFamilyName(lName.replaceAll("[^A-Za-z]",""));
             if (mName != null && !mName.equals("")) {
-                pn.setMiddleName(mName);
+                pn.setMiddleName(mName.replaceAll("[^A-Za-z]",""));
             }
 
             toSave.addName(pn);
@@ -111,19 +111,22 @@ public class HTSPatientContactRegistrar {
             if (pc.getContactListingDeclineReason() != null && pc.getContactListingDeclineReason().equalsIgnoreCase("CHT")) { // we temporarily used this field to indicate contacts originating from CHT
                 toSave = addCHTRecordUuid(toSave, pc.getUuid());
             }
+            try {
+                Patient ret = Context.getPatientService().savePatient(toSave);
 
-            Patient ret = Context.getPatientService().savePatient(toSave);
+                // Explicitly save all identifier objects including voided
+                for (PatientIdentifier identifier : toSave.getIdentifiers()) {
+                    Context.getPatientService().savePatientIdentifier(identifier);
+                }
 
-            // Explicitly save all identifier objects including voided
-            for (PatientIdentifier identifier : toSave.getIdentifiers()) {
-                Context.getPatientService().savePatientIdentifier(identifier);
+                // add relationship and update PatientContact record
+                addRelationship(pc.getPatientRelatedTo(), ret, pc.getRelationType());
+                pc.setPatient(ret);
+                Context.getService(HTSService.class).savePatientContact(pc);
+
+            } catch (Exception e) { // we don't want to block processing in case of any error
+                e.printStackTrace();
             }
-
-            // add relationship and update PatientContact record
-            addRelationship(pc.getPatientRelatedTo(), ret, pc.getRelationType());
-            pc.setPatient(ret);
-            Context.getService(HTSService.class).savePatientContact(pc);
-
         }
     }
 
