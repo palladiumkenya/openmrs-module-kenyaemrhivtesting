@@ -3,8 +3,7 @@ package org.openmrs.module.hivtestingservices.reporting.data.patientContact.eval
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientOccupationDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientPopulationTypeDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientKeyOrPriorityPopulationDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.SqlQueryBuilder;
@@ -16,8 +15,8 @@ import java.util.Map;
 /**
  * Evaluates a VisitIdDataDefinition to produce a VisitData
  */
-@Handler(supports=RelatedPatientPopulationTypeDataDefinition.class, order=50)
-public class RelatedPatientPopulationTypeDataEvaluator implements PatientContactDataEvaluator {
+@Handler(supports= RelatedPatientKeyOrPriorityPopulationDataDefinition.class, order=50)
+public class RelatedPatientKeyOrPriorityPopulationDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
     private EvaluationService evaluationService;
