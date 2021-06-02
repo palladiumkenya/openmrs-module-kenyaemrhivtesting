@@ -4,7 +4,6 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactConsentedTestingDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateOutcomeDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.SqlQueryBuilder;
@@ -17,7 +16,7 @@ import java.util.Map;
  * Evaluates a VisitIdDataDefinition to produce a VisitData
  */
 @Handler(supports= PatientContactConsentedTestingDataDefinition.class, order=50)
-public class PatientContactConsentedTestingDataEvaluator implements PatientContactDataEvaluator {
+public class PatientContactTestedDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
     private EvaluationService evaluationService;
@@ -25,7 +24,9 @@ public class PatientContactConsentedTestingDataEvaluator implements PatientConta
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "";
+        String qry = "select c.id, case mid(max(concat(t.visit_date,t.final_test_result)),11) when null then 'N' else 'Y' end as tested from kenyaemr_etl.etl_patient_contact c inner join\n" +
+                "kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id where c.voided=0\n" +
+                "group by c.patient_id;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
