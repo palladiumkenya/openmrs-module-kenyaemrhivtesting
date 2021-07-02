@@ -89,8 +89,8 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
     protected List<Mapped<DataSetDefinition>> buildDataSets(ReportDescriptor reportDescriptor, ReportDefinition reportDefinition) {
         return Arrays.asList(
                 ReportUtils.map(datasetColumns(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(htsDataSet(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(pnsDataSet(), "startDate=${startDate},endDate=${endDate}")
+                ReportUtils.map(htsDataSet(), "startDate=${startDate},endDate=${endDate}")
+               // ReportUtils.map(pnsDataSet(), "startDate=${startDate},endDate=${endDate}")
 
         );
     }
