@@ -25,7 +25,7 @@
 		<property name="appointmentDate" type = "java.util.Date" column ="appointment_date"/>
 		<property name="baselineHivStatus" type = "java.lang.String" column ="baseline_hiv_status" length="255"/>
 		<property name="ipvOutcome" type="java.lang.String" column = "ipv_outcome" length="255"/>
-		<many-to-one name="patient" class="org.openmrs.Patient" not-null="true" column="patient_id"/>
+		<many-to-one name="patient" class="org.openmrs.Patient" not-null="false" column="patient_id"/>
 		<property name="maritalStatus" type="java.lang.Integer" column="marital_status" length="19"/>
 		<property name="livingWithPatient" type="java.lang.Integer" column="living_with_patient" length="19"/>
 		<property name="pnsApproach" type="java.lang.Integer" column="pns_approach" length="19"/>
