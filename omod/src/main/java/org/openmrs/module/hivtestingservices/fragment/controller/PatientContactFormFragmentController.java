@@ -282,6 +282,11 @@ public class PatientContactFormFragmentController {
                 if (appointmentDate.before(listingDate))
                     errors.rejectValue("appointmentDate", "Cannot be before contact listing date");
             }
+            require(errors,"relationType");
+            if (relationType == null) {
+                errors.rejectValue("relationType", "Relationship to Patient is required");
+
+            }
         }
 
         public PatientContact getOriginal() {

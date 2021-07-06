@@ -123,7 +123,7 @@
             <legend>Relationship</legend>
             <table>
                 <tr>
-                    <td class="ke-field-label">Relationship to Patient</td>
+                    <td class="ke-field-label">Relationship to Patient*</td>
                     <td class="ke-field-label">Living with Client?</td>
                 </tr>
                 <tr>
