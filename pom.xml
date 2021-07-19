@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>hivtestingservices</artifactId>
-	<version>1.1.6</version>
+	<version>1.2.0</version>
 	<packaging>pom</packaging>
 	<name>HTS in KenyaEMR Module</name>
 	<description>Provides HTS features in KenyaEMR</description>
@@ -46,8 +46,8 @@
 		<reportingVersion>1.18.0</reportingVersion>
 		<serializationxstreamVersion>0.2.14</serializationxstreamVersion>
 		<uiframeworkVersion>3.15.0</uiframeworkVersion>
-     	<kenyacoreVersion>2.2</kenyacoreVersion>
-		<kenyauiVersion>2.0.3</kenyauiVersion>
+     	<kenyacoreVersion>3.0.0</kenyacoreVersion>
+		<kenyauiVersion>3.0.0</kenyauiVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
