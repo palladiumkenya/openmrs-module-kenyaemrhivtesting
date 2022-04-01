@@ -16,40 +16,16 @@
 
     <script type="text/javascript" src="../moduleResources/kenyaemr/scripts/moment.js"></script>
     <script type="text/javascript">
-
-        //On Ready
-        $(document).ready(function () {
-            //defaults
-            jq("#key-population").hide();
-            jq("#priority-population").hide();
-            jq('#test-result').hide();
-            jq('#tr-art-start-date').hide();
-            //jq('#tr-art-start-date').hide();
-            jq('#population-type :input[type=radio]').change(populationTypeSelected);
-            jq('#test-history :input[type=radio]').change(everTested);
-
-        });
-        //Before Submit
-        beforeSubmit.push(function() {
-
-        });
         var populationTypeSelected = function () {
             var val = jq(this).val();
             var keypop = jq('#key-population');
-            var pripop = jq('#priority-population');
+
             if (val == 164929 ){
                 jq("#key-population").show();
-                jq("#priority-population").hide();
-            }
-            if (val == 138643 ){
-                jq("#priority-population").show();
-                jq("#key-population").hide();
             }
             if(val == 164928){
                 jq("#key-population").hide();
-                jq("#priority-population").hide();
                 clearHiddenSections(keypop);
-                clearHiddenSections(pripop);
             }
         }
         var everTested = function (){
@@ -62,7 +38,6 @@
                 clearHiddenSections(testDate);
                 clearHiddenSections(testResults);
                 jq('#test-result').hide();
-                jq('#tr-art-start-date').hide();
                 jq('#eligible-for-test').show();
                 jq('#eligible-test input[value=1065]').prop("checked", true);
 
@@ -71,7 +46,6 @@
                 clearHiddenSections(eligibleForTesting);
                 jq('#eligible-for-test').show();
                 jq('#test-result').show();
-                jq('#tr-art-start-date').show();
             }
         }
 
@@ -91,34 +65,19 @@
             });
         }
 
-    </script>
-    <style>
-        .simple-table {
-            border: solid 1px #DDEEEE;
-            border-collapse: collapse;
-            border-spacing: 0;
-            font: normal 13px Arial, sans-serif;
-        }
+        //On Ready
+        $(document).ready(function () {
+            //pop type
+            jq("#key-population").hide();
+            jq('#population-type :input[type=radio]').change(populationTypeSelected);
+            jq('#test-history :input[type=radio]').change(everTested);
+            jq('#test-result').hide();
+        });
+        //Before Submit
+        beforeSubmit.push(function() {
 
-        .simple-table thead th {
-            background-color: #DDEFEF;
-            border: solid 1px #DDEEEE;
-            color: #336B6B;
-            padding: 10px;
-            text-align: left;
-            text-shadow: 1px 1px 1px #fff;
-        }
-
-        .simple-table td {
-            border: solid 1px #DDEEEE;
-            color: #333;
-            padding: 10px;
-            text-shadow: 1px 1px 1px #fff;
-        }
-
-        .disabled {
-            color: #ebebe4;
-    </style>
+        });
+           </script>
 
     <div class="ke-form-header">
         <table style="width: 100%" class="simple-table">
@@ -133,449 +92,68 @@
     </div>
 
     <div class="ke-form-content">
-        <!-- Population Type  -->
         <fieldset>
-            <legend>Population Type</legend>
+            <legend>Patient Type</legend>
             <div>
-                Population type : &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                <obs conceptId="164930"
-                     answerConceptIds="164928,164929,138643"
-                     answerLabels="General Population,Key Population,Priority Population" id="population-type"
-                     style="radio"  />
+                Population type :
+                <obs conceptId="160112"
+                     answerConceptIds="1066,1065"
+                     answerLabels="HP,NP"
+                     style="radio" />
             </div>
-            <table id="key-population">
-                <tr>
-                    <td>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="105AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="People who inject drugs" style="checkbox" /><br/>
-                        <includeIf velocityTest="$patient.gender == 'M'">
-                            <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160578AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Men who have sex with men" style="checkbox" /><br/>
-                        </includeIf>
-                        <includeIf velocityTest="$patient.gender == 'F'">
-                            <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160579AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Female sex Worker" style="checkbox" id="female-sex-worker" /><br/>
-                        </includeIf>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="People in prison and other closed settings" style="checkbox"  id="prisoner"/><br/>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165100"
-                             answerLabel="Transgender" style="checkbox"  id="transgender"/><br/>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Other" style="checkbox" id="other" /><br/>
-
-                    </td>
-
-                </tr>
-            </table>
-            <table id="priority-population">
-                <tr>
-                    <td>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="159674AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Fisher folk" style="checkbox" /><br/>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162198AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Truck driver" style="checkbox" /><br/>
-                        <includeIf velocityTest="$patient.gender == 'F'">
-                            <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Adolescent and young girls" style="checkbox" id="adyg" /><br/>
-                        </includeIf>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Prisoner" style="checkbox" /><br/>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165192"
-                             answerLabel="Military and other uniformed services" style="checkbox" id="dodOnly" /><br/>
-
-                    </td>
-                </tr>
-            </table>
         </fieldset>
         <fieldset>
             <legend>Department/Coverage</legend>
-            <table class="simple-table">
-                <tr>
-                    <td>Department :   </td>
-                    <td>
-                        <obs conceptId="159936"
-                             answerConceptIds="160542,5485,160473,160538,159940"
-                             answerLabels="OPD:Out-patient department,IPD:In-patient department,Emergency,PMTCT,VCT"
-                             style="dropdown" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Patient Type:</td>
-                    <td>
-                        <obs conceptId="164956"
-                             answerConceptIds="164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,164953"
-                             answerLabels="HP:Hospital Patient,NP:Non-Hospital Patient"
-                             style="radio" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Client a health care worker?</td>
-                    <td>
-                        <obs conceptId="5619AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No"
-                             style="radio" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Client has any relationship with an index client?</td>
-                    <td>
-                        <obs conceptId="166570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="163565AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Sexual Contact" style="checkbox" /><br/>
-                        <obs conceptId="166570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="166606AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Social Contact" style="checkbox" /><br/>
-                        <obs conceptId="166570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="None" style="checkbox" /><br/>
-                    </td>
-                </tr>
-            </table>
+            <div>
+                Department :
+                <obs conceptId="159936"
+                     answerConceptIds="160542,5485"
+                     answerLabels="OPD,IPD"
+                     style="radio" />
+            </div>
         </fieldset>
         <fieldset>
             <legend>History of HIV Testing</legend>
-            <table class="simple-table">
-                <tr>
-                    <td>Tested for HIV before :</td>
-                    <td>
-                        <obs conceptId="164401"
-                             id="test-history"
-                             answerConceptIds="1065,1066"
-                             answerLabels="Yes,No"
-                             style="radio" />
-                    </td>
-                    <td>
-                        <table id="test-result">
-                            <tr id="testResult">
-                                <td> Who performed the test?:</td>
-                                <td>
-                                    <obs conceptId="165215"
-                                         answerConceptIds="5619AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,164952"
-                                         answerLabels="HTS Provider,Self Tested"
-                                         style="radio"  id="tester"  answerSeparator="&lt;br /&gt;&lt;br /&gt;" />
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td>
-                        <table>
-                            <tr id="tr-art-start-date">
-                                <td>
-                                    Test Result :
-                                    <obs id="ever-tested" conceptId="159427"
-                                         answerConceptIds="703,664,1067"
-                                         answerLabel="Positive,Negative,Unknown"
-                                         style="dropdown" />
-                                </td>
-                                <td> Date Tested:
-                                    <obs id="duration_months" conceptId="164400" />
-
-                                </td>
-                                <td width="250">Client started on ART:
-                                    <obs conceptId="165240"
-                                         id="started-art"
-                                         answerConceptIds="1065,1066"
-                                         answerLabels="Yes,No" />
-                                </td>
-                                <td> CCC Number:
-                                    <obs class="upn" conceptId="162053" id="upn-concept" size ="20" />
-                                    <span id="upnError" class="error"></span>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </fieldset>
-        <fieldset id="risk-assessment">
-            <legend>Risk Assessment</legend>
             <div>
-                Client Sexual Behaviour Assessment:
+                Tested for HIV before :
+                <obs conceptId="164401"
+                     id="test-history"
+                     answerConceptIds="1065,1066"
+                     answerLabels="Yes,No"
+                     style="radio" />
             </div>
-            <table class="simple-table">
+        </fieldset>
+
+        <fieldset id="test-result">
+            <legend>Test Result</legend>
+            <table id="testResult">
                 <tr>
-                    <td>Has the client ever had sex?</td>
                     <td>
-                        <obs conceptId="5569AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="yes_no" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Is the client sexually active?</td>
-                    <td>
-                        <obs conceptId="160109AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No"
+                        Test Result :
+                        <obs id="ever-tested" conceptId="159427"
+                             answerConceptIds="703,664"
+                             answerLabel="Positive,Negative"
                              style="radio" />
+                        &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
                     </td>
-                </tr>
-                <tr>
-                    <td>Has the client had a new sexual partner in the last 3 months?</td>
-                    <td>
-                        <obs conceptId="167144AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No"
-                             style="radio" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Partner HIV status</td>
-                    <td>
-                        <obs conceptId="1436AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             id="partner-hiv-status"
-                             answerConceptIds="703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="HIV Positive,HIV Negative,Unknown" style="radio"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Discordant Couple </td>
-                    <td>
-                        <obs id="couple-discordant" conceptId="6096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Have you engaged yourself in unprotected sex with more than one sexual partner? </td>
-                    <td>
-                        <obs id="multiple-sex-partners" conceptId="5568AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="yes_no"/>
-                    </td>
-                    <td>How many sexual partners? </td>
-                    <td>
-                        <obs id="no-sex-partners" conceptId="5570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Does the client engage in sex under the influence of alcohol/drugs? </td>
-                    <td>
-                        <obs id="alcoholic-sex" conceptId="165088"
-                             answerConceptIds="1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1385AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1358AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Not at all,Sometimes,Always"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Have you ever had unprotected sex in exchange of money or other material gains?</td>
-                    <td>
-                        <obs id="money-sex" conceptId="160579AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Have you recently had any incident of condom burst?</td>
-                    <td>
-                        <obs id="condom-burst" conceptId="166559AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Have you engaged in unprotected sex with someone you don’t know their HIV status in the last 24months?</td>
-                    <td>
-                        <obs id="stranger-sex" conceptId="159218AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Has the client recently experienced GBV?</td>
-                    <td>
-                        <obs id="experienced-gbv" conceptId="167161"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Within the last 3 months, has the client experienced either physical or sexual violence?</td>
-                    <td>
-                        <obs id="sexual-violence" conceptId="167145"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Have you recently been forced to participate into sexual activity against your wish?</td>
-                    <td>
-                        <obs id="forced-sex" conceptId="160658AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Has the client received any of the following services recently?</td>
-                </tr>
-                <tr>
-                    <td>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs conceptId="165269" answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="PrEP" style="checkbox" /><br/>
-                    </td>
-                    <td>Is the client currently on PrEP? </td>
-                    <td>
-                        <obs conceptId="165203"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs conceptId="164845AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="PEP" style="checkbox" />
-                    </td>
-                    <td>Has the client used PEP in the last 3 months?  </td>
-                    <td>
-                        <obs conceptId="1691AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="yes_no" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs conceptId="165098"
-                             answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="STI" style="checkbox" />
-                    </td>
-                    <td>Has the client had an STI in the last 3 months?  </td>
-                    <td>
-                        <obs conceptId="165200"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs conceptId="112141AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="TB" style="checkbox" />
-                    </td>
-                    <td>Is the client presumed to have TB </td>
-                    <td>
-                        <obs conceptId="164948"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Have you ever shared a needle while injecting drugs with someone else?</td>
-                    <td>
-                        <obs conceptId="165090"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Has the client had needle stick injuries?</td>
-                    <td>
-                        <obs conceptId="165060"
-                             answerConceptIds="153574AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Traditional /non-medical procedures e.g. scarification, plastic tooth extraction, Circumcision, uvulectomy etc</td>
-                    <td>
-                        <obs conceptId="166365AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
+                    <td> Date Tested:
+                        <obs id="duration_months" conceptId="164400"
+                        />
+                        &#160;&#160;&#160;
                     </td>
                 </tr>
             </table>
         </fieldset>
-        <fieldset id="children-eligibilit">
-            <legend>Children Eligibility</legend>
-            <table class="simple-table">
-                <obsgroup groupingConceptId="159392AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
-                    <tr id="children-eligibility">
-                        <td>  For children if any of the below are present , explore with the guardian and determine HTS eligibility </td>
-                        <td>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="115122AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Malnutrition" style="checkbox" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5050AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Failure to thrive (age and child's growth rate has discrepancy)" style="checkbox" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="127833AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Recurrent infections" style="checkbox" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="112141AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="TB" style="checkbox" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="No parent (are orphaned)" style="checkbox" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="163718AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Parents /siblings who recently tested HIV positive." style="checkbox" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="140238AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Prolonged fever of unknown origin" style="checkbox" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Children >18 months who are still breasteeding or wet nursing" style="checkbox" /><br/>
-                        </td>
-                    </tr>
-                </obsgroup>
-            </table>
-        </fieldset>
-        <fieldset id="fs-pregnancy-assessment">
-            <legend>Pregnancy Assessment</legend>
-            <table class="simple-table">
-                <tr>
-                    <td> Client currently pregnant? </td>
-                    <td>
-                        <obs conceptId="5272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No" id="pregnant" />
-                    </td>
-                </tr>
-                <tr>
-                    <td> Breasteeding mother</td>
-                    <td>
-                        <obs conceptId="5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No"
-                             style="radio" id="breastfeeding" />
-                    </td>
-                </tr>
-            </table>
-        </fieldset>
+
         <fieldset id="eligible-for-test">
             <legend>Eligible for Testing</legend>
-            <table class="simple-table">
-                <tr>
-                    <td>Client eligible for testing : </td>
-                    <td>
-                        <obs conceptId="167146" id="eligible-test"
-                             answerConceptIds="1065,1066"
-                             answerLabels="Yes,No"
-                             style="radio" />
-                    </td>
-                </tr>
-                <obsgroup groupingConceptId="165078">
-                    <tr id="reasons-ineligibility">
-                        <td> If No, Choose a reason below </td>
-                        <td>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="167156AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Declined testing" style="checkbox" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165029"
-                                 answerLabel="Wants to test with partner" style="checkbox" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160589AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Stigma related issues" style="checkbox" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="141814AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Fear of violent partner" style="checkbox" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="155974AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="No counselor to test" style="checkbox" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="158948AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="High workload for the staff" style="checkbox" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="163293AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Too sick" style="checkbox" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Other" style="checkbox" /><br/>
-                        </td>
-                        <td>
-                            <br/>
-                            <table id="tbl-other-decline-reason">
-                                <tr>
-                                    <td>  &#160;&#160;&#160; Specify :
-                                        <obs id="other-decline-reason" conceptId="160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
-                                        &#160;&#160;&#160;
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </obsgroup>
-            </table>
+            <div>
+                Client eligible? :
+                <obs conceptId="162699" id="eligible-test"
+                     answerConceptIds="1065,1066"
+                     answerLabels="Yes,No"
+                     style="radio" />
+            </div>
         </fieldset>
 
     </div>
