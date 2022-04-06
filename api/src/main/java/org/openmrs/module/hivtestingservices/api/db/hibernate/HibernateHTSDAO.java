@@ -189,6 +189,9 @@ public class HibernateHTSDAO implements HTSDAO {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
         criteria.add(Restrictions.isNull("patient"));
         criteria.add(Restrictions.isNotNull("appointmentDate"));
+        criteria.add(Restrictions.isNotNull("firstName"));
+        criteria.add(Restrictions.isNotNull("lastName"));
+        criteria.add(Restrictions.isNotNull("birthDate"));
         criteria.add(Restrictions.eq("voided", false));
         criteria.setMaxResults(20);
         return criteria.list();
@@ -212,7 +215,9 @@ public class HibernateHTSDAO implements HTSDAO {
         if(!CollectionUtils.isEmpty(criteria.list())){
             for (int i =0; i < criteria.list().size(); i++) {
                 ContactTrace trace = (ContactTrace) criteria.list().get(i);
-                if (trace.getPatientContact() != null && trace.getPatientContact().getPatient() == null) { // check that contact is not yet registered
+                PatientContact pc = trace.getPatientContact();
+
+                if (pc != null && pc.getPatient() == null && pc.getBirthDate() != null && pc.getFirstName() != null && pc.getLastName() != null) { // check that contact is not yet registered
                     contacts.add(trace.getPatientContact());
                 }
             }
