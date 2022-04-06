@@ -54,6 +54,7 @@
             jq('#tb-service :input[type=checkbox]').change(tbServiceSelected);
             jq('#pwid :input[type=checkbox]').change(pwidSelected);
             jq('#other-decline-reason :input[type=checkbox]').change(otherDeclineReasonSelected);
+            jq('#index-relationship :input[type=checkbox]').change(indexRelationshipSelected);
 
 
             if(pgender == 'M' || pAge &lt; 10 ){
@@ -282,9 +283,44 @@
                 clearHiddenSections(jq('#other-reason-specify'));
             }
         }
+        var indexRelationshipSelected = function(){
+            var val = jq(this).val();
+            var relationshipChecked = jq("#index-relationship input:checkbox:checked");
+            if(val == 1107 &amp;&amp; relationshipChecked.length ==1){
+                jq("#index-relationship input[type=checkbox]").prop("disabled",true);
+                jq(this).prop("disabled",false);
+            }else {
+                jq("#index-relationship input[type=checkbox]").prop("disabled",false);
+                jq("#index-relationship input[value=1107]").prop("disabled",true);
+            }
+            if(relationshipChecked.length ==0){
+                jq("#index-relationship input[value=1107]").prop("disabled",false);
+            }
+        }
         //Before Submit
         beforeSubmit.push(function() {
-
+            var relationshipChecked = jq("#index-relationship input:checkbox:checked");
+            var patientPregnant = getValue('pregnant.value');
+            var healthWorker = getValue('health-worker.value');
+            var needleStick = getValue('needle-stick.value');
+            if(relationshipChecked.length ==0){
+                getField('index-error.error').html('Please specify relationship to index.').show();
+                return false;
+            }else {
+                getField('index-error.error').html('Please specify relationship to index.').hide();
+            }
+            if(pgender == 'F' &amp;&amp; pAge &gt; 9  &amp;&amp; patientPregnant == false ){
+                getField('pregnant.error').html('Please specify pregnancy status.').show();
+                return false;
+            }else {
+                getField('pregnant.error').html('Please specify pregnancy status.').hide();
+            }
+            if(healthWorker == 1065 &amp;&amp; needleStick == false ){
+                getField('needle-stick.error').html('Please specify of client had needle stick injuries.').show();
+                return false;
+            }else {
+                getField('needle-stick.error').html('Please specify of client had needle stick injuries.').hide();
+            }
         });
         //Clear hidden sections
         clearHiddenSections = function(parentObj) {
@@ -442,7 +478,7 @@
                 <obs conceptId="164930"
                      answerConceptIds="164928,164929,138643"
                      answerLabels="General Population,Key Population,Priority Population" id="population-type"
-                     style="radio"  />
+                     style="radio"  required="true" />
             </div>
             <table id="key-population">
                 <tr>
@@ -497,7 +533,7 @@
                         <obs conceptId="159936"
                              answerConceptIds="160542,5485,160473,160538,159940"
                              answerLabels="OPD:Out-patient department,IPD:In-patient department,Emergency,PMTCT,VCT"
-                             style="dropdown" id="department" />
+                             style="dropdown" id="department" required="true"/>
                     </td>
                 </tr>
                 <tr>
@@ -506,7 +542,7 @@
                         <obs conceptId="164956"
                              answerConceptIds="164163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,164953"
                              answerLabels="HP:Hospital Patient,NP:Non-Hospital Patient"
-                             style="radio" />
+                             style="radio" required="true" />
                     </td>
                 </tr>
                 <tr>
@@ -515,18 +551,18 @@
                         <obs conceptId="5619AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerLabels="Yes,No"
-                             style="radio" id="health-worker" />
+                             style="radio" id="health-worker" required="true" />
                     </td>
                 </tr>
-                <tr>
-                    <td>Client has any relationship with an index client?</td>
+                <tr id="index-relationship">
+                    <td>Client has any relationship with an index client? <span style="color:red;"><strong>*</strong></span></td>
                     <td>
                         <obs conceptId="166570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="163565AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerLabel="Sexual Contact" style="checkbox" /><br/>
                         <obs conceptId="166570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="166606AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerLabel="Social Contact" style="checkbox" /><br/>
                         <obs conceptId="166570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="None" style="checkbox" /><br/>
+                             answerLabel="None" style="checkbox" id="index-error"/><br/>
                     </td>
                 </tr>
             </table>
@@ -541,7 +577,7 @@
                              id="test-history"
                              answerConceptIds="1065,1066"
                              answerLabels="Yes,No"
-                             style="radio" />
+                             style="radio" required="true"/>
                     </td>
                     <td>
                         <table id="test-result">
@@ -604,7 +640,7 @@
                     <td>Has the client ever had sex?</td>
                     <td>
                         <obs conceptId="5569AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="yes_no" id="sexually-active" />
+                             style="yes_no" id="sexually-active" required="true" />
                     </td>
                 </tr>
             </table>
@@ -701,7 +737,7 @@
                     <td>
                         <obs id="experienced-gbv" conceptId="167161"
                              answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
+                             style="radio" answerLabels="Yes,No" required="true"/>
                     </td>
                 </tr>
                 <tr id="experienced-physical-violence">
@@ -788,7 +824,7 @@
                     </td>
                 </tr>
                 <tr id="tr-needle-stick">
-                    <td>Has the client had needle stick injuries?</td>
+                    <td>Has the client had needle stick injuries? <span style="color:red;"><strong>*</strong></span></td>
                     <td>
                         <obs conceptId="165060"
                              answerConceptIds="153574AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -800,7 +836,7 @@
                     <td>
                         <obs conceptId="166365AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
+                             style="radio" answerLabels="Yes,No" required="true"/>
                     </td>
                 </tr>
             </table>
@@ -842,7 +878,7 @@
             <legend>Pregnancy Assessment</legend>
             <table class="simple-table">
                 <tr>
-                    <td> Client currently pregnant? </td>
+                    <td> Client currently pregnant? <span style="color:red;"><strong>*</strong></span> </td>
                     <td>
                         <obs conceptId="5272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -870,7 +906,7 @@
                         <obs conceptId="162699" id="eligible-test"
                              answerConceptIds="1065,1066"
                              answerLabels="Yes,No"
-                             style="radio" />
+                             style="radio" required="true"/>
                     </td>
                 </tr>
                 <obsgroup groupingConceptId="165078">
