@@ -73,7 +73,7 @@ public class PatientContactFormFragmentController {
     }
 
     private List<String> hivStatusOptions() {
-        return Arrays.asList("Unknown", "Positive", "Negative", "Exposed Infant");
+        return Arrays.asList("Unknown", "Positive", "Negative");
     }
 
     private List<String> ipvOutcomeOptions() {

@@ -436,7 +436,6 @@ public class ContactTreeViewFragmentController {
         Map<Concept, String> hivStatusList = new HashMap<Concept, String>();
         hivStatusList.put(conceptService.getConcept(703), "Positive");
         hivStatusList.put(conceptService.getConcept(664), "Negative");
-        hivStatusList.put(conceptService.getConcept(1405), "Exposed");
         hivStatusList.put(conceptService.getConcept(1067), "Unknown");
         return hivStatusList.get(key);
     }
