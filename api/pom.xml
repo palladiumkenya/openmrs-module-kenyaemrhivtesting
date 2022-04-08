@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>hivtestingservices</artifactId>
-		<version>1.1.7</version>
+		<version>1.1.8</version>
 	</parent>
 
 	<artifactId>hivtestingservices-api</artifactId>
@@ -149,6 +149,16 @@
 				<filtering>true</filtering>
 			</testResource>
 		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>7</source>
+					<target>7</target>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>

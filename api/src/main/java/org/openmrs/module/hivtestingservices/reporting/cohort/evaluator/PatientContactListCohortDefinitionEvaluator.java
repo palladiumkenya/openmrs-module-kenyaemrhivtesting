@@ -33,8 +33,16 @@ public class PatientContactListCohortDefinitionEvaluator implements PatientConta
 		PatientContactQueryResult queryResult = new PatientContactQueryResult(definition, context);
 
 
-		String qry = "SELECT c.id from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id\n" +
-				" where t.voided=0 and t.test_type in(1,2) and c.relationship_type in(163565, 5617) and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive' and c.voided = 0; ";
+		String qry = "SELECT c.id\n" +
+				"from kenyaemr_hiv_testing_patient_contact c\n" +
+				"         inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id\n" +
+				"where date(c.date_created) between date(:startDate) and date(:endDate)\n" +
+				"  and t.voided = 0\n" +
+				"  and t.test_type = 2\n" +
+				"  and c.relationship_type in (163565, 5617, 162221)\n" +
+				"  and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+				"  and t.final_test_result = 'Positive'\n" +
+				"  and c.voided = 0;";
 
 		SqlQueryBuilder builder = new SqlQueryBuilder();
 		builder.append(qry);
