@@ -20,6 +20,7 @@ import org.openmrs.module.hivtestingservices.reporting.ColumnParameters;
 import org.openmrs.module.hivtestingservices.reporting.EmrReportingUtils;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.HIVDiagnosedZeroContactCohortDefinition;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactListCohortDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.converter.KPTypeConverter;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSLandmarkDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSMaritalStatusDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.HTSPopulationTypeDataDefinition;
@@ -27,33 +28,8 @@ import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PN
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientCCCNumberDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSPatientInCareDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.client.definition.PNSTestStrategyDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactAgeDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactAppointmentForTestDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactBaselineHivStatusDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDateLinkedToCareDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactFacilityLinkedDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateOutcomeDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLinkageCCCNumberDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLinkageToCareDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactNameDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactPhoneContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactRelationshipDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactScreenedForIpvDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactSexDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientCCCNumberDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientDOBDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientFacilityEnrolledDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientGenderDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientIdDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientInCareDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientLandMarkDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientMaritalStatusDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientNameDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientPhoneContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientPopulationTypeDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientTestStrategyDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedPatientVisitDateDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.converter.MaritalStatusConverter;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.*;
 import org.openmrs.module.hivtestingservices.reporting.definition.PatientContactDataSetDefinition;
 import org.openmrs.module.hivtestingservices.reporting.library.PNSReportIndicatorLibrary;
 import org.openmrs.module.hivtestingservices.reporting.library.shared.CommonHtsDimensionLibrary;
@@ -113,8 +89,8 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
     protected List<Mapped<DataSetDefinition>> buildDataSets(ReportDescriptor reportDescriptor, ReportDefinition reportDefinition) {
         return Arrays.asList(
                 ReportUtils.map(datasetColumns(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(htsDataSet(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(pnsDataSet(), "startDate=${startDate},endDate=${endDate}")
+                ReportUtils.map(htsDataSet(), "startDate=${startDate},endDate=${endDate}")
+               // ReportUtils.map(pnsDataSet(), "startDate=${startDate},endDate=${endDate}")
 
         );
     }
@@ -136,10 +112,13 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("Visit Date", new RelatedPatientVisitDateDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
         dsd.addColumn("Telephone No", new RelatedPatientPhoneContactDataDefinition(), "");
 
-        dsd.addColumn("Marital Status", new RelatedPatientMaritalStatusDataDefinition(), null);
+        dsd.addColumn("Marital Status", new RelatedPatientMaritalStatusDataDefinition(), null, new MaritalStatusConverter());
+        dsd.addColumn("Occupation", new RelatedPatientOccupationDataDefinition(), null);
+        dsd.addColumn("Index Client Type", new RelatedIndexClientTypeDataDefinition(), null);
         dsd.addColumn("Land Mark", new RelatedPatientLandMarkDataDefinition(), "");
 
-        dsd.addColumn("Population Type", new RelatedPatientPopulationTypeDataDefinition(), null);
+        dsd.addColumn("Key or Priority PoP", new RelatedPatientKeyOrPriorityPopulationDataDefinition(), null);
+        dsd.addColumn("Population Type", new RelatedPatientPopulationTypeDataDefinition(), null,new KPTypeConverter());
         dsd.addColumn("Test Strategy", new RelatedPatientTestStrategyDataDefinition(), null);
         dsd.addColumn("In Care", new RelatedPatientInCareDataDefinition(), null);
         dsd.addColumn("Facility Enrolled", new RelatedPatientFacilityEnrolledDataDefinition(), null);
@@ -148,12 +127,16 @@ public class PNSRegisterReportBuilder extends AbstractReportBuilder {
         dsd.addColumn("Contact Age", new PatientContactAgeDataDefinition(), "");
         dsd.addColumn("Contact Sex", new PatientContactSexDataDefinition(), "");
         dsd.addColumn("Contact Relationship", new PatientContactRelationshipDataDefinition(), "");
+        dsd.addColumn("Contact Occupation", new PatientContactOccupationDataDefinition(), null);
         dsd.addColumn("Contact Phone Number", new PatientContactPhoneContactDataDefinition(), "");
         dsd.addColumn("Contact Baseline Status", new PatientContactBaselineHivStatusDataDefinition(), "");
+        dsd.addColumn("Contact Preferred PNS Approach", new PatientContactPNSApproachDataDefinition(), "");
         dsd.addColumn("Contact Screened for IPV", new PatientContactScreenedForIpvDataDefinition(), "");
 
         // test columns
         dsd.addColumn("Contact Booking Date", new PatientContactAppointmentForTestDataDefinition(), "", new DateConverter(ENC_DATE_FORMAT));
+        dsd.addColumn("Contact Consented Testing", new PatientContactConsentedTestingDataDefinition(), "");
+        dsd.addColumn("Contact Tested", new PatientContactTestedDataDefinition(), "");
         dsd.addColumn("Contact Last Test Date", new PatientContactLastTestDateDataDefinition(), "", new DateConverter(ENC_DATE_FORMAT));
         dsd.addColumn("Contact Last Test Outcome", new PatientContactLastTestDateOutcomeDefinition(), "");
         dsd.addColumn("Contact Linked to Care", new PatientContactLinkageToCareDataDefinition(), "");

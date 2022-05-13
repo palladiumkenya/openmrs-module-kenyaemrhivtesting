@@ -16,9 +16,9 @@ package org.openmrs.module.hivtestingservices.reporting.library.shared;
 
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
-import org.openmrs.api.PatientSetService;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactAgeCohortDefinition;
 import org.openmrs.module.hivtestingservices.reporting.cohort.definition.PatientContactGenderCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
 import org.openmrs.module.kenyacore.report.ReportUtils;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -204,7 +204,7 @@ public class CommonHtsCohortLibrary {
 		cd.setName("has obs between dates");
 		cd.setQuestion(question);
 		cd.setOperator(SetComparator.IN);
-		cd.setTimeModifier(PatientSetService.TimeModifier.ANY);
+		cd.setTimeModifier(TimeModifier.ANY);
 		cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
 		cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
 		if (answers.length > 0) {

@@ -2,9 +2,8 @@ package org.openmrs.module.hivtestingservices.reporting.data.patientContact.eval
 
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.EvaluatedPatientContactData;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactAppointmentForTestDataDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactDataDefinition;
-import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.PatientContactLastTestDateDataDefinition;
+import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.RelatedIndexClientTypeDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.SqlQueryBuilder;
@@ -14,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Map;
 
 /**
- * Evaluates a VisitIdDataDefinition to produce a VisitData
+ * Evaluates a RelatedIndexClientTypeDataDefinition to produce a VisitData
  */
-@Handler(supports=PatientContactLastTestDateDataDefinition.class, order=50)
-public class PatientContactLastTestDateDataEvaluator implements PatientContactDataEvaluator {
+@Handler(supports= RelatedIndexClientTypeDataDefinition.class, order=50)
+public class RelatedIndexClientTypeDataEvaluator implements PatientContactDataEvaluator {
 
     @Autowired
     private EvaluationService evaluationService;
@@ -25,8 +24,8 @@ public class PatientContactLastTestDateDataEvaluator implements PatientContactDa
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "SELECT c.id, date(left(max(concat(t.visit_date, t.final_test_result)), 10)) as last_test_date from kenyaemr_etl.etl_hts_test t inner join kenyaemr_hiv_testing_patient_contact c on t.patient_id=c.patient_id  \n" +
-                "where t.voided = 0 and t.test_type = 1 and c.voided = 0 GROUP BY c.id; ";
+        String qry = "select c.id,if(c.patient_related_to in (select c1.patient_id from openmrs.kenyaemr_hiv_testing_patient_contact c1),'S','P')\n" +
+                "       from openmrs.kenyaemr_hiv_testing_patient_contact c where c.voided = 0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

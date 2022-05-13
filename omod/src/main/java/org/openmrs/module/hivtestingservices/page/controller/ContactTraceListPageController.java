@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
+@AppPage("kenyaemr.hivtesting")
 public class ContactTraceListPageController {
 
     public void controller(@SpringBean KenyaUiUtils kenyaUi,
@@ -56,6 +56,7 @@ public class ContactTraceListPageController {
                     "date", kenyaUi.formatDate(cTrace.getDate()),
                     "contactType", cTrace.getContactType(),
                     "status", cTrace.getStatus(),
+                    "dateBooked", cTrace.getAppointmentDate() != null ? kenyaUi.formatDate(cTrace.getAppointmentDate()) : "",
                     "reasonUncontacted", cTrace.getReasonUncontacted(),
                     "facilityLinkedTo", cTrace.getFacilityLinkedTo(),
                     "healthWorkerHandedTo", cTrace.getHealthWorkerHandedTo(),

@@ -14,8 +14,10 @@
 
 package org.openmrs.module.hivtestingservices.metadata;
 
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.springframework.stereotype.Component;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.patientIdentifierType;
 
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.relationshipType;
@@ -44,6 +46,9 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		public static final String INJECTABLE_DRUG_USER = "58da0d1e-9c89-42e9-9412-275cef1e0429";
 
 	}
+	public static final class _PatientIdentifierType {
+		public static final String CHT_RECORD_UUID = "c6552b22-f191-4557-a432-1f4df872d473";
+	}
 
 	@Override
 	public void install() throws Exception {
@@ -56,6 +61,10 @@ public class HTSMetadata extends AbstractMetadataBundle {
 		install(relationshipType("Partner", "Partner", "Someone I had sex with for fun without commitment to a relationship", _RelationshipType.PARTNER));
 		install(relationshipType("Co-wife", "Co-wife", "Female member spouse in a polygamist household", _RelationshipType.CO_WIFE));
 		install(relationshipType("Injectable-drug-user", "Injectable-druguser", "Those who share drug needles", _RelationshipType.INJECTABLE_DRUG_USER));
+
+		install(patientIdentifierType("CHT Record Reference UUID", "Record reference UUID from CHT",
+				null, null, null,
+				PatientIdentifierType.LocationBehavior.NOT_USED, false, _PatientIdentifierType.CHT_RECORD_UUID));
 	}
 
 }

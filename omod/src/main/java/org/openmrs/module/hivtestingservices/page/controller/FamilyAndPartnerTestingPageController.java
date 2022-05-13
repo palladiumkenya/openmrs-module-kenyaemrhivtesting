@@ -522,7 +522,6 @@ public class FamilyAndPartnerTestingPageController {
         Map<Concept, String> hivStatusList = new HashMap<Concept, String>();
         hivStatusList.put(conceptService.getConcept(703), "Positive");
         hivStatusList.put(conceptService.getConcept(664), "Negative");
-        hivStatusList.put(conceptService.getConcept(1405), "Exposed");
         hivStatusList.put(conceptService.getConcept(1067), "Unknown");
         hivStatusList.put(conceptService.getConcept(1138), "Inconclusive");
         return hivStatusList.get(key);

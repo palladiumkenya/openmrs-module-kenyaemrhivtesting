@@ -7,6 +7,7 @@ import org.openmrs.Patient;
 import org.openmrs.User;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 public class PatientContact extends BaseOpenmrsData {
@@ -24,6 +25,7 @@ public class PatientContact extends BaseOpenmrsData {
     private Patient patientRelatedTo;
     private Integer relationType;
     private Date appointmentDate;
+    private Date listingDate = new Date();
     private String baselineHivStatus;
     private String ipvOutcome;
     private Patient patient;
@@ -42,10 +44,12 @@ public class PatientContact extends BaseOpenmrsData {
     public PatientContact(String uuid, String firstName, String middleName,
                           String lastName, String sex, Date birthDate, String physicalAddress,
                           String phoneContact, Integer relationType, Date appointmentDate,
-                          String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,
+                          String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,Date listingDate,
                           String contactListingDeclineReason, Integer consentedContactListing,
                            boolean voided, User voidedBy, Date dateVoided, String voidedReason) {
+
         this.uuid = uuid;
+        this.listingDate = listingDate;
         // this.obsGroupId = obsGroupId;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -246,6 +250,14 @@ public class PatientContact extends BaseOpenmrsData {
         this.consentedContactListing = consentedContactListing;
     }
 
+    public Date getListingDate() {
+        return listingDate;
+    }
+
+    public void setListingDate(Date listingDate) {
+        this.listingDate = listingDate;
+    }
+
     @Override
     public Boolean getVoided() {
         return voided;
@@ -289,6 +301,20 @@ public class PatientContact extends BaseOpenmrsData {
     @Override
     public void setVoidReason(String voidReason) {
         super.setVoidReason(voidReason);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PatientContact that = (PatientContact) o;
+        return id.equals(that.id) && uuid.equals(that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id, uuid);
     }
 }
 

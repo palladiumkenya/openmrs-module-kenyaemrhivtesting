@@ -19,20 +19,20 @@ div.column-two {
     width: 140px;
 }
 div.column-three {
-    width: 200px;
+    width: 130px;
 }
 div.column-four {
-    width: 200px;
+    width: 150px;
 }
 div.column-five {
-    width: 200px;
+    width: 150px;
 }
 div.column-six {
     width: 200px;
 }
 
 div.column-seven {
-    width: 200px;
+    width: 80px;
 }
 
 div.clear {
@@ -84,7 +84,8 @@ div.section-title {
 
                     <div class="column-three col-header">Status</div>
 
-                    <div class="column-four col-header">Reason not Contacted</div>
+                    <div class="column-four col-header">Booking Date</div>
+                <div class="column-four col-header">Reason <br/> not Contacted</div>
 
                     <div class="column-five col-header">Facility Linked To</div>
 
@@ -105,13 +106,14 @@ div.section-title {
 
                         <div class="column-two">${rel.contactType}</div>
 
-                        <div class="column-three">${rel.status}</div>
+                        <div class="column-three">${rel.status ?: ""}</div>
 
-                        <div class="column-four">${rel.reasonUncontacted}</div>
+                        <div class="column-four">${rel.dateBooked ?: ""}</div>
+                        <div class="column-four">${rel.reasonUncontacted ?: ""}</div>
 
-                        <div class="column-five">${rel.facilityLinkedTo}</div>
+                        <div class="column-five">${rel.facilityLinkedTo ?: ""}</div>
 
-                        <div class="column-six">${rel.remarks}</div>
+                        <div class="column-six">${rel.remarks ?: ""}</div>
 
                         <div class="column-seven">
                             <button type="button"

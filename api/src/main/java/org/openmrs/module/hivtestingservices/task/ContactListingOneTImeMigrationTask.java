@@ -32,9 +32,9 @@ public class ContactListingOneTImeMigrationTask extends AbstractTask {
 		Context.openSession();
 		try {
 
-			if (!Context.isAuthenticated()) {
+			/*if (!Context.isAuthenticated()) {
 				authenticate();
-			}
+			}*/
 			// check if the task had executed
 			AdministrationService service = Context.getAdministrationService();
 			GlobalProperty choreStatus = service.getGlobalPropertyObject("hivtestingservices.contactListingMigrationChore");

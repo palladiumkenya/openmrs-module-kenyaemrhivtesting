@@ -73,7 +73,7 @@ public class PatientContactFormFragmentController {
     }
 
     private List<String> hivStatusOptions() {
-        return Arrays.asList("Unknown", "Positive", "Negative", "Exposed Infant");
+        return Arrays.asList("Unknown", "Positive", "Negative");
     }
 
     private List<String> ipvOutcomeOptions() {
@@ -164,6 +164,7 @@ public class PatientContactFormFragmentController {
         private Patient patientRelatedTo;
         private Integer relationType;
         private Date appointmentDate;
+        private Date listingDate;
         private String baselineHivStatus;
         private String ipvOutcome;
         private Integer maritalStatus;
@@ -198,6 +199,7 @@ public class PatientContactFormFragmentController {
             this.patientRelatedTo = patient;
             this.relationType = patientContact.getRelationType();
             this.appointmentDate = patientContact.getAppointmentDate();
+            this.listingDate = patientContact.getListingDate();
             this.baselineHivStatus = patientContact.getBaselineHivStatus();
             this.ipvOutcome = patientContact.getIpvOutcome();
             this.maritalStatus = patientContact.getMaritalStatus();
@@ -219,6 +221,7 @@ public class PatientContactFormFragmentController {
                 toSave = new PatientContact();
             }
 
+            toSave.setListingDate(listingDate);
             toSave.setFirstName(firstName);
             toSave.setMiddleName(middleName);
             toSave.setLastName(lastName);
@@ -260,19 +263,29 @@ public class PatientContactFormFragmentController {
                     }
                 }
             }
-
-            if (appointmentDate != null && !DateUtils.isSameDay(appointmentDate, new Date())) {
-
-                if (appointmentDate.before(new Date())) {
-                    errors.rejectValue("appointmentDate", "Cannot be in the past");
+            require(errors, "listingDate");
+            if (listingDate != null) {
+                if (listingDate.after(new Date())) {
+                    errors.rejectValue("listingDate", "Cannot be a future date");
                 } else {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(new Date());
                     calendar.add(Calendar.YEAR, -120);
-                    if (appointmentDate.before(calendar.getTime())) {
-                        errors.rejectValue("appointmentDate", " error.date.invalid");
+                    if (listingDate.before(calendar.getTime())) {
+                        errors.rejectValue("listingDate", "error.date.invalid");
                     }
                 }
+            }
+
+            if (appointmentDate != null && !DateUtils.isSameDay(appointmentDate, listingDate)) {
+
+                if (appointmentDate.before(listingDate))
+                    errors.rejectValue("appointmentDate", "Cannot be before contact listing date");
+            }
+            require(errors,"relationType");
+            if (relationType == null) {
+                errors.rejectValue("relationType", "Relationship to Patient is required");
+
             }
         }
 
@@ -426,6 +439,14 @@ public class PatientContactFormFragmentController {
 
         public void setConsentedContactListing(Integer consentedContactListing) {
             this.consentedContactListing = consentedContactListing;
+        }
+
+        public Date getListingDate() {
+            return listingDate;
+        }
+
+        public void setListingDate(Date listingDate) {
+            this.listingDate = listingDate;
         }
     }
 

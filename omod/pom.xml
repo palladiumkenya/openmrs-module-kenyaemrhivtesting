@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>hivtestingservices</artifactId>
-		<version>1.1.4</version>
+		<version>1.2.1</version>
 	</parent>
 
 	<artifactId>hivtestingservices-omod</artifactId>
@@ -36,6 +36,10 @@
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>uiframework-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>legacyui-omod</artifactId>
 		</dependency>
 
 		<dependency>

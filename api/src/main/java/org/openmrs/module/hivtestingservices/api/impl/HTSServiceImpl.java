@@ -134,6 +134,21 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
+    public PatientContact getPatientContactByUuid(String uuid) {
+        return patientContactDAO.getPatientContactByUuid(uuid);
+    }
+
+    @Override
+    public List<PatientContact> getPatientContactListForRegistration() {
+        return patientContactDAO.getPatientContactListForRegistration();
+    }
+
+    @Override
+    public List<PatientContact> getPatientContactsTracedAndBooked() {
+        return patientContactDAO.getPatientContactsTracedAndBooked();
+    }
+
+    @Override
     public void onStartup() {
 
     }

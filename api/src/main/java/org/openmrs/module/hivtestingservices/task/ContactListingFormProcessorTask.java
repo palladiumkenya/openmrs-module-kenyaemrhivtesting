@@ -12,11 +12,11 @@ package org.openmrs.module.hivtestingservices.task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.hivtestingservices.advice.model.HTSContactListingFormProcessor;
+import org.openmrs.module.hivtestingservices.advice.model.HTSPatientContactRegistrar;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
 /**
- * Periodically refreshes ETL tables
+ * Periodically pushes contacts registered in the EMR back to Afyastat
  */
 public class ContactListingFormProcessorTask extends AbstractTask {
 
@@ -29,11 +29,11 @@ public class ContactListingFormProcessorTask extends AbstractTask {
 		Context.openSession();
 		try {
 
-			if (!Context.isAuthenticated()) {
+			/*if (!Context.isAuthenticated()) {
 				authenticate();
-			}
-			HTSContactListingFormProcessor processor = new HTSContactListingFormProcessor();
-			processor.processAOPEncounterEntries();
+			}*/
+			HTSPatientContactRegistrar processor = new HTSPatientContactRegistrar();
+			processor.registerBookedPatientContacts();
 
 		}
 		catch (Exception e) {
