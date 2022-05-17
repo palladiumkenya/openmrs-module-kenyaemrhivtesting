@@ -46,6 +46,7 @@ public class HTSPatientContactRegistrar {
     String partnerRelType = "007b765f-6725-4ae9-afee-9966302bace4";
     String cowifeRelType = "2ac0d501-eadc-4624-b982-563c70035d46";
     String injectableDrugUserRelType = "58da0d1e-9c89-42e9-9412-275cef1e0429";
+    String snsRelType = "76edc1fe-c5ce-4608-b326-c8ecd1020a73";
 
     /**
      * Registers patient contacts who have been booked/traced
@@ -248,6 +249,7 @@ public class HTSPatientContactRegistrar {
         options.put(163565, partnerRelType);
         options.put(162221, cowifeRelType);
         options.put(157351, injectableDrugUserRelType);
+        options.put(166606, snsRelType);
         return options.get(relType);
     }
 
