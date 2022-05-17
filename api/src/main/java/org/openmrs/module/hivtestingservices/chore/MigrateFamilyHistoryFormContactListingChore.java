@@ -190,6 +190,7 @@ public class MigrateFamilyHistoryFormContactListingChore {
         relationshipList.put(conceptService.getConcept(163565), 7); // partner
         relationshipList.put(conceptService.getConcept(162221), 8); // co-wife
         relationshipList.put(conceptService.getConcept(157351), 9); // Injectable drug user
+        relationshipList.put(conceptService.getConcept(166606), 12); // SNS
 
         return relationshipList.get(key);
     }

@@ -458,6 +458,8 @@ public class ContactTreeViewFragmentController {
         options.put(163565, "Partner");
         options.put(162221, "Co-wife");
         options.put(157351, "Injectable drug user");
+        options.put(166606, "SNS");
+        
         return options;
     }
 
