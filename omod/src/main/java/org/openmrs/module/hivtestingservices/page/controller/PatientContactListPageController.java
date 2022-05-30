@@ -164,6 +164,8 @@ public class PatientContactListPageController {
         options.put(163565, "Sexual partner");
         options.put(162221, "Co-wife");
         options.put(157351, "Injectable drug user");
+        options.put(166606, "SNS");
+        
         return options;
     }
 
