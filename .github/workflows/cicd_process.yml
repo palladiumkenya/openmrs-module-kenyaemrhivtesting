@@ -19,7 +19,7 @@ jobs:
         script: |
           git config --global --add safe.directory /apps/github-workflows/kenyaemr-modules/openmrs-module-kenyaemrhivtesting      
           cd /apps/github-workflows/kenyaemr-modules/openmrs-module-kenyaemrhivtesting
-          git pull origin openmrs-2.3.3-upgrade
+          git pull origin master
           git status
           mvn clean install -DskipTests
           sudo rm -rf /var/lib/OpenMRS/modules/hivtestingservices-*.omod
