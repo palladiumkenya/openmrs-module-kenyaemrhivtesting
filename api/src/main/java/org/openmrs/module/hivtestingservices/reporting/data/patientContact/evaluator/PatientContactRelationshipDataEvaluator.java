@@ -33,6 +33,7 @@ public class PatientContactRelationshipDataEvaluator implements PatientContactDa
                 "WHEN 5617 THEN 'Spouse'\n" +
                 "WHEN 163565 THEN 'Partner'\n" +
                 "WHEN 162221 THEN 'Co-wife' \n" +
+                "WHEN 166606 THEN 'SNS' \n" +
                 "ELSE '' END\n" +
                 ") relationship from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
 
