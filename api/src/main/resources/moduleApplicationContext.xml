@@ -110,6 +110,7 @@
 				<ref bean="kenyaemr.hts.common.report.htsIndicatorReport" />
 				<ref bean="kenyaemr.hts.common.report.pnsRegister" />
 				<ref bean="kenyaemr.hts.common.report.familyTestingRegister"/>
+				<ref bean="kenyaemr.hts.common.report.contactsWithUndocumentedStatus"/>
 			</set>
 		</property>
 	</bean>
@@ -170,6 +171,18 @@
 		<property name="showIfCalculation" value="org.openmrs.module.kenyaemr.calculation.library.hiv.hts.PatientsEligibleForHtsScreeningCalculation" />
 		<property name="icon" value="kenyaui:forms/generic.png" />
 		<property name="htmlform" value="hivtestingservices:hts/htsscreeningform.html" />
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.contactsWithUndocumentedStatus" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="299243b3-89c3-4733-9d1f-90a29ac9eb72" />
+		<property name="name" value="PNS contacts with undocumented HIV status" />
+		<property name="description" value="PNS contacts with undocumented HIV status" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:Undocumented_Status_Contacts_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:UndocumentedContacts" />
 	</bean>
 
 </beans>

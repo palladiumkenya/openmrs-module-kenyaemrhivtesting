@@ -72,6 +72,9 @@ public class HTSPatientContactRegistrar {
                 log.error("A contact for " + pc.getPatientRelatedTo().getNames().toString() + " misses the mandatory first/last name or date of birth for registration.");
                 continue;
             }
+            if (!sex.equals("F") || !sex.equals("M")) {
+                sex = "U";
+            }
             Patient toSave = new Patient(); // Creating a new patient and person
             toSave.setGender(sex);
             toSave.setBirthdate(pc.getBirthDate());
