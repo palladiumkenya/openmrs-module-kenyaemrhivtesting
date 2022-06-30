@@ -110,7 +110,10 @@
 				<ref bean="kenyaemr.hts.common.report.htsIndicatorReport" />
 				<ref bean="kenyaemr.hts.common.report.pnsRegister" />
 				<ref bean="kenyaemr.hts.common.report.familyTestingRegister"/>
-				<ref bean="kenyaemr.hts.common.report.contactsWithUndocumentedStatus"/>
+				<ref bean="kenyaemr.hts.common.report.allContactsWithUndocumentedStatus"/>
+				<ref bean="kenyaemr.hts.common.report.childrenContactsWithUndocumentedStatus"/>
+				<ref bean="kenyaemr.hts.common.report.pnsContactsWithUndocumentedStatus"/>
+				<ref bean="kenyaemr.hts.common.report.snsContactsWithUndocumentedStatus"/>
 			</set>
 		</property>
 	</bean>
@@ -173,15 +176,51 @@
 		<property name="htmlform" value="hivtestingservices:hts/htsscreeningform.html" />
 	</bean>
 
-	<bean id="kenyaemr.hts.common.report.contactsWithUndocumentedStatus" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+	<bean id="kenyaemr.hts.common.report.allContactsWithUndocumentedStatus" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
 		<property name="targetUuid" value="299243b3-89c3-4733-9d1f-90a29ac9eb72" />
+		<property name="name" value="All contacts with undocumented HIV status" />
+		<property name="description" value="All contacts with undocumented HIV status" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:Undocumented_Status_Contacts_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:UndocumentedContacts" />
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.childrenContactsWithUndocumentedStatus" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="bd7dfb23-debb-49c7-a7d9-650c2f806cd2" />
+		<property name="name" value="Children of HIV infected adults with undocumented HIV status" />
+		<property name="description" value="children of HIV infected adults with undocumented HIV status" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:Children_Undocumented_Status_Contacts_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:UndocumentedContacts" />
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.pnsContactsWithUndocumentedStatus" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="bd11a172-0dc0-4f75-893b-e3d5dd9fb38a" />
 		<property name="name" value="PNS contacts with undocumented HIV status" />
 		<property name="description" value="PNS contacts with undocumented HIV status" />
 		<property name="apps">
 			<set>
 				<ref bean="kenyaemr.app.reports" />
 			</set></property>
-		<property name="template" value="hivtestingservices:Undocumented_Status_Contacts_Register_Template.xls" />
+		<property name="template" value="hivtestingservices:PNS_Undocumented_Status_Contacts_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:UndocumentedContacts" />
+	</bean>
+
+	<bean id="kenyaemr.hts.common.report.snsContactsWithUndocumentedStatus" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="9fe362b7-d3a2-46b1-870d-cbcc9463c4b2" />
+		<property name="name" value="SNS contacts with undocumented HIV status" />
+		<property name="description" value="SNS contacts with undocumented HIV status" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:SNS_Undocumented_Status_Contacts_Register_Template.xls" />
 		<property name="repeatingSection" value="sheet:1,row:7,dataset:UndocumentedContacts" />
 	</bean>
 
