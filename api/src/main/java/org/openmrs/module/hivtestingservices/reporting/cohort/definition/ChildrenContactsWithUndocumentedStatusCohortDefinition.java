@@ -11,11 +11,11 @@ import org.openmrs.module.reporting.query.BaseQuery;
 import java.util.Date;
 
 /**
- * All Contacts Register cohort definition
+ * Children contacts Register cohort definition
  */
 @Caching(strategy = ConfigurationPropertyCachingStrategy.class)
-@Localized("reporting.ContactsWithUndocumentedStatusCohortDefinition")
-public class ContactsWithUndocumentedStatusCohortDefinition extends BaseQuery<PatientContact> implements PatientContactQuery {
+@Localized("reporting.ChildrenContactsWithUndocumentedStatusCohortDefinition")
+public class ChildrenContactsWithUndocumentedStatusCohortDefinition extends BaseQuery<PatientContact> implements PatientContactQuery {
 
     @ConfigurationProperty
     private Date startDate;
@@ -23,7 +23,7 @@ public class ContactsWithUndocumentedStatusCohortDefinition extends BaseQuery<Pa
     @ConfigurationProperty
     private Date endDate;
 
-    public ContactsWithUndocumentedStatusCohortDefinition() {
+    public ChildrenContactsWithUndocumentedStatusCohortDefinition() {
     }
 
     public Date getStartDate() {
