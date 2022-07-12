@@ -59,6 +59,11 @@
             </div>
 
             <div>
+                <span class="ke-identifier-type">Reported Test Date:</span>
+                <span class="ke-identifier-value">${patientContact.reportedTestDate}</span>
+            </div>
+
+            <div>
                 <span class="ke-identifier-type">Booking Date:</span>
                 <span class="ke-identifier-value">${patientContact.appointmentDate}</span>
             </div>
