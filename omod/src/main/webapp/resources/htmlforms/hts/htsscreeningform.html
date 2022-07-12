@@ -309,8 +309,9 @@
             }else {
                 getField('index-error.error').html('Please specify relationship to index.').hide();
             }
-            if(pgender == 'F'){
-               if(pAge &gt; 9  &amp;&amp; patientPregnant == false ){
+
+            if(pgender == 'F' &amp;&amp; pAge &gt; 9){
+               if(patientPregnant == false ){
                   getField('pregnant.error').html('Please specify pregnancy status.').show();
                   return false;
                }else {
