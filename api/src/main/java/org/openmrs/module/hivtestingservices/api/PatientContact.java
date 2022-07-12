@@ -24,6 +24,7 @@ public class PatientContact extends BaseOpenmrsData {
     private String phoneContact;
     private Patient patientRelatedTo;
     private Integer relationType;
+    private Date reportedTestDate;
     private Date appointmentDate;
     private Date listingDate = new Date();
     private String baselineHivStatus;
@@ -43,7 +44,7 @@ public class PatientContact extends BaseOpenmrsData {
 
     public PatientContact(String uuid, String firstName, String middleName,
                           String lastName, String sex, Date birthDate, String physicalAddress,
-                          String phoneContact, Integer relationType, Date appointmentDate,
+                          String phoneContact, Integer relationType,Date reportedTestDate, Date appointmentDate,
                           String baselineHivStatus, String ipvOutcome, Integer maritalStatus,  Integer livingWithPatient, Integer pnsApproach,Date listingDate,
                           String contactListingDeclineReason, Integer consentedContactListing,
                            boolean voided, User voidedBy, Date dateVoided, String voidedReason) {
@@ -60,6 +61,7 @@ public class PatientContact extends BaseOpenmrsData {
         this.phoneContact = phoneContact;
         // this.patientRelatedTo = patientRelatedTo;
         this.relationType = relationType;
+        this.reportedTestDate = reportedTestDate;
         this.appointmentDate = appointmentDate;
         this.baselineHivStatus = baselineHivStatus;
         this.ipvOutcome = ipvOutcome;
@@ -168,6 +170,14 @@ public class PatientContact extends BaseOpenmrsData {
 
     public void setRelationType(Integer relationType) {
         this.relationType = relationType;
+    }
+
+    public Date getReportedTestDate() {
+        return  reportedTestDate;
+    }
+
+    public void setReportedTestDate(Date reportedTestDate) {
+        this.reportedTestDate = reportedTestDate;
     }
 
     public Date getAppointmentDate() {

@@ -142,6 +142,8 @@ div.section-title {
 
                         <div class="column-six col-header">Baseline HIV Status</div>
 
+                        <div class="column-seven col-header">Reported test date</div>
+
                         <div class="column-seven col-header">Booking Date</div>
 
                         <div class="column-seven col-header">PNS Approach</div>
@@ -170,6 +172,8 @@ div.section-title {
                             <div class="column-five">${rel.relationType}</div>
 
                             <div class="column-six">${rel.baselineHivStatus ?: ''}</div>
+
+                            <div class="column-seven">${rel.reportedTestDate ?: ''}</div>
 
                             <div class="column-seven">${rel.appointmentDate ?: ''}</div>
 

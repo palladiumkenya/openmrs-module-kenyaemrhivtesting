@@ -29,6 +29,7 @@
 
 
                     [object: command, property: "baselineHivStatus", label: "Baseline HIV status"],
+                    [object: command, property: "dateTested", label: "Date tested"],
                     [object: command, property: "appointmentDate", label: "Booking date"]
 
 
@@ -212,6 +213,7 @@
             <table>
                 <tr>
                     <td class="ke-field-label">HIV Status</td>
+                     <td id="tdReportedTestDate" class="ke-field-label">Reported test date</td>
                      <td class="ke-field-label">Booking Date</td>
                     <td class="ke-field-label">Preferred PNS Approach</td>
                 </tr>
@@ -227,7 +229,9 @@
                             <% } %>
                         </select>
                     </td>
-
+                    <td id="reportedTestDate" style="width: 200px">
+                        ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "reportedTestDate"])}
+                    </td>
                     <td style="width: 200px">
                         ${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "appointmentDate"])}
                     </td>
@@ -347,6 +351,8 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         //IPV validation
         jq('.ipvQuestions').hide();
         jq('.ipvOutcome').hide();
+        jq('#reportedTestDate').hide();
+        jq('#tdReportedTestDate').hide();
         jq("select[name='relationType']").change(function () {
 
             var relType = jq(this).val();
@@ -371,5 +377,19 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         kenyaui.setDateField('patient-birthdate', birthdate);
 
     }
+    jq("select[name='baselineHivStatus']").change(function () {
+
+        var hivStatus = jq(this).val();
+
+        if (hivStatus === "Positive" || hivStatus === "Negative") {
+
+            jq('#reportedTestDate').show();
+            jq('#tdReportedTestDate').show();
+        }
+        else {
+            jq('#reportedTestDate').hide();
+            jq('#tdReportedTestDate').hide();
+        }
+    });
 
 </script>
