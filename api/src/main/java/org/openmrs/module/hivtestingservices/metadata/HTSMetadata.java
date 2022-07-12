@@ -49,7 +49,6 @@ public class HTSMetadata extends AbstractMetadataBundle {
 	public static final class _PatientIdentifierType {
 		public static final String CHT_RECORD_UUID = "c6552b22-f191-4557-a432-1f4df872d473";
 	}
-
 	@Override
 	public void install() throws Exception {
 		// doing this in the scheduled task so that previous value set is preserved

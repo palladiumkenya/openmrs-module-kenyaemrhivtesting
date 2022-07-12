@@ -52,6 +52,7 @@ public class PatientContactProfileFragmentController {
                         "phoneContact", patientContact.getPhoneContact() != null ? patientContact.getPhoneContact() : "",
                         "relationType", formatRelationshipType(patientContact.getRelationType()),
                         "baselineHivStatus", patientContact.getBaselineHivStatus() != null ? patientContact.getBaselineHivStatus() : "",
+                        "dateTested",  patientContact.getReportedTestDate() != null ? kenyaUi.formatDate(patientContact.getReportedTestDate()) : "",
                         "appointmentDate",  patientContact.getAppointmentDate() != null ? kenyaUi.formatDate(patientContact.getAppointmentDate()) : "",
                         "birthDate", patientContact.getBirthDate() != null ? kenyaUi.formatDate(patientContact.getBirthDate()) : "",
                         "age", patientContact.getBirthDate() != null ? calculateContactAge(patientContact.getBirthDate(), new Date()) : "",
