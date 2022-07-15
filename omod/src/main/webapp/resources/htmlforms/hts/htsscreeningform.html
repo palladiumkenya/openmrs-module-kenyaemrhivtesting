@@ -833,7 +833,12 @@
             </div>
             <table class="simple-table">
                 <tr>
+                    <includeIf velocityTest="$patient.age &lt; 10">
+                    <td>Has the child ever been defiled?  <span style="color:red;"><strong>*</strong></span></td>
+                    </includeIf>
+                    <includeIf velocityTest="$patient.age &gt; 9">
                     <td>Has the client ever had sex?  <span style="color:red;"><strong>*</strong></span></td>
+                    </includeIf>
                     <td>
                         <obs conceptId="5569AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              style="yes_no" id="sexually-active" />
