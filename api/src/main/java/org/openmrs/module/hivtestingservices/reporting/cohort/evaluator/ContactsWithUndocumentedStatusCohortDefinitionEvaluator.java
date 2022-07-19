@@ -31,11 +31,12 @@ public class ContactsWithUndocumentedStatusCohortDefinitionEvaluator implements 
 		context = ObjectUtil.nvl(context, new EvaluationContext());
 		PatientContactQueryResult queryResult = new PatientContactQueryResult(definition, context);
 
-		String qry = "select pc.id from kenyaemr_hiv_testing_patient_contact pc\n" +
-				"left join (select ht.patient_id, mid(max(concat(ht.final_test_result)),11) as hiv_status\n" +
+		String qry = "select pc.id from openmrs.kenyaemr_hiv_testing_patient_contact pc\n" +
+				"                      inner join openmrs.patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
+				"left join (select ht.patient_id, mid(max(concat(date(ht.visit_date),ht.final_test_result)),11) as hiv_status\n" +
 				"        from kenyaemr_etl.etl_hts_test ht group by ht.patient_id\n" +
 				"        having hiv_status in ('Negative','Positive'))ht on ht.patient_id = pc.patient_id and pc.voided = 0\n" +
-				"where (pc.baseline_hiv_status not in ('Positive','Negative') or pc.baseline_hiv_status is null) and pc.voided = 0 and ht.patient_id is null;";
+				"where date(pc.date_created) <= date(:endDate) and (pc.baseline_hiv_status is null or pc.baseline_hiv_status in ('Unknown','1067')) and pc.voided = 0 and ht.patient_id is null;";
 
 		SqlQueryBuilder builder = new SqlQueryBuilder();
 		builder.append(qry);
