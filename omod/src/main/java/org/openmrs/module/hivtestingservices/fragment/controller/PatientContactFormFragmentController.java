@@ -292,9 +292,8 @@ public class PatientContactFormFragmentController {
                 errors.rejectValue("relationType", "Relationship to Patient is required");
             }
 
-            require(errors, "reportedTestDate");
-            if (baselineHivStatus == "Positive" || baselineHivStatus == "Negative" && reportedTestDate == null){
-                errors.rejectValue("reportedTestDate", "Date tested is required");
+            if ((baselineHivStatus.equals("Positive") || baselineHivStatus.equals("Negative")) && reportedTestDate == null) {
+                    errors.rejectValue("reportedTestDate", "Date tested is required");
             }
 
             if (reportedTestDate != null) {
