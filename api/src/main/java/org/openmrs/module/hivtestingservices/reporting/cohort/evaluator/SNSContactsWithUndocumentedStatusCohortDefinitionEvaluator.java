@@ -33,13 +33,16 @@ public class SNSContactsWithUndocumentedStatusCohortDefinitionEvaluator implemen
 		context = ObjectUtil.nvl(context, new EvaluationContext());
 		PatientContactQueryResult queryResult = new PatientContactQueryResult(definition, context);
 
-		String qry = "select pc.id from kenyaemr_hiv_testing_patient_contact pc\n" +
-				"                      left join patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
-				"                      left join (select ht.patient_id, mid(max(concat(ht.final_test_result)),11) as hiv_status\n" +
-				"                                 from kenyaemr_etl.etl_hts_test ht group by ht.patient_id\n" +
-				"                                 having hiv_status in ('Negative','Positive'))ht on ht.patient_id = pc.patient_id\n" +
-				"where (pc.baseline_hiv_status not in ('Positive','Negative') or pc.baseline_hiv_status is null) and pc.relationship_type =166606 and\n" +
-				"date(pc.date_created) <= date(:endDate) and pc.voided = 0 and ht.patient_id is null;";
+		String qry = "select pc.id\n" +
+				"from kenyaemr_hiv_testing_patient_contact pc\n" +
+				"         inner join patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
+				"left join (select ht.patient_id, mid(max(concat(date(ht.visit_date), ht.final_test_result)), 11) as hiv_status\n" +
+				" from kenyaemr_etl.etl_hts_test ht\n" +
+				" group by ht.patient_id\n" +
+				" having hiv_status in ('Negative', 'Positive'))\n" +
+				"ht on ht.patient_id = pc.patient_id\n" +
+				"             where (pc.baseline_hiv_status is null or pc.baseline_hiv_status in ('Unknown','1067')) and pc.relationship_type = 166606 and date(pc.date_created) <= date(:endDate)\n" +
+				"               and pc.voided = 0 and ht.patient_id is null;";
 
 		SqlQueryBuilder builder = new SqlQueryBuilder();
 		builder.append(qry);
