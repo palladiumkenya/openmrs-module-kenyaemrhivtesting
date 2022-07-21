@@ -24,8 +24,8 @@ public class RelatedIndexClientTypeDataEvaluator implements PatientContactDataEv
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id,if(c.patient_related_to in (select c1.patient_id from openmrs.kenyaemr_hiv_testing_patient_contact c1),'S','P')\n" +
-                "       from openmrs.kenyaemr_hiv_testing_patient_contact c where c.voided = 0;";
+        String qry = "select c.id,if(c.patient_related_to in (select c1.patient_id from kenyaemr_hiv_testing_patient_contact c1),'S','P')\n" +
+                "       from kenyaemr_hiv_testing_patient_contact c where c.voided = 0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
