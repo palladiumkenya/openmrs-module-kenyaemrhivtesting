@@ -185,7 +185,7 @@
 				<ref bean="kenyaemr.app.reports" />
 			</set></property>
 		<property name="template" value="hivtestingservices:Undocumented_Status_Contacts_Register_Template.xls" />
-		<property name="repeatingSection" value="sheet:1,row:7,dataset:UndocumentedContacts" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:AllUndocumentedContacts" />
 	</bean>
 
 	<bean id="kenyaemr.hts.common.report.childrenContactsWithUndocumentedStatus" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
