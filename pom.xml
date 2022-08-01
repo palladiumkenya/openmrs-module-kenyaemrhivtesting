@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>hivtestingservices</artifactId>
-	<version>1.1.8</version>
+	<version>1.1.9</version>
 	<packaging>pom</packaging>
 	<name>HTS in KenyaEMR Module</name>
 	<description>Provides HTS features in KenyaEMR</description>
