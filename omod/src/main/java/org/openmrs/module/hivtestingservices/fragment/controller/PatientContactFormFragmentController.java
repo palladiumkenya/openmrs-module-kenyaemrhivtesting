@@ -164,6 +164,7 @@ public class PatientContactFormFragmentController {
         private String phoneContact;
         private Patient patientRelatedTo;
         private Integer relationType;
+        private Date reportedTestDate;
         private Date appointmentDate;
         private Date listingDate;
         private String baselineHivStatus;
@@ -199,6 +200,7 @@ public class PatientContactFormFragmentController {
             this.phoneContact = patientContact.getPhoneContact();
             this.patientRelatedTo = patient;
             this.relationType = patientContact.getRelationType();
+            this.reportedTestDate = patientContact.getReportedTestDate();
             this.appointmentDate = patientContact.getAppointmentDate();
             this.listingDate = patientContact.getListingDate();
             this.baselineHivStatus = patientContact.getBaselineHivStatus();
@@ -233,6 +235,7 @@ public class PatientContactFormFragmentController {
             toSave.setPhysicalAddress(physicalAddress);
             toSave.setPhoneContact(phoneContact);
             toSave.setAppointmentDate(appointmentDate);
+            toSave.setReportedTestDate(reportedTestDate);
             toSave.setBaselineHivStatus(baselineHivStatus);
             toSave.setIpvOutcome(ipvOutcome);
             toSave.setMaritalStatus(maritalStatus);
@@ -282,6 +285,28 @@ public class PatientContactFormFragmentController {
 
                 if (appointmentDate.before(listingDate))
                     errors.rejectValue("appointmentDate", "Cannot be before contact listing date");
+            }
+
+            require(errors, "relationType");
+            if (relationType == null) {
+                errors.rejectValue("relationType", "Relationship to Patient is required");
+            }
+
+            if ((baselineHivStatus.equals("Positive") || baselineHivStatus.equals("Negative")) && reportedTestDate == null) {
+                    errors.rejectValue("reportedTestDate", "Date tested is required");
+            }
+
+            if (reportedTestDate != null) {
+                if (reportedTestDate.after(new Date())) {
+                    errors.rejectValue("reportedTestDate", "Cannot be a future date");
+                } else {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.YEAR, -120);
+                    if (reportedTestDate.before(calendar.getTime())) {
+                        errors.rejectValue("reportedTestDate", "error.date.invalid");
+                    }
+                }
             }
         }
 
@@ -363,6 +388,14 @@ public class PatientContactFormFragmentController {
 
         public void setRelationType(Integer relationType) {
             this.relationType = relationType;
+        }
+
+        public Date getReportedTestDate() {
+            return reportedTestDate;
+        }
+
+        public void setReportedTestDate(Date reportedTestDate) {
+            this.reportedTestDate = reportedTestDate;
         }
 
         public Date getAppointmentDate() {

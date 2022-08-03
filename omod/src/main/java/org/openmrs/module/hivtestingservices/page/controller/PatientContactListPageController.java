@@ -113,6 +113,7 @@ public class PatientContactListPageController {
                     "phoneContact", contact.getPhoneContact(),
                     "relationType", formatRelationshipType(contact.getRelationType()),
                     "baselineHivStatus", contact.getBaselineHivStatus(),
+                    "reportedTestDate", kenyaUi.formatDate(contact.getReportedTestDate()),
                     "appointmentDate", kenyaUi.formatDate(contact.getAppointmentDate()),
                     "birthDate", kenyaUi.formatDate(contact.getBirthDate()),
                     "maritalStatus", formatMaritalStatusOptions(contact.getMaritalStatus()),

@@ -368,4 +368,15 @@
         </delete>
     </changeSet>
 
+    <changeSet author="schege" id="kenyaemr_hiv_testing_020">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="kenyaemr_hiv_testing_patient_contact" columnName="reported_test_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="kenyaemr_hiv_testing_patient_contact">
+            <column name="reported_test_date" type="date"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
