@@ -495,13 +495,14 @@
                 getField('index-error.error').html('Please specify relationship to index.').hide();
             }
 
+
             if(pgender == 'F' &amp;&amp; pAge &gt; 9 &amp;&amp; (testHistory == 1065 &amp;&amp; testStatus != 703)){
-               if(patientPregnant == false ){
-                  getField('pregnant.error').html('Please specify pregnancy status.').show();
-                  return false;
-               }else {
-                  getField('pregnant.error').html('Please specify pregnancy status.').hide();
-               }
+                if(patientPregnant == false ){
+                    getField('pregnant.error').html('Please specify pregnancy status.').show();
+                    return false;
+                }else {
+                    getField('pregnant.error').html('Please specify pregnancy status.').hide();
+                }
             }
             if(pAge &lt; 10) {
                 if (mothersStatus == false) {
@@ -517,31 +518,45 @@
             }else {
                 getField('test-history.error').html('Please specify if client has been tested for HIV before.').hide();
             }
-            if(((pAge &lt; 10 &amp;&amp; mothersStatus != 703) || (testHistory == 1065 &amp;&amp;  testStatus != 703) || (pAge &gt; 9 &amp;&amp; testHistory == 1066)) &amp;&amp; everHadSex == false){
-                getField('sexually-active.error').html('Please specify of client has ever been defiled.').show();
-                return false;
-               }else {
-                getField('sexually-active.error').html('Please specify of client has ever been defiled.').hide();
+            if(pAge &lt; 10 &amp;&amp; mothersStatus != 703 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703){
+                if (everHadSex == false) {
+                    getField('sexually-active.error').html('Please specify of client has ever been defiled.').show();
+                    return false;
+                } else {
+                    getField('sexually-active.error').html('Please specify of client has ever been defiled.').hide();
+                }
             }
-            if(((pAge &gt; 9  &amp;&amp; testHistory == 1065 &amp;&amp; testStatus != 703) || (pAge &gt; 9 &amp;&amp; testHistory == 1066)) &amp;&amp; everHadSex == false){
-                getField('sexually-active.error').html('Please specify of client has ever had sex.').show();
-                return false;
-            }else {
-                getField('sexually-active.error').html('Please specify of client has ever had sex.').hide();
+            if(pAge &gt; 9  &amp;&amp; testHistory == 1065 &amp;&amp; testStatus != 703) {
+                if (everHadSex == false) {
+                    getField('sexually-active.error').html('Please specify of client has ever had sex.').show();
+                    return false;
+                } else {
+                    getField('sexually-active.error').html('Please specify of client has ever had sex.').hide();
+                }
             }
             if(pAge &gt; 9 &amp;&amp; (testHistory == 1065 &amp;&amp;  testStatus != 703)){
                 if(experiencedGbv == false){
-                getField('experienced-gbv.error').html('Please specify if client has ever experienced gender based violence.').show();
-                return false;
-               }else {
+                    getField('experienced-gbv.error').html('Please specify if client has ever experienced gender based violence.').show();
+                    return false;
+                }else {
                     getField('experienced-gbv.error').html('Please specify if client has ever experienced gender based violence.').hide();
                 }
             }
-            if(((pAge &lt; 10 &amp;&amp; mothersStatus != 703) || (testHistory == 1065 &amp;&amp;  testStatus != 703) || (pAge &gt; 9 &amp;&amp; testHistory == 1066)) &amp;&amp; scarification == false){
-                getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').show();
-                return false;
-            }else {
-                getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').hide();
+            if(pAge &lt; 10 &amp;&amp; mothersStatus != 703 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703){
+                if (scarification == false) {
+                    getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').show();
+                    return false;
+                } else {
+                    getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').hide();
+                }
+            }
+            if(pAge &gt; 9 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703) {
+                if (scarification == false) {
+                    getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').show();
+                    return false;
+                } else {
+                    getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').hide();
+                }
             }
             if((testHistory == 1065 &amp;&amp;  testStatus != 703) &amp;&amp;  (healthWorker == 1065 &amp;&amp; needleStick == false)){
                 getField('needle-stick.error').html('Please specify if client had needle stick injuries.').show();
