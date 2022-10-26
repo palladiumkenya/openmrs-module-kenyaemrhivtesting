@@ -46,13 +46,11 @@ public class PNSReportCohortLibrary {
      */
     public CohortDefinition htsNewlyTested(){
         SqlCohortDefinition cd = new SqlCohortDefinition();
-        String sqlQuery = "select patient_id from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
-                " from  kenyaemr_etl.etl_hts_test t \n" +
-                " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
-                " where t.voided=0 and t.test_type=1\n" +
-                " group by t.patient_id\n" +
-                " having initial_test_date between date(:startDate) and date(:endDate)) t\n" +
-                " ;";
+        String sqlQuery = "select t.patient_id from  kenyaemr_etl.etl_hts_test t\n" +
+                "  inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
+                "  where t.voided=0 and t.test_type=1 and ((t.ever_tested_for_hiv = 'Yes' and months_since_last_test >=12) or t.ever_tested_for_hiv = 'No')\n" +
+                "                   and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
+                "  group by t.patient_id;";
         cd.setName("totalTested");
         cd.setQuery(sqlQuery);
         cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
