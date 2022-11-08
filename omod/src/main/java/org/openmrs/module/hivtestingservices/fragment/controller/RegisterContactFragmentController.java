@@ -48,6 +48,7 @@ import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestParam;
+//import org.openmrs.module.kenyaemr.Dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +82,7 @@ public class RegisterContactFragmentController {
 	private static final String OTHER_NON_CODED = "5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	private static final String IN_SCHOOL = "5629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	private static final String ORPHAN = "1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+	private static final String COUNTRY = "165657AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 	static final String MARRIED_POLYGAMOUS = "159715AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	static final String MARRIED_MONOGAMOUS = "5555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -133,6 +135,14 @@ public class RegisterContactFragmentController {
 
 		Set<String> uniqueCountyList = new HashSet<String>(countyList);
 		model.addAttribute("countyList", uniqueCountyList);
+
+		//create list of countries
+		List<Concept> countryList = new ArrayList<Concept>();
+		for(Concept countryConcept : conceptService.getConcept(165657).getSetMembers()) {
+			countryList.add(countryConcept);
+		}
+
+		model.addAttribute("countryOptions", countryList);
 
 		// create list of next of kin relationship
 
@@ -261,6 +271,8 @@ public class RegisterContactFragmentController {
 		private String emailAddress;
 		private String guardianFirstName;
 		private String guardianLastName;
+		private Concept country;
+		//private Obs savedCountry;
 
 		/**
 		 * Creates an edit form for a new patient
@@ -315,6 +327,16 @@ public class RegisterContactFragmentController {
 			require(errors, "personName.familyName");
 			require(errors, "gender");
 			require(errors, "birthdate");
+
+			require(errors, "maritalStatus");
+			require(errors, "occupation");
+			require(errors, "education");
+			require(errors, "personAddress.cityVillage");
+			require(errors, "telephoneContact");
+			require(errors, "personAddress.countyDistrict");
+			require(errors, "personAddress.stateProvince");
+			require(errors, "personAddress.address4");
+			require(errors, "country");
 
 			// Require death details if patient is deceased
 			if (dead) {
@@ -452,6 +474,7 @@ public class RegisterContactFragmentController {
 			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(EDUCATION), null, education);
 			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(IN_SCHOOL), null, inSchool);
 			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(ORPHAN), null, orphan);
+			handleOncePerPatientObs(ret, obsToSave, obsToVoid, conceptService.getConceptByUuid(COUNTRY), null, country);
 
 
 			for (Obs o : obsToSave) {
@@ -667,6 +690,14 @@ public class RegisterContactFragmentController {
 		 */
 		public void setUniquePatientNumber(String uniquePatientNumber) {
 			this.uniquePatientNumber = uniquePatientNumber;
+		}
+
+		public Concept getCountry() {
+			return country;
+		}
+
+		public void setCountry(Concept country) {
+			this.country = country;
 		}
 
 		/**

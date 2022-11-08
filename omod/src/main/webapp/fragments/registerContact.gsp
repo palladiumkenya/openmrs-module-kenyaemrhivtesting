@@ -11,9 +11,9 @@
 
     def otherDemogFieldRows = [
             [
-                    [object: command, property: "maritalStatus", label: "Marital status", config: [style: "list", options: maritalStatusOptions]],
-                    [object: command, property: "occupation", label: "Occupation", config: [style: "list", options: occupationOptions]],
-                    [object: command, property: "education", label: "Education", config: [style: "list", options: educationOptions]]
+                    [object: command, property: "maritalStatus", label: "Marital status *", config: [style: "list", options: maritalStatusOptions]],
+                    [object: command, property: "occupation", label: "Occupation *", config: [style: "list", options: occupationOptions]],
+                    [object: command, property: "education", label: "Education *", config: [style: "list", options: educationOptions]]
             ]
     ]
     def deathFieldRows = [
@@ -32,7 +32,7 @@
 
     def contactsFields = [
             [
-                    [object: command, property: "telephoneContact", label: "Telephone contact"]
+                    [object: command, property: "telephoneContact", label: "Telephone contact *"]
             ],
             [
                     [object: command, property: "alternatePhoneContact", label: "Alternate phone number"],
@@ -46,7 +46,7 @@
             [
                     [object: command, property: "personAddress.address6", label: "Location"],
                     [object: command, property: "personAddress.address5", label: "Sub-location"],
-                    [object: command, property: "personAddress.cityVillage", label: "Village"]
+                    [object: command, property: "personAddress.cityVillage", label: "Village *"]
             ]
     ]
 
@@ -58,6 +58,9 @@
             ]
     ]
 %>
+
+<script type="text/javascript" src="/${ contextPath }/moduleResources/hivtestingservices/scripts/KenyaAddressHierarchy.js"></script>
+<script type="text/javascript" src="/${ contextPath }/moduleResources/hivtestingservices/scripts/upiVerificationUtils.js"></script>
 
 <form id="edit-patient-form" method="post" action="${ui.actionLink("hivtestingservices", "registerContact", "savePatient")}">
     <% if (command.original) { %>
@@ -145,28 +148,63 @@
         <fieldset>
             <legend>Address</legend>
 
+            <table>
+            <tr>
+            <td class="ke-field-label">Country *</td>
+            <td> </td>
+            </tr>
+            <tr>
+                
+                <td>${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "country", id: "country-registration", config: [style: "list", options: countryOptions]])}</td>
+                <td> <input type="checkbox" name="select-kenya-option" value="Y" id="select-kenya-option" /> Select Kenya </td>
+                <td>
+                    <div id="country-msgBox" class="ke-warning">Country is Required</div>
+                </td>
+            </tr>
+            </table>
+
             <% contactsFields.each { %>
             ${ui.includeFragment("kenyaui", "widget/rowOfFields", [fields: it])}
             <% } %>
 
             <table>
                 <tr>
-                    <td class="ke-field-label" style="width: 265px">County</td>
-                    <td class="ke-field-label" style="width: 260px">Sub-County</td>
-                    <td class="ke-field-label" style="width: 260px">Ward</td>
+                    <td class="ke-field-label" style="width: 265px">County *</td>
+                    <td class="ke-field-label" style="width: 260px">Sub-County *</td>
+                    <td class="ke-field-label" style="width: 260px">Ward *</td>
                 </tr>
 
                 <tr>
                     <td style="width: 265px">
-                        <select name="personAddress.countyDistrict">
+                        <select id="county" name="personAddress.countyDistrict">
                             <option></option>
                             <%countyList.each { %>
                             <option value="${it}">${it}</option>
                             <%}%>
                         </select>
                     </td>
-                    <td style="width: 260px">${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "personAddress.stateProvince"])}</td>
-                    <td style="width: 260px">${ui.includeFragment("kenyaui", "widget/field", [object: command, property: "personAddress.address4"])}</td>
+                    <td style="width: 260px">
+                        <select id="subCounty" name="personAddress.stateProvince">
+                            <option></option>
+                        </select>
+                    </td>
+                    <td style="width: 260px">
+                        <select id="ward" name="personAddress.address4">
+                            <option></option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div id="county-msgBox" class="ke-warning">County is Required</div>
+                    </td>
+                    <td>
+                        <div id="subCounty-msgBox" class="ke-warning">Sub County is Required</div>
+                    </td>
+                    <td>
+                        <div id="ward-msgBox" class="ke-warning">Ward is Required</div>
+                    </td>
                 </tr>
             </table>
             <% locationSubLocationVillageFields.each { %>
@@ -206,7 +244,13 @@
 
     </div>
 
+    <div class="text-wrap" align="center" id="post-msgBox"></div>
+    <br/>
+
     <div class="ke-panel-footer">
+        <div class="message-nupi-reminder message-colors">
+            <label id="msgBox">Please Don't Forget To Verify With Client Registry</label>
+        </div>
         <button type="submit">
             <img src="${ui.resourceLink("kenyaui", "images/glyphs/ok.png")}"/> ${command.original ? "Save Changes" : "Create Patient"}
         </button>
@@ -238,14 +282,36 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         cancelLabel      : ui.message("general.cancel")
 ])}
 
+<style>
+.message-nupi-reminder {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.message-colors {
+    padding: 10px 20px;
+    background-color: yellowgreen;
+    color: #000000;
+    font-weight: bold;
+}
+</style>
+
 <script type="text/javascript">
     //On ready
     jQuery(function () {
+        var countyCode;
+
+        jQuery("#country-msgBox").hide();
+        jQuery("#county-msgBox").hide();
+        jQuery("#subCounty-msgBox").hide();
+        jQuery("#ward-msgBox").hide();
 
         jQuery('#from-age-button').appendTo(jQuery('#from-age-button-placeholder'));
+
         jQuery('#edit-patient-form .cancel-button').click(function () {
             ui.navigate('${ config.returnUrl }');
         });
+
         kenyaui.setupAjaxPost('edit-patient-form', {
             onSuccess: function (data) {
                 if (data.id) {
@@ -256,6 +322,118 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
             }
         });
 
+        jQuery('#county').change(updateSubcounty);
+        jQuery('#subCounty').change(updateWard);
+        jQuery('#select-kenya-option').click(selectCountryKenyaOptionOnRegistration);
+
+        function validateFields() {
+            //County Code status:
+            //var countyCode;
+            if(jQuery('select[name="personAddress.countyDistrict"]').val() !=""){
+                jQuery("#county-msgBox").hide();
+                countyCode = countyObject[jQuery('select[name="personAddress.countyDistrict"]').val()].countyCode;
+            } else {
+                // County is required
+                jQuery("#post-msgBox").text("Please enter county to successfully register patient");
+                jQuery("#post-msgBox").show();
+                jQuery("#county-msgBox").show();
+                return(false);
+            }
+            //SubCounty Validation
+            if(jQuery('select[name="personAddress.stateProvince"]').val() ==""){
+                // Sub-County is required
+                jQuery("#post-msgBox").text("Please enter sub county to successfully register patient");
+                jQuery("#post-msgBox").show();
+                jQuery("#subCounty-msgBox").show();
+                return(false);
+            }else{
+                jQuery("#subCounty-msgBox").hide();
+            }
+            //Ward Validation
+            if(jQuery('select[name="personAddress.address4"]').val() ==""){
+                //Ward is required
+                jQuery("#post-msgBox").text("Please enter ward to successfully register patient");
+                jQuery("#post-msgBox").show();
+                jQuery("#ward-msgBox").show();
+                return(false);
+            }else{
+                jQuery("#ward-msgBox").hide();
+            }
+            //Telephone Validation
+            if(jQuery('input[name="telephoneContact"]').val() ==""){
+                // Telephone number is required
+                jQuery("#post-msgBox").text("Please enter telephone number to successfully post to CR");
+                jQuery("#post-msgBox").show();
+                jQuery("#phone-msgBox").show();
+                return(false);
+            }else{
+                jQuery("#phone-msgBox").hide();
+            }
+            //Age Validation
+            if(jQuery('#patient-birthdate_date').val() ==""){
+                // Age is required
+                jQuery("#post-msgBox").text("Please enter age to successfully post to CR");
+                jQuery("#post-msgBox").show();
+                jQuery("#age-msgBox").show();
+                return(false);
+            }else{
+                jQuery("#age-msgBox").hide();
+            }
+            //First name Validation
+            if(jQuery('input[name="personName.givenName"]').val() ==""){
+                // First Name is required
+                jQuery("#post-msgBox").text("Please enter First name to successfully post to CR");
+                jQuery("#post-msgBox").show();
+                jQuery('#firstname-msgBox').show();
+                return(false);
+            }else{
+                jQuery('#firstname-msgBox').hide();
+            }
+            //Surname Validation
+            if(jQuery('input[name="personName.familyName"]').val() ==""){
+                //Family Name is required
+                jQuery("#post-msgBox").text("Please enter Surname to successfully post to CR");
+                jQuery("#post-msgBox").show();
+                jQuery('#surname-msgBox').show();
+                return(false);
+            }else{
+                jQuery('#surname-msgBox').hide();
+            }
+            //Village Validation
+            if(jQuery('input[name="personAddress.cityVillage"]').val() =="") {
+                //Village is required
+                jQuery("#post-msgBox").text("Please enter Village to successfully post to CR");
+                jQuery("#post-msgBox").show();
+                jQuery('#village-msgBox').show();
+                return(false);
+            }else{
+                jQuery('#village-msgBox').hide();
+            }
+
+            return(true);
+        }
+
+        function updateSubcounty() {
+            jQuery('#subCounty').empty();
+            jQuery('#ward').empty();
+            var selectedCounty = jQuery('#county').val();
+            var scKey;
+            jQuery('#subCounty').append(jQuery("<option></option>").attr("value", "").text(""));
+            for (scKey in kenyaAddressHierarchy[selectedCounty]) {
+                jQuery('#subCounty').append(jQuery("<option></option>").attr("value", scKey).text(scKey));
+            }
+        }
+
+        function updateWard() {
+            jQuery('#ward').empty();
+            var selectedCounty = jQuery('#county').val();
+            var selectedsubCounty = jQuery('#subCounty').val();
+            var scKey;
+            jQuery('#ward').append(jQuery("<option></option>").attr("value", "").text(""));
+            for (scKey in kenyaAddressHierarchy[selectedCounty][selectedsubCounty]) {
+                jQuery('#ward').append(jQuery("<option></option>").attr("value", kenyaAddressHierarchy[selectedCounty][selectedsubCounty][scKey].facility).text(kenyaAddressHierarchy[selectedCounty][selectedsubCounty][scKey].facility));
+            }
+        }
 
     }); // end of jQuery initialization block
 
@@ -264,4 +442,22 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
         kenyaui.setDateField('patient-birthdate', birthdate);
         kenyaui.setRadioField('patient-birthdate-estimated', 'true');
     }
+
+    //Ckeckbox to select country Kenya on registration
+    var selectCountryKenyaOptionOnRegistration = function () {
+        console.log("Reg country selection");
+        var val = jq(this).val();
+        if (jq(this).is(':checked')){
+            jQuery('select[id=country-registration]').val(162883);
+        }else{
+            jQuery('select[id=country-registration]').val("");
+        }
+
+        jQuery('select[id=country-registration]').on('change', function() {
+         if(this.value != 162883)  {
+             jq("#select-kenya-option").prop("checked", false);
+         }
+         });
+    }
+
 </script>
