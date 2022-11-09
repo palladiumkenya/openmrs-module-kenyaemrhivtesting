@@ -303,9 +303,13 @@ public class RegisterContactFragmentController {
 				personAddress.setAddress1(contact.getPhysicalAddress());
 				personAddress.setPerson(original);
 			}
-			if (contact.getPhoneContact() != null)
+			if (contact.getPhoneContact() != null) {
 				telephoneContact = contact.getPhoneContact();
+			}
 
+			if (contact.getMaritalStatus() != null) {
+				maritalStatus = conceptService.getConcept(contact.getMaritalStatus());
+			}
 
 			gender = contact.getSex();
 			birthdate = contact.getBirthDate();
