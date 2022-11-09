@@ -64,7 +64,6 @@ public class PatientContactListPageController {
         Form initial = formService.getFormByUuid(HTS_INITIAL_TEST);
         Form retest = formService.getFormByUuid(HTS_CONFIRMATORY_TEST);
         String finalResultConceptUUID = "159427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-        String finalResult = "";
 
         for (PatientContact contact : contacts) {
             String fullName = "";
@@ -83,6 +82,7 @@ public class PatientContactListPageController {
 
             // check if contact is registered, and has undertaken hts
             Date dateTested = null;
+            String finalResult = "";
             if (contact.getPatient() != null) {
                 Encounter encounter = lastEncounter(contact.getPatient(), et, Arrays.asList(initial, retest));
                 if (encounter != null) {
