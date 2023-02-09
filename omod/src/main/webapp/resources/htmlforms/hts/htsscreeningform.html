@@ -41,6 +41,7 @@
             jq('#tr-reasons-ineligibility').hide();
             jq('#experienced-physical-violence').hide();
             jq('#sex-againist-wish').hide();
+            jq('#tbl-other-priority-population').hide();
             jq('#tbl-other-decline-reason').hide();
             jq('#screening-questions').hide();
             jq('#no-sex-partners input').prop('disabled', true);
@@ -66,6 +67,7 @@
             jq('#sti-service :input[type=checkbox]').change(stiServiceSelected);
             jq('#tb-service :input[type=checkbox]').change(tbServiceSelected);
             jq('#pwid :input[type=checkbox]').change(pwidSelected);
+            jq('#other-priority-population :input[type=checkbox]').change(otherPriorityPopulationSelected);
             jq('#other-decline-reason :input[type=checkbox]').change(otherDeclineReasonSelected);
             jq('#index-relationship :input[type=checkbox]').change(indexRelationshipSelected);
             jq('#screened-tb :input[type=radio]').change(tbScreenedSelected);
@@ -443,6 +445,18 @@
             }
         }
 
+        //Other Priority Population Selected
+        var otherPriorityPopulationSelected = function(){
+            var val = jq(this).val();
+            var otherChecked = jq("#other-priority-population input:checkbox:checked");
+            if(val == 5622 &amp;&amp; otherChecked.length >=1){
+                jq('#tbl-other-priority-population').show();
+            } else {
+                jq('#tbl-other-priority-population').hide();
+                clearHiddenSections(jq('#other-priority-population'));
+            }
+        }
+
         //Other Decline Reason Selected
         var otherDeclineReasonSelected = function(){
             var val = jq(this).val();
@@ -454,6 +468,7 @@
                 clearHiddenSections(jq('#other-reason-specify'));
             }
         }
+
         var indexRelationshipSelected = function(){
             var val = jq(this).val();
             var relationshipChecked = jq("#index-relationship input:checkbox:checked");
@@ -1293,6 +1308,8 @@
             var department = getValue('department.value');
             var patientType = getValue('patient-type.value');
             var relationshipChecked = jq("#index-relationship input:checkbox:checked");
+            var otherPriorityPopulationChecked = jq("#other-priority-population input:checkbox:checked");
+            var otherPriorityPopulationSpecify = getValue('other-priority-population-specify.value');
             var patientPregnant = getValue('pregnant.value');
             var healthWorker = getValue('health-worker.value');
             var needleStick = getValue('needle-stick.value');
@@ -1311,6 +1328,7 @@
             var reasonForNoTest = getValue("tb-not-testing-reasons.value");
             var predictionResultCategory = getValue("algorithm_result_category.value");
             var predictionResultScore = getValue("algorithm_result_score.value");
+            
 
             if(popType == false){
                 getField('population-type.error').html('Please specify client population type.').show();
@@ -1380,11 +1398,18 @@
                 }
             }
 
-            if(relationshipChecked.length ==0){
+            if(relationshipChecked.length == 0){
                 getField('index-error.error').html('Please specify relationship to index.').show();
                 return false;
             } else {
                 getField('index-error.error').html('Please specify relationship to index.').hide();
+            }
+
+            if(otherPriorityPopulationChecked.length > 0 &amp;&amp; otherPriorityPopulationSpecify == false){
+                getField('other-priority-population-specify.error').html('Please specify the other priority population.').show();
+                return false;
+            } else {
+                getField('other-priority-population-specify.error').html('Please specify the other priority population.').hide();
             }
 
             if(pgender == 'F' &amp;&amp; pAge &gt; 9 &amp;&amp; (testHistory == 1065 &amp;&amp; testStatus != 703)){
@@ -1683,20 +1708,45 @@
             <table id="priority-population">
                 <tr>
                     <td>
+
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="159674AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Fisher folk" style="checkbox" id="fisherfolk"/><br/>
+                             answerLabel="Fishing Communities" style="checkbox" id="fisherfolk"/><br/>
+                        
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162198AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Truck driver" style="checkbox" id="truckdriver" /><br/>
-                        <includeIf velocityTest="($patient.gender == 'F') &amp;&amp; ($patient.age &gt; 9) &amp;&amp; ($patient.age &lt; 25)">
-                             <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Adolescent and young girls" style="checkbox" id="adyg" /><br/>
-                        </includeIf>
+                             answerLabel="Mobile Populations (e.g., migrant workers, truck drivers)" style="checkbox" id="truckdriver" /><br/>
+
+                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160580AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            answerLabel="Clients of sex workers" style="checkbox" id="ppclientofsexualworkers" /><br/>
+                        
+                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="167286AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            answerLabel="Displaced persons (e.g., refugees)" style="checkbox" id="ppdisplacedpersons" /><br/>
+                        
+                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165085"
+                            answerLabel="Non-injecting drug users" style="checkbox" id="ppnoninjectingusers" /><br/>
+
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerLabel="Prisoner" style="checkbox" id="ppprisoner"/><br/>
+                        
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165192"
-                             answerLabel="Military and other uniformed services" style="checkbox" id="dodOnly" /><br/>
+                             answerLabel="Military and other uniformed services (including police, border guards, and security workers)" style="checkbox" id="dodOnly" /><br/>
 
+                        <table style="padding-left:0px;margin-left:0px;">
+                            <tr style="{padding-left:0px;margin-left:0px;">
+                                <td style="padding-left:0px;margin-left:0px;">
+                                    <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                        answerLabel="Other Priority Population Type (Describe in the narrative)" style="checkbox" id="other-priority-population"/><br/>
+                                </td>
+                                <td> 
+                                    <div id="tbl-other-priority-population">
+                                        &#160;&#160;&#160; Specify : <span style="color:red;"><strong>*</strong></span>
+                                        <obs id="other-priority-population-specify" conceptId="160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
+                                        &#160;&#160;&#160;
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
+
                 </tr>
             </table>
         </fieldset>
