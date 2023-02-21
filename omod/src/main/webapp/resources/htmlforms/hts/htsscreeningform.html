@@ -1603,6 +1603,9 @@
         }
 
         function validatePrediction() {
+            var predictionResultCategory = getValue("algorithm_result_category.value");
+            var predictionResultScore = getValue("algorithm_result_score.value");
+            
             // Validate prediction
             if(predictionResultCategory == false || predictionResultScore == false){
                 jq('#ml-prediction-desc').html('<span style="color:red;"><strong>Please predict the probability of HIV.</strong></span>');
@@ -1617,7 +1620,7 @@
             if(validateVariables() &amp;&amp; validatePrediction()) {
                 return true;
             }
-
+            console.log("Failed at 23");
             return false;
         }
 
