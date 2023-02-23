@@ -1401,17 +1401,13 @@
             var experiencedGbv = getValue('experienced-gbv.value');
             var scarification = getValue('scarification.value');
             var eligibility = getValue('eligible-test.value');
-            var referred = getValue('referred.value');
             var htsEntryPoint = getValue('hts-entry-point.value');
             var testStrategy = getValue("strategy.value");
             var eligibleForTest = getValue("eligible-test.value");
-            var reasonForTest = getValue("tb-testing-reasons.value");
-            var reasonForNoTest = getValue("tb-not-testing-reasons.value");
             var predictionResultCategory = getValue("algorithm_result_category.value");
             var predictionResultScore = getValue("algorithm_result_score.value");
             var hasDisability = getValue('has-disability.value');
             var disabilityChecked = jq("#disability input:checkbox:checked");
-            var recommendForTest = getValue("recommended-test.value");
 
             console.log("Testing 1");
             if (disabilityChecked.length == 0 &amp;&amp; hasDisability == 1065) {
@@ -1449,26 +1445,6 @@
                 return false;
             } else {
                 getField('strategy.error').html('Please specify the strategy.').hide();
-            }
-
-            console.log("Testing 6");
-            // Validate Reasons For Test
-            if(recommendForTest == 1065 &amp;&amp; reasonForTest == false){
-                getField('recommended-test.error').html('Please specify reason for recommending testing.').show();
-                console.log("Failed at 6");
-                return false;
-            } else {
-                getField('recommended-test.error').html('Please specify reason for recommending testing.').hide();
-            }
-
-            console.log("Testing 7");
-            // Validate Reasons For No Test
-            if(recommendForTest == 1066 &amp;&amp; reasonForNoTest == false){
-                getField('recommended-test.error').html('Please specify reason for NOT recommending testing.').show();
-                console.log("Failed at 7");
-                return false;
-            } else {
-                getField('recommended-test.error').html('Please specify reason for NOT recommending testing.').hide();
             }
 
             console.log("Testing 8");
@@ -1613,15 +1589,6 @@
                 getField('eligible-test.error').html('Please specify whether client is eligible for HIV test.').hide();
             }
 
-            console.log("Testing 22");
-            if(referred == false){
-                getField('referred.error').html('Please specify whether client was referred.').show();
-                console.log("Failed at 22");
-                return false;
-            } else {
-                getField('referred.error').html('Please specify whether client was referred.').hide();
-            }
-
             return true;
         }
 
@@ -1641,12 +1608,66 @@
         }
 
         function validateForPush() {
-            console.log("Testing 23");
-            if(validateVariables() &amp;&amp; validatePrediction()) {
-                return true;
+            var recommendForTest = getValue("recommended-test.value");
+            var reasonForTest = getValue("tb-testing-reasons.value");
+            var reasonForNoTest = getValue("tb-not-testing-reasons.value");
+            var referred = getValue('referred.value');
+
+            console.log("Testing 25");
+            // Validate variables
+            if(!validateVariables()) {
+                console.log("Failed at 25");
+                return false;
             }
-            console.log("Failed at 23");
-            return false;
+
+            console.log("Testing 26");
+            // Validate prediction
+            if(!validatePrediction()) {
+                console.log("Failed at 26");
+                return false;
+            }
+
+            console.log("Testing 24");
+            // Validate Recommended For Test
+            if(recommendForTest == false){
+                getField('recommended-test.error').html('Please specify if recommending testing.').show();
+                console.log("Failed at 24");
+                return false;
+            } else {
+                getField('recommended-test.error').html('Please specify if recommending testing.').hide();
+            }
+
+            console.log("Testing 6");
+            // Validate Reasons For Test
+            if(recommendForTest == 1065 &amp;&amp; reasonForTest == false){
+                getField('tb-testing-reasons.error').html('Please specify reason for recommending testing.').show();
+                console.log("Failed at 6");
+                return false;
+            } else {
+                getField('tb-testing-reasons.error').html('Please specify reason for recommending testing.').hide();
+            }
+
+            console.log("Testing 7");
+            // Validate Reasons For No Test
+            if(recommendForTest == 1066 &amp;&amp; reasonForNoTest == false){
+                getField('tb-not-testing-reasons.error').html('Please specify reason for NOT recommending testing.').show();
+                console.log("Failed at 7");
+                return false;
+            } else {
+                getField('tb-not-testing-reasons.error').html('Please specify reason for NOT recommending testing.').hide();
+            }
+
+            console.log("Testing 22");
+            // Validate for referred
+            if(referred == false){
+                getField('referred.error').html('Please specify whether client was referred.').show();
+                console.log("Failed at 22");
+                return false;
+            } else {
+                getField('referred.error').html('Please specify whether client was referred.').hide();
+            }
+
+            return(true);
         }
 
         //Before Submit
