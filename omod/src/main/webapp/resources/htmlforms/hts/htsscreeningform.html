@@ -1316,7 +1316,7 @@
                 variableValues: predictionVariables
             }
 
-            console.log("ML Payload: " + JSON.stringify(mlScoringRequestPayload));
+            //console.log("ML Payload: " + JSON.stringify(mlScoringRequestPayload));
 
             var predResponse = '';
             if (casefindingURL !='') {
@@ -1409,181 +1409,145 @@
             var hasDisability = getValue('has-disability.value');
             var disabilityChecked = jq("#disability input:checkbox:checked");
 
-            console.log("Testing 1");
             if (disabilityChecked.length == 0 &amp;&amp; hasDisability == 1065) {
                 getField('has-disability.error').html('Please specify the disabilty type.').show();
-                console.log("Failed at 1");
                 return false;
             } else {
                 getField('has-disability.error').html('Please specify the disabilty type.').hide();
             }
 
-            console.log("Testing 2");
             if(popType == false){
                 getField('population-type.error').html('Please specify client population type.').show();
-                console.log("Failed at 2");
                 return false;
             } else {
                 getField('population-type.error').html('Please specify client population type.').hide();
             }
 
-            console.log("Testing 4");
             // Validate Entry Point
             if(htsEntryPoint == false){
                 getField('hts-entry-point.error').html('Please specify the entry point.').show();
-                console.log("Failed at 4");
                 return false;
             } else {
                 getField('hts-entry-point.error').html('Please specify the entry point.').hide();
             }
 
-            console.log("Testing 5");
             // Validate Test Strategy
             if(testStrategy == false){
                 getField('strategy.error').html('Please specify the strategy.').show();
-                console.log("Failed at 5");
                 return false;
             } else {
                 getField('strategy.error').html('Please specify the strategy.').hide();
             }
 
-            console.log("Testing 8");
             if(department == false){
                 getField('department.error').html('Please specify department.').show();
-                console.log("Failed at 8");
                 return false;
             } else {
                 getField('department.error').html('Please specify department.').hide();
             }
 
-            console.log("Testing 9");
             if(patientType == false){
                 getField('patient-type.error').html('Please specify client patient type.').show();
-                console.log("Failed at 9");
                 return false;
             } else {
                 getField('patient-type.error').html('Please specify client patient type.').hide();
             }
 
-            console.log("Testing 10");
             if(pAge &gt; 17) {
                 if (healthWorker == false) {
                     getField('health-worker.error').html('Please specify if client is a health worker.').show();
-                    console.log("Failed at 10");
                     return false;
                 } else {
                     getField('health-worker.error').html('Please specify if client is a health worker.').hide();
                 }
             }
 
-            console.log("Testing 11");
             if(relationshipChecked.length == 0){
                 getField('index-error.error').html('Please specify relationship to index.').show();
-                console.log("Failed at 11");
                 return false;
             } else {
                 getField('index-error.error').html('Please specify relationship to index.').hide();
             }
 
-            console.log("Testing 12");
             if(pgender == 'F' &amp;&amp; pAge &gt; 9 &amp;&amp; (testHistory == 1065 &amp;&amp; testStatus != 703)){
                 if(patientPregnant == false ){
                     getField('pregnant.error').html('Please specify pregnancy status.').show();
-                    console.log("Failed at 12");
                     return false;
                 } else {
                     getField('pregnant.error').html('Please specify pregnancy status.').hide();
                 }
             }
 
-            console.log("Testing 13");
             if(pAge &lt; 10) {
                 if (mothersStatus == false) {
                     getField('mothers-hiv-status.error').html("Please specify client mother's hiv status.").show();
-                    console.log("Failed at 13");
                     return false;
                 } else {
                     getField('mothers-hiv-status.error').html("Please specify client mother's hiv status.").hide();
                 }
             }
 
-            console.log("Testing 14");
             if(testHistory == false){
                 getField('test-history.error').html('Please specify if client has been tested for HIV before.').show();
-                console.log("Failed at 14");
                 return false;
             } else {
                 getField('test-history.error').html('Please specify if client has been tested for HIV before.').hide();
             }
 
-            console.log("Testing 15");
             if(pAge &lt; 10 &amp;&amp; mothersStatus != 703 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703){
                 if (everHadSex == false) {
                     getField('active-sexually.error').html('Please specify of client has ever been defiled.').show();
-                    console.log("Failed at 15");
                     return false;
                 } else {
                     getField('active-sexually.error').html('Please specify of client has ever been defiled.').hide();
                 }
             }
 
-            console.log("Testing 16");
             if(pAge &gt; 9  &amp;&amp; testHistory == 1065 &amp;&amp; testStatus != 703) {
                 if (everHadSex == false) {
                     getField('active-sexually.error').html('Please specify of client has ever had sex.').show();
-                    console.log("Failed at 16");
                     return false;
                 } else {
                     getField('active-sexually.error').html('Please specify of client has ever had sex.').hide();
                 }
             }
 
-            console.log("Testing 17");
             if(pAge &gt; 9 &amp;&amp; (testHistory == 1065 &amp;&amp;  testStatus != 703)){
                 if(experiencedGbv == false){
                     getField('experienced-gbv.error').html('Please specify if client has ever experienced gender based violence.').show();
-                    console.log("Failed at 17");
                     return false;
                 } else {
                     getField('experienced-gbv.error').html('Please specify if client has ever experienced gender based violence.').hide();
                 }
             }
 
-            console.log("Testing 18");
             if(pAge &lt; 10 &amp;&amp; mothersStatus != 703 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703){
                 if (scarification == false) {
                     getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').show();
-                    console.log("Failed at 18");
                     return false;
                 } else {
                     getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').hide();
                 }
             }
 
-            console.log("Testing 19");
             if(pAge &gt; 9 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703) {
                 if (scarification == false) {
                     getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').show();
-                    console.log("Failed at 19");
                     return false;
                 } else {
                     getField('scarification.error').html('Please specify if client has ever had scarification, plastic tooth extraction, Circumcision, uvulectomy etc.').hide();
                 }
             }
 
-            console.log("Testing 20");
             if((testHistory == 1065 &amp;&amp;  testStatus != 703) &amp;&amp;  (healthWorker == 1065 &amp;&amp; needleStick == false)){
                 getField('needle-stick.error').html('Please specify if client had needle stick injuries.').show();
-                console.log("Failed at 20");
                 return false;
             } else {
                 getField('needle-stick.error').html('Please specify if client had needle stick injuries.').hide();
             }
             
-            console.log("Testing 21");
             if(eligibility == false){
                 getField('eligible-test.error').html('Please specify whether client is eligible for HIV test.').show();
-                console.log("Failed at 21");
                 return false;
             } else {
                 getField('eligible-test.error').html('Please specify whether client is eligible for HIV test.').hide();
@@ -1596,11 +1560,9 @@
             var predictionResultCategory = getValue("algorithm_result_category.value");
             var predictionResultScore = getValue("algorithm_result_score.value");
 
-            console.log("Testing 3");
             // Validate prediction
             if(predictionResultCategory == false || predictionResultScore == false){
                 jq('#ml-prediction-desc').html('<span style="color:red;"><strong>Please predict the probability of HIV.</strong></span>');
-                console.log("Failed at 3");
                 return false;
             }
 
@@ -1613,55 +1575,43 @@
             var reasonForNoTest = getValue("tb-not-testing-reasons.value");
             var referred = getValue('referred.value');
 
-            console.log("Testing 25");
             // Validate variables
             if(!validateVariables()) {
-                console.log("Failed at 25");
                 return false;
             }
 
-            console.log("Testing 26");
             // Validate prediction
             if(!validatePrediction()) {
-                console.log("Failed at 26");
                 return false;
             }
 
-            console.log("Testing 24");
             // Validate Recommended For Test
             if(recommendForTest == false){
                 getField('recommended-test.error').html('Please specify if recommending testing.').show();
-                console.log("Failed at 24");
                 return false;
             } else {
                 getField('recommended-test.error').html('Please specify if recommending testing.').hide();
             }
 
-            console.log("Testing 6");
             // Validate Reasons For Test
             if(recommendForTest == 1065 &amp;&amp; reasonForTest == false){
                 getField('tb-testing-reasons.error').html('Please specify reason for recommending testing.').show();
-                console.log("Failed at 6");
                 return false;
             } else {
                 getField('tb-testing-reasons.error').html('Please specify reason for recommending testing.').hide();
             }
 
-            console.log("Testing 7");
             // Validate Reasons For No Test
             if(recommendForTest == 1066 &amp;&amp; reasonForNoTest == false){
                 getField('tb-not-testing-reasons.error').html('Please specify reason for NOT recommending testing.').show();
-                console.log("Failed at 7");
                 return false;
             } else {
                 getField('tb-not-testing-reasons.error').html('Please specify reason for NOT recommending testing.').hide();
             }
 
-            console.log("Testing 22");
             // Validate for referred
             if(referred == false){
                 getField('referred.error').html('Please specify whether client was referred.').show();
-                console.log("Failed at 22");
                 return false;
             } else {
                 getField('referred.error').html('Please specify whether client was referred.').hide();
