@@ -1,7 +1,7 @@
 name: deploy to prod 8600
 on:
   push:
-    branches: [ master ]
+    branches: [ ML-HTS-Eligibility-Screening-DEV ]
 jobs:
 
   build:
@@ -22,7 +22,7 @@ jobs:
           sudo mkdir openmrs-module-kenyaemrhivtesting
           sudo chown -R cicd2:cicd2 openmrs-module-kenyaemrhivtesting
           git config --global --add safe.directory /apps/github-workflows/kenyaemr-modules/openmrs-module-kenyaemrhivtesting      
-          git clone -b master https://github.com/palladiumkenya/openmrs-module-kenyaemrhivtesting.git openmrs-module-kenyaemrhivtesting
+          git clone -b ML-HTS-Eligibility-Screening-DEV https://github.com/palladiumkenya/openmrs-module-kenyaemrhivtesting.git openmrs-module-kenyaemrhivtesting
           cd /apps/github-workflows/kenyaemr-modules/openmrs-module-kenyaemrhivtesting
           git status
           mvn clean install -DskipTests

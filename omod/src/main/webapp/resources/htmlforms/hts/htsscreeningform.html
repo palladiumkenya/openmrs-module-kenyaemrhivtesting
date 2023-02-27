@@ -38,7 +38,7 @@
             jq('#tr-sexually-active').hide();
             jq('#tr-needle-stick').hide();
             jq('#tr-needle-shared').hide();
-            jq('#tr-reasons-ineligibility').hide();
+            jq('#tr-reasons-not-refered').hide();
             jq('#experienced-physical-violence').hide();
             jq('#sex-againist-wish').hide();
             jq('#tbl-other-priority-population').hide();
@@ -48,30 +48,36 @@
             jq('#currently-prep input').prop('disabled', true);
             jq('#currently-pep input').prop('disabled', true);
             jq('#currently-sti input').prop('disabled', true);
-            jq('#screened-tb input').prop('disabled', true);
+            // jq('#screened-tb input').prop('disabled', true);
             jq('#tr-testing-reasons').hide();
             jq('#tr-not-testing-reasons').hide();
+            jq('#supported-reason').hide();
+            jq('#tbl-other-strategy').hide();
 
-
+            //strategy selected
+            jq('.hts-strategy select').change(strategySelected);
+            jq('#strategy select').change(strategySelected);
+            //disability
+            jq('#has-disability input').change(isDisabilitySelected);
             jq('#population-type :input[type=radio]').change(populationTypeSelected);
             jq('#test-history :input[type=radio]').change(everTested);
             jq('#mothers-hiv-status :input[type=radio]').change(motherTestStatus);
             jq('#health-worker :input[type=radio]').change(healthWorkerSelected);
             jq('#referred :input[type=radio]').change(referredSelected);
             jq('#ever-tested select').change(testResultsSelected);
-            jq('#sexually-active').change(sexuallyActiveSelected);
+            jq('#ever-had-sex').change(everHadSexSelected);
             jq('#multiple-sex-partners').change(multipleSexualPartnersSelected);
             jq('#experienced-gbv').change(experiencedGBVSelected);
             jq('#prep-service :input[type=checkbox]').change(prepServiceSelected);
             jq('#pep-service :input[type=checkbox]').change(pepServiceSelected);
             jq('#sti-service :input[type=checkbox]').change(stiServiceSelected);
-            jq('#tb-service :input[type=checkbox]').change(tbServiceSelected);
+            // jq('#tb-service :input[type=checkbox]').change(tbServiceSelected);
             jq('#pwid :input[type=checkbox]').change(pwidSelected);
             jq('#other-priority-population :input[type=checkbox]').change(otherPriorityPopulationSelected);
             jq('#other-decline-reason :input[type=checkbox]').change(otherDeclineReasonSelected);
             jq('#index-relationship :input[type=checkbox]').change(indexRelationshipSelected);
             jq('#screened-tb :input[type=radio]').change(tbScreenedSelected);
-            jq('#eligible-test :input[type=radio]').change(eligibleForTestSelected);
+            jq('#recommended-test :input[type=radio]').change(recommendedForTestSelected);
 
 
             if(pgender == 'M' || pAge &lt; 10 ){
@@ -89,6 +95,32 @@
                 jq("#population-type input[value=164929]").prop("disabled",false);
                 jq("#population-type input[value=138643]").prop("disabled",false);
                 jq("#population-type input[value=164928]").prop("checked", false);
+            }
+
+            //HTS Strategy
+            var htsStrategySelected = getField('strategy.value').val();
+            if (htsStrategySelected == 159938 ){
+                getField('hts-entry-point.value').prop("selectedIndex", 14);
+            }else if (htsStrategySelected == 159939 ){
+                getField('hts-entry-point.value').prop("selectedIndex", 15);
+            }else if (htsStrategySelected == 164954 || htsStrategySelected == 164955){
+                getField('hts-entry-point.value').prop("selectedIndex", 9);
+            }
+            // Specify other
+            if (htsStrategySelected == 5622){
+                jq('#tbl-other-strategy').show();
+            }else{
+                jq('#tbl-other-strategy').hide();
+            }
+
+            //disability
+            jq('#has-other-disability :input[type=checkbox]').change(otherDisabilitySelected);
+            var hasDisability = getValue('has-disability.value');
+
+            // Specify other
+            if (hasDisability == 1065) {
+                jq('#disability').show();
+                jq('#tbl-other-disability').show();
             }
 
             //TB screening validation
@@ -134,6 +166,30 @@
 
         });
 
+        var otherDisabilitySelected = function() {
+            var hasOtherDisabilityChecked = jq("#has-other-disability input:checkbox:checked");
+            if (hasOtherDisabilityChecked.length == 0) {
+                jq('#tbl-other-disability').hide();
+            } else {
+                jq('#tbl-other-disability').show();
+            }
+        }
+
+        var isDisabilitySelected = function () {
+            var val = jq(this).val();
+            if (val == 1066 ){
+                jq('#disability').hide();
+                jq('#tbl-other-disability').hide();
+                jq('#disability select').prop("disabled", true);
+                jq('#disability select').val('');
+                clearHiddenSections(jq('#disability'));
+                clearHiddenSections(jq('#other-disability'));
+            }else{
+                jq('#disability').show();
+                jq('#disability select').prop("disabled", false);
+            }
+        }
+
         var populationTypeSelected = function () {
             var val = jq(this).val();
             var keypop = jq('#key-population');
@@ -170,7 +226,23 @@
                 jq('#fs-children-eligibility').show();
                 jq("#eligible-test input[value=1065]").prop("checked", false);
             }
+        }
 
+        var strategySelected = function () {
+            var val = jq(this).val();
+            if (val == 159938 ){
+                getField('hts-entry-point.value').prop("selectedIndex", 14);
+            }else if (val == 159939 ){
+                getField('hts-entry-point.value').prop("selectedIndex", 15);
+            }else if (val == 164954 || val == 164955){
+                getField('hts-entry-point.value').prop("selectedIndex", 9);
+            }
+            // Specify other
+            if (val == 5622){
+                jq('#tbl-other-strategy').show();
+            }else{
+                jq('#tbl-other-strategy').hide();
+            }
         }
 
         var everTested = function (){
@@ -192,13 +264,17 @@
                 jq('#tr-art-start-date').hide();
                 jq('#positive-client').hide();
                 jq('#positive-client').hide();
-                jq('#fs-risk-assessment').hide();
+                if(pAge &lt; 10 ) {
+                    jq('#fs-risk-assessment').hide();
+                }
                 jq('#fs-children-eligibility').hide();
                 jq("#eligible-test input[value=1065]").prop("checked", true);
 
             }
             if (val == 1065){
-                jq('#fs-risk-assessment').show();
+                if(pAge &lt; 10 ) {
+                    jq('#fs-risk-assessment').show();
+                }
                 jq('#fs-children-eligibility').show();
                 jq("#eligible-test input[value=1065]").prop("checked", false);
                 jq('#eligible-for-test').show();
@@ -260,7 +336,7 @@
                 clearHiddenSections(jq('#pep-service'));
                 clearHiddenSections(jq('#sti-service'));
                 clearHiddenSections(jq('#currently-sti'));
-                clearHiddenSections(jq('#tb-service'));
+                // clearHiddenSections(jq('#tb-service'));
                 clearHiddenSections(jq('#screened-tb'));
                 clearHiddenSections(jq('#scr-cough'));
                 clearHiddenSections(jq('#scr-fever'));
@@ -293,8 +369,8 @@
             }
         }
 
-        var sexuallyActiveSelected = function(){
-            var val = getValue('sexually-active.value');
+        var everHadSexSelected = function(){
+            var val = getValue('ever-had-sex.value');
 
             if(val == 'true'  &amp;&amp; pAge &gt; 10) {
                 jq('#tr-sexually-active').show();
@@ -374,18 +450,20 @@
                 jq('#currently-sti input').prop('disabled', true);
             }
         }
-        //TB selected
-        var tbServiceSelected = function(){
-            var val = jq(this).val();
-            var tbChecked = jq("#tb-service input:checkbox:checked");
-            if(val == 1065 &amp;&amp; tbChecked.length >=1){
-                jq('#screened-tb input').prop('disabled', false);
-            }else{
-                jq("#screened-tb input[value=1065]").prop("checked", false);
-                jq("#screened-tb input[value=1066]").prop("checked", false);
-                jq('#screened-tb input').prop('disabled', true);
-            }
-        }
+
+        //TB service selected
+        // var tbServiceSelected = function(){
+        //     var val = jq(this).val();
+        //     var tbChecked = jq("#tb-service input:checkbox:checked");
+        //     if(val == 1065 &amp;&amp; tbChecked.length >=1){
+        //         jq('#screened-tb input').prop('disabled', false);
+        //     }else{
+        //         jq("#screened-tb input[value=1065]").prop("checked", false);
+        //         jq("#screened-tb input[value=1066]").prop("checked", false);
+        //         jq('#screened-tb input').prop('disabled', true);
+        //     }
+        // }
+
         //Health Worker Selected
         var healthWorkerSelected = function(){
             var val = jq(this).val();
@@ -408,8 +486,8 @@
             }
         }
 
-        //Eligible For Test Selected for HTS Test selected
-        var eligibleForTestSelected = function(){
+        // Recommended For HTS Test Selected
+        var recommendedForTestSelected = function(){
             var val = jq(this).val();
             var tableTesting = jq('#tb-testing-reasons');
             var tableNotTesting = jq('#tb-not-testing-reasons');
@@ -417,10 +495,12 @@
             if(val == 1066){
                 jq('#tr-testing-reasons').hide();
                 clearHiddenSections(tableTesting);
+                jq('#supported-reason').show();
                 jq('#tr-not-testing-reasons').show();
             } else if(val == 1065){
                 jq('#tr-not-testing-reasons').hide();
                 clearHiddenSections(tableNotTesting);
+                jq('#supported-reason').show();
                 jq('#tr-testing-reasons').show();
             }
         }
@@ -430,9 +510,9 @@
             var val = jq(this).val();
 
             if(val == 1066){
-                jq('#tr-reasons-ineligibility').show();
+                jq('#tr-reasons-not-refered').show();
             }else{
-                jq('#tr-reasons-ineligibility').hide();
+                jq('#tr-reasons-not-refered').hide();
                 clearHiddenSections(jq('#other-decline-reason'));
                 clearHiddenSections(jq('#decline-testing'));
                 clearHiddenSections(jq('#wants-partner'));
@@ -494,7 +574,6 @@
         }
 
         // handle ML prediction button
-        // jq("#btn-ml-prediction").click(function () {
         function hivPrediction() {
             var ctxPath = typeof openmrsContextPath === 'string' ? openmrsContextPath : OPENMRS_CONTEXT_PATH;
             var casefindingURL = "<lookup expression="fn.globalProperty('kenyaemrml.casefinding.endpoint')"/>";
@@ -572,7 +651,8 @@
             // entry point / department
             // ever tested for HIV / months since last test
 
-            if (populationType == '' || testHistory == '' || htsDepartment == '' || testStrategy == '' || htsEntryPoint == '') {
+            //if (populationType == '' || testHistory == '' || htsDepartment == '' || testStrategy == '' || htsEntryPoint == '') {
+            if(validateVariables() == false) {
                 jq('#ml-prediction-desc').html('Please ensure that you have provided answers to all questions above');
                 return;
             }
@@ -1236,6 +1316,8 @@
                 variableValues: predictionVariables
             }
 
+            //console.log("ML Payload: " + JSON.stringify(mlScoringRequestPayload));
+
             var predResponse = '';
             if (casefindingURL !='') {
                 jq.ajax({
@@ -1302,8 +1384,7 @@
 
         }
 
-        //Before Submit
-        beforeSubmit.push(function() {
+        function validateVariables() {
             var popType = getValue('population-type.value');
             var department = getValue('department.value');
             var patientType = getValue('patient-type.value');
@@ -1315,32 +1396,31 @@
             var needleStick = getValue('needle-stick.value');
             var testHistory = getValue('test-history.value');
             var mothersStatus = getValue('mothers-hiv-status.value');
-            var everHadSex = getValue('sexually-active.value');
+            var everHadSex = getValue('ever-had-sex.value');
             var testStatus = getValue('ever-tested.value');
             var experiencedGbv = getValue('experienced-gbv.value');
             var scarification = getValue('scarification.value');
             var eligibility = getValue('eligible-test.value');
-            var referred = getValue('referred.value');
             var htsEntryPoint = getValue('hts-entry-point.value');
             var testStrategy = getValue("strategy.value");
             var eligibleForTest = getValue("eligible-test.value");
-            var reasonForTest = getValue("tb-testing-reasons.value");
-            var reasonForNoTest = getValue("tb-not-testing-reasons.value");
             var predictionResultCategory = getValue("algorithm_result_category.value");
             var predictionResultScore = getValue("algorithm_result_score.value");
-            
+            var hasDisability = getValue('has-disability.value');
+            var disabilityChecked = jq("#disability input:checkbox:checked");
+
+            if (disabilityChecked.length == 0 &amp;&amp; hasDisability == 1065) {
+                getField('has-disability.error').html('Please specify the disabilty type.').show();
+                return false;
+            } else {
+                getField('has-disability.error').html('Please specify the disabilty type.').hide();
+            }
 
             if(popType == false){
                 getField('population-type.error').html('Please specify client population type.').show();
                 return false;
-            }else {
+            } else {
                 getField('population-type.error').html('Please specify client population type.').hide();
-            }
-
-            // Validate prediction
-            if(predictionResultCategory == false || predictionResultScore == false){
-                jq('#ml-prediction-desc').html('<span style="color:red;"><strong>Please predict the probability of HIV.</strong></span>');
-                return false;
             }
 
             // Validate Entry Point
@@ -1357,22 +1437,6 @@
                 return false;
             } else {
                 getField('strategy.error').html('Please specify the strategy.').hide();
-            }
-
-            // Validate Reasons For Test
-            if(eligibleForTest == 1065 &amp;&amp; reasonForTest == false){
-                getField('eligible-test.error').html('Please specify reason for testing.').show();
-                return false;
-            } else {
-                getField('eligible-test.error').html('Please specify reason for testing.').hide();
-            }
-
-            // Validate Reasons For No Test
-            if(eligibleForTest == 1066 &amp;&amp; reasonForNoTest == false){
-                getField('eligible-test.error').html('Please specify reason for NOT testing.').show();
-                return false;
-            } else {
-                getField('eligible-test.error').html('Please specify reason for NOT testing.').hide();
             }
 
             if(department == false){
@@ -1405,13 +1469,6 @@
                 getField('index-error.error').html('Please specify relationship to index.').hide();
             }
 
-            if(otherPriorityPopulationChecked.length > 0 &amp;&amp; otherPriorityPopulationSpecify == false){
-                getField('other-priority-population-specify.error').html('Please specify the other priority population.').show();
-                return false;
-            } else {
-                getField('other-priority-population-specify.error').html('Please specify the other priority population.').hide();
-            }
-
             if(pgender == 'F' &amp;&amp; pAge &gt; 9 &amp;&amp; (testHistory == 1065 &amp;&amp; testStatus != 703)){
                 if(patientPregnant == false ){
                     getField('pregnant.error').html('Please specify pregnancy status.').show();
@@ -1439,19 +1496,19 @@
 
             if(pAge &lt; 10 &amp;&amp; mothersStatus != 703 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703){
                 if (everHadSex == false) {
-                    getField('sexually-active.error').html('Please specify of client has ever been defiled.').show();
+                    getField('active-sexually.error').html('Please specify of client has ever been defiled.').show();
                     return false;
                 } else {
-                    getField('sexually-active.error').html('Please specify of client has ever been defiled.').hide();
+                    getField('active-sexually.error').html('Please specify of client has ever been defiled.').hide();
                 }
             }
 
             if(pAge &gt; 9  &amp;&amp; testHistory == 1065 &amp;&amp; testStatus != 703) {
                 if (everHadSex == false) {
-                    getField('sexually-active.error').html('Please specify of client has ever had sex.').show();
+                    getField('active-sexually.error').html('Please specify of client has ever had sex.').show();
                     return false;
                 } else {
-                    getField('sexually-active.error').html('Please specify of client has ever had sex.').hide();
+                    getField('active-sexually.error').html('Please specify of client has ever had sex.').hide();
                 }
             }
 
@@ -1488,7 +1545,7 @@
             } else {
                 getField('needle-stick.error').html('Please specify if client had needle stick injuries.').hide();
             }
-
+            
             if(eligibility == false){
                 getField('eligible-test.error').html('Please specify whether client is eligible for HIV test.').show();
                 return false;
@@ -1496,6 +1553,63 @@
                 getField('eligible-test.error').html('Please specify whether client is eligible for HIV test.').hide();
             }
 
+            return true;
+        }
+
+        function validatePrediction() {
+            var predictionResultCategory = getValue("algorithm_result_category.value");
+            var predictionResultScore = getValue("algorithm_result_score.value");
+
+            // Validate prediction
+            if(predictionResultCategory == false || predictionResultScore == false){
+                jq('#ml-prediction-desc').html('<span style="color:red;"><strong>Please predict the probability of HIV.</strong></span>');
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateForPush() {
+            var recommendForTest = getValue("recommended-test.value");
+            var reasonForTest = getValue("tb-testing-reasons.value");
+            var reasonForNoTest = getValue("tb-not-testing-reasons.value");
+            var referred = getValue('referred.value');
+
+            // Validate variables
+            if(!validateVariables()) {
+                return false;
+            }
+
+            // Validate prediction
+            if(!validatePrediction()) {
+                return false;
+            }
+
+            // Validate Recommended For Test
+            if(recommendForTest == false){
+                getField('recommended-test.error').html('Please specify if recommending testing.').show();
+                return false;
+            } else {
+                getField('recommended-test.error').html('Please specify if recommending testing.').hide();
+            }
+
+            // Validate Reasons For Test
+            if(recommendForTest == 1065 &amp;&amp; reasonForTest == false){
+                getField('tb-testing-reasons.error').html('Please specify reason for recommending testing.').show();
+                return false;
+            } else {
+                getField('tb-testing-reasons.error').html('Please specify reason for recommending testing.').hide();
+            }
+
+            // Validate Reasons For No Test
+            if(recommendForTest == 1066 &amp;&amp; reasonForNoTest == false){
+                getField('tb-not-testing-reasons.error').html('Please specify reason for NOT recommending testing.').show();
+                return false;
+            } else {
+                getField('tb-not-testing-reasons.error').html('Please specify reason for NOT recommending testing.').hide();
+            }
+
+            // Validate for referred
             if(referred == false){
                 getField('referred.error').html('Please specify whether client was referred.').show();
                 return false;
@@ -1503,8 +1617,12 @@
                 getField('referred.error').html('Please specify whether client was referred.').hide();
             }
 
-            return true;
-        });
+            return(true);
+        }
+
+        //Before Submit
+        beforeSubmit.push(validateForPush);
+
         //Clear hidden sections
         clearHiddenSections = function(parentObj) {
             parentObj.find('input[type=radio]').each(function() {
@@ -1563,8 +1681,8 @@
                     jq('#positive-client').hide();
                 }
 
-                var sexuallyActive = getValue('sexually-active.value');
-                if(sexuallyActive == 'true' &amp;&amp; pAge &gt; 10) {
+                var everHadSex = getValue('ever-had-sex.value');
+                if(everHadSex == 'true' &amp;&amp; pAge &gt; 10) {
                     jq('#tr-sexually-active').show();
                 }  else{
                     jq('#tr-sexually-active').hide();
@@ -1602,20 +1720,22 @@
                     jq('#tr-needle-shared').hide();
                 }
 
-                var eligibleToTest = getValue('eligible-test.value');
-                if(eligibleToTest == 1066){
+                var recommendedToTest = getValue('recommended-test.value');
+                if(recommendedToTest == 1066){
                     jq('#tr-testing-reasons').hide();
+                    jq('#supported-reason').show();
                     jq('#tr-not-testing-reasons').show();
                 }else{
                     jq('#tr-not-testing-reasons').hide();
+                    jq('#supported-reason').show();
                     jq('#tr-testing-reasons').show();
                 }
 
                 var referredTo = getValue('referred.value');
                 if(referredTo == 1066){
-                    jq('#tr-reasons-ineligibility').show();
+                    jq('#tr-reasons-not-refered').show();
                 }else{
-                    jq('#tr-reasons-ineligibility').hide();
+                    jq('#tr-reasons-not-refered').hide();
                 }
 
                 var otherReasons = getValue('other-decline-reason.value');
@@ -1705,96 +1825,66 @@
 
                 </tr>
             </table>
+            
             <table id="priority-population">
                 <tr>
                     <td>
-
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="159674AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Fishing Communities" style="checkbox" id="fisherfolk"/><br/>
-                        
+                             answerLabel="Fisher folk" style="checkbox" /><br/>
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162198AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Mobile Populations (e.g., migrant workers, truck drivers)" style="checkbox" id="truckdriver" /><br/>
-
-                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160580AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                            answerLabel="Clients of sex workers" style="checkbox" id="ppclientofsexualworkers" /><br/>
-                        
-                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="167286AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                            answerLabel="Displaced persons (e.g., refugees)" style="checkbox" id="ppdisplacedpersons" /><br/>
-                        
-                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165085"
-                            answerLabel="Non-injecting drug users" style="checkbox" id="ppnoninjectingusers" /><br/>
-
+                             answerLabel="Truck driver" style="checkbox" /><br/>
+                        <includeIf velocityTest="($patient.gender == 'F') &amp;&amp; ($patient.age &gt; 9) &amp;&amp; ($patient.age &lt; 25)">
+                             <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                 answerLabel="Adolescent and young girls" style="checkbox" id="adyg" /><br/>
+                        </includeIf>
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Prisoner" style="checkbox" id="ppprisoner"/><br/>
-                        
+                             answerLabel="Prisoner" style="checkbox" /><br/>
                         <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165192"
-                             answerLabel="Military and other uniformed services (including police, border guards, and security workers)" style="checkbox" id="dodOnly" /><br/>
+                             answerLabel="Military and other uniformed services" style="checkbox" id="dodOnly" /><br/>
 
-                        <table style="padding-left:0px;margin-left:0px;">
-                            <tr style="{padding-left:0px;margin-left:0px;">
-                                <td style="padding-left:0px;margin-left:0px;">
-                                    <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                        answerLabel="Other Priority Population Type (Describe in the narrative)" style="checkbox" id="other-priority-population"/><br/>
-                                </td>
-                                <td> 
-                                    <div id="tbl-other-priority-population">
-                                        &#160;&#160;&#160; Specify : <span style="color:red;"><strong>*</strong></span>
-                                        <obs id="other-priority-population-specify" conceptId="160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
-                                        &#160;&#160;&#160;
-                                    </div>
+                    </td>
+                </tr>
+            </table>
+
+            <br />
+            <table id="tbl-disability">
+                <tr>
+                    <td>
+                        Does client have any disability? &#160;&#160;&#160;&#160;&#160;
+                        <obs id="has-disability" conceptId="164951"
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Yes,No"
+                             style="radio" />
+                        <br/>
+                    </td>
+                </tr>
+                <tr id="disability" style="display: none;">
+                    <td>  Please indicated the type of disability : <br/>
+                        <obs conceptId="162558AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="120291AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Hearing impairment" style="checkbox" /><br/>
+                        <obs conceptId="162558AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="147215AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Visual impairment" style="checkbox" /><br/>
+                        <obs conceptId="162558AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="151342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Mentally Challenged" style="checkbox"  /><br/>
+                        <obs conceptId="162558AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="164538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Physically Challenged" style="checkbox" /><br/>
+                        <obs conceptId="162558AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Other" style="checkbox" id="has-other-disability"  /><br/>
+
+                       <table id="tbl-other-disability" style="display: none;">
+                            <tr>
+                                <td>  &#160;&#160;&#160; Specify :
+                                    <obs id="other-disability" conceptId="160632" />
+                                    &#160;&#160;&#160;
                                 </td>
                             </tr>
                         </table>
                     </td>
+                </tr>
+            </table>
 
-                </tr>
-            </table>
         </fieldset>
-        <fieldset>
-            <legend>HTS Entry Point</legend>
-            <table id="tbl-hts-entry-point">
-                <tr>
-                    <td>Indicate HTS entry point: &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs id="hts-entry-point"
-                             conceptId="160540"
-                             answerConceptIds="5485,
-                                               160542,
-                                               162181,
-                                               160552,
-                                               160538,
-                                               160456,
-                                               1623,
-                                               160541,
-                                               159940,
-                                               162223,
-                                               160546,
-                                               160522,
-                                               163096,
-                                               159938,
-                                               159939,
-                                               5622"
-                             answerLabels="In Patient Department(IPD),
-                                           Out Patient Department(OPD),
-                                           Peadiatric Clinic,
-                                           Nutrition Clinic,
-                                           PMTCT - ANC,
-                                           PMTCT - MAT,
-                                           PMTCT - PNC,
-                                           TB,
-                                           VCT,
-                                           VMMC,
-                                           STI Clinic,
-                                           Emergency,
-                                           Community Testing,
-                                           Home Based Testing,
-                                           Mobile Outreach,
-                                           Other"
-                             required="true"
-                        />
-                    </td>
-                </tr>
-            </table>
-        </fieldset>
+        
         <fieldset>
             <legend>Department/Coverage</legend>
             <table class="simple-table">
@@ -1845,6 +1935,7 @@
                 </tr>
             </table>
         </fieldset>
+
         <fieldset>
             <legend>HTS Strategy</legend>
             <table id="tbl-hts-strategy">
@@ -1875,7 +1966,7 @@
                         />
                     </td>
                     <td>
-                        <table id="tbl-other-strategy">
+                        <table id="tbl-other-strategy" style="display: none;">
                              <tr>
                                 <td>  &#160;&#160;&#160; Specify :
                                     <obs id="other-strategy" conceptId="163761" />
@@ -1887,6 +1978,91 @@
                 </tr>
             </table>
         </fieldset>
+
+        <fieldset>
+            <legend>HTS Entry Point</legend>
+            <table id="tbl-hts-entry-point">
+                <tr>
+                    <td>Indicate HTS entry point: &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                        <includeIf velocityTest="$patient.gender == 'M'">
+                            <obs id="hts-entry-point"
+                                conceptId="160540"
+                                answerConceptIds="5485,
+                                                160542,
+                                                162181,
+                                                160552,
+                                                160538,
+                                                160456,
+                                                1623,
+                                                160541,
+                                                159940,
+                                                162223,
+                                                160546,
+                                                160522,
+                                                163096,
+                                                159938,
+                                                159939,
+                                                5622"
+                                answerLabels="In Patient Department(IPD),
+                                            Out Patient Department(OPD),
+                                            Peadiatric Clinic,
+                                            Nutrition Clinic,
+                                            PMTCT - ANC,
+                                            PMTCT - MAT,
+                                            PMTCT - PNC,
+                                            TB,
+                                            VCT,
+                                            VMMC,
+                                            STI Clinic,
+                                            Emergency,
+                                            Community Testing,
+                                            Home Based Testing,
+                                            Mobile Outreach,
+                                            Other"
+                                required="true"
+                            />
+                        </includeIf>
+                        <includeIf velocityTest="$patient.gender == 'F'">
+                            <obs id="hts-entry-point"
+                                conceptId="160540"
+                                answerConceptIds="5485,
+                                                160542,
+                                                162181,
+                                                160552,
+                                                160538,
+                                                160456,
+                                                1623,
+                                                160541,
+                                                159940,
+                                                160546,
+                                                160522,
+                                                163096,
+                                                159938,
+                                                159939,
+                                                5622"
+                                answerLabels="In Patient Department(IPD),
+                                            Out Patient Department(OPD),
+                                            Peadiatric Clinic,
+                                            Nutrition Clinic,
+                                            PMTCT - ANC,
+                                            PMTCT - MAT,
+                                            PMTCT - PNC,
+                                            TB,
+                                            VCT,
+                                            STI Clinic,
+                                            Emergency,
+                                            Community Testing,
+                                            Home Based Testing,
+                                            Mobile Outreach,
+                                            Other"
+                                required="true"
+                            />
+                        </includeIf>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
         <fieldset>
             <legend>History of HIV Testing</legend>
             <table class="simple-table">
@@ -1972,14 +2148,14 @@
             <table class="simple-table">
                 <tr>
                     <includeIf velocityTest="$patient.age &lt; 10">
-                    <td>Has the child ever been defiled?  <span style="color:red;"><strong>*</strong></span></td>
+                        <td>Has the child ever been defiled?  <span style="color:red;"><strong>*</strong></span></td>
                     </includeIf>
                     <includeIf velocityTest="$patient.age &gt; 9">
-                    <td>Has the client ever had sex?  <span style="color:red;"><strong>*</strong></span></td>
+                        <td>Has the client ever had sex?  <span style="color:red;"><strong>*</strong></span></td>
                     </includeIf>
                     <td>
                         <obs conceptId="5569AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="yes_no" id="sexually-active" />
+                             style="yes_no" id="ever-had-sex" />
                     </td>
                 </tr>
             </table>
@@ -1988,8 +2164,8 @@
                     <td>Is the client sexually active?</td>
                     <td>
                         <obs conceptId="160109AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No"
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Yes,No,Declined to answer"
                              style="radio" id="active-sexually" />
                     </td>
                 </tr>
@@ -1997,8 +2173,8 @@
                     <td>Has the client had a new sexual partner in the last 3 months?</td>
                     <td>
                         <obs conceptId="167144AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No"
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Yes,No,Declined to answer"
                              style="radio" id="new-partner"/>
                     </td>
                 </tr>
@@ -2007,8 +2183,8 @@
                     <td>
                         <obs conceptId="1436AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              id="partner-hiv-status"
-                             answerConceptIds="703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="HIV Positive,HIV Negative,Unknown" style="radio"/>
+                             answerConceptIds="703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="HIV Positive,HIV Negative,Unknown,Declined to answer" style="radio"/>
                     </td>
                 </tr>
                 <tr>
@@ -2039,16 +2215,16 @@
                     <td>Have you ever had unprotected sex in exchange of money or other material gains?</td>
                     <td>
                         <obs id="money-sex" conceptId="160579AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer"/>
                     </td>
                 </tr>
                 <tr>
                     <td>Have you recently had any incident of condom burst?</td>
                     <td>
                         <obs id="condom-burst" conceptId="166559AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer"/>
                     </td>
                 </tr>
                 <tr>
@@ -2057,40 +2233,40 @@
                      </td>
                     <td>
                         <obs id="stranger-sex" conceptId="159218AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer"/>
                     </td>
                 </tr>
                 <tr>
                     <td>Have you had unprotected sex with someone who has known HIV positive status? ?</td>
                     <td>
                         <obs id="known-positive" conceptId="163568AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="163289AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
+                             answerConceptIds="163289AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer"/>
                     </td>
                 </tr>
             </table>
             <excludeIf velocityTest="$patient.age &lt; 10">
-            <table class="simple-table">
-                <tr>
-                    <td>Has the client recently experienced GBV? <span style="color:red;"><strong>*</strong></span></td>
-                    <td>
-                        <obs id="experienced-gbv" conceptId="167161"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No"/>
-                    </td>
-                </tr>
-                <tr id="experienced-physical-violence">
-                    <td>
-                    <obs conceptId="167145AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                         answerLabel="Sexual violence" style="checkbox" id="sexual-violence" /><br/>
-                    <obs conceptId="160658AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                         answerLabel="Emotional abuse" style="checkbox" id="emotional-violence" /><br/>
-                    <obs conceptId="165205" answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                         answerLabel="Physical violence" style="checkbox" id="physical-violence"/><br/>
-                    </td>
-                </tr>
-             </table>
+                <table class="simple-table">
+                    <tr>
+                        <td>Has the client recently experienced GBV? <span style="color:red;"><strong>*</strong></span></td>
+                        <td>
+                            <obs id="experienced-gbv" conceptId="167161"
+                                answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                style="radio" answerLabels="Yes,No,Declined to answer"/>
+                        </td>
+                    </tr>
+                    <tr id="experienced-physical-violence">
+                        <td>
+                        <obs conceptId="167145AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            answerLabel="Sexual violence" style="checkbox" id="sexual-violence" /><br/>
+                        <obs conceptId="160658AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            answerLabel="Emotional abuse" style="checkbox" id="emotional-violence" /><br/>
+                        <obs conceptId="165205" answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            answerLabel="Physical violence" style="checkbox" id="physical-violence"/><br/>
+                        </td>
+                    </tr>
+                </table>
             </excludeIf>
             <table class="simple-table">
                 <tr>
@@ -2106,8 +2282,8 @@
                     <td>Is the client currently on PrEP? </td>
                     <td>
                         <obs conceptId="165203"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No" id="currently-prep"/>
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer" id="currently-prep"/>
                     </td>
                 </tr>
                 </includeIf>
@@ -2123,89 +2299,31 @@
                              style="yes_no"  id="currently-pep" />
                     </td>
                 </tr>
-                <tr>
-                    <td>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs conceptId="165098"
-                             answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="STI" style="checkbox" id="sti-service" />
-                    </td>
-                    <td>Has the client had an STI in the last 3 months?  </td>
-                    <td>
-                        <obs conceptId="165200"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No" id="currently-sti"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs conceptId="112141AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="TB" style="checkbox" id="tb-service" />
-                    </td>
-                    <td>Has the client been screened for TB? </td>
-                    <td>
-                        <obs conceptId="165197"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No" id="screened-tb"/>
-                    </td>
-                </tr>
-            </table>
-            <table class="simple-table" id="screening-questions">
-
-                    <obsgroup groupingConceptId="166661AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
-                        <tr>
-                            <td>Cough of any duration:  &#160;&#160; </td>
-                            <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="159799AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-cough" /></td>
-                        </tr>
-                        <tr>
-                            <td>Fever: &#160;&#160;</td>
-                            <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="1494AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-fever" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Noticeable weight loss or poor weight gain: &#160; </td>
-                            <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="832AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-weight" /></td>
-                        </tr>
-                        <!--Adult Questions-->
-                        <includeIf velocityTest="$patient.age &gt; 15">
-                            <tr>
-                                <td>Night sweats: &#160;&#160;</td>
-                                <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="133027AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-sweat" /></td>
-                            </tr>
-                        </includeIf>
-                        <!--Paed Questions-->
-                        <includeIf velocityTest="$patient.age &lt; 16">
-                            <tr>
-                                <td>Contact with a TB Case: &#160;&#160;</td>
-                                <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="124068AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-contact"/></td>
-                            </tr>
-                            <tr>
-                                <td>Lethergy, less playful than usual: &#160;&#160;</td>
-                                <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="116334AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-lethergy" /></td>
-                            </tr>
-                        </includeIf>
-                    </obsgroup>
+                <excludeIf velocityTest="$patient.age &lt; 10">
                     <tr>
-                        <td>
-                            Resulting TB Status:
+                        <td>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                            <obs conceptId="165098"
+                                answerConceptId="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                answerLabel="STI" style="checkbox" id="sti-service" />
                         </td>
-                    <td colspan="3">
-                        <obs id="tb-result-status" conceptId="1659AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=""
-                                                   answerConceptIds="1660AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
-                                                                     142177AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
-                                                                     1662AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="No TB Signs,Presumed TB,TB Confirmed" />
-                    </td>
-                  </tr>
+                        <td>Has the client had an STI in the last 3 months?  </td>
+                        <td>
+                            <obs conceptId="165200"
+                                answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                style="radio" answerLabels="Yes,No,Declined to answer" id="currently-sti"/>
+                        </td>
+                    </tr>
+                </excludeIf>
             </table>
+            
             <table class="simple-table">
 
                 <tr id="tr-needle-shared">
                     <td>Have you ever shared a needle while injecting drugs with someone else?</td>
                     <td>
                         <obs conceptId="165090"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No" id="needle-shared"/>
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer" id="needle-shared"/>
                     </td>
                 </tr>
                 <tr id="tr-needle-stick">
@@ -2217,6 +2335,68 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Has the client been screened for TB? <span style="color:red;"><strong>*</strong></span></td>
+                    <td>
+                        <obs conceptId="165197"
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer" id="screened-tb"/>
+                    </td>
+                </tr>
+                <tr id="screening-questions">
+                    <td>
+                        <table class="simple-table">
+                            <obsgroup groupingConceptId="166661AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
+                                <tr>
+                                    <td>Cough of any duration:  &#160;&#160; </td>
+                                    <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="159799AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-cough" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Fever: &#160;&#160;</td>
+                                    <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="1494AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-fever" /></td>
+
+                                </tr>
+                                <tr>
+                                    <td>Noticeable weight loss or poor weight gain: &#160; </td>
+                                    <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="832AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-weight" /></td>
+                                </tr>
+                                <!--Adult Questions-->
+                                <includeIf velocityTest="$patient.age &gt; 15">
+                                    <tr>
+                                        <td>Night sweats: &#160;&#160;</td>
+                                        <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="133027AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-sweat" /></td>
+                                    </tr>
+                                </includeIf>
+                                <!--Paed Questions-->
+                                <includeIf velocityTest="$patient.age &lt; 16">
+                                    <tr>
+                                        <td>Contact with a TB Case: &#160;&#160;</td>
+                                        <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="124068AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-contact"/></td>
+                                    </tr>
+                                    <includeIf velocityTest="$patient.age &lt; 10">
+                                        <tr>
+                                            <td>Lethargy, less playful than usual: &#160;&#160;</td>
+                                            <td><obs conceptId="1729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=" " answerConceptIds="116334AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="radio" answerLabels="Yes,No" id="scr-lethergy" /></td>
+                                        </tr>
+                                    </includeIf>
+                                </includeIf>
+                            </obsgroup>
+                            <tr>
+                                <td>
+                                    Resulting TB Status:
+                                </td>
+                                <td colspan="3">
+                                    <obs id="tb-result-status" conceptId="1659AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=""
+                                                            answerConceptIds="1660AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                                                                                142177AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                                                                                1662AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                        style="radio" answerLabels="No TB Signs,Presumed TB,TB Confirmed" />
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
                     <td>Traditional /non-medical procedures e.g. scarification, plastic tooth extraction, Circumcision, uvulectomy etc <span style="color:red;"><strong>*</strong></span></td>
                     <td>
                         <obs conceptId="166365AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"   id="scarification"
@@ -2225,39 +2405,40 @@
                     </td>
                 </tr>
             </table>
+            
         </fieldset>
+
         <includeIf velocityTest="($patient.age &lt; 10)">
-        <fieldset id="fs-children-eligibility">
-            <legend>Children Eligibility</legend>
-            <table class="simple-table">
-                <obsgroup groupingConceptId="159392AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
-                    <tr id="children-eligibility">
-                        <td>  For children if any of the below are present , explore with the guardian and determine HTS eligibility
-                            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        </td>
-                        <td>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="115122AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Malnutrition" style="checkbox" id="malnutrition" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5050AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Failure to thrive (age and child's growth rate has discrepancy)" style="checkbox" id="growth-rate" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="127833AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Recurrent infections" style="checkbox" id="infections" /><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="112141AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="TB" style="checkbox"  id="tb-infection"/><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="No parent (are orphaned)" style="checkbox" id="orphaned"/><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="163718AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Parents /siblings who recently tested HIV positive" style="checkbox" id="parent-positive"/><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="140238AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Prolonged fever of unknown origin" style="checkbox" id="prolonged-fever"/><br/>
-                            <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Children >18 months who are still breasteeding or wet nursing" style="checkbox" id="still-breastfeering"/><br/>
-                        </td>
-                    </tr>
-                </obsgroup>
-            </table>
-        </fieldset>
+            <fieldset id="fs-children-eligibility">
+                <legend>Children Eligibility</legend>
+                <table class="simple-table">
+                    <obsgroup groupingConceptId="159392AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
+                        <tr id="children-eligibility">
+                            <td>  For children if any of the below are present , explore with the guardian and determine HTS eligibility
+                                &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+                            </td>
+                            <td>
+                                <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="115122AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="Malnutrition" style="checkbox" id="malnutrition" /><br/>
+                                <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5050AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="Failure to thrive (age and child's growth rate has discrepancy)" style="checkbox" id="growth-rate" /><br/>
+                                <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="127833AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="Recurrent infections" style="checkbox" id="infections" /><br/>
+                                <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="No parent (are orphaned)" style="checkbox" id="orphaned"/><br/>
+                                <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="163718AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="Parents /siblings who recently tested HIV positive" style="checkbox" id="parent-positive"/><br/>
+                                <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="140238AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="Prolonged fever of unknown origin" style="checkbox" id="prolonged-fever"/><br/>
+                                <obs conceptId="165908AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="Children >18 months who are still breasteeding or wet nursing" style="checkbox" id="still-breastfeering"/><br/>
+                            </td>
+                        </tr>
+                    </obsgroup>
+                </table>
+            </fieldset>
         </includeIf>
+
         <includeIf velocityTest="($patient.gender == 'F') &amp;&amp; ($patient.age &gt; 9)">
           <fieldset id="fs-pregnancy-assessment">
             <legend>Pregnancy Assessment</legend>
@@ -2266,16 +2447,16 @@
                     <td> Client currently pregnant? <span style="color:red;"><strong>*</strong></span> </td>
                     <td>
                         <obs conceptId="5272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Yes,No" id="pregnant" />
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="radio" answerLabels="Yes,No,Declined to answer" id="pregnant" />
                     </td>
                 </tr>
                 <tr>
                     <td> Breastfeeding mother</td>
                     <td>
                         <obs conceptId="5632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No"
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Yes,No,Declined to answer"
                              style="radio" id="breastfeeding" />
                     </td>
                 </tr>
@@ -2283,13 +2464,28 @@
         </fieldset>
         </includeIf>
 
+        <fieldset id="eligible-for-test">
+            <legend>Eligible for Testing</legend>
+            <table class="simple-table">
+                <tr>
+                    <td>Client eligible for testing : <span style="color:red;"><strong>*</strong></span> </td>
+                    <td>
+                        <obs conceptId="162699" id="eligible-test"
+                             answerConceptIds="1065,1066"
+                             answerLabels="Yes,No"
+                             style="radio" />
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
         <fieldset>
-            <legend>HIV Prediction</legend>
+            <legend>Generate HIV Risk Category</legend>
             <div id="div-ml-prediction">
                 <table>
                     <tr>
                         <td>
-                            <button type="button" class="ke-getscore-button" id="btn-ml-prediction">Get
+                            <button type="button" class="ke-getscore-button" id="btn-ml-prediction">Get HIV
                                 risk category
                             </button>
                             <span style="color:red;"><strong>*</strong></span>
@@ -2314,42 +2510,56 @@
             <br/>
         </fieldset>
 
-        <fieldset id="eligible-for-test">
-            <legend>Eligible for Testing</legend>
+        <fieldset id="testing-recommended">
+            <legend>Testing Recommended </legend>
             <table class="simple-table">
                 <tr>
-                    <td>Client eligible for testing : <span style="color:red;"><strong>*</strong></span> </td>
+                    <td>Did you recommend HIV testing? : <span style="color:red;"><strong>*</strong></span> </td>
                     <td>
-                        <obs conceptId="162699" id="eligible-test"
+                        <obs conceptId="167229" id="recommended-test"
                              answerConceptIds="1065,1066"
                              answerLabels="Yes,No"
                              style="radio" />
                     </td>
                 </tr>
+            </table>
+        </fieldset>
+
+        <fieldset id="supported-reason" style="display: none">
+            <legend>Supported Reason</legend>
+            <table class="simple-table">
                 <tr id="tr-testing-reasons">
                     <td>
-                        Why was testing recommended?:
+                        Why did you recommend testing?: <span style="color:red;"><strong>*</strong></span>
                     </td>
                     <td colspan="3">
-                        <obs id="tb-testing-reasons" conceptId="164126AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=""
-                                                   answerConceptIds="167141AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
-                                                                     166664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                        <obs id="tb-testing-reasons" conceptId="164082AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=""
+                                                   answerConceptIds="165087,
+                                                                     165091,
                                                                      1163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Computed risk score, Eligibility screening outcome, Both" />
+                             style="radio" answerLabels="Client is eligible, Based on HIV Risk category from EMR, Both eligible and risk
+category." />
                     </td>
                 </tr>
                 <tr id="tr-not-testing-reasons">
                     <td>
-                        Why was testing NOT recommended?:
+                        Why did you NOT recommend testing?: <span style="color:red;"><strong>*</strong></span>
                     </td>
                     <td colspan="3">
-                        <obs id="tb-not-testing-reasons" conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=""
-                                                   answerConceptIds="167141AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
-                                                                     166664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                        <obs id="tb-not-testing-reasons" conceptId="160416AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" labelText=""
+                                                   answerConceptIds="165078,
+                                                                     165091,
                                                                      1163AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             style="radio" answerLabels="Computed risk score, Eligibility screening outcome, Both" />
+                             style="radio" answerLabels="Client is NOT eligible, Based on HIV Risk category from EMR, Both NOT eligible and risk
+category." />
                     </td>
                 </tr>
+            </table>
+        </fieldset>
+
+        <fieldset id="refering-for-testing">
+            <legend>Referring for Testing</legend>
+            <table class="simple-table">
                 <tr>
                     <td>Client referred for testing : <span style="color:red;"><strong>*</strong></span> </td>
                     <td>
@@ -2360,25 +2570,34 @@
                     </td>
                 </tr>
                 <obsgroup groupingConceptId="165078">
-                    <tr id="tr-reasons-ineligibility">
+                    <tr id="tr-reasons-not-refered" style="display: none;">
                         <td> If No, Choose a reason below </td>
                         <td>
                             <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="167156AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                                  answerLabel="Declined testing" style="checkbox"  id="decline-testing"/><br/>
-                        <includeIf velocityTest="$patient.age &gt; 9">
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165029"
-                                 answerLabel="Wants to test with partner" style="checkbox" id="wants-partner" /><br/>
-                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="141814AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Fear of violent partner" style="checkbox" id="violent-partner"/><br/>
-                        </includeIf>
+
+                            <includeIf velocityTest="$patient.age &gt; 9">
+                                <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165029"
+                                    answerLabel="Wants to test with partner" style="checkbox" id="wants-partner" /><br/>
+                                <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="141814AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                    answerLabel="Fear of violent partner" style="checkbox" id="violent-partner"/><br/>
+                            </includeIf>
+
                             <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160589AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                                  answerLabel="Stigma related issues" style="checkbox" id="stigma" /><br/>
+
                             <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="155974AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                                  answerLabel="No counselor to test" style="checkbox" id="lack-counsellor" /><br/>
+
                             <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="158948AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                                  answerLabel="High workload for the staff" style="checkbox" id="heavy-workload" /><br/>
+
                             <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="163293AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                                  answerLabel="Too sick" style="checkbox" id="too-sick"/><br/>
+
+                            <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160352AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                 answerLabel="Lack of test kits" style="checkbox" id="lack-of-test-kits"/><br/>
+
                             <obs conceptId="159803AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                                  answerLabel="Other" style="checkbox" id="other-decline-reason" /><br/>
                         </td>
