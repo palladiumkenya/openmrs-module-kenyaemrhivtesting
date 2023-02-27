@@ -372,7 +372,7 @@
         var everHadSexSelected = function(){
             var val = getValue('ever-had-sex.value');
 
-            if(val == 1065  &amp;&amp; pAge &gt; 10) {
+            if(val == 'true'  &amp;&amp; pAge &gt; 10) {
                 jq('#tr-sexually-active').show();
             }  else{
                 jq('#tr-sexually-active').hide();
@@ -2034,42 +2034,80 @@
             <table id="tbl-hts-entry-point">
                 <tr>
                     <td>Indicate HTS entry point: &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-                        <obs id="hts-entry-point"
-                             conceptId="160540"
-                             answerConceptIds="5485,
-                                               160542,
-                                               162181,
-                                               160552,
-                                               160538,
-                                               160456,
-                                               1623,
-                                               160541,
-                                               159940,
-                                               162223,
-                                               160546,
-                                               160522,
-                                               163096,
-                                               159938,
-                                               159939,
-                                               5622"
-                             answerLabels="In Patient Department(IPD),
-                                           Out Patient Department(OPD),
-                                           Peadiatric Clinic,
-                                           Nutrition Clinic,
-                                           PMTCT - ANC,
-                                           PMTCT - MAT,
-                                           PMTCT - PNC,
-                                           TB,
-                                           VCT,
-                                           VMMC,
-                                           STI Clinic,
-                                           Emergency,
-                                           Community Testing,
-                                           Home Based Testing,
-                                           Mobile Outreach,
-                                           Other"
-                             required="true"
-                        />
+                        <includeIf velocityTest="$patient.gender == 'M'">
+                            <obs id="hts-entry-point"
+                                conceptId="160540"
+                                answerConceptIds="5485,
+                                                160542,
+                                                162181,
+                                                160552,
+                                                160538,
+                                                160456,
+                                                1623,
+                                                160541,
+                                                159940,
+                                                162223,
+                                                160546,
+                                                160522,
+                                                163096,
+                                                159938,
+                                                159939,
+                                                5622"
+                                answerLabels="In Patient Department(IPD),
+                                            Out Patient Department(OPD),
+                                            Peadiatric Clinic,
+                                            Nutrition Clinic,
+                                            PMTCT - ANC,
+                                            PMTCT - MAT,
+                                            PMTCT - PNC,
+                                            TB,
+                                            VCT,
+                                            VMMC,
+                                            STI Clinic,
+                                            Emergency,
+                                            Community Testing,
+                                            Home Based Testing,
+                                            Mobile Outreach,
+                                            Other"
+                                required="true"
+                            />
+                        </includeIf>
+                        <includeIf velocityTest="$patient.gender == 'F'">
+                            <obs id="hts-entry-point"
+                                conceptId="160540"
+                                answerConceptIds="5485,
+                                                160542,
+                                                162181,
+                                                160552,
+                                                160538,
+                                                160456,
+                                                1623,
+                                                160541,
+                                                159940,
+                                                160546,
+                                                160522,
+                                                163096,
+                                                159938,
+                                                159939,
+                                                5622"
+                                answerLabels="In Patient Department(IPD),
+                                            Out Patient Department(OPD),
+                                            Peadiatric Clinic,
+                                            Nutrition Clinic,
+                                            PMTCT - ANC,
+                                            PMTCT - MAT,
+                                            PMTCT - PNC,
+                                            TB,
+                                            VCT,
+                                            STI Clinic,
+                                            Emergency,
+                                            Community Testing,
+                                            Home Based Testing,
+                                            Mobile Outreach,
+                                            Other"
+                                required="true"
+                            />
+                        </includeIf>
                     </td>
                 </tr>
             </table>
@@ -2166,10 +2204,8 @@
                         <td>Has the client ever had sex?  <span style="color:red;"><strong>*</strong></span></td>
                     </includeIf>
                     <td>
-                        <obs conceptId="163272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No,Declined To Answer"
-                             style="radio" id="ever-had-sex" />
+                        <obs conceptId="5569AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="yes_no" id="ever-had-sex" />
                     </td>
                 </tr>
             </table>
