@@ -372,7 +372,7 @@
         var everHadSexSelected = function(){
             var val = getValue('ever-had-sex.value');
 
-            if(val == 1065  &amp;&amp; pAge &gt; 10) {
+            if(val == 'true'  &amp;&amp; pAge &gt; 10) {
                 jq('#tr-sexually-active').show();
             }  else{
                 jq('#tr-sexually-active').hide();
@@ -2204,10 +2204,8 @@
                         <td>Has the client ever had sex?  <span style="color:red;"><strong>*</strong></span></td>
                     </includeIf>
                     <td>
-                        <obs conceptId="163272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Yes,No,Declined To Answer"
-                             style="radio" id="ever-had-sex" />
+                        <obs conceptId="5569AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             style="yes_no" id="ever-had-sex" />
                     </td>
                 </tr>
             </table>
