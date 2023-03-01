@@ -594,19 +594,21 @@
             var pAge = parseInt('<lookup expression="patient.age"/>');
 
             // key population
-            var pwidChecked = jq("#pwid input:checkbox:checked");
-            var mwsmChecked = jq("#kpmsm input:checkbox:checked");
-            var fswChecked = jq("#female-sex-worker input:checkbox:checked");
-            var kpPrisonerChecked = jq("#prisoner input:checkbox:checked");
-            var transgenderChecked = jq("#transgender input:checkbox:checked");
-            var kpotherChecked = jq("#kpother input:checkbox:checked");
+            // var pwidChecked = jq("#pwid input:checkbox:checked");
+            // var mwsmChecked = jq("#kpmsm input:checkbox:checked");
+            // var fswChecked = jq("#female-sex-worker input:checkbox:checked");
+            // var kpPrisonerChecked = jq("#prisoner input:checkbox:checked");
+            // var transgenderChecked = jq("#transgender input:checkbox:checked");
+            // var kpotherChecked = jq("#kpother input:checkbox:checked");
+            var keyPopulationVal = getValue("chooseKeyPop.value");
 
             // priority population
-            var fisherFolkChecked = jq("#fisherfolk input:checkbox:checked");
-            var truckDriverChecked = jq("#truckdriver input:checkbox:checked");
-            var adygChecked = jq("#adyg input:checkbox:checked");
-            var ppPrisonerChecked = jq("#ppprisoner input:checkbox:checked");
-            var dodOnlyChecked = jq("#dodOnly input:checkbox:checked");
+            // var fisherFolkChecked = jq("#fisherfolk input:checkbox:checked");
+            // var truckDriverChecked = jq("#truckdriver input:checkbox:checked");
+            // var adygChecked = jq("#adyg input:checkbox:checked");
+            // var ppPrisonerChecked = jq("#ppprisoner input:checkbox:checked");
+            // var dodOnlyChecked = jq("#dodOnly input:checkbox:checked");
+            var priPopulationVal = getValue("choosePriPop.value");
 
             var onPREP = getValue("currently-prep.value");
             var hasSTI = getValue("currently-sti.value");
@@ -854,13 +856,24 @@
 
             //Key Population
             
-            if (pwidChecked.length >=1) { //INJECT DRUGS
+            // if (pwidChecked.length >=1) { //INJECT DRUGS
+            // 	predictionVariables.KeyPopulationPWID = 1;
+            // } else if (mwsmChecked.length >=1) { // MEN WITH MEN
+            // 	predictionVariables.KeyPopulationMSM = 1;
+            // } else if (fswChecked.length >=1) { // FEMALE SEX WORKER
+            // 	predictionVariables.KeyPopulationFSW = 1;
+            // } else if (kpotherChecked.length >=1 || kpPrisonerChecked.length >=1 || transgenderChecked.length >=1) { // Other|PRISONER|TRANS
+            // 	predictionVariables.KeyPopulationOther = 1;
+            // } else { // Not relevant
+            //     predictionVariables.KeyPopulationNR = 1;
+            // }
+            if (keyPopulationVal == 105) { //INJECT DRUGS
             	predictionVariables.KeyPopulationPWID = 1;
-            } else if (mwsmChecked.length >=1) { // MEN WITH MEN
+            } else if (keyPopulationVal == 160578) { // MEN WITH MEN
             	predictionVariables.KeyPopulationMSM = 1;
-            } else if (fswChecked.length >=1) { // FEMALE SEX WORKER
+            } else if (keyPopulationVal == 160579) { // FEMALE SEX WORKER
             	predictionVariables.KeyPopulationFSW = 1;
-            } else if (kpotherChecked.length >=1 || kpPrisonerChecked.length >=1 || transgenderChecked.length >=1) { // Other|PRISONER|TRANS
+            } else if (keyPopulationVal == 5622 || keyPopulationVal == 162277 || keyPopulationVal == 165100) { // Other|PRISONER|TRANS
             	predictionVariables.KeyPopulationOther = 1;
             } else { // Not relevant
                 predictionVariables.KeyPopulationNR = 1;
@@ -868,11 +881,20 @@
 
             //Priority Population
 
-            if (fisherFolkChecked.length >=1) { //FISHER
+            // if (fisherFolkChecked.length >=1) { //FISHER
+            // 	predictionVariables.PriorityPopulationFISHERMEN = 1;
+            // } else if (adygChecked.length >=1) { //ADOLESCENT
+            // 	predictionVariables.PriorityPopulationAGYW = 1;
+            // } else if (truckDriverChecked.length >=1 || ppPrisonerChecked.length >=1 || dodOnlyChecked.length >=1) { //MILITARY|PRISONER|TRUCK
+            // 	predictionVariables.PriorityPopulationOTHER = 1;
+            // } else { // Not relevant
+            //     predictionVariables.PriorityPopulationNR = 1;
+            // }
+            if (priPopulationVal == 159674) { //FISHER
             	predictionVariables.PriorityPopulationFISHERMEN = 1;
-            } else if (adygChecked.length >=1) { //ADOLESCENT
+            } else if (priPopulationVal == 160549) { //ADOLESCENT
             	predictionVariables.PriorityPopulationAGYW = 1;
-            } else if (truckDriverChecked.length >=1 || ppPrisonerChecked.length >=1 || dodOnlyChecked.length >=1) { //MILITARY|PRISONER|TRUCK
+            } else if (priPopulationVal == 165192 || priPopulationVal == 162277 || priPopulationVal == 162198) { //MILITARY|PRISONER|TRUCK
             	predictionVariables.PriorityPopulationOTHER = 1;
             } else { // Not relevant
                 predictionVariables.PriorityPopulationNR = 1;
@@ -1384,6 +1406,7 @@
 
         }
 
+        // Validate valiables
         function validateVariables() {
             var popType = getValue('population-type.value');
             var department = getValue('department.value');
@@ -1556,6 +1579,7 @@
             return true;
         }
 
+        // Validate Prediction
         function validatePrediction() {
             var predictionResultCategory = getValue("algorithm_result_category.value");
             var predictionResultScore = getValue("algorithm_result_score.value");
@@ -1569,6 +1593,7 @@
             return true;
         }
 
+        // Validate everything before pushing
         function validateForPush() {
             var recommendForTest = getValue("recommended-test.value");
             var reasonForTest = getValue("tb-testing-reasons.value");
@@ -1804,44 +1829,29 @@
             <table id="key-population">
                 <tr>
                     <td>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="105AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="People who inject drugs" style="checkbox"  id="pwid"/><br/>
                         <includeIf velocityTest="$patient.gender == 'M'">
-                            <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160578AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Men who have sex with men" style="checkbox" id="kpmsm"/><br/>
+                            <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="105AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160578AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,165100,5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            answerLabels="People who inject drugs, Men who have sex with men, People in prison and other closed settings, Transgender, Other" style="radio" id="chooseKeyPop"/><br/>
                         </includeIf>
-                        <includeIf velocityTest="$patient.gender == 'F'">
-                            <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160579AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Female sex Worker" style="checkbox" id="female-sex-worker" /><br/>
-                        </includeIf>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="People in prison and other closed settings" style="checkbox"  id="prisoner"/><br/>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165100"
-                             answerLabel="Transgender" style="checkbox"  id="transgender"/><br/>
-                        <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Other" style="checkbox" id="other" /><br/>
-
+                        <excludeIf velocityTest="$patient.gender == 'M'">
+                            <obs conceptId="160581AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="105AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160579AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,165100,5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                            answerLabels="People who inject drugs, Female sex Worker, People in prison and other closed settings, Transgender, Other" style="radio" id="chooseKeyPop"/><br/>
+                        </excludeIf>
                     </td>
-
                 </tr>
             </table>
             
             <table id="priority-population">
                 <tr>
                     <td>
-                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="159674AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Fisher folk" style="checkbox" /><br/>
-                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162198AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Truck driver" style="checkbox" /><br/>
                         <includeIf velocityTest="($patient.gender == 'F') &amp;&amp; ($patient.age &gt; 9) &amp;&amp; ($patient.age &lt; 25)">
-                             <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                                 answerLabel="Adolescent and young girls" style="checkbox" id="adyg" /><br/>
+                            <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="159674AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162198AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160549AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,165192"
+                            answerLabels="Fisher folk,Truck driver,Adolescent and young girls,Prisoner,Military and other uniformed services" style="radio" id="choosePriPop"/><br/>
                         </includeIf>
-                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabel="Prisoner" style="checkbox" /><br/>
-                        <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="165192"
-                             answerLabel="Military and other uniformed services" style="checkbox" id="dodOnly" /><br/>
-
+                        <excludeIf velocityTest="($patient.gender == 'F') &amp;&amp; ($patient.age &gt; 9) &amp;&amp; ($patient.age &lt; 25)">
+                            <obs conceptId="138643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="159674AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162198AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,165192"
+                            answerLabels="Fisher folk,Truck driver,Prisoner,Military and other uniformed services" style="radio"  id="choosePriPop"/><br/>
+                        </excludeIf>
                     </td>
                 </tr>
             </table>
