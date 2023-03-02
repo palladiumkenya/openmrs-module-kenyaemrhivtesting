@@ -75,11 +75,11 @@ public class UnknownHIVStatusCalculation extends AbstractPatientCalculation impl
                 Concept htsNegativeResult = cs.getConcept(HtsConstants.HTS_NEGATIVE_RESULT_CONCEPT_ID);
 
                 for (PatientContact pc : patientContacts) {
+                    int count = 0;
                     if (pc.getVoided().equals(false)) {
 
                         //Checking for HTS encounters for valid test results (Positive or Negative)
                         Patient patient = pc.getPatient();
-
                         List<Encounter> htsEncounters = encounterService.getEncounters(patient, null, null, null, Arrays.asList(HtsConstants.htsInitialForm, HtsConstants.htsRetestForm), null, null, null, null, false);
 
                         Encounter lastHtsInitialEnc = EmrUtils.lastEncounter(patient, HtsConstants.htsEncType, HtsConstants.htsInitialForm);
@@ -87,27 +87,38 @@ public class UnknownHIVStatusCalculation extends AbstractPatientCalculation impl
 
                         Encounter lastHtsEnc = null;
 
-                        if (lastHtsInitialEnc != null && lastHtsRetestEnc == null) {
-                            lastHtsEnc = lastHtsInitialEnc;
-                        } else if (lastHtsInitialEnc == null && lastHtsRetestEnc != null) {
-                            lastHtsEnc = lastHtsRetestEnc;
-                        } else if (lastHtsInitialEnc != null && lastHtsRetestEnc != null) {
-                            if (lastHtsInitialEnc.getEncounterDatetime().after(lastHtsRetestEnc.getEncounterDatetime())) {
+                        boolean patientHasNegativeTestResult = false;
+                        boolean patientHasPositiveTestResult = false;
+
+                        if (patient != null) {
+
+                            if (lastHtsInitialEnc != null && lastHtsRetestEnc == null) {
                                 lastHtsEnc = lastHtsInitialEnc;
-                            } else {
+                            } else if (lastHtsInitialEnc == null && lastHtsRetestEnc != null) {
                                 lastHtsEnc = lastHtsRetestEnc;
+                            } else if (lastHtsInitialEnc != null && lastHtsRetestEnc != null) {
+                                if (lastHtsInitialEnc.getEncounterDatetime().after(lastHtsRetestEnc.getEncounterDatetime())) {
+                                    lastHtsEnc = lastHtsInitialEnc;
+                                } else {
+                                    lastHtsEnc = lastHtsRetestEnc;
+                                }
+                            }
+                            patientHasNegativeTestResult = htsEncounters.size() > 0 && lastHtsEnc != null ? EmrUtils.encounterThatPassCodedAnswer(lastHtsEnc, htsFinalTestQuestion, htsNegativeResult) : false;
+                            patientHasPositiveTestResult = htsEncounters.size() > 0 && lastHtsEnc != null ? EmrUtils.encounterThatPassCodedAnswer(lastHtsEnc, htsFinalTestQuestion, htsPositiveResult) : false;
+                        }
+                        if (patient != null && lastHtsEnc != null) {
+                            if ((pc.getBaselineHivStatus() == null || (!pc.getBaselineHivStatus().equalsIgnoreCase("Positive") && !pc.getBaselineHivStatus().equalsIgnoreCase("Negative"))) && !patientHasNegativeTestResult && !patientHasPositiveTestResult) {
+                                ++count;
                             }
                         }
 
-                        boolean patientHasNegativeTestResult = htsEncounters.size() > 0 && lastHtsEnc != null ? EmrUtils.encounterThatPassCodedAnswer(lastHtsEnc, htsFinalTestQuestion, htsNegativeResult) : false;
-                        boolean patientHasPositiveTestResult = htsEncounters.size() > 0 && lastHtsEnc != null ? EmrUtils.encounterThatPassCodedAnswer(lastHtsEnc, htsFinalTestQuestion, htsPositiveResult) : false;
-
-                        //Checking for Unknown status in Patient contact and HTS
-                        if (pc.getBaselineHivStatus() == null || (!pc.getBaselineHivStatus().equalsIgnoreCase("Positive") && !pc.getBaselineHivStatus().equalsIgnoreCase("Negative") && !patientHasNegativeTestResult && !patientHasPositiveTestResult)) {
-                            eligible = true;
-                            break;
+                        //Checking for Unknown status in Patient contact for non-registered and untested contacts
+                        else if ((pc.getBaselineHivStatus() == null || (!pc.getBaselineHivStatus().equalsIgnoreCase("Positive") && !pc.getBaselineHivStatus().equalsIgnoreCase("Negative")))) {
+                            ++count;
                         }
                     }
+                    if (count > 0)
+                        eligible = true;
                 }
             }
             ret.put(ptId, new BooleanResult(eligible, this));
