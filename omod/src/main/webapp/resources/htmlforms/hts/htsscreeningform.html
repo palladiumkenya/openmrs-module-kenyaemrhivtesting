@@ -1771,6 +1771,42 @@
                     jq('#tbl-other-decline-reason').hide();
                 }
 
+                var prepChecked = jq("#prep-service input:checkbox:checked");
+                    if(prepChecked.length >=1){
+                        jq('#currently-prep input').prop('disabled', false);
+                    }else{
+                        jq("#currently-prep input[value=1065]").prop("checked", false);
+                        jq("#currently-prep input[value=1066]").prop("checked", false);
+                        jq('#currently-prep input').prop('disabled', true);
+                    }
+
+                    var pepChecked = jq("#pep-service input:checkbox:checked");
+                    if(pepChecked.length >=1){
+                        jq('#currently-pep input').prop('disabled', false);
+                    }else{
+                        jq("#currently-pep input[value=false]").prop("checked", false);
+                        jq("#currently-pep input[value=true]").prop("checked", false);
+                        jq('#currently-pep input').prop('disabled', true);
+                    }
+
+                //Sti selected
+                    var stiChecked = jq("#sti-service input:checkbox:checked");
+                    if(stiChecked.length >=1){
+                        jq('#currently-sti input').prop('disabled', false);
+                    }else{
+                        jq("#currently-sti input[value=1065]").prop("checked", false);
+                        jq("#currently-sti input[value=1066]").prop("checked", false);
+                        jq('#currently-sti input').prop('disabled', true);
+                    }
+
+                //Number of sex partners
+                var val = getValue('multiple-sex-partners.value');
+                if (val == 'true') {
+                    jq('#no-sex-partners input').prop('disabled', false);
+                } else {
+                    jq('#no-sex-partners input').prop('disabled', true);
+                    clearHiddenSections(jq('#no-sex-partners'));
+                }
             });
         </script>
     </ifMode>
