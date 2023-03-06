@@ -580,7 +580,9 @@
             var glbLowRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.lowRiskThreshold')"/>";
             var glbMediumRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.mediumRiskThreshold')"/>";
             var glbHighRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.highRiskThreshold')"/>";
-            var latestMaritalStatus = "<lookup expression="fn.latestObs(1054).getValueCoded()"/>";
+            // var latestMaritalStatus = "<lookup expression="fn.latestObs(1054).getValueCoded()"/>";
+            var latestMaritalStatus = "<lookup expression="fn.latestObs(1054).valueCoded"/>";
+            latestMaritalStatus = latestMaritalStatus.replace(/\D/g,'');
             var monthsSinceLastTest = getValue('date-tested.value');
             var populationType = getValue('population-type.value');
             var isDisabled = getValue('has-disability.value');
@@ -856,17 +858,6 @@
 
             //Key Population
             
-            // if (pwidChecked.length >=1) { //INJECT DRUGS
-            // 	predictionVariables.KeyPopulationPWID = 1;
-            // } else if (mwsmChecked.length >=1) { // MEN WITH MEN
-            // 	predictionVariables.KeyPopulationMSM = 1;
-            // } else if (fswChecked.length >=1) { // FEMALE SEX WORKER
-            // 	predictionVariables.KeyPopulationFSW = 1;
-            // } else if (kpotherChecked.length >=1 || kpPrisonerChecked.length >=1 || transgenderChecked.length >=1) { // Other|PRISONER|TRANS
-            // 	predictionVariables.KeyPopulationOther = 1;
-            // } else { // Not relevant
-            //     predictionVariables.KeyPopulationNR = 1;
-            // }
             if (keyPopulationVal == 105) { //INJECT DRUGS
             	predictionVariables.KeyPopulationPWID = 1;
             } else if (keyPopulationVal == 160578) { // MEN WITH MEN
@@ -881,15 +872,6 @@
 
             //Priority Population
 
-            // if (fisherFolkChecked.length >=1) { //FISHER
-            // 	predictionVariables.PriorityPopulationFISHERMEN = 1;
-            // } else if (adygChecked.length >=1) { //ADOLESCENT
-            // 	predictionVariables.PriorityPopulationAGYW = 1;
-            // } else if (truckDriverChecked.length >=1 || ppPrisonerChecked.length >=1 || dodOnlyChecked.length >=1) { //MILITARY|PRISONER|TRUCK
-            // 	predictionVariables.PriorityPopulationOTHER = 1;
-            // } else { // Not relevant
-            //     predictionVariables.PriorityPopulationNR = 1;
-            // }
             if (priPopulationVal == 159674) { //FISHER
             	predictionVariables.PriorityPopulationFISHERMEN = 1;
             } else if (priPopulationVal == 160549) { //ADOLESCENT
@@ -900,10 +882,10 @@
                 predictionVariables.PriorityPopulationNR = 1;
             }
 
-            // convert ever tested for hiv status
-            if (everTested == 1065) {
+            // convert ever tested (testHistory) for hiv status
+            if (testHistory == 1065) {
                 predictionVariables.EverTestedForHivYES = 1;
-            } else if (everTested == 1066) {
+            } else if (testHistory == 1066) {
                 predictionVariables.EverTestedForHivNO = 1;
             }
 
@@ -990,7 +972,7 @@
             }
 
             // convert HIV self test
-            // 164952 - self tested
+            
             if (selfTested == 5619) {
                 predictionVariables.ClientSelfTestedNO = 1;
             } else if (selfTested == 164952) {
@@ -1338,7 +1320,7 @@
                 variableValues: predictionVariables
             }
 
-            //console.log("ML Payload: " + JSON.stringify(mlScoringRequestPayload));
+            console.log("ML Payload: " + JSON.stringify(mlScoringRequestPayload));
 
             var predResponse = '';
             if (casefindingURL !='') {
