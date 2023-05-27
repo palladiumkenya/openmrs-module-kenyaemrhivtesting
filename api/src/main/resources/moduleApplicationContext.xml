@@ -223,5 +223,16 @@
 		<property name="template" value="hivtestingservices:SNS_Undocumented_Status_Contacts_Register_Template.xls" />
 		<property name="repeatingSection" value="sheet:1,row:7,dataset:UndocumentedContacts" />
 	</bean>
+	<bean id="kenyaemr.hts.common.report.pmtctrrichildrencontacts" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+		<property name="targetUuid" value="8dffa401-01b3-4765-bbc6-ab4ddc332c42" />
+		<property name="name" value="Children of TX Curr reproductive women" />
+		<property name="description" value="children of reproductive women who are current on ART" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<property name="template" value="hivtestingservices:pmtctrri_children_contacts.xls" />
+		<property name="repeatingSection" value="sheet:1,row:6,dataset:ChildrenContacts | sheet:2,row:6,dataset:ChildrenContactsUndocumentedHIVStatus" />
+	</bean>
 
 </beans>
