@@ -27,7 +27,8 @@ public class ChildrenContactHIVTestDateDataEvaluator implements PatientContactDa
 
         String qry = "select c.id,\n" +
                 "       greatest(ifnull(left(max(concat(t.date_tested, t.latest_hts_test_results)), 10), ''),\n" +
-                "                ifnull(left(max(concat(l.lab_date, l.latest_lab_test_results)), 10), '')) latest_date\n" +
+                "                ifnull(left(max(concat(l.lab_date, l.latest_lab_test_results)), 10), ''),\n" +
+                "                ifnull(left(max(concat(date(c.reported_test_date), c.baseline_hiv_status)), 10), '')) latest_date\n" +
                 "from openmrs.kenyaemr_hiv_testing_patient_contact c\n" +
                 "         left join (select t.patient_id,\n" +
                 "                           max(t.visit_date)                                             as date_tested,\n" +
