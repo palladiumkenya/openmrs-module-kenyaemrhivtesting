@@ -11,11 +11,11 @@ import org.openmrs.module.reporting.query.BaseQuery;
 import java.util.Date;
 
 /**
- * Children contacts of TX CURR reproductive women cohort definition
+ * Children contacts of reproductive TX Curr women with undocumented HIV status
  */
 @Caching(strategy = ConfigurationPropertyCachingStrategy.class)
-@Localized("reporting.ChildrenContactsOfTXCurrReproductiveWomenUnknownHIVStatusCohortDefinition")
-public class ChildrenContactsOfTXCurrReproductiveWomenUnknownHIVStatusCohortDefinition extends BaseQuery<PatientContact> implements PatientContactQuery {
+@Localized("reporting.ChildrenContactsOfTXCurrReproductiveWomenCohortDefinition")
+public class ChildrenContactsOfTXCurrWRACohortDefinition extends BaseQuery<PatientContact> implements PatientContactQuery {
 
     @ConfigurationProperty
     private Date startDate;
@@ -23,7 +23,7 @@ public class ChildrenContactsOfTXCurrReproductiveWomenUnknownHIVStatusCohortDefi
     @ConfigurationProperty
     private Date endDate;
 
-    public ChildrenContactsOfTXCurrReproductiveWomenUnknownHIVStatusCohortDefinition() {
+    public ChildrenContactsOfTXCurrWRACohortDefinition() {
     }
 
     public Date getStartDate() {

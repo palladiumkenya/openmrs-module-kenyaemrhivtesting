@@ -114,6 +114,7 @@
 				<ref bean="kenyaemr.hts.common.report.childrenContactsWithUndocumentedStatus"/>
 				<ref bean="kenyaemr.hts.common.report.pnsContactsWithUndocumentedStatus"/>
 				<ref bean="kenyaemr.hts.common.report.snsContactsWithUndocumentedStatus"/>
+				<ref bean="kenyaemr.hts.common.report.pmtctrrichildrencontacts"/>
 			</set>
 		</property>
 	</bean>
@@ -225,14 +226,14 @@
 	</bean>
 	<bean id="kenyaemr.hts.common.report.pmtctrrichildrencontacts" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
 		<property name="targetUuid" value="8dffa401-01b3-4765-bbc6-ab4ddc332c42" />
-		<property name="name" value="Children of TX Curr reproductive women" />
-		<property name="description" value="children of reproductive women who are current on ART" />
+		<property name="name" value="Children Contacts of TX Curr WRA" />
+		<property name="description" value="Children contacts of current on ART reproductive women (15-49) years" />
 		<property name="apps">
 			<set>
 				<ref bean="kenyaemr.app.reports" />
 			</set></property>
 		<property name="template" value="hivtestingservices:pmtctrri_children_contacts.xls" />
-		<property name="repeatingSection" value="sheet:1,row:6,dataset:ChildrenContacts | sheet:2,row:6,dataset:ChildrenContactsUndocumentedHIVStatus" />
+		<property name="repeatingSection" value="sheet:1,row:6,dataset:ChildrenContacts | sheet:2,row:6,dataset:UndocumentedHIVStatus" />
 	</bean>
 
 </beans>

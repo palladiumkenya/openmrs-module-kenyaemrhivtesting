@@ -14,8 +14,8 @@
 
 package org.openmrs.module.hivtestingservices.reporting.builder;
 
-import org.openmrs.module.hivtestingservices.reporting.cohort.definition.ChildrenContactsOfTXCurrReproductiveWomenCohortDefinition;
-import org.openmrs.module.hivtestingservices.reporting.cohort.definition.ChildrenContactsOfTXCurrReproductiveWomenUnknownHIVStatusCohortDefinition;
+import org.openmrs.module.hivtestingservices.reporting.cohort.definition.ChildrenContactsOfTXCurrWRACohortDefinition;
+import org.openmrs.module.hivtestingservices.reporting.cohort.definition.ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinition;
 import org.openmrs.module.hivtestingservices.reporting.data.patientContact.definition.*;
 import org.openmrs.module.hivtestingservices.reporting.definition.PatientContactDataSetDefinition;
 import org.openmrs.module.kenyacore.report.HybridReportDescriptor;
@@ -89,11 +89,11 @@ public class TXCurrReproductiveWomenChildrenContactReportBuilder extends Abstrac
         dsd.addColumn("HIV test results", hivTestResults, "endDate=${endDate}");
 
         dsd.addColumn("Mother's Name", new RelatedPatientNameDataDefinition(), "");
-        dsd.addColumn("Mother's CCC Number", new RelatedPatientCCCNumberDataDefinition(), null);
+        dsd.addColumn("Mother's CCC Number", new ChildIndexCCCNumberDataDefinition(), null);
         dsd.addColumn("Mother's Age", motherAge, "endDate=${endDate}");
         dsd.addColumn("Phone Number", new RelatedPatientPhoneContactDataDefinition(), "");
 
-        ChildrenContactsOfTXCurrReproductiveWomenCohortDefinition cd = new ChildrenContactsOfTXCurrReproductiveWomenCohortDefinition();
+        ChildrenContactsOfTXCurrWRACohortDefinition cd = new ChildrenContactsOfTXCurrWRACohortDefinition();
         cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
@@ -102,7 +102,7 @@ public class TXCurrReproductiveWomenChildrenContactReportBuilder extends Abstrac
     }
     protected DataSetDefinition ChildrenContactsUndocumentedHIVStatus() {
         PatientContactDataSetDefinition dsd = new PatientContactDataSetDefinition();
-        dsd.setName("ChildrenContactsUndocumentedHIVStatus");
+        dsd.setName("UndocumentedHIVStatus");
         dsd.setDescription("Children Contact with undocumented HIV status");
 
         dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -117,11 +117,11 @@ public class TXCurrReproductiveWomenChildrenContactReportBuilder extends Abstrac
         dsd.addColumn("Age", ageAtReportingDataDefinition, "endDate=${endDate}");
         dsd.addColumn("Sex", new PatientContactSexDataDefinition(), "");
         dsd.addColumn("Mother's Name", new RelatedPatientNameDataDefinition(), "");
-        dsd.addColumn("Mother's CCC Number", new RelatedPatientCCCNumberDataDefinition(), null);
+        dsd.addColumn("Mother's CCC Number", new ChildIndexCCCNumberDataDefinition(), null);
         dsd.addColumn("Mother's Age", motherAge, "endDate=${endDate}");
         dsd.addColumn("Phone Number", new RelatedPatientPhoneContactDataDefinition(), "");
 
-        ChildrenContactsOfTXCurrReproductiveWomenUnknownHIVStatusCohortDefinition cd = new ChildrenContactsOfTXCurrReproductiveWomenUnknownHIVStatusCohortDefinition();
+        ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinition cd = new ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinition();
         cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
 

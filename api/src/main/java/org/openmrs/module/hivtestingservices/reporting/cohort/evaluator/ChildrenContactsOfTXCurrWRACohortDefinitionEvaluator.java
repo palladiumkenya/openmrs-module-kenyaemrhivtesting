@@ -6,7 +6,7 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.module.hivtestingservices.query.patientContact.PatientContactQueryResult;
 import org.openmrs.module.hivtestingservices.query.patientContact.definition.PatientContactQuery;
 import org.openmrs.module.hivtestingservices.query.patientContact.evaluator.PatientContactQueryEvaluator;
-import org.openmrs.module.hivtestingservices.reporting.cohort.definition.ChildrenContactsOfTXCurrReproductiveWomenCohortDefinition;
+import org.openmrs.module.hivtestingservices.reporting.cohort.definition.ChildrenContactsOfTXCurrWRACohortDefinition;
 import org.openmrs.module.reporting.common.ObjectUtil;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -20,8 +20,8 @@ import java.util.List;
 /**
  * Evaluator for Children contacts of TX Curr reproductive omen
  */
-@Handler(supports = {ChildrenContactsOfTXCurrReproductiveWomenCohortDefinition.class})
-public class ChildrenContactsOfTXCurrReproductiveWomenCohortDefinitionEvaluator implements PatientContactQueryEvaluator {
+@Handler(supports = {ChildrenContactsOfTXCurrWRACohortDefinition.class})
+public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements PatientContactQueryEvaluator {
 
     private final Log log = LogFactory.getLog(this.getClass());
 	@Autowired
