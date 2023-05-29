@@ -33,7 +33,10 @@ public class ChildrenContactHIVTestResultsDataEvaluator implements PatientContac
                 "                                                             when 1138 then 'Indeterminate'\n" +
                 "                                                             when 1304 then 'Poor sample quality' end),\n" +
                 "                                      '0000-00-00'),\n" +
-                "                               ifnull(concat(date(c.reported_test_date), c.baseline_hiv_status), '000-00-00')))),\n" +
+                "                               ifnull(concat(date(cast(c.reported_test_date AS CHAR CHARACTER SET utf8) COLLATE\n" +
+                "                                                  utf8_unicode_ci),\n" +
+                "                                             cast(c.baseline_hiv_status AS CHAR CHARACTER SET utf8) COLLATE\n" +
+                "                                             utf8_unicode_ci), '000-00-00')))),\n" +
                 "           11) as latest_results\n" +
                 "from openmrs.kenyaemr_hiv_testing_patient_contact c\n" +
                 "         left join (select t.patient_id,\n" +
