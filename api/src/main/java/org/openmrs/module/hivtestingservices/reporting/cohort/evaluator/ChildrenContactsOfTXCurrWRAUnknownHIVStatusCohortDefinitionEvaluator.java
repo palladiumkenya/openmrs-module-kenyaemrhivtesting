@@ -73,7 +73,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"                  (c.baseline_hiv_status not in ('Positive', 'Negative') or c.baseline_hiv_status is null) and\n" +
 				"                  (t.latest_hts_test_status not in ('Positive', 'Negative') or t.latest_hts_test_status is null))\n" +
 				"          and date(c.date_created) <= date(:endDate)\n" +
-				"      group by patient_id\n" +
+				"      group by c.id\n" +
 				"      having (started_on_drugs is not null and started_on_drugs <> '')\n" +
 				"         and (\n" +
 				"          (\n" +

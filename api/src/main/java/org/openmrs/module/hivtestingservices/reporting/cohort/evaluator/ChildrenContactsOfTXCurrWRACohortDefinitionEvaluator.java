@@ -65,7 +65,7 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 				"        and date(c.date_created) <= date(:endDate)\n" +
 				"        and c.relationship_type = 1528\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
-				"      group by patient_id\n" +
+				"      group by c.id\n" +
 				"      having (started_on_drugs is not null and started_on_drugs <> '')\n" +
 				"         and (\n" +
 				"          (\n" +
