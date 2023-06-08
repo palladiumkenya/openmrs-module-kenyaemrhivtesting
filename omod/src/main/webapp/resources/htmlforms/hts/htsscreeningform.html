@@ -285,11 +285,14 @@
 
         var testResultsSelected = function (){
             var val = jq(this).val();
+            var testType =getValue('tester.value');
             var testDate = jq('#date-tested');
             var artStartDate = jq('#started-art');
             var upn = jq('#upn-concept');
 
-            if (val == 664 ){
+
+
+            if (val == 664 &amp;&amp; testType == 5619){
                 jq('#date-tested :input').prop('disabled', false);
                 jq('#started-art :input').prop('disabled', true);
                 jq('#upn-concept :input').prop('disabled', true);
@@ -297,13 +300,32 @@
                 jq('#fs-risk-assessment').show();
                 jq('#fs-pregnancy-assessment').show();
                 jq('#fs-children-eligibility').show();
+                jq('#fs-generate-risk-score').show();
+                jq('#fs-testing-recommended').show();
+                jq('#fs-refering-for-testing').show();
                 jq("#eligible-test input[value=1066]").prop("checked", false);
                 clearHiddenSections(testDate);
                 clearHiddenSections(artStartDate);
                 clearHiddenSections(upn);
 
             }
-            if (val == 703){
+            if (val == 703 &amp;&amp; testType == 164952){      // positive self tested same as negative
+                jq('#date-tested :input').prop('disabled', false);
+                jq('#started-art :input').prop('disabled', true);
+                jq('#upn-concept :input').prop('disabled', true);
+                jq('#positive-client').hide();
+                jq('#fs-risk-assessment').show();
+                jq('#fs-pregnancy-assessment').show();
+                jq('#fs-children-eligibility').show();
+                jq('#fs-generate-risk-score').show();
+                jq('#fs-testing-recommended').show();
+                jq('#fs-refering-for-testing').show();
+                jq("#eligible-test input[value=1066]").prop("checked", false);
+                clearHiddenSections(testDate);
+                clearHiddenSections(artStartDate);
+                clearHiddenSections(upn);
+            }
+            if (val == 703 &amp;&amp; testType == 5619){
                 jq('#positive-client').show();
                 jq('#date-tested :input').prop('disabled', false);
                 jq('#started-art :input').prop('disabled', false);
@@ -311,6 +333,9 @@
                 jq('#fs-risk-assessment').hide();
                 jq('#fs-pregnancy-assessment').hide();
                 jq('#fs-children-eligibility').hide();
+                jq('#fs-generate-risk-score').hide();
+                jq('#fs-testing-recommended').hide();
+                jq('#fs-refering-for-testing').hide();
                 jq("#eligible-test input[value=1066]").prop("checked", true);
 
                 clearHiddenSections(jq('#sexually-active'));
@@ -365,6 +390,9 @@
                 jq('#fs-risk-assessment').show();
                 jq('#fs-pregnancy-assessment').show();
                 jq('#fs-children-eligibility').show();
+                jq('#fs-generate-risk-score').show();
+                jq('#fs-testing-recommended').show();
+                jq('#fs-refering-for-testing').show();
                 jq("#eligible-test input[value=1066]").prop("checked", false);
             }
         }
@@ -1501,19 +1529,19 @@
 
             if(pAge &lt; 10 &amp;&amp; mothersStatus != 703 &amp;&amp; testHistory == 1065 &amp;&amp;  testStatus != 703){
                 if (everHadSex == false) {
-                    getField('active-sexually.error').html('Please specify of client has ever been defiled.').show();
+                    getField('ever-had-sex.error').html('Please specify of client has ever been defiled.').show();
                     return false;
                 } else {
-                    getField('active-sexually.error').html('Please specify of client has ever been defiled.').hide();
+                    getField('ever-had-sex.error').html('Please specify of client has ever been defiled.').hide();
                 }
             }
 
             if(pAge &gt; 9  &amp;&amp; testHistory == 1065 &amp;&amp; testStatus != 703) {
                 if (everHadSex == false) {
-                    getField('active-sexually.error').html('Please specify of client has ever had sex.').show();
+                    getField('ever-had-sex.error').html('Please specify of client has ever had sex.').show();
                     return false;
                 } else {
-                    getField('active-sexually.error').html('Please specify of client has ever had sex.').hide();
+                    getField('ever-had-sex.error').html('Please specify of client has ever had sex.').hide();
                 }
             }
 
@@ -1565,9 +1593,10 @@
         function validatePrediction() {
             var predictionResultCategory = getValue("algorithm_result_category.value");
             var predictionResultScore = getValue("algorithm_result_score.value");
-
+            var testType =getValue('tester.value');
+            var testStatus = getValue('ever-tested.value');
             // Validate prediction
-            if(predictionResultCategory == false || predictionResultScore == false){
+            if( !(testType == 5619 &amp;&amp; testStatus == 703) &amp;&amp; (predictionResultCategory == false || predictionResultScore == false)){
                 jq('#ml-prediction-desc').html('<span style="color:red;"><strong>Please predict the probability of HIV.</strong></span>');
                 return false;
             }
@@ -1577,6 +1606,8 @@
 
         // Validate everything before pushing
         function validateForPush() {
+            var testType =getValue('tester.value');
+            var testStatus = getValue('ever-tested.value');
             var recommendForTest = getValue("recommended-test.value");
             var reasonForTest = getValue("tb-testing-reasons.value");
             var reasonForNoTest = getValue("tb-not-testing-reasons.value");
@@ -1593,7 +1624,7 @@
             }
 
             // Validate Recommended For Test
-            if(recommendForTest == false){
+            if(!(testType == 5619 &amp;&amp; testStatus == 703) &amp;&amp; recommendForTest == false){
                 getField('recommended-test.error').html('Please specify if recommending testing.').show();
                 return false;
             } else {
@@ -1601,7 +1632,7 @@
             }
 
             // Validate Reasons For Test
-            if(recommendForTest == 1065 &amp;&amp; reasonForTest == false){
+            if(!(testType == 5619 &amp;&amp; testStatus == 703)  &amp;&amp; recommendForTest == 1065 &amp;&amp; reasonForTest == false){
                 getField('tb-testing-reasons.error').html('Please specify reason for recommending testing.').show();
                 return false;
             } else {
@@ -1609,7 +1640,7 @@
             }
 
             // Validate Reasons For No Test
-            if(recommendForTest == 1066 &amp;&amp; reasonForNoTest == false){
+            if(!(testType == 5619 &amp;&amp; testStatus == 703)  &amp;&amp; recommendForTest == 1066 &amp;&amp; reasonForNoTest == false){
                 getField('tb-not-testing-reasons.error').html('Please specify reason for NOT recommending testing.').show();
                 return false;
             } else {
@@ -1617,7 +1648,7 @@
             }
 
             // Validate for referred
-            if(referred == false){
+            if(!(testType == 5619 &amp;&amp; testStatus == 703)  &amp;&amp; referred == false){
                 getField('referred.error').html('Please specify whether client was referred.').show();
                 return false;
             } else {
@@ -2507,7 +2538,7 @@
             </table>
         </fieldset>
 
-        <fieldset>
+        <fieldset id="fs-generate-risk-score">
             <legend>Generate HIV Risk Category</legend>
             <div id="div-ml-prediction">
                 <table>
@@ -2538,7 +2569,7 @@
             <br/>
         </fieldset>
 
-        <fieldset id="testing-recommended">
+        <fieldset id="fs-testing-recommended">
             <legend>Testing Recommended </legend>
             <table class="simple-table">
                 <tr>
@@ -2585,7 +2616,7 @@ category." />
             </table>
         </fieldset>
 
-        <fieldset id="refering-for-testing">
+        <fieldset id="fs-refering-for-testing">
             <legend>Referring for Testing</legend>
             <table class="simple-table">
                 <tr>
