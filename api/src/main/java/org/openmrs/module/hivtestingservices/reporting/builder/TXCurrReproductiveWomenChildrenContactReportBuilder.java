@@ -53,7 +53,8 @@ public class TXCurrReproductiveWomenChildrenContactReportBuilder extends Abstrac
     protected List<Mapped<DataSetDefinition>> buildDataSets(ReportDescriptor reportDescriptor, ReportDefinition reportDefinition) {
         return Arrays.asList(
                 ReportUtils.map(ChildrenContacts(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(ChildrenContactsUndocumentedHIVStatus(), "startDate=${startDate},endDate=${endDate}")
+                ReportUtils.map(ChildrenContactsUndocumentedHIVStatus(), "startDate=${startDate},endDate=${endDate}"),
+                ReportUtils.map(ChildrenContactsTracingAndOutcome(), "startDate=${startDate},endDate=${endDate}")
         );
     }
 
@@ -129,4 +130,51 @@ public class TXCurrReproductiveWomenChildrenContactReportBuilder extends Abstrac
         return dsd;
     }
 
+    protected DataSetDefinition ChildrenContactsTracingAndOutcome() {
+        PatientContactDataSetDefinition dsd = new PatientContactDataSetDefinition();
+        dsd.setName("TracingAndOutcome");
+        dsd.setDescription("Children Contact Tracing and Outcome");
+
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        String paramMapping = "startDate=${startDate},endDate=${endDate}";
+        PatientContactAgeAtReportingDataDefinition ageAtReportingDataDefinition = new PatientContactAgeAtReportingDataDefinition();
+        ageAtReportingDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        RelatedPatientAgeAtReportingDataDefinition motherAge = new RelatedPatientAgeAtReportingDataDefinition();
+        motherAge.addParameter(new Parameter("endDate", "End Date", Date.class));
+        PatientContactTracedDataDefinition tracingAttempt = new PatientContactTracedDataDefinition();
+        tracingAttempt.addParameter(new Parameter("endDate", "End Date", Date.class));
+        PatientContactTracingOutcomeDataDefinition tracingOutcome = new PatientContactTracingOutcomeDataDefinition();
+        tracingOutcome.addParameter(new Parameter("endDate", "End Date", Date.class));
+        PatientContactDateTestedDataDefinition dateTested = new PatientContactDateTestedDataDefinition();
+        dateTested.addParameter(new Parameter("endDate", "End Date", Date.class));
+        PatientContactHIVTestResultsDataDefinition hivTestResults = new PatientContactHIVTestResultsDataDefinition();
+        hivTestResults.addParameter(new Parameter("endDate", "End Date", Date.class));
+        PatientContactLinkedCCCNoDataDefinition cccNumber = new PatientContactLinkedCCCNoDataDefinition();
+        cccNumber.addParameter(new Parameter("endDate", "End Date", Date.class));
+        PatientContactDateEnrolledToCareDataDefinition dateEnrolledInCare = new PatientContactDateEnrolledToCareDataDefinition();
+        dateEnrolledInCare.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+
+        dsd.addColumn("Child's Name", new PatientContactNameDataDefinition(), "");
+        dsd.addColumn("Age", ageAtReportingDataDefinition, "endDate=${endDate}");
+        dsd.addColumn("Sex", new PatientContactSexDataDefinition(), "");
+        dsd.addColumn("Baseline HIV status", new PatientContactBaselineHivStatusDataDefinition(), "");
+        dsd.addColumn("Mother's Name", new RelatedPatientNameDataDefinition(), "");
+        dsd.addColumn("Mother's CCC Number", new ChildIndexCCCNumberDataDefinition(), null);
+        dsd.addColumn("Phone Number", new RelatedPatientPhoneContactDataDefinition(), "");
+        dsd.addColumn("Tracing attempt", tracingAttempt, "endDate=${endDate}");
+        dsd.addColumn("Tracing Outcome", tracingOutcome, "endDate=${endDate}");
+        dsd.addColumn("Date Tested for HIV", dateTested, "endDate=${endDate}");
+        dsd.addColumn("HIV Test Results", hivTestResults, "endDate=${endDate}");
+        dsd.addColumn("CCC Number", cccNumber, "endDate=${endDate}");
+        dsd.addColumn("Date Enrolled in Care", dateEnrolledInCare, "endDate=${endDate}");
+
+        ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinition cd = new ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinition();
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        dsd.addRowFilter(cd, paramMapping);
+        return dsd;
+    }
 }
