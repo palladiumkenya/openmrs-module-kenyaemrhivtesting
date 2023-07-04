@@ -233,7 +233,7 @@
 				<ref bean="kenyaemr.app.reports" />
 			</set></property>
 		<property name="template" value="hivtestingservices:pmtctrri_children_contacts.xls" />
-		<property name="repeatingSection" value="sheet:1,row:6,dataset:ChildrenContacts | sheet:2,row:6,dataset:UndocumentedHIVStatus" />
+		<property name="repeatingSection" value="sheet:1,row:6,dataset:ChildrenContacts | sheet:2,row:6,dataset:UndocumentedHIVStatus | sheet:3,row:6,dataset:TracingAndOutcome" />
 	</bean>
 
 </beans>
