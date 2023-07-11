@@ -29,7 +29,7 @@ public class PatientContactDateEnrolledInCareDataEvaluator implements PatientCon
                 "       if(coalesce(t.test_results,\n" +
                 "                   c.baseline_hiv_status) = 'Positive' and l.ccc_number is not null, l.date_enrolled,\n" +
                 "          null) as date_enrolled_in_hiv_program\n" +
-                "from openmrs.kenyaemr_hiv_testing_patient_contact c\n" +
+                "from kenyaemr_hiv_testing_patient_contact c\n" +
                 "         left join (select r.client_id                                                     as client_id,\n" +
                 "                           mid(max(concat(date(r.date_created), r.unique_patient_no)), 11) as unique_patient_no\n" +
                 "                    from openmrs.kenyaemr_hiv_testing_client_trace r\n" +
@@ -58,7 +58,7 @@ public class PatientContactDateEnrolledInCareDataEvaluator implements PatientCon
                 "                                        where date(e.visit_date) <= date(CURRENT_DATE)\n" +
                 "                                        group by e.patient_id) e on p.patient_id = e.patient_id\n" +
                 "                    group by p.patient_id) l on c.patient_id = l.patient_id\n" +
-                "where date(c.date_created) <= date(:endDate);";
+                "where date(c.date_created) <= date(:endDate) and c.voided = 0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

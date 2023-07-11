@@ -28,12 +28,12 @@ public class PatientContactHIVTestResultsDataEvaluator implements PatientContact
         String qry = "select c.id,\n" +
                 "       coalesce(if(t.test_results in ('Positive', 'Negative'), t.test_results, null),\n" +
                 "                if(c.baseline_hiv_status in ('Positive', 'Negative'), c.baseline_hiv_status, null)) as test_results\n" +
-                "from openmrs.kenyaemr_hiv_testing_patient_contact c\n" +
+                "from kenyaemr_hiv_testing_patient_contact c\n" +
                 "         left join (select t.patient_id, mid(max(concat(date(t.visit_date), t.final_test_result)), 11) as test_results\n" +
                 "                    from kenyaemr_etl.etl_hts_test t\n" +
                 "                    where date(t.visit_date) <= date(CURRENT_DATE)\n" +
                 "                    group by t.patient_id) t on c.patient_id = t.patient_id\n" +
-                "where date(c.date_created) <= date(:endDate);";
+                "where date(c.date_created) <= date(:endDate) and c.voided = 0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

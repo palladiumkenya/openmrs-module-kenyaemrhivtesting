@@ -72,7 +72,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"              and relationship_type = 1528 and\n" +
 				"                  (c.baseline_hiv_status not in ('Positive', 'Negative') or c.baseline_hiv_status is null) and\n" +
 				"                  (t.latest_hts_test_status not in ('Positive', 'Negative') or t.latest_hts_test_status is null))\n" +
-				"          and date(c.date_created) <= date(:endDate)\n" +
+				"          and date(c.date_created) <= date(:endDate) and c.voided = 0\n" +
 				"      group by c.id\n" +
 				"      having (started_on_drugs is not null and started_on_drugs <> '')\n" +
 				"         and (\n" +
