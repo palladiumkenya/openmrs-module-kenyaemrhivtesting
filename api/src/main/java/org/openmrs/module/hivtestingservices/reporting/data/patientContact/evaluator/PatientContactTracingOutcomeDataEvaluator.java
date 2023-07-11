@@ -29,9 +29,9 @@ public class PatientContactTracingOutcomeDataEvaluator implements PatientContact
                 "         left join\n" +
                 "     (select t.client_id, mid(max(concat(date(t.date_created), t.status)), 11) as outcome\n" +
                 "      from kenyaemr_hiv_testing_client_trace t\n" +
-                "      where DATE(t.date_created) <= date(CURRENT_DATE)\n" +
+                "      where DATE(t.date_created) <= date(CURRENT_DATE) and t.voided = 0\n" +
                 "      group by t.client_id) t\n" +
-                "     on c.id = t.client_id;";
+                "     on c.id = t.client_id where c.voided = 0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
