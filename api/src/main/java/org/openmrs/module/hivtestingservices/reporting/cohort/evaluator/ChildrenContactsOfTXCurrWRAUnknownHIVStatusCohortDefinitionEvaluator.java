@@ -44,7 +44,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"             d.effective_disc_date                                                            as effective_disc_date,\n" +
 				"             max(d.visit_date)                                                                as date_discontinued,\n" +
 				"             de.patient_id                                                                    as started_on_drugs\n" +
-				"      from kenyaemr_hiv_testing_patient_contact c\n" +
+				"      from kenyaemr_etl.etl_patient_contact c\n" +
 				"               join kenyaemr_etl.etl_patient_hiv_followup fup on c.patient_related_to = fup.patient_id\n" +
 				"               left join (select t.patient_id,\n" +
 				"                                 mid(max(concat(date(t.visit_date), t.final_test_result)), 11) as latest_hts_test_status\n" +

@@ -28,10 +28,10 @@ public class PatientContactLinkedCCCNoDataEvaluator implements PatientContactDat
         String qry = "select c.id,\n" +
                 "       if(coalesce(t.test_results,\n" +
                 "                   c.baseline_hiv_status) = 'Positive', coalesce(l.ccc_number, r.unique_patient_no), null) as ccc_number\n" +
-                "from kenyaemr_hiv_testing_patient_contact c\n" +
+                "from kenyaemr_etl.etl_patient_contact c\n" +
                 "         left join (select r.client_id                                                     as client_id,\n" +
                 "                           mid(max(concat(date(r.date_created), r.unique_patient_no)), 11) as unique_patient_no\n" +
-                "                    from openmrs.kenyaemr_hiv_testing_client_trace r\n" +
+                "                    from kenyaemr_etl.etl_client_trace r\n" +
                 "                    where DATE(r.date_created) <= date(CURRENT_DATE)\n" +
                 "                    group by r.client_id) r on c.id = r.client_id\n" +
                 "         left join (select t.patient_id,\n" +
