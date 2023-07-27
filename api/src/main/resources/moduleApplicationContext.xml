@@ -108,7 +108,7 @@
 		<property name="commonReports">
 			<set>
 				<ref bean="kenyaemr.hts.common.report.htsIndicatorReport" />
-				<ref bean="kenyaemr.hts.common.report.pnsRegister" />
+				<ref bean="kenyaemr.hts.common.report.htsIndexTestingRegister" />
 				<ref bean="kenyaemr.hts.common.report.allContactsWithUndocumentedStatus"/>
 				<ref bean="kenyaemr.hts.common.report.childrenContactsWithUndocumentedStatus"/>
 				<ref bean="kenyaemr.hts.common.report.pnsContactsWithUndocumentedStatus"/>
@@ -118,16 +118,16 @@
 		</property>
 	</bean>
 
-	<bean id="kenyaemr.hts.common.report.pnsRegister" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
+	<bean id="kenyaemr.hts.common.report.htsIndexTestingRegister" class="org.openmrs.module.kenyacore.report.HybridReportDescriptor">
 		<property name="targetUuid" value="c9d3f1fa-6fd0-11e8-adc0-fa7ae01bbebc" />
-		<property name="name" value="Partner Notification Register" />
-		<property name="description" value="Monthly PNS Register" />
+		<property name="name" value="HTS Index Testing Register" />
+		<property name="description" value="Monthly HTS Index Testing Register" />
 		<property name="apps">
 			<set>
 				<ref bean="kenyaemr.app.reports" />
 			</set></property>
-		<property name="template" value="hivtestingservices:PNS_Register_Template.xls" />
-		<property name="repeatingSection" value="sheet:1,row:7,dataset:PNSRegister" />
+		<property name="template" value="hivtestingservices:HTS_Index_Testing_Register_Template.xls" />
+		<property name="repeatingSection" value="sheet:1,row:7,dataset:HTSIndexTestingRegister" />
 	</bean>
 
 	<bean id="kenyaemr.hts.common.report.htsIndicatorReport" class="org.openmrs.module.kenyacore.report.IndicatorReportDescriptor">

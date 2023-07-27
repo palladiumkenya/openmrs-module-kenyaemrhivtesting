@@ -38,8 +38,7 @@ public class PatientContactListCohortDefinitionEvaluator implements PatientConta
 				"         inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id\n" +
 				"where date(c.date_created) between date(:startDate) and date(:endDate)\n" +
 				"  and t.voided = 0\n" +
-				"  and t.test_type = 2\n" +
-				"  and c.relationship_type in (163565, 5617, 162221)\n" +
+				"  and t.test_type = 1\n" +
 				"  and date(t.visit_date) between date(:startDate) and date(:endDate)\n" +
 				"  and t.final_test_result = 'Positive'\n" +
 				"  and c.voided = 0;";
