@@ -112,7 +112,7 @@ public class PNSReportCohortLibrary {
         String sqlQuery = "select patient_id from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender\n" +
                 " from  kenyaemr_etl.etl_hts_test t \n" +
                 " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
-                " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.test_type=2 and t.final_test_result='Positive'\n" +
+                " where t.voided=0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.test_type=1 and t.final_test_result='Positive'\n" +
                 " group by t.patient_id) t\n" +
                 " ;";
         cd.setName("totalTested");
@@ -133,7 +133,7 @@ public class PNSReportCohortLibrary {
         String sqlQuery = "select patient_id from (select t.patient_id, DATE_FORMAT(FROM_DAYS(DATEDIFF(CURDATE(),d.DOB)), '%Y')+0 as age, d.Gender as Gender, min(t.visit_date) as initial_test_date\n" +
                 " from  kenyaemr_etl.etl_hts_test t \n" +
                 " inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=t.patient_id\n" +
-                " where t.voided=0 and t.patient_given_result='Yes' and t.test_type=2 and t.final_test_result='Positive'\n" +
+                " where t.voided=0 and t.patient_given_result='Yes' and t.test_type=1 and t.final_test_result='Positive'\n" +
                 " group by t.patient_id\n" +
                 " having initial_test_date between date(:startDate) and date(:endDate)) t\n" +
                 " ;";
@@ -236,7 +236,7 @@ public class PNSReportCohortLibrary {
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "select id from (select c.id\n" +
                 " from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id\n" +
-                " where t.voided=0 and t.test_type=2 and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive' \n" +
+                " where t.voided=0 and t.test_type=1 and c.voided = 0 and date(t.visit_date) between date(:startDate) and date(:endDate) and t.final_test_result = 'Positive' \n" +
                 " group by c.id ) t\n" +
                 " ;";
         cd.setName("contactsNewlyIdentifiedPositive");
