@@ -44,7 +44,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"             d.effective_disc_date                                                            as effective_disc_date,\n" +
 				"             max(d.visit_date)                                                                as date_discontinued,\n" +
 				"             de.patient_id                                                                    as started_on_drugs\n" +
-				"      from kenyaemr_hiv_testing_patient_contact c\n" +
+				"      from kenyaemr_etl.etl_patient_contact c\n" +
 				"               join kenyaemr_etl.etl_patient_hiv_followup fup on c.patient_related_to = fup.patient_id\n" +
 				"               left join (select t.patient_id,\n" +
 				"                                 mid(max(concat(date(t.visit_date), t.final_test_result)), 11) as latest_hts_test_status\n" +
@@ -72,7 +72,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"              and relationship_type = 1528 and\n" +
 				"                  (c.baseline_hiv_status not in ('Positive', 'Negative') or c.baseline_hiv_status is null) and\n" +
 				"                  (t.latest_hts_test_status not in ('Positive', 'Negative') or t.latest_hts_test_status is null))\n" +
-				"          and date(c.date_created) <= date(:endDate)\n" +
+				"          and date(c.date_created) <= date(:endDate) and c.voided = 0\n" +
 				"      group by c.id\n" +
 				"      having (started_on_drugs is not null and started_on_drugs <> '')\n" +
 				"         and (\n" +

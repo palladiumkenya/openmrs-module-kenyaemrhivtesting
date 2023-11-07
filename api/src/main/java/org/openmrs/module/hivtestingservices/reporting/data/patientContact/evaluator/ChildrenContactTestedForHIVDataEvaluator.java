@@ -25,7 +25,10 @@ public class ChildrenContactTestedForHIVDataEvaluator implements PatientContactD
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, if(t.patient_id is not null or l.patient_id is not null or c.baseline_hiv_status in ('Positive','Negative'), 'Yes', 'No') as ever_tested_for_hiv\n" +
+        String qry = "select c.id,\n" +
+                "       if((t.patient_id is not null and t.patient_id <> '') or (l.patient_id is not null and l.patient_id <> '') or\n" +
+                "          (c.baseline_hiv_status in ('Positive', 'Negative') and c.baseline_hiv_status is not null),\n" +
+                "          'Yes', 'No') as ever_tested_for_hiv\n" +
                 "from kenyaemr_hiv_testing_patient_contact c\n" +
                 "         left join (select t.patient_id,\n" +
                 "                           max(t.visit_date)                                             as date_tested,\n" +
@@ -39,8 +42,9 @@ public class ChildrenContactTestedForHIVDataEvaluator implements PatientContactD
                 "                    from kenyaemr_etl.etl_laboratory_extract l\n" +
                 "                    where date(l.date_test_requested) <= date(:endDate)\n" +
                 "                      and l.lab_test in (1030, 163722)\n" +
-                "                    group by l.patient_id) l on c.patient_id = l.patient_id\n" +
-                "where date(c.date_created) <= date(:endDate);";
+                "                    group by l.patient_id\n" +
+                "                    having latest_lab_test_results is not null) l on c.patient_id = l.patient_id\n" +
+                "where date(c.date_created) <= date(:endDate) and c.voided = 0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

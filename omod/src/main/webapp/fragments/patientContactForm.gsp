@@ -215,7 +215,7 @@
                     <td class="ke-field-label">HIV Status</td>
                      <td id="tdReportedTestDate" class="ke-field-label">Reported test date</td>
                      <td class="ke-field-label">Booking Date</td>
-                    <td class="ke-field-label">Preferred PNS Approach</td>
+                    <td id="pns-approach" class="ke-field-label">Preferred PNS Approach</td>
                 </tr>
                 <tr>
                     <td style="width: 140px">
@@ -357,8 +357,6 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
 
             var relType = jq(this).val();
 
-            console.log('Relationship type ' + relType);
-
             if (relType === "5617" || relType === "163565"/* Spouse or Partner*/) {
 
                 jq('.ipvQuestions').show();
@@ -367,6 +365,14 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
             else {
                 jq('.ipvQuestions').hide();
                 jq('.ipvOutcome').hide();
+            }
+            if (relType === "166606") {
+                jq('#pns-approach').hide();
+                jq('#pnsApproach').hide();
+            }
+            else {
+                jq('#pns-approach').show();
+                jq('#pnsApproach').show();
             }
         });
 

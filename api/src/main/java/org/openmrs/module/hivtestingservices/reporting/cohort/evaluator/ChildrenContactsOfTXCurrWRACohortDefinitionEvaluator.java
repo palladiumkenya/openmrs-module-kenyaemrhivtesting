@@ -64,6 +64,7 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 				"        and timestampdiff(YEAR, date(c.birth_date), date(:endDate)) < 15\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
 				"        and c.relationship_type = 1528\n" +
+				"        and c.voided = 0\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
 				"      group by c.id\n" +
 				"      having (started_on_drugs is not null and started_on_drugs <> '')\n" +
