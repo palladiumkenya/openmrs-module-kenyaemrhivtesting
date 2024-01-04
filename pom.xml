@@ -46,8 +46,8 @@
 		<reportingVersion>1.18.0</reportingVersion>
 		<serializationxstreamVersion>0.2.14</serializationxstreamVersion>
 		<uiframeworkVersion>3.15.0</uiframeworkVersion>
-     	<kenyacoreVersion>3.0.0</kenyacoreVersion>
-		<kenyaemrVersion>18.4.2</kenyaemrVersion>
+     	<kenyacoreVersion>3.0.1</kenyacoreVersion>
+		<kenyaemrVersion>18.7.0</kenyaemrVersion>
 		<kenyauiVersion>3.0.0</kenyauiVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
 
@@ -276,7 +276,7 @@
 		<repository>
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
-			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 		</repository>
 	</repositories>
 
@@ -284,7 +284,7 @@
 		<pluginRepository>
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
-			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
