@@ -99,13 +99,13 @@
 
             //HTS Strategy
             var htsStrategySelected = getField('strategy.value').val();
-            if (htsStrategySelected == 159938 ){
-                getField('hts-entry-point.value').prop("selectedIndex", 14);
-            }else if (htsStrategySelected == 159939 ){
-                getField('hts-entry-point.value').prop("selectedIndex", 15);
-            }else if (htsStrategySelected == 164954 || htsStrategySelected == 164955){
-                getField('hts-entry-point.value').prop("selectedIndex", 9);
-            }
+            // if (htsStrategySelected == 159938 ){
+            //     getField('hts-entry-point.value').prop("selectedIndex", 14);
+            // }else if (htsStrategySelected == 159939 ){
+            //     getField('hts-entry-point.value').prop("selectedIndex", 15);
+            // }else if (htsStrategySelected == 164954 || htsStrategySelected == 164955){
+            //     getField('hts-entry-point.value').prop("selectedIndex", 9);
+            // }
             // Specify other
             if (htsStrategySelected == 5622){
                 jq('#tbl-other-strategy').show();
@@ -230,13 +230,13 @@
 
         var strategySelected = function () {
             var val = jq(this).val();
-            if (val == 159938 ){
-                getField('hts-entry-point.value').prop("selectedIndex", 14);
-            }else if (val == 159939 ){
-                getField('hts-entry-point.value').prop("selectedIndex", 15);
-            }else if (val == 164954 || val == 164955){
-                getField('hts-entry-point.value').prop("selectedIndex", 9);
-            }
+            // if (val == 159938 ){
+            //     getField('hts-entry-point.value').prop("selectedIndex", 14);
+            // }else if (val == 159939 ){
+            //     getField('hts-entry-point.value').prop("selectedIndex", 15);
+            // }else if (val == 164954 || val == 164955){
+            //     getField('hts-entry-point.value').prop("selectedIndex", 9);
+            // }
             // Specify other
             if (val == 5622){
                 jq('#tbl-other-strategy').show();
@@ -1347,8 +1347,7 @@
                 modelConfigs: modelConfigs,
                 variableValues: predictionVariables
             }
-
-            console.log("ML Payload: " + JSON.stringify(mlScoringRequestPayload));
+     
 
             var predResponse = '';
             if (casefindingURL !='') {
