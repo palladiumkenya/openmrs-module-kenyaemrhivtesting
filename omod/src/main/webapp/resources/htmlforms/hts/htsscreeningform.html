@@ -136,14 +136,14 @@
                 var screeningYesResponses = [];
                 var screeningNoResponses = [];
                 jq.each(screeningRadios, function () {    //Fetch responses for the screening questions
-//Push any responses to the respective screeningYesResponses and screeningNoResponses array
+                //Push any responses to the respective screeningYesResponses and screeningNoResponses array
                     const COUGH = 159799;
                     const CONTACT = 124068;
                     const FEVER = 1494;
                     const WEIGHTLOSS = 832;
                     const SWEAT = 133027;
                     const LETHERGY = 116334;
-//Push any responses to the respective screeningYesResponses and screeningNoResponses array
+                    //Push any responses to the respective screeningYesResponses and screeningNoResponses array
                     if ((this.value == COUGH || this.value == CONTACT || this.value == FEVER || this.value == WEIGHTLOSS || this.value == SWEAT || this.value == LETHERGY ) &amp;&amp; this.checked == true) {
                         screeningYesResponses.push(this);
                     }
@@ -423,7 +423,7 @@
 
             if(val == 'true') {
                 jq('#no-sex-partners input').prop('disabled', false);
-            }  else{
+            } else {
                 jq('#no-sex-partners input').prop('disabled', true);
                 clearHiddenSections(jq('#no-sex-partners'));
             }
@@ -478,19 +478,6 @@
                 jq('#currently-sti input').prop('disabled', true);
             }
         }
-
-        //TB service selected
-        // var tbServiceSelected = function(){
-        //     var val = jq(this).val();
-        //     var tbChecked = jq("#tb-service input:checkbox:checked");
-        //     if(val == 1065 &amp;&amp; tbChecked.length >=1){
-        //         jq('#screened-tb input').prop('disabled', false);
-        //     }else{
-        //         jq("#screened-tb input[value=1065]").prop("checked", false);
-        //         jq("#screened-tb input[value=1066]").prop("checked", false);
-        //         jq('#screened-tb input').prop('disabled', true);
-        //     }
-        // }
 
         //Health Worker Selected
         var healthWorkerSelected = function(){
@@ -618,26 +605,15 @@
             var testedAs = getValue("couple-testing.value");
             var htsDepartment = getValue("department.value");
             var testStrategy = getValue("strategy.value");
-            var tbScreening = getValue("tb-result-status.value");
+            // var tbScreening = getValue("tb-result-status.value");
             var selfTested = getValue("tester.value");
             var monthsSinceLastTestInt = parseInt(monthsSinceLastTest);
             var pAge = parseInt('<lookup expression="patient.age"/>');
 
             // key population
-            // var pwidChecked = jq("#pwid input:checkbox:checked");
-            // var mwsmChecked = jq("#kpmsm input:checkbox:checked");
-            // var fswChecked = jq("#female-sex-worker input:checkbox:checked");
-            // var kpPrisonerChecked = jq("#prisoner input:checkbox:checked");
-            // var transgenderChecked = jq("#transgender input:checkbox:checked");
-            // var kpotherChecked = jq("#kpother input:checkbox:checked");
             var keyPopulationVal = getValue("chooseKeyPop.value");
 
             // priority population
-            // var fisherFolkChecked = jq("#fisherfolk input:checkbox:checked");
-            // var truckDriverChecked = jq("#truckdriver input:checkbox:checked");
-            // var adygChecked = jq("#adyg input:checkbox:checked");
-            // var ppPrisonerChecked = jq("#ppprisoner input:checkbox:checked");
-            // var dodOnlyChecked = jq("#dodOnly input:checkbox:checked");
             var priPopulationVal = getValue("choosePriPop.value");
 
             var onPREP = getValue("currently-prep.value");
@@ -669,7 +645,7 @@
             var patientReferred = getValue('referred.value');
             var patientBreastFeeding = getValue('breastfeeding.value');
             var sharedNeedle = getValue('needle-shared.value');
-            var testHistory = getValue('test-history.value');
+            // var testHistory = getValue('test-history.value');
             var htsEntryPoint = getValue('hts-entry-point.value');
             var prepServiceChecked = jq("#prep-service input:checkbox:checked");
             var pepServiceChecked = jq("#pep-service input:checkbox:checked");
@@ -679,17 +655,18 @@
             // BEGIN New model may 2024
             var screenedForTb = getValue('screened-tb.value');
             var everHadSex = getValue('ever-had-sex.value');
+            var hasFever = getValue('scr-fever.value');
+            var hasNightSweats = getValue('scr-weight.value');
+            var hasCough = getValue('scr-cough.value');
+            var multipleSexPartners = getValue('multiple-sex-partners.value');
+            var tbResultsStatus = getValue("tb-result-status.value");
+            var patientType = getValue('patient-type.value');
+            var testHistory = getValue('test-history.value');
 
             // END New model may 2024
 
             //Validate mandatory fields
-            // test strategy (Index/HP)
-            // Population type / key population / priority population
-            // client self-tested
-            // entry point / department
-            // ever tested for HIV / months since last test
 
-            //if (populationType == '' || testHistory == '' || htsDepartment == '' || testStrategy == '' || htsEntryPoint == '') {
             if(validateVariables() == false) {
                 jq('#ml-prediction-desc').html('Please ensure that you have provided answers to all questions above');
                 return;
@@ -847,66 +824,35 @@
 
             //Key Population
             
-            if (keyPopulationVal == 105) { //INJECT DRUGS
-            	predictionVariables.KeyPopulationPWID = 1;
-            } else if (keyPopulationVal == 160578) { // MEN WITH MEN
-            	predictionVariables.KeyPopulationMSM = 1;
-            } else if (keyPopulationVal == 160579) { // FEMALE SEX WORKER
-            	predictionVariables.KeyPopulationFSW = 1;
-            } else if (keyPopulationVal == 5622 || keyPopulationVal == 162277 || keyPopulationVal == 165100) { // Other|PRISONER|TRANS
-            	predictionVariables.KeyPopulationOther = 1;
+            if (populationType == 164929) { // Key Population
+                if (keyPopulationVal == 105) { //INJECT DRUGS
+                    predictionVariables.KeyPopulationPWID = 1;
+                } else if (keyPopulationVal == 160578) { // MEN WITH MEN
+                    predictionVariables.KeyPopulationMSM = 1;
+                } else if (keyPopulationVal == 160579) { // FEMALE SEX WORKER
+                    predictionVariables.KeyPopulationFSW = 1;
+                } else if (keyPopulationVal == 5622 || keyPopulationVal == 162277 || keyPopulationVal == 165100) { // Other|PRISONER|TRANS
+                    predictionVariables.KeyPopulationOther = 1;
+                }
             } else { // Not relevant
                 predictionVariables.KeyPopulationNR = 1;
             }
 
             //Priority Population
 
-            if (priPopulationVal == 159674) { //FISHER
-            	predictionVariables.PriorityPopulationFISHERMEN = 1;
-            } else if (priPopulationVal == 160549) { //ADOLESCENT
-            	predictionVariables.PriorityPopulationAGYW = 1;
-            } else if (priPopulationVal == 165192 || priPopulationVal == 162277 || priPopulationVal == 162198) { //MILITARY|PRISONER|TRUCK
-            	predictionVariables.PriorityPopulationOTHER = 1;
+            if (populationType == 138643) { //Priority Population
+                if (priPopulationVal == 159674) { //FISHER
+                    predictionVariables.PriorityPopulationFISHERMEN = 1;
+                } else if (priPopulationVal == 160549) { //Adolescent outreach program
+                    predictionVariables.PriorityPopulationAGYW = 1;
+                } else if (priPopulationVal == 165192 || priPopulationVal == 162277 || priPopulationVal == 162198) { //MILITARY|PRISONER|TRUCK
+                    predictionVariables.PriorityPopulationOTHER = 1;
+                }
             } else { // Not relevant
                 predictionVariables.PriorityPopulationNR = 1;
             }
 
-            // convert ever tested (testHistory) for hiv status
-            // if (testHistory == 1065) {
-            //     predictionVariables.EverTestedForHivYES = 1;
-            // } else if (testHistory == 1066) {
-            //     predictionVariables.EverTestedForHivNO = 1;
-            // }
-
-            // converter for tested as i.e. individual, couple:
-            // TO-DO check field
-            // if (testedAs == 164957) {
-            //     predictionVariables.ClientTestedAsINDIVIDUAL = 1;
-            // } else if (testedAs == 164958) {
-            //     predictionVariables.ClientTestedAsCOUPLE = 1;
-            // }
-
             // convert entry point
-            
-            // if (htsEntryPoint == 159940) { // VCT
-            //     predictionVariables.EntryPointVCT = 1;
-            // } else if (htsEntryPoint == 160542) { // OPD
-            //     predictionVariables.EntryPointOPD = 1;
-            // } else if (htsEntryPoint == 160456 || htsEntryPoint == 1623) { // Maternity
-            //     predictionVariables.EntryPointPMTCT_MAT_PNC = 1;
-            // } else if (htsEntryPoint == 5485) { // IPD
-            //     predictionVariables.EntryPointIPD = 1;
-            // } else if (htsEntryPoint == 162181) { // Paed
-            //     predictionVariables.EntryPointPEDIATRIC = 1;
-            // } else if (htsEntryPoint == 5622 || htsEntryPoint == 160552 || htsEntryPoint == 162050 || htsEntryPoint == 159938 || htsEntryPoint == 159939 || htsEntryPoint == 160546 || htsEntryPoint == 160522 || htsEntryPoint == 163096) { // Other
-            //     predictionVariables.EntryPointOTHER = 1;
-            // } else if (htsEntryPoint == 162223) { // vmmc
-            //     predictionVariables.EntryPointVMMC = 1;
-            // } else if (htsEntryPoint == 160541) { // tb
-            //     predictionVariables.EntryPointTB = 1;
-            // } else if (htsEntryPoint == 160538) { // ANC
-            //     predictionVariables.EntryPointPMTCT_ANC = 1;
-            // }
 
             if (htsEntryPoint == 159940) { // VCT
                 predictionVariables.HTSEntryPointVCT = 1;
@@ -962,26 +908,6 @@
 
             // convert testing strategy
 
-            // if (testStrategy == 159938) { // HB
-            //     predictionVariables.TestStrategyHB = 1;
-            // } else if (testStrategy == 159939) { // Mobile
-            //     predictionVariables.TestStrategyMO = 1;
-            // } else if (testStrategy == 164163) { // HP
-            //     predictionVariables.TestStrategyHP = 1;
-            // } else if (testStrategy == 164953) { // NP
-            //     predictionVariables.TestStrategyNP = 1;
-            // } else if (testStrategy == 164954) { // Integrated VCT sites
-            //     predictionVariables.TestStrategyVI = 1;
-            // } else if (testStrategy == 164955) { // Stand Alone VCT center
-            //     predictionVariables.TestStrategyVS = 1;
-            // } else if (testStrategy == 161557) { // INDEX
-            //     predictionVariables.TestStrategyINDEX = 1;
-            // } else if (testStrategy == 5622) { // OTHER
-            //     predictionVariables.TestStrategyOTHER = 1;
-            // } else if (testStrategy == 166606) { // SNS
-            //     predictionVariables.TestStrategySNS = 1;
-            // }
-
             if (testStrategy == 159938) { // HB
                 predictionVariables.HTSStrategyHB = 1;
             } else if (testStrategy == 159939) { // Mobile
@@ -1002,39 +928,16 @@
                 predictionVariables.HTSStrategySNS = 1;
             }
 
-            // convert HIV self test
-            
-            // if (selfTested == 5619) {
-            //     predictionVariables.ClientSelfTestedNO = 1;
-            // } else if (selfTested == 164952) {
-            //     predictionVariables.ClientSelfTestedYES = 1;
-            // }
-
-            // convert TB screening
-
-            // if (tbScreening == 1660 || tbScreening == 160737) {
-            //     predictionVariables.TbScreeningNOPRESUMEDTB = 1;
-            // } else if (tbScreening == 142177 || tbScreening == 1111) {
-            //     predictionVariables.TbScreeningPRESUMEDTB = 1;
-            // } else if (tbScreening == 1496 || tbScreening == 1662) {
-            //     predictionVariables.TbScreeningCONFIRMEDTB = 1;
-            // }
-
-            // convert currently on PREP
-
-            // if (onPREP == 1065) {
-            //     predictionVariables.CurrentlyOnPrepYES = 1;
-            // } else if (onPREP == 1066) {
-            //     predictionVariables.CurrentlyOnPrepNO = 1;
-            // }
-
-            // convert has STI
-
-            // if (hasSTI == 1065) {
-            //     predictionVariables.CurrentlyHasSTIYES = 1;
-            // } else if (hasSTI == 1066) {
-            //     predictionVariables.CurrentlyHasSTINO = 1;
-            // }
+            // Multiple Sexual Partners 
+            if(everHadSex == 1065) {
+                if (multipleSexPartners == 'true') {
+                    predictionVariables.MultiplePartnersYES = 1;
+                } else if (multipleSexPartners == 'false') {
+                    predictionVariables.MultiplePartnersNO = 1;
+                }
+            } else {
+                predictionVariables.MultiplePartnersNR = 1;
+            }
 
             // convert Sexually Active
 
@@ -1064,37 +967,31 @@
                 predictionVariables.NewPartnerNR = 1;
             }
 
-            // convert Health Worker
-
-            // if (isHealthWorker == 1065) {
-            //     predictionVariables.IsHealthWorkerYES = 1;
-            // } else if (isHealthWorker == 1066) {
-            //     predictionVariables.IsHealthWorkerNO = 1;
-            // } else {
-            //     predictionVariables.IsHealthWorkerNR = 1;
-            // }
-
             // Partner HIV Status
             
-            if (partnerHIVStatus == 703) {
-                predictionVariables.PartnerHIVStatusPOSITIVE = 1;
-            } else if (partnerHIVStatus == 664) {
-                predictionVariables.PartnerHIVStatusNEGATIVE = 1;
-            } else if (partnerHIVStatus == 1067) {
-                predictionVariables.PartnerHIVStatusUNKNOWN = 1;
-            } else if (partnerHIVStatus == 162570) {
-                predictionVariables.PartnerHIVStatusDECLINE = 1;
+            if(everHadSex == 1065) {
+                if (partnerHIVStatus == 703) {
+                    predictionVariables.PartnerHIVStatusPOSITIVE = 1;
+                } else if (partnerHIVStatus == 664) {
+                    predictionVariables.PartnerHIVStatusNEGATIVE = 1;
+                } else if (partnerHIVStatus == 1067) {
+                    predictionVariables.PartnerHIVStatusUNKNOWN = 1;
+                } else if (partnerHIVStatus == 162570) {
+                    predictionVariables.PartnerHIVStatusDECLINE = 1;
+                }
             } else {
                 predictionVariables.PartnerHIVStatusNR = 1;
             }
 
             // Number of Partners
             
-            if(numberOfPartnersInt &gt; 0) {
-                if(numberOfPartnersInt &gt; 1) {
-                    predictionVariables.NumberOfPartnersMULTIPLE = 1;
-                } else if(numberOfPartnersInt == 1) {
-                    predictionVariables.NumberOfPartnersSINGLE = 1;
+            if(everHadSex == 1065) {
+                if(numberOfPartnersInt &gt; 0) {
+                    if(numberOfPartnersInt &gt; 1) {
+                        predictionVariables.NumberOfPartnersMULTIPLE = 1;
+                    } else if(numberOfPartnersInt == 1) {
+                        predictionVariables.NumberOfPartnersSINGLE = 1;
+                    }
                 }
             } else {
                 predictionVariables.NumberOfPartnersNR = 1;
@@ -1102,12 +999,14 @@
 
             // Alcoholic Sex
 
-            if (alcoholicSex == 1066) {
-                predictionVariables.AlcoholSexNEVER = 1;
-            } else if (alcoholicSex == 1385) {
-                predictionVariables.AlcoholSexSOMETIMES = 1;
-            } else if (alcoholicSex == 165027) {
-                predictionVariables.AlcoholSexALWAYS = 1;
+            if(everHadSex == 1065) {
+                if (alcoholicSex == 1066) {
+                    predictionVariables.AlcoholSexNEVER = 1;
+                } else if (alcoholicSex == 1385) {
+                    predictionVariables.AlcoholSexSOMETIMES = 1;
+                } else if (alcoholicSex == 165027) {
+                    predictionVariables.AlcoholSexALWAYS = 1;
+                }
             } else {
                 predictionVariables.AlcoholSexNR = 1;
             }
@@ -1125,16 +1024,6 @@
             } else {
                 predictionVariables.MoneySexNR = 1;
             }
-
-            //condom burst
-            
-            // if (condomBurst == 1065) {
-            //     predictionVariables.CondomBurstYES = 1;
-            // } else if (condomBurst == 1066) {
-            //     predictionVariables.CondomBurstNO = 1;
-            // } else {
-            //     predictionVariables.CondomBurstNR = 1;
-            // }
 
             // unknown status partner
             
@@ -1192,70 +1081,14 @@
                 predictionVariables.BreastfeedingMotherNR = 1;
             }
 
-            // GBV experienced
-            
-            // if (GBVExperienced == 1065) {
-            //     predictionVariables.ExperiencedGBVYES = 1;
-            // } else if (GBVExperienced == 1066) {
-            //     predictionVariables.ExperiencedGBVNO = 1;
-            // }
-
-            //shared needle
-            
-            // if (sharedNeedle == 1065) {
-            //     predictionVariables.SharedNeedleYES = 1;
-            // } else if (sharedNeedle == 1066) {
-            //     predictionVariables.SharedNeedleNO = 1;
-            // } else {
-            //     predictionVariables.SharedNeedleNR = 1;
-            // }
-
-            //needle stick injuries
-            
-            // if (needleStickInjuries == 153574) {
-            //     predictionVariables.NeedleStickInjuriesYES = 1;
-            // } else if (needleStickInjuries == 1066) {
-            //     predictionVariables.NeedleStickInjuriesNO = 1;
-            // } else {
-            //     predictionVariables.NeedleStickInjuriesNR = 1;
-            // }
-
-            //traditional procedures
-            
-            // if (traditionalProcedures == 1065) {
-            //     predictionVariables.TraditionalProceduresYES = 1;
-            // } else if (traditionalProcedures == 1066) {
-            //     predictionVariables.TraditionalProceduresNO = 1;
-            // } else {
-            //     predictionVariables.TraditionalProceduresNR = 1;
-            // }
-
-            //mothers status
-            
-            // if (mothersStatus == 703) {
-            //     predictionVariables.MothersStatusPOSITIVE = 1;
-            // } else if (mothersStatus == 664) {
-            //     predictionVariables.MothersStatusNEGATIVE = 1;
-            // } else if (mothersStatus == 1067) {
-            //     predictionVariables.MothersStatusUNKNOWN = 1;
-            // } else {
-            //     predictionVariables.MothersStatusNR = 1;
-            // }
-
-            //referred for testing
-            
-            // if (patientReferred == 1065) {
-            //     predictionVariables.ReferredForTestingYES = 1;
-            // } else if (patientReferred == 1066) {
-            //     predictionVariables.ReferredForTestingNO = 1;
-            // }
-
             // Discordant Couple
             
-            if (discordantCouple == 1065) {
-                predictionVariables.CoupleDiscordantYES = 1;
-            } else if (discordantCouple == 1066) {
-                predictionVariables.CoupleDiscordantNO = 1;
+            if(everHadSex == 1065) {
+                if (discordantCouple == 1065) {
+                    predictionVariables.CoupleDiscordantYES = 1;
+                } else if (discordantCouple == 1066) {
+                    predictionVariables.CoupleDiscordantNO = 1;
+                }
             } else {
                 predictionVariables.CoupleDiscordantNR = 1;
             }
@@ -1272,14 +1105,6 @@
                 }
             }
 
-            // Relationship with Contact - Social
-            
-            // if (socialContactChecked.length &gt;= 1) {
-            //     predictionVariables.SOCIALYES = 1;
-            // } else {
-            //     predictionVariables.SOCIALNO = 1;
-            // }
-
             // Relationship with Contact - None
             
             if (noneContactChecked.length &gt;= 1) {
@@ -1288,92 +1113,9 @@
                 predictionVariables.NONENO = 1;
             }
 
-            // Relationship with Contact Needle sharing
-            
-            // if (needleSharingContactChecked.length &gt;= 1) {
-            //     predictionVariables.NEEDLE_SHARINGYES = 1;
-            // } else {
-            //     predictionVariables.NEEDLE_SHARINGNO = 1;
-            // }
-
-            // Received Services - prep, pep, tb, sti
-            // received prep
-
-            // if (prepServiceChecked.length &gt;= 1) {
-            //     predictionVariables.ReceivedPrEPYES = 1;
-            // } else {
-            //     predictionVariables.ReceivedPrEPNO = 1;
-            // }
-
-            // received pep
-
-            // if (pepServiceChecked.length &gt;= 1) {
-            //     predictionVariables.ReceivedPEPYES = 1;
-            // } else {
-            //     predictionVariables.ReceivedPEPNO = 1;
-            // }
-
-            // received TB
-            
-            // if (tbServiceChecked.length &gt;= 1) {
-            //     predictionVariables.ReceivedTBYES = 1;
-            // } else {
-            //     predictionVariables.ReceivedTBNO = 1;
-            // }
-
-            // received STI
-            
-            // if (stiServiceChecked.length &gt;= 1) {
-            //     predictionVariables.ReceivedSTIYES = 1;
-            // } else {
-            //     predictionVariables.ReceivedSTINO = 1;
-            // }
-
-            // GBV Sexual
-            
-            // if (GBVSexualChecked.length &gt;= 1) {
-            //     predictionVariables.GBVSexualYES = 1;
-            // } else {
-            //     predictionVariables.GBVSexualNO = 1;
-            // }
-
-            // GBV Physical
-            
-            // if (GBVPhysicalChecked.length &gt;= 1) {
-            //     predictionVariables.GBVPhysicalYES = 1;
-            // } else {
-            //     predictionVariables.GBVPhysicalNO = 1;
-            // }
-
-            // GBV Emotional
-            
-            // if (GBVEmotionalChecked.length &gt;= 1) {
-            //     predictionVariables.GBVEmotionalYES = 1;
-            // } else {
-            //     predictionVariables.GBVEmotionalNO = 1;
-            // }
-
-            // Day of week
-            
-            const currentDate = new Date();
-            let dayOfWeek = currentDate.getDay();
-            // if(dayOfWeek == 0) { // Sunday
-            //     predictionVariables.dayofweekSUNDAY = 1;
-            // } else if(dayOfWeek == 1) { // Monday
-            //     predictionVariables.dayofweekMONDAY = 1;
-            // } else if(dayOfWeek == 2) { // Tuesday
-            //     predictionVariables.dayofweekTUESDAY = 1;
-            // } else if(dayOfWeek == 3) { // Wednesday
-            //     predictionVariables.dayofweekWEDNESDAY = 1;
-            // } else if(dayOfWeek == 4) { // Thursday
-            //     predictionVariables.dayofweekTHURSDAY = 1;
-            // } else if(dayOfWeek == 5) { // Friday
-            //     predictionVariables.dayofweekFRIDAY = 1;
-            // } else if(dayOfWeek == 6) { // Saturday
-            //     predictionVariables.dayofweekSATURDAY = 1;
-            // }
-
             // BEGIN New model may 2024
+
+            // Screened For TB
 
             if(screenedForTb == 1065){ 
                 // YES
@@ -1384,6 +1126,71 @@
             } else if(screenedForTb == 162570) {
                 // DECLINED
                 predictionVariables.ScreenedTBDECLINE = 1;
+            }
+
+            // TB Screening Results
+
+            if(screenedForTb == 1065){
+                if(tbResultsStatus == 1660) {
+                    predictionVariables.TBStatusNO_TBSIGNS = 1;
+                } else if(tbResultsStatus == 1662) {
+                    predictionVariables.TBStatusTBCONFIRMED = 1;
+                } else if(tbResultsStatus == 142177) {
+                    predictionVariables.TBStatusTBPRESUMED = 1;
+                }
+            } else {
+                predictionVariables.TBStatusNR = 1;
+            }
+
+            // Has Fever
+
+            if(screenedForTb == 1065){
+                if(hasFever == 1066) {
+                    predictionVariables.FeverNO = 1;
+                } else if(hasFever == 1494) {
+                    predictionVariables.FeverYES = 1;
+                }
+            } else {
+                predictionVariables.FeverNR = 1;
+            }
+
+            // Has Night Sweats
+
+            if(screenedForTb == 1065){
+                if(hasNightSweats == 1066) {
+                    predictionVariables.NightSweatsNO = 1;
+                } else if(hasNightSweats == 133027) {
+                    predictionVariables.NightSweatsYES = 1;
+                }
+            } else {
+                predictionVariables.NightSweatsNR = 1;
+            }
+
+            // Has Cough
+
+            if(screenedForTb == 1065){
+                if(hasCough == 1066) {
+                    predictionVariables.CoughNO = 1;
+                } else if(hasCough == 159799) {
+                    predictionVariables.CoughYES = 1;
+                }
+            } else {
+                predictionVariables.CoughNR = 1;
+            }
+
+            // Patient Type
+
+            if(patientType == 164163) {
+                predictionVariables.PatientTypeHP = 1;
+            } else if(patientType == 164953) {
+                predictionVariables.PatientTypeNon_HP = 1;
+            }
+
+            // Tested for HIV Before
+            if(testHistory == 1065) {
+                predictionVariables.TestedHIVBeforeYes = 1;
+            } else if(testHistory == 1066) {
+                predictionVariables.TestedHIVBeforeNo = 1;
             }
 
             // END New model may 2024
@@ -1413,10 +1220,6 @@
                     success: function (response, textStatus, jqXHR) {
                         console.log("HTS ML Scoring Response: " + JSON.stringify(response));
                         var probabilityForPositivity = response.result.predictions["probability(Positive)"];
-                        
-                        // var lowRiskThreshold = glbLowRiskThreshold;
-                        // var mediumRiskThreshold = glbMediumRiskThreshold;
-                        // var highRiskThreshold = glbHighRiskThreshold;
 
                         var lowRiskThreshold = response.result.thresholds["Medium"];
                         var mediumRiskThreshold = response.result.thresholds["High"];
