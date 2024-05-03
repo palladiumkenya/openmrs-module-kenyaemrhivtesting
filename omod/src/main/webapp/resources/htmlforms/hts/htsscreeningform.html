@@ -605,10 +605,10 @@
         function hivPrediction() {
             var ctxPath = typeof openmrsContextPath === 'string' ? openmrsContextPath : OPENMRS_CONTEXT_PATH;
             var casefindingURL = "<lookup expression="fn.globalProperty('kenyaemrml.casefinding.endpoint')"/>";
-            var glbLowRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.lowRiskThreshold')"/>";
-            var glbMediumRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.mediumRiskThreshold')"/>";
-            var glbHighRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.highRiskThreshold')"/>";
-            // var latestMaritalStatus = "<lookup expression="fn.latestObs(1054).getValueCoded()"/>";
+            // var glbLowRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.lowRiskThreshold')"/>";
+            // var glbMediumRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.mediumRiskThreshold')"/>";
+            // var glbHighRiskThreshold = "<lookup expression="fn.globalProperty('kenyaemrml.hts.highRiskThreshold')"/>";
+            //// var latestMaritalStatus = "<lookup expression="fn.latestObs(1054).getValueCoded()"/>";
             var latestMaritalStatus = "<lookup expression="fn.latestObs(1054).valueCoded"/>";
             latestMaritalStatus = latestMaritalStatus.replace(/\D/g,'');
             var monthsSinceLastTest = getValue('date-tested.value');
@@ -676,6 +676,12 @@
             var tbServiceChecked = jq("#tb-service input:checkbox:checked");
             var stiServiceChecked = jq("#sti-service input:checkbox:checked");
 
+            // BEGIN New model may 2024
+            var screenedForTb = getValue('screened-tb.value');
+            var everHadSex = getValue('ever-had-sex.value');
+
+            // END New model may 2024
+
             //Validate mandatory fields
             // test strategy (Index/HP)
             // Population type / key population / priority population
@@ -691,10 +697,9 @@
 
             var predictionVariables = {
                 Age: pAge,
-                TbScreeningNo_Signs: 0,
-                TbScreeningNot_Done: 0,
-                TbScreeningOn_TB_Treatment: 0,
-                TbScreeningPresumed_TB: 0,
+                ScreenedTBDECLINE:0,
+	            ScreenedTBNO:0,
+	            ScreenedTBYES:0,
                 HTSStrategyHB: 0,
                 HTSStrategyHP: 0,
                 HTSStrategyINDEX: 0,
@@ -823,6 +828,8 @@
                 predictionVariables.MaritalStatusDIVORCED = 1;
             } else if (latestMaritalStatus == 1059 || latestMaritalStatus == 1057) { // widowed=single
                 predictionVariables.MaritalStatusSINGLE = 1;
+            } else if (latestMaritalStatus == 5622) { // other
+                predictionVariables.MaritalStatusOTHER = 1;
             }
 
             if (pAge &lt; 15) {
@@ -919,6 +926,8 @@
                 predictionVariables.HTSEntryPointTB = 1;
             } else if (htsEntryPoint == 160538) { // ANC
                 predictionVariables.HTSEntryPointPMTCT_ANC = 1;
+            } else if (htsEntryPoint == 161359) { // Home Based
+                predictionVariables.HTSEntryPointHOMEBASED = 1;
             }
 
             // convert department
@@ -1115,20 +1124,28 @@
 
             // unknown status partner
             
-            if (strangerSex == 1065) {
-                predictionVariables.UnknownStatusPartnerYES = 1;
-            } else if (strangerSex == 1066) {
-                predictionVariables.UnknownStatusPartnerNO = 1;
+            if(everHadSex == 1065) {
+                if (strangerSex == 1065) {
+                    predictionVariables.UnknownStatusPartnerYES = 1;
+                } else if (strangerSex == 1066) {
+                    predictionVariables.UnknownStatusPartnerNO = 1;
+                } else if (positiveSex == 162570) {
+                    predictionVariables.UnKnownStatusPartnerDECLINE = 1;
+                } 
             } else {
                 predictionVariables.UnknownStatusPartnerNR = 1;
             }
 
             //known status partner
             
-            if (positiveSex == 1065) {
-                predictionVariables.KnownStatusPartnerYES = 1;
-            } else if (positiveSex == 1066) {
-                predictionVariables.KnownStatusPartnerNO = 1;
+            if(everHadSex == 1065) {
+                if (positiveSex == 163289) {
+                    predictionVariables.KnownStatusPartnerYES = 1;
+                } else if (positiveSex == 1066) {
+                    predictionVariables.KnownStatusPartnerNO = 1;
+                } else if (positiveSex == 162570) {
+                    predictionVariables.KnownStatusPartnerDECLINE = 1;
+                } 
             } else {
                 predictionVariables.KnownStatusPartnerNR = 1;
             }
@@ -1330,9 +1347,24 @@
             //     predictionVariables.dayofweekSATURDAY = 1;
             // }
 
+            // BEGIN New model may 2024
+
+            if(screenedForTb == 1065){ 
+                // YES
+                predictionVariables.ScreenedTBYES = 1;
+            } else if(screenedForTb == 1066) {
+                // NO
+                predictionVariables.ScreenedTBNO = 1;
+            } else if(screenedForTb == 162570) {
+                // DECLINED
+                predictionVariables.ScreenedTBDECLINE = 1;
+            }
+
+            // END New model may 2024
+
             var mlFormattedDate = moment(new Date()).format('YYYY-MM-DD');
             var modelConfigs = {
-                "modelId":"hts_xgb_06032024_march_2024",
+                "modelId":"hts_xgb_03042024_april_2024",
                 "encounterDate":mlFormattedDate,
                 "facilityId":"",
                 "debug": "true"
@@ -1356,9 +1388,13 @@
                         console.log("HTS ML Scoring Response: " + JSON.stringify(response));
                         var probabilityForPositivity = response.result.predictions["probability(Positive)"];
                         
-                        var lowRiskThreshold = glbLowRiskThreshold;
-                        var mediumRiskThreshold = glbMediumRiskThreshold;
-                        var highRiskThreshold = glbHighRiskThreshold;
+                        // var lowRiskThreshold = glbLowRiskThreshold;
+                        // var mediumRiskThreshold = glbMediumRiskThreshold;
+                        // var highRiskThreshold = glbHighRiskThreshold;
+
+                        var lowRiskThreshold = response.result.thresholds["Medium"];
+                        var mediumRiskThreshold = response.result.thresholds["High"];
+                        var highRiskThreshold = response.result.thresholds["Very_High"];
 
                         var highestRiskConcept = 167164;
                         var highRiskConcept = 1408;
@@ -2056,6 +2092,7 @@
                                                 163096,
                                                 159938,
                                                 159939,
+                                                161359,
                                                 5622"
                                 answerLabels="In Patient Department(IPD),
                                             Out Patient Department(OPD),
