@@ -1154,7 +1154,7 @@
 
             //pregnant
             
-            if(pgender == 'F' &amp;&amp; (pAge &gt;= 10 || pAge &lt;= 50) ) {
+            if(pgender == 'F' &amp;&amp; (pAge &gt;= 10 &amp;&amp; pAge &lt;= 50) ) {
                 if (patientPregnant == 1065) {
                     predictionVariables.PregnantYES = 1;
                 } else if (patientPregnant == 1066) {
@@ -1173,7 +1173,7 @@
 
             //breastfeeding
             
-            if(pgender == 'F' &amp;&amp; (pAge &gt;= 10 || pAge &lt;= 50) ) {
+            if(pgender == 'F' &amp;&amp; (pAge &gt;= 10 &amp;&amp; pAge &lt;= 50) ) {
                 if (patientBreastFeeding == 1065) {
                     predictionVariables.BreastfeedingMotherYES = 1;
                 } else if (patientBreastFeeding == 1066) {
