@@ -254,7 +254,7 @@
             var artStartDate = jq('#started-art');
             var upn = jq('#upn-concept');
 
-            if ((val == 1066 &amp;&amp; mothersStatus == 703) || val == 1066 ){
+            if (val == 1066){
                 clearHiddenSections(testDate);
                 clearHiddenSections(testedBy);
                 clearHiddenSections(testResults);
@@ -264,9 +264,14 @@
                 jq('#tr-art-start-date').hide();
                 jq('#positive-client').hide();
                 jq('#positive-client').hide();
-                if(pAge &lt; 10 ) {
-                    jq('#fs-risk-assessment').hide();
-                }
+                if(pAge &lt; 10){
+                    if(mothersStatus == 703){
+                        jq('#fs-risk-assessment').hide();
+                    }
+                    if(mothersStatus == 664){
+                        jq('#fs-risk-assessment').show();
+                   }
+                    }
                 jq('#fs-children-eligibility').hide();
                 jq("#eligible-test input[value=1065]").prop("checked", true);
 
