@@ -1302,80 +1302,96 @@
 
             // TB Screening Results
 
-            if(screenedForTb == 1065){
-                if(tbResultsStatus == 1660) {
-                    predictionVariables.TBStatusNO_TBSIGNS = 1;
-                } else if(tbResultsStatus == 1662) {
-                    predictionVariables.TBStatusTBCONFIRMED = 1;
-                } else if(tbResultsStatus == 142177) {
-                    predictionVariables.TBStatusTBPRESUMED = 1;
+            if((pAge &lt;= 10 &amp;&amp; testHistory == 1065) || pAge &gt; 10) {
+                if(screenedForTb == 1065){
+                    if(tbResultsStatus == 1660) {
+                        predictionVariables.TBStatusNO_TBSIGNS = 1;
+                    } else if(tbResultsStatus == 1662) {
+                        predictionVariables.TBStatusTBCONFIRMED = 1;
+                    } else if(tbResultsStatus == 142177) {
+                        predictionVariables.TBStatusTBPRESUMED = 1;
+                    } else {
+                        predictionVariables.TBStatusNO_TBSIGNS = -10000.0;
+                        predictionVariables.TBStatusTBCONFIRMED = -10000.0;
+                        predictionVariables.TBStatusTBPRESUMED = -10000.0;
+                        predictionVariables.TBStatusNR = -10000.0;
+                    }
+                } else if(screenedForTb == 1066) {
+                    predictionVariables.TBStatusNR = 1;
                 } else {
                     predictionVariables.TBStatusNO_TBSIGNS = -10000.0;
                     predictionVariables.TBStatusTBCONFIRMED = -10000.0;
                     predictionVariables.TBStatusTBPRESUMED = -10000.0;
                     predictionVariables.TBStatusNR = -10000.0;
                 }
-            } else if(screenedForTb == 1066) {
-                predictionVariables.TBStatusNR = 1;
             } else {
-                predictionVariables.TBStatusNO_TBSIGNS = -10000.0;
-                predictionVariables.TBStatusTBCONFIRMED = -10000.0;
-                predictionVariables.TBStatusTBPRESUMED = -10000.0;
-                predictionVariables.TBStatusNR = -10000.0;
+                predictionVariables.TBStatusNR = 1;
             }
 
             // Has Fever
 
-            if(screenedForTb == 1065){
-                if(hasFever == 1066) {
-                    predictionVariables.FeverNO = 1;
-                } else if(hasFever == 1494) {
-                    predictionVariables.FeverYES = 1;
+            if((pAge &lt;= 10 &amp;&amp; testHistory == 1065) || pAge &gt; 10) {
+                if(screenedForTb == 1065){
+                    if(hasFever == 1066) {
+                        predictionVariables.FeverNO = 1;
+                    } else if(hasFever == 1494) {
+                        predictionVariables.FeverYES = 1;
+                    } else {
+                        predictionVariables.FeverNO = -10000.0;
+                        predictionVariables.FeverYES = -10000.0;
+                    }
+                } else if(screenedForTb == 1066) {
+                    predictionVariables.FeverNR = 1;
                 } else {
                     predictionVariables.FeverNO = -10000.0;
                     predictionVariables.FeverYES = -10000.0;
                 }
-            } else if(screenedForTb == 1066) {
-                predictionVariables.FeverNR = 1;
             } else {
-                predictionVariables.FeverNO = -10000.0;
-                predictionVariables.FeverYES = -10000.0;
+                predictionVariables.FeverNR = 1;
             }
 
             // Has Night Sweats
 
-            if(screenedForTb == 1065){
-                if(hasNightSweats == 1066) {
-                    predictionVariables.NightSweatsNO = 1;
-                } else if(hasNightSweats == 133027) {
-                    predictionVariables.NightSweatsYES = 1;
+            if((pAge &lt;= 10 &amp;&amp; testHistory == 1065) || pAge &gt; 10) {
+                if(screenedForTb == 1065){
+                    if(hasNightSweats == 1066) {
+                        predictionVariables.NightSweatsNO = 1;
+                    } else if(hasNightSweats == 133027) {
+                        predictionVariables.NightSweatsYES = 1;
+                    } else {
+                        predictionVariables.NightSweatsNO = -10000.0;
+                        predictionVariables.NightSweatsYES = -10000.0;
+                    }
+                } else if(screenedForTb == 1066) {
+                    predictionVariables.NightSweatsNR = 1;
                 } else {
                     predictionVariables.NightSweatsNO = -10000.0;
                     predictionVariables.NightSweatsYES = -10000.0;
                 }
-            } else if(screenedForTb == 1066) {
-                predictionVariables.NightSweatsNR = 1;
             } else {
-                predictionVariables.NightSweatsNO = -10000.0;
-                predictionVariables.NightSweatsYES = -10000.0;
+                predictionVariables.NightSweatsNR = 1;
             }
 
             // Has Cough
 
-            if(screenedForTb == 1065){
-                if(hasCough == 1066) {
-                    predictionVariables.CoughNO = 1;
-                } else if(hasCough == 159799) {
-                    predictionVariables.CoughYES = 1;
+            if((pAge &lt;= 10 &amp;&amp; testHistory == 1065) || pAge &gt; 10) {
+                if(screenedForTb == 1065){
+                    if(hasCough == 1066) {
+                        predictionVariables.CoughNO = 1;
+                    } else if(hasCough == 159799) {
+                        predictionVariables.CoughYES = 1;
+                    } else {
+                        predictionVariables.CoughNO = -10000.0;
+                        predictionVariables.CoughYES = -10000.0;
+                    }
+                } else if(screenedForTb == 1066) {
+                    predictionVariables.CoughNR = 1;
                 } else {
                     predictionVariables.CoughNO = -10000.0;
                     predictionVariables.CoughYES = -10000.0;
                 }
-            } else if(screenedForTb == 1066) {
-                predictionVariables.CoughNR = 1;
             } else {
-                predictionVariables.CoughNO = -10000.0;
-                predictionVariables.CoughYES = -10000.0;
+                predictionVariables.CoughNR = 1;
             }
 
             // Patient Type
