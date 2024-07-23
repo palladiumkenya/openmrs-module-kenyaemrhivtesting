@@ -25,7 +25,7 @@ public class PatientContactRelationshipDataEvaluator implements PatientContactDa
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, (CASE relationship_type\n" +
+        String qry = "select patient_id, (CASE relationship_type\n" +
                 "\tWHEN 970 THEN  'Mother'\n" +
                 "WHEN 971 THEN  'Father'\n" +
                 "WHEN 972 THEN 'Sibling'\n" +
@@ -35,7 +35,7 @@ public class PatientContactRelationshipDataEvaluator implements PatientContactDa
                 "WHEN 162221 THEN 'Co-wife' \n" +
                 "WHEN 166606 THEN 'SNS' \n" +
                 "ELSE '' END\n" +
-                ") relationship from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
+                ") relationship from kenyaemr_etl.etl_patient_contact c where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

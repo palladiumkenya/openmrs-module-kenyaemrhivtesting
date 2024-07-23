@@ -32,9 +32,8 @@ public class ChildrenContactsWithUndocumentedStatusCohortDefinitionEvaluator imp
 		context = ObjectUtil.nvl(context, new EvaluationContext());
 		PatientContactQueryResult queryResult = new PatientContactQueryResult(definition, context);
 
-		String qry = "select c.id\n" +
-				"from (select pc.id,\n" +
-				"             pc.patient_id,\n" +
+		String qry = "select c.patient_id\n" +
+				"from (select pc.patient_id,\n" +
 				"             pc.patient_related_to,\n" +
 				"             h.patient_id  as hei,\n" +
 				"             pc.baseline_hiv_status,\n" +
@@ -42,7 +41,7 @@ public class ChildrenContactsWithUndocumentedStatusCohortDefinitionEvaluator imp
 				"             pc.date_created,\n" +
 				"             pc.voided,\n" +
 				"             ht.patient_id as tested_contact\n" +
-				"      from kenyaemr_hiv_testing_patient_contact pc\n" +
+				"      from kenyaemr_etl.etl_patient_contact pc\n" +
 				"               inner join patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
 				"               left join (select ht.patient_id,\n" +
 				"                                 mid(max(concat(date(ht.visit_date), ht.final_test_result)), 11) as hiv_status\n" +

@@ -25,11 +25,11 @@ public class ChildrenContactTestedForHIVDataEvaluator implements PatientContactD
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id,\n" +
+        String qry = "select c.patient_id,\n" +
                 "       if((t.patient_id is not null and t.patient_id <> '') or (l.patient_id is not null and l.patient_id <> '') or\n" +
                 "          (c.baseline_hiv_status in ('Positive', 'Negative') and c.baseline_hiv_status is not null),\n" +
                 "          'Yes', 'No') as ever_tested_for_hiv\n" +
-                "from kenyaemr_hiv_testing_patient_contact c\n" +
+                "from kenyaemr_etl.etl_patient_contact c\n" +
                 "         left join (select t.patient_id,\n" +
                 "                           max(t.visit_date)                                             as date_tested,\n" +
                 "                           mid(max(concat(date(t.visit_date), t.final_test_result)), 11) as latest_hts_test_results\n" +

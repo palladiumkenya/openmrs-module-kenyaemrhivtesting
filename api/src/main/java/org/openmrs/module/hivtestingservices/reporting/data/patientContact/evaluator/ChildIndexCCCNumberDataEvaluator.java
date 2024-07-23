@@ -25,8 +25,8 @@ public class ChildIndexCCCNumberDataEvaluator implements PatientContactDataEvalu
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, d.unique_patient_no as ccc_number\n" +
-                "from kenyaemr_hiv_testing_patient_contact c\n" +
+        String qry = "select c.patient_id, d.unique_patient_no as ccc_number\n" +
+                "from kenyaemr_etl.etl_patient_contact c\n" +
                 "         inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id = c.patient_related_to\n" +
                 "where c.voided = 0;\n";
 

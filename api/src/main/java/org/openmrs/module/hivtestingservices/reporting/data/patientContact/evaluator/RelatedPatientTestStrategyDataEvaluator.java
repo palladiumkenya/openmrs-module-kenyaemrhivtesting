@@ -25,7 +25,7 @@ public class RelatedPatientTestStrategyDataEvaluator implements PatientContactDa
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, (case t.test_strategy\n" +
+        String qry = "select c.patient_id, (case t.test_strategy\n" +
                 "                      when 164163 then 'HP: Hospital Patient Testing'\n" +
                 "                      when 164953 then 'NP: HTS for non-patients'\n" +
                 "                      when 164954 then 'VI:Integrated VCT Center'\n" +
@@ -36,7 +36,7 @@ public class RelatedPatientTestStrategyDataEvaluator implements PatientContactDa
                 "                      when 166606 then 'SNS - Social Networks'\n" +
                 "                      when 5622 then 'O:Other'\n" +
                 "                      else '' end ) as testStrategy\n" +
-                "                    from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on t.patient_id=c.patient_related_to where c.voided = 0;";
+                "                    from kenyaemr_etl.etl_patient_contact c inner join kenyaemr_etl.etl_hts_test t on t.patient_id=c.patient_related_to where c.voided = 0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

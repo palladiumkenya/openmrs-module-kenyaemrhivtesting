@@ -25,7 +25,7 @@ public class PatientContactHIVTestResultsDataEvaluator implements PatientContact
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id,\n" +
+        String qry = "select c.patient_id,\n" +
                 "       coalesce(if(t.test_results in ('Positive', 'Negative'), t.test_results, null),\n" +
                 "                if(c.baseline_hiv_status in ('Positive', 'Negative'), c.baseline_hiv_status, null)) as test_results\n" +
                 "from kenyaemr_etl.etl_patient_contact c\n" +

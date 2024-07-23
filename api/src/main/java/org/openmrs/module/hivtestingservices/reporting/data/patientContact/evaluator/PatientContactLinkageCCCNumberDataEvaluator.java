@@ -25,8 +25,8 @@ public class PatientContactLinkageCCCNumberDataEvaluator implements PatientConta
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "SELECT c.id, l.ccc_number as ccc_number from kenyaemr_etl.etl_hts_referral_and_linkage l right join kenyaemr_hiv_testing_patient_contact c on l.patient_id=c.patient_id  \n" +
-                "where l.voided = 0 and c.voided =0 GROUP BY c.id; ";
+        String qry = "SELECT c.patient_id, l.ccc_number as ccc_number from kenyaemr_etl.etl_hts_referral_and_linkage l right join kenyaemr_etl.etl_patient_contact c on l.patient_id=c.patient_id  \n" +
+                "where l.voided = 0 and c.voided =0 GROUP BY c.patient_id; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

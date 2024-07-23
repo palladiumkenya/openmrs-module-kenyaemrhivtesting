@@ -35,7 +35,7 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 		String qry = "select t.contact_id\n" +
 				"from (select fup.visit_date,\n" +
 				"             fup.patient_id,\n" +
-				"             c.id                                                                   as contact_id,\n" +
+				"             c.patient_id                                                                   as contact_id,\n" +
 				"             max(e.visit_date)                                                      as enroll_date,\n" +
 				"             greatest(max(fup.visit_date), ifnull(max(d.visit_date), '0000-00-00')) as latest_vis_date,\n" +
 				"             greatest(mid(max(concat(fup.visit_date, fup.next_appointment_date)), 11),\n" +
@@ -44,7 +44,7 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 				"             d.effective_disc_date                                                  as effective_disc_date,\n" +
 				"             max(d.visit_date)                                                      as date_discontinued,\n" +
 				"             de.patient_id                                                          as started_on_drugs\n" +
-				"      from kenyaemr_hiv_testing_patient_contact c\n" +
+				"      from kenyaemr_etl.etl_patient_contact c\n" +
 				"               join kenyaemr_etl.etl_patient_hiv_followup fup on fup.patient_id = c.patient_related_to\n" +
 				"               join kenyaemr_etl.etl_patient_demographics p on p.patient_id = fup.patient_id\n" +
 				"               join kenyaemr_etl.etl_hiv_enrollment e on fup.patient_id = e.patient_id\n" +
@@ -66,7 +66,7 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 				"        and c.relationship_type = 1528\n" +
 				"        and c.voided = 0\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
-				"      group by c.id\n" +
+				"      group by c.patient_id\n" +
 				"      having (started_on_drugs is not null and started_on_drugs <> '')\n" +
 				"         and (\n" +
 				"          (\n" +

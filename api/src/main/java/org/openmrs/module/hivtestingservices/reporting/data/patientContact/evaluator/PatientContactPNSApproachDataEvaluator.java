@@ -25,7 +25,7 @@ public class PatientContactPNSApproachDataEvaluator implements PatientContactDat
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, case c.pns_approach when 162284 then 'D' when 160551 then 'Con' when 161642 then 'Cr' when 163096 then 'Pr' end as preferred_pns_approach from kenyaemr_hiv_testing_patient_contact c where c.voided=0;";
+        String qry = "select c.patient_id, case c.pns_approach when 162284 then 'D' when 160551 then 'Con' when 161642 then 'Cr' when 163096 then 'Pr' end as preferred_pns_approach from kenyaemr_etl.etl_patient_contact c where c.voided=0;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
