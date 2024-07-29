@@ -214,7 +214,6 @@ public class HTSContactListingFormProcessor {
         relationshipList.put(conceptService.getConcept(157351), 9); // Injectable drug user
         relationshipList.put(conceptService.getConcept(166606), 12); // SNS
 
-        
 
         return relationshipList.get(key);
     }

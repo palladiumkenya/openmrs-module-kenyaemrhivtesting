@@ -41,7 +41,7 @@ public class PNSContactsWithUndocumentedStatusCohortDefinitionEvaluator implemen
 				" group by ht.patient_id\n" +
 				" having hiv_status in ('Negative', 'Positive'))\n" +
 				"ht on ht.patient_id = pc.patient_id\n" +
-				"             where (pc.baseline_hiv_status is null or pc.baseline_hiv_status in ('Unknown','1067')) and pc.relationship_type in (162221,163565,5617) and date(pc.date_created) <= date(:endDate)\n" +
+				"             where (pc.baseline_hiv_status is null or pc.baseline_hiv_status in ('Unknown','1067')) and pc.relationship_type in (6, 7, 8) and date(pc.date_created) <= date(:endDate)\n" +
 				"               and pc.voided = 0 and ht.patient_id is null;";
 
 		SqlQueryBuilder builder = new SqlQueryBuilder();

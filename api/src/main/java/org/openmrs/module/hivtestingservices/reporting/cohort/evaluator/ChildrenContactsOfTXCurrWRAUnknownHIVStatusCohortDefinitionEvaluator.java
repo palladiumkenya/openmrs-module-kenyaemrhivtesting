@@ -69,7 +69,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"        and timestampdiff(YEAR, date(p.dob), date(:endDate)) between 15 and 49\n" +
 				"        and (\n" +
 				"                  timestampdiff(YEAR, date(c.birth_date), date(:endDate)) < 15\n" +
-				"              and relationship_type = 1528 and\n" +
+				"              and relationship_type = 3 and\n" +
 				"                  (c.baseline_hiv_status not in ('Positive', 'Negative') or c.baseline_hiv_status is null) and\n" +
 				"                  (t.latest_hts_test_status not in ('Positive', 'Negative') or t.latest_hts_test_status is null))\n" +
 				"          and date(c.date_created) <= date(:endDate) and c.voided = 0\n" +

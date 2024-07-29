@@ -63,7 +63,7 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 				"        and timestampdiff(YEAR, date(p.dob), date(:endDate)) between 15 and 49\n" +
 				"        and timestampdiff(YEAR, date(c.birth_date), date(:endDate)) < 15\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
-				"        and c.relationship_type = 1528\n" +
+				"        and c.relationship_type = 3\n" +
 				"        and c.voided = 0\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
 				"      group by c.patient_id\n" +

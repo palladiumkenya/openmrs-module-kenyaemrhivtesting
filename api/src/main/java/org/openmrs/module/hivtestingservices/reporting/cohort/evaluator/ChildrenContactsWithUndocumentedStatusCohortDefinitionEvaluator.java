@@ -58,7 +58,7 @@ public class ChildrenContactsWithUndocumentedStatusCohortDefinitionEvaluator imp
 				"  date(c.date_created) <= date(:endDate)\n" +
 				"  and c.hei is null\n" +
 				"  and (c.baseline_hiv_status is null or c.baseline_hiv_status in ('Unknown','1067'))\n" +
-				"  and c.relationship_type = 1528\n" +
+				"  and c.relationship_type = 3\n" +
 				"  and c.voided = 0\n" +
 				"  and c.tested_contact is null;";
 
