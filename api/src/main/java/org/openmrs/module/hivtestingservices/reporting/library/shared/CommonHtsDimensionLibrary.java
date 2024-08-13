@@ -127,14 +127,14 @@ public class CommonHtsDimensionLibrary {
 		CohortDefinitionDimension dim = new CohortDefinitionDimension();
 		dim.setName("fine age between(<1, btw 1 and 9, btw 10 and 14, btw 15 and 19, btw 20 and 24, 25 to 29, btw 25 and 49, 50+");
 		dim.addParameter(new Parameter("onDate", "Date", Date.class));
-		dim.addCohortDefinition("<1", map(commonCohortLibrary.contactAgedAtMost(0), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("1-9", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(1, 9), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("10-14", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(10, 14), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("15-19", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(15, 19), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("20-24", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(20, 24), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("25-29", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(25, 29), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("30-49", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(30, 49), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("50+", map(commonCohortLibrary.contactAgedAtLeast(50), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("<1", map(commonCohortLibrary.agedAtMost(0), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("1-9", map(commonCohortLibrary.agedAtLeastAgedAtMost(1, 9), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("10-14", map(commonCohortLibrary.agedAtLeastAgedAtMost(10, 14), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("15-19", map(commonCohortLibrary.agedAtLeastAgedAtMost(15, 19), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("20-24", map(commonCohortLibrary.agedAtLeastAgedAtMost(20, 24), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("25-29", map(commonCohortLibrary.agedAtLeastAgedAtMost(25, 29), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("30-49", map(commonCohortLibrary.agedAtLeastAgedAtMost(30, 49), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("50+", map(commonCohortLibrary.agedAtLeast(50), "effectiveDate=${onDate}"));
 
 		return dim;
 	}
@@ -143,9 +143,9 @@ public class CommonHtsDimensionLibrary {
 		CohortDefinitionDimension dim = new CohortDefinitionDimension();
 		dim.setName("fine age <=14 Yrs, 15-19 Yrs, >=20 Yrs");
 		dim.addParameter(new Parameter("onDate", "Date", Date.class));
-		dim.addCohortDefinition("0-14", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(0, 14), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("15-19", map(commonCohortLibrary.contactAgedAtLeastAgedAtMost(15, 19), "effectiveDate=${onDate}"));
-		dim.addCohortDefinition("20+", map(commonCohortLibrary.contactAgedAtLeast(20), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("0-14", map(commonCohortLibrary.agedAtLeastAgedAtMost(0, 14), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("15-19", map(commonCohortLibrary.agedAtLeastAgedAtMost(15, 19), "effectiveDate=${onDate}"));
+		dim.addCohortDefinition("20+", map(commonCohortLibrary.agedAtLeast(20), "effectiveDate=${onDate}"));
 
 		return dim;
 	}

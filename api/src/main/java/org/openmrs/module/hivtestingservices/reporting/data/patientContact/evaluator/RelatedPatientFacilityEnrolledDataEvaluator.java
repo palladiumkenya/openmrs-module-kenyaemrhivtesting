@@ -25,8 +25,8 @@ public class RelatedPatientFacilityEnrolledDataEvaluator implements PatientConta
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, l.facility_linked_to  as facilityRelatedPatientIsEnrolled\n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_related_to where c.voided = 0; ";
+        String qry = "select c.patient_id, l.facility_linked_to  as facilityRelatedPatientIsEnrolled\n" +
+                "from kenyaemr_etl.etl_patient_contact c inner join kenyaemr_etl.etl_hts_referral_and_linkage l on l.patient_id=c.patient_related_to where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

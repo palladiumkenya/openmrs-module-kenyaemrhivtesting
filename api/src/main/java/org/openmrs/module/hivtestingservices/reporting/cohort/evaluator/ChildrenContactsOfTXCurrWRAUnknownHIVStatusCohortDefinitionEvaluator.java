@@ -35,7 +35,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 		String qry = "select t.contact_id\n" +
 				"from (select fup.visit_date,\n" +
 				"             fup.patient_id,\n" +
-				"             c.id                                                                   as contact_id,\n" +
+				"             c.patient_id                                                                   as contact_id,\n" +
 				"             max(e.visit_date)                                                      as enroll_date,\n" +
 				"             greatest(max(fup.visit_date), ifnull(max(d.visit_date), '0000-00-00')) as latest_vis_date,\n" +
 				"             greatest(mid(max(concat(fup.visit_date, fup.next_appointment_date)), 11),\n" +
@@ -69,11 +69,11 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"        and timestampdiff(YEAR, date(p.dob), date(:endDate)) between 15 and 49\n" +
 				"        and (\n" +
 				"                  timestampdiff(YEAR, date(c.birth_date), date(:endDate)) < 15\n" +
-				"              and relationship_type = 1528 and\n" +
+				"              and relationship_type = 3 and\n" +
 				"                  (c.baseline_hiv_status not in ('Positive', 'Negative') or c.baseline_hiv_status is null) and\n" +
 				"                  (t.latest_hts_test_status not in ('Positive', 'Negative') or t.latest_hts_test_status is null))\n" +
 				"          and date(c.date_created) <= date(:endDate) and c.voided = 0\n" +
-				"      group by c.id\n" +
+				"      group by c.patient_id\n" +
 				"      having (started_on_drugs is not null and started_on_drugs <> '')\n" +
 				"         and (\n" +
 				"          (\n" +

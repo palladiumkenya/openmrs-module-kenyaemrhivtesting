@@ -25,7 +25,7 @@ public class PatientContactBaselineHivStatusDataEvaluator implements PatientCont
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, baseline_hiv_status as baseline_hiv_status from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
+        String qry = "select c.patient_id, baseline_hiv_status from kenyaemr_etl.etl_patient_contact c where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

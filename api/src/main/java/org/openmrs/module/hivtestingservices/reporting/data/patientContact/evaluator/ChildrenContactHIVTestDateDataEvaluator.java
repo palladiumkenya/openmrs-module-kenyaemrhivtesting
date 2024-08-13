@@ -25,14 +25,14 @@ public class ChildrenContactHIVTestDateDataEvaluator implements PatientContactDa
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id,\n" +
+        String qry = "select c.patient_id,\n" +
                 "       greatest(ifnull(left(max(concat(t.date_tested, t.latest_hts_test_results)), 10), ''),\n" +
                 "                ifnull(left(max(concat(l.lab_date, l.latest_lab_test_results)), 10), ''),\n" +
                 "                ifnull(left(max(concat(\n" +
                 "                        date(cast(c.reported_test_date AS CHAR CHARACTER SET utf8) COLLATE utf8_unicode_ci),\n" +
                 "                        cast(c.baseline_hiv_status AS CHAR CHARACTER SET utf8) COLLATE utf8_unicode_ci)), 10),\n" +
                 "                       '')) as latest_date\n" +
-                "from kenyaemr_hiv_testing_patient_contact c\n" +
+                "from kenyaemr_etl.etl_patient_contact c\n" +
                 "         left join (select t.patient_id,\n" +
                 "                           max(t.visit_date)                                             as date_tested,\n" +
                 "                           mid(max(concat(date(t.visit_date), t.final_test_result)), 11) as latest_hts_test_results\n" +
@@ -47,7 +47,7 @@ public class ChildrenContactHIVTestDateDataEvaluator implements PatientContactDa
                 "                      and l.lab_test in (1030, 163722)\n" +
                 "                    group by l.patient_id) l on c.patient_id = l.patient_id\n" +
                 "where date(c.date_created) <= date(:endDate) and c.voided = 0\n" +
-                "group by c.id;";
+                "group by c.patient_id;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

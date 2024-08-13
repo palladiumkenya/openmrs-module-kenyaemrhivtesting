@@ -25,7 +25,7 @@ public class PatientContactLinkedCCCNoDataEvaluator implements PatientContactDat
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id,\n" +
+        String qry = "select c.patient_id,\n" +
                 "       if(coalesce(t.test_results,\n" +
                 "                   c.baseline_hiv_status) = 'Positive', coalesce(l.ccc_number, r.unique_patient_no), null) as ccc_number\n" +
                 "from kenyaemr_etl.etl_patient_contact c\n" +
@@ -33,7 +33,7 @@ public class PatientContactLinkedCCCNoDataEvaluator implements PatientContactDat
                 "                           mid(max(concat(date(r.date_created), r.unique_patient_no)), 11) as unique_patient_no\n" +
                 "                    from kenyaemr_etl.etl_client_trace r\n" +
                 "                    where DATE(r.date_created) <= date(CURRENT_DATE)\n" +
-                "                    group by r.client_id) r on c.id = r.client_id\n" +
+                "                    group by r.client_id) r on c.patient_id = r.client_id\n" +
                 "         left join (select t.patient_id,\n" +
                 "                           max(date(t.visit_date))                                       as date_tested,\n" +
                 "                           mid(max(concat(date(t.visit_date), t.final_test_result)), 11) as test_results\n" +

@@ -25,7 +25,7 @@ public class PatientContactDateTestedForHIVDataEvaluator implements PatientConta
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id,\n" +
+        String qry = "select c.patient_id,\n" +
                 "       coalesce(if(t.test_results in ('Positive', 'Negative'), t.date_tested, null),\n" +
                 "                if(c.baseline_hiv_status in ('Positive', 'Negative'), c.reported_test_date, null)) as date_tested\n" +
                 "from kenyaemr_etl.etl_patient_contact c\n" +

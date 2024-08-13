@@ -33,8 +33,8 @@ public class PatientContactListCohortDefinitionEvaluator implements PatientConta
 		PatientContactQueryResult queryResult = new PatientContactQueryResult(definition, context);
 
 
-		String qry = "SELECT c.id\n" +
-				"from kenyaemr_hiv_testing_patient_contact c\n" +
+		String qry = "SELECT c.patient_id\n" +
+				"from kenyaemr_etl.etl_patient_contact c\n" +
 				"         inner join kenyaemr_etl.etl_hts_test t on c.patient_related_to = t.patient_id\n" +
 				"where date(c.date_created) between date(:startDate) and date(:endDate)\n" +
 				"  and t.voided = 0\n" +

@@ -25,9 +25,9 @@ public class PatientContactConsentedTestingDataEvaluator implements PatientConta
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, case mid(max(concat(t.visit_date,t.patient_consented)),11) when 'Yes' then 'Y' when 'No' then 'N' end as consented_testing from kenyaemr_etl.etl_patient_contact c\n" +
+        String qry = "select c.patient_id, case mid(max(concat(t.visit_date,t.patient_consented)),11) when 'Yes' then 'Y' when 'No' then 'N' end as consented_testing from kenyaemr_etl.etl_patient_contact c\n" +
                 "inner join kenyaemr_etl.etl_hts_test t on c.patient_id = t.patient_id where c.voided=0\n" +
-                "group by c.id;";
+                "group by c.patient_id;";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

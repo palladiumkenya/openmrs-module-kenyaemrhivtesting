@@ -25,8 +25,8 @@ public class RelatedPatientNameDataEvaluator implements PatientContactDataEvalua
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, concat_ws(' ', d.given_name, d.family_name, d.middle_name) as patientName \n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=c.patient_related_to where c.voided = 0; ";
+        String qry = "select c.patient_id, concat_ws(' ', d.given_name, d.family_name, d.middle_name) as patientName \n" +
+                "from kenyaemr_etl.etl_patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=c.patient_related_to where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

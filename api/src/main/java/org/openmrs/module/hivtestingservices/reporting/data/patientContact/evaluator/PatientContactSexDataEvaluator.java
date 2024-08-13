@@ -25,7 +25,7 @@ public class PatientContactSexDataEvaluator implements PatientContactDataEvaluat
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, c.sex as sex from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
+        String qry = "select c.patient_id, d.gender from kenyaemr_etl.etl_patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id = c.patient_id where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

@@ -277,7 +277,7 @@ public class HTSIndexTestingRegisterReportBuilder extends AbstractReportBuilder 
         cohortDsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDsd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDsd.addDimension("age", ReportUtils.map(commonDimensions.pnsReportAgeGroups(), "onDate=${endDate}"));
-        cohortDsd.addDimension("gender", ReportUtils.map(commonDimensions.contactGender()));
+        cohortDsd.addDimension("gender", ReportUtils.map(commonDimensions.gender()));
 
 
         ColumnParameters colInfants = new ColumnParameters(null, "<1", "age=<1");

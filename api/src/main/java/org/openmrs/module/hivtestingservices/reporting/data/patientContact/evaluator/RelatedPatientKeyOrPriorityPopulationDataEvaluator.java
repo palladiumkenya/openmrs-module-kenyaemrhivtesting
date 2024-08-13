@@ -24,8 +24,8 @@ public class RelatedPatientKeyOrPriorityPopulationDataEvaluator implements Patie
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select c.id, if(t.population_type='Key Population', 'Y', 'N') as isKeyPop\n" +
-                "from kenyaemr_hiv_testing_patient_contact c inner join kenyaemr_etl.etl_hts_test t on t.patient_id=c.patient_related_to where c.voided = 0; ";
+        String qry = "select c.patient_id, if(t.population_type='Key Population', 'Y', 'N') as isKeyPop\n" +
+                "from kenyaemr_etl.etl_patient_contact c inner join kenyaemr_etl.etl_hts_test t on t.patient_id=c.patient_related_to where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);

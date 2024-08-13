@@ -25,7 +25,7 @@ public class RelatedPatientIdDataEvaluator implements PatientContactDataEvaluato
     public EvaluatedPatientContactData evaluate(PatientContactDataDefinition definition, EvaluationContext context) throws EvaluationException {
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
-        String qry = "select id, patient_related_to as patientId from kenyaemr_hiv_testing_patient_contact c where c.voided = 0; ";
+        String qry = "select c.patient_id, patient_related_to as patientId from kenyaemr_etl.etl_patient_contact c where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
