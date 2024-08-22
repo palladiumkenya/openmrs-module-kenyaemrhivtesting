@@ -26,7 +26,7 @@ public class RelatedPatientPhoneContactDataEvaluator implements PatientContactDa
         EvaluatedPatientContactData c = new EvaluatedPatientContactData(definition, context);
 
         String qry = "select c.patient_id, d.phone_number as phone_number \n" +
-                "from kenyaemr_etl._patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=c.patient_related_to where c.voided = 0; ";
+                "from kenyaemr_etl.etl_patient_contact c inner join kenyaemr_etl.etl_patient_demographics d on d.patient_id=c.patient_related_to where c.voided = 0; ";
 
         SqlQueryBuilder queryBuilder = new SqlQueryBuilder();
         queryBuilder.append(qry);
