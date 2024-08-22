@@ -59,7 +59,7 @@ jobs:
           mvn license:format
           sudo mvn clean install -DskipTests
           sudo rm -rf /var/lib/OpenMRS/modules/hivtestingservices-*.omod
-          sudo cp /apps/github-workflows/kenyaemr-modules/openmrs-module-kenyaemrhivtesting/omod/target/hivtestingservices-*.omod /var/lib/OpenMRS/modules/
+          sudo cp /apps/githubworkflows/kenyaemr-modules/openmrs-module-kenyaemrhivtesting/omod/target/hivtestingservices-*.omod /var/lib/OpenMRS/modules/
           sudo chown -R tomcat:tomcat /var/lib/OpenMRS/modules/
           sudo chmod +r /var/lib/OpenMRS/modules/*.omod
           sudo chmod 755 /var/lib/OpenMRS/modules/*.omod
