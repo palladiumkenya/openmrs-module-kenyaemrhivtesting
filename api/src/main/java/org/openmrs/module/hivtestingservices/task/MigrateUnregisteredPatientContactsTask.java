@@ -1,7 +1,5 @@
-package org.openmrs.module.hivtestingservices.chore;
+package org.openmrs.module.hivtestingservices.task;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.*;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
@@ -12,21 +10,18 @@ import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.wrapper.PatientWrapper;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.openmrs.module.kenyacore.chore.AbstractChore;
 import org.openmrs.module.kenyaemr.metadata.CommonMetadata;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.scheduler.tasks.AbstractTask;
 import org.openmrs.util.PrivilegeConstants;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-@Component("hivtestingservices.chore.MigrateUnregisteredPatientContactsChore")
-public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
-    private static final Log LOGGER = LogFactory.getLog(MigrateUnregisteredPatientContactsChore.class);
+public class MigrateUnregisteredPatientContactsTask extends AbstractTask {
+    private static final Logger log = LoggerFactory.getLogger(MigrateUnregisteredPatientContactsTask.class);
+
     private static final String UNKNOWN = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     private static final List<String> CONCEPTS_FOR_OBS = Arrays.asList(
             "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // CIVIL_STATUS
@@ -41,44 +36,34 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
     private final ObsService obsService;
     private final ConceptService conceptService;
 
-    public MigrateUnregisteredPatientContactsChore() {
+    public MigrateUnregisteredPatientContactsTask() {
         htsService = Context.getService(HTSService.class);
         obsService = Context.getObsService();
         conceptService = Context.getConceptService();
     }
 
-    /**
-     * @see AbstractChore#perform(PrintWriter)
-     */
     @Override
-    public void perform(PrintWriter printWriter) throws APIException {
-        LOGGER.info("Scheduling migration of unregistered contacts chore...");
-
-        // Create an ExecutorService to manage the thread
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        // Define a Runnable implementation
-        Runnable migrationTask = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    savePatientInfo();
-                } catch (Exception e) {
-                    LOGGER.error("Error during migration task", e);
+    public void execute() throws APIException {
+        if (!isExecuting) {
+            try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Starting Contact migration Task...");
                 }
+                log.info("Started Migrating unregistered contacts");
+                startExecuting();
+                save();
+            } catch (Exception e) {
+                log.error("Error occurred during migration", e);
+                throw new APIException("Error occurred during migration", e);
+            } finally {
+                stopExecuting();
             }
-        };
-
-        // Submit the Runnable to the ExecutorService
-        executor.submit(migrationTask);
-
-        // Properly shut down the executor when it's no longer needed
-        executor.shutdown();
-
-        LOGGER.info("Migration chore scheduled...");
+        } else {
+            log.warn("Migration task is already executing.");
+        }
     }
 
-    private void savePatientInfo() {
+    private void save() {
         List<PatientContact> patientContacts = getPatientContactsToMigrate();
         if (patientContacts.isEmpty()) {
             return;
@@ -100,10 +85,9 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
         if (patientContacts == null) {
             return Collections.emptyList();
         }
-        for (Iterator<PatientContact> iterator = patientContacts.iterator(); iterator.hasNext(); ) {
-            PatientContact patientContact = iterator.next();
+        for (PatientContact patientContact : patientContacts) {
             if (patientContact.getPatient() == null && !patientContact.getVoided()) {
-                iterator.remove();
+                patientContacts.remove(patientContact);
             }
         }
         return patientContacts;
@@ -132,18 +116,13 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
                 createPersonAttribute(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_REGISTRATION_SOURCE, "1065"),
                 createPersonAttribute(CommonMetadata._PersonAttributeType.NEAREST_HEALTH_CENTER, "Unknown")
         ));
-        // Format birthdate if it's not null
-        String formattedBirthdate = null;
-        if (pc.getBirthDate() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            formattedBirthdate = sdf.format(pc.getBirthDate());
-        }
-        person.setBirthdate(formattedBirthdate != null ? new Date(formattedBirthdate) : null);
+
+        person.setBirthdate(pc.getBirthDate());
         person.setGender(pc.getSex());
         person.addAddress(address);
         person.setAttributes(personAttributes);
         person.addName(name);
-System.out.println("---------------------Perosn: "+ person.getFamilyName());
+
         return person;
     }
 

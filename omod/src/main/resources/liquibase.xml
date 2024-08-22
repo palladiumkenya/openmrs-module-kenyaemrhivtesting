@@ -379,9 +379,34 @@
         </addColumn>
     </changeSet>
 
-    <changeSet author="schege" id="kenyaemr_hiv_testing_021">
-        <delete tableName="scheduler_task_config">
-            <where>schedulable_class='org.openmrs.module.hivtestingservices.task.UnregisteredContactsOneTimeMigrationTask'</where>
-        </delete>
-    </changeSet>
+    <!--Adding scheduled task to process migration of unregistered patient contacts-->
+   <!-- <changeSet id="kenyaemr_hiv_testing_021" author="schege">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.MigrateUnregisteredPatientContactsTask'
+                  And name = 'HTS unregistered Contacts migration'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting unregistered Contacts migration Task into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="HTS unregistered Contacts migration" />
+            <column name="description" value="Migrates patient contacts not yet registered as patients" />
+            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.MigrateUnregisteredPatientContactsTask" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="2024-08-21T23:59:59" />
+            <column name="repeat_interval" value="120" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="start_on_startup" value="0" />
+            <column name="started" value="1" />
+            <column name="uuid" value="41bc14d5-00a3-450f-858b-bb5e944d540e" />
+        </insert>
+
+    </changeSet>-->
+      <!-- <changeSet author="schege" id="kenyaemr_hiv_testing_022">
+            <delete tableName="scheduler_task_config">
+                <where>schedulable_class='org.openmrs.module.hivtestingservices.task.MigrateUnregisteredPatientContactsTask'</where>
+            </delete>
+        </changeSet>-->
 </databaseChangeLog>
