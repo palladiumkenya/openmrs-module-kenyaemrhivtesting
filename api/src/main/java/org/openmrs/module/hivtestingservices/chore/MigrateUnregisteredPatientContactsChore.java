@@ -53,6 +53,7 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
     @Override
     public void perform(PrintWriter printWriter) throws APIException {
         LOGGER.info("Scheduling migration of unregistered contacts chore...");
+        System.out.println("-------Scheduling migration of unregistered contacts chore...");
 
         // Create an ExecutorService to manage the thread
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -65,6 +66,7 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
                     savePatientInfo();
                 } catch (Exception e) {
                     LOGGER.error("Error during migration task", e);
+                    e.printStackTrace();
                 }
             }
         };
@@ -76,6 +78,7 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
         executor.shutdown();
 
         LOGGER.info("Migration chore scheduled...");
+        System.out.println("----------------------Migration chore scheduled...");
     }
 
     private void savePatientInfo() {
@@ -86,7 +89,7 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
 
         Set<Patient> contactPatients = new HashSet<>();
         for (PatientContact pc : patientContacts) {
-            Patient patient = (Patient) getPerson(pc);
+            Patient patient = (Patient) composePerson(pc);
             contactPatients.add(patient);
         }
 
@@ -109,7 +112,7 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
         return patientContacts;
     }
 
-    private Person getPerson(PatientContact pc) {
+    private Person composePerson(PatientContact pc) {
         Person person = new Person();
         PersonName name = new PersonName(
                 defaultIfEmpty(pc.getLastName(), "Unknown"),
@@ -143,7 +146,7 @@ public class MigrateUnregisteredPatientContactsChore extends AbstractChore {
         person.addAddress(address);
         person.setAttributes(personAttributes);
         person.addName(name);
-System.out.println("---------------------Perosn: "+ person.getFamilyName());
+        System.out.println("---------------------Person: "+ person.getFamilyName());
         return person;
     }
 
@@ -155,7 +158,7 @@ System.out.println("---------------------Perosn: "+ person.getFamilyName());
         ensurePatientIdentifier(toSave, openmrsIdType);
 
         Patient savedPatient = Context.getPatientService().savePatient(toSave);
-        savePatientIdentifiers(toSave);
+        savePatientIdentifiers(savedPatient);
         saveObservations(savedPatient);
 
         for (PatientContact contact : patientContacts) {
@@ -201,8 +204,8 @@ System.out.println("---------------------Perosn: "+ person.getFamilyName());
 
         Relationship relationship = new Relationship();
         relationship.setRelationshipType(type);
-        relationship.setPersonA(contact);
-        relationship.setPersonB(patient);
+        relationship.setPersonA(patient);
+        relationship.setPersonB(contact);
 
         personService.saveRelationship(relationship);
     }
