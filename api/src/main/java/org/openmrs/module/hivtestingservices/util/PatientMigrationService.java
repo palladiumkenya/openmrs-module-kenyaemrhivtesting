@@ -1,14 +1,14 @@
 package org.openmrs.module.hivtestingservices.util;
 
 import org.openmrs.*;
-import org.openmrs.api.*;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.ObsService;
+import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
-import org.openmrs.module.hivtestingservices.util.PersonComposer;
 import org.openmrs.module.hivtestingservices.wrapper.PatientWrapper;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,10 +18,10 @@ import static org.openmrs.util.LocationUtility.getDefaultLocation;
 @Service
 public class PatientMigrationService {
 
-	@Autowired
-	private ConceptService conceptService;
-	@Autowired
-	private ObsService obsService;
+	private static final ConceptService conceptService = Context.getConceptService();
+
+	private static final ObsService obsService = Context.getObsService();
+
 	private static final String UNKNOWN = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 	private static final List<String> CONCEPTS_FOR_OBS = Arrays.asList(
 			"1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // CIVIL_STATUS
@@ -45,8 +45,9 @@ public class PatientMigrationService {
 
 		try {
 			// Attempt to save the patient
+			System.out.println("---------Attempting to sav ethe patient: " + toSave);
 			Patient savedPatient = Context.getPatientService().savePatient(toSave);
-
+			System.out.println(" --------We succeeded saving patient with ID: " + savedPatient.getPatientId());
 			// If successful, save the patient identifiers
 			savePatientIdentifiers(savedPatient);
 
@@ -59,7 +60,7 @@ public class PatientMigrationService {
 
 		} catch (Exception e) {
 			// Handle the exception if saving the patient fails
-			throw new RuntimeException("Failed to save patient data: " + e.getMessage(), e);
+			throw new RuntimeException("---Failed to save patient data: " + e.getMessage(), e);
 		}
 	}
 		private void ensurePatientIdentifier(Patient toSave, PatientIdentifierType idType) {

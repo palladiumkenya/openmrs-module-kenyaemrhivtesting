@@ -1,6 +1,7 @@
 package org.openmrs.module.hivtestingservices.util;
 
 import org.openmrs.Patient;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,23 +12,16 @@ import java.util.*;
 @Service
 public class PatientContactMigrationService {
 
-	@Autowired
-	private PatientMigrationService patientMigrationService;
+	PatientMigrationService patientMigrationService = Context.getService(PatientMigrationService.class);
 
-	@Autowired
-	private HTSService htsService;
+	HTSService htsService = Context.getService(HTSService.class);
 
 	public List<PatientContact> getPatientContactsToMigrate() {
 		List<PatientContact> patientContacts = htsService.getPatientContacts();
 		if (patientContacts == null) {
 			return Collections.emptyList();
 		}
-		for (Iterator<PatientContact> iterator = patientContacts.iterator(); iterator.hasNext(); ) {
-			PatientContact patientContact = iterator.next();
-			if (patientContact.getPatient() == null && !patientContact.getVoided()) {
-				iterator.remove();
-			}
-		}
+        patientContacts.removeIf(patientContact -> patientContact.getPatient() != null || patientContact.getVoided());
 		return patientContacts;
 	}
 

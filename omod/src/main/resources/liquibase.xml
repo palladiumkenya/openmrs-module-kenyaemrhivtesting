@@ -406,21 +406,21 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM scheduler_task_config
-                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.TestTaskOne'
-                  And name = 'Contacts migration Task one'
+                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.PatientContactMigrationTask'
+                  And name = 'Unregistered Patient Contacts migration Task'
             </sqlCheck>
         </preConditions>
         <comment>Inserting unregistered Contacts migration Task into 'schedule_task_config' table</comment>
         <insert tableName="scheduler_task_config">
-            <column name="name" value="Contacts migration Task one" />
+            <column name="name" value="Unregistered Patient Contacts migration Task" />
             <column name="description" value="Migrates patient contacts not yet registered as patients" />
-            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.TestTaskOne" />
+            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.PatientContactMigrationTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2024-08-21T23:59:59" />
-            <column name="repeat_interval" value="1800" />
+            <column name="repeat_interval" value="120" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
-            <column name="start_on_startup" value="1" />
+            <column name="start_on_startup" value="0" />
             <column name="started" value="0" />
             <column name="uuid" value="2f1ca53d-dfca-49b2-813d-85e39238b5f6" />
         </insert>
@@ -428,7 +428,7 @@
     </changeSet>
 <!--       <changeSet author="schege" id="kenyaemr_hiv_testing_026">
             <delete tableName="scheduler_task_config">
-                <where>schedulable_class='org.openmrs.module.hivtestingservices.task.TestTaskOne'</where>
+                <where>schedulable_class='org.openmrs.module.hivtestingservices.task.PatientContactMigrationTask'</where>
             </delete>
         </changeSet>-->
 </databaseChangeLog>

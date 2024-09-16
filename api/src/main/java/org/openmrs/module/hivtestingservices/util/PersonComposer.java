@@ -44,8 +44,8 @@ import java.util.*;
 			person.setBirthdate(formattedBirthdate != null ? new Date(formattedBirthdate) : null);
 			person.setGender(pc.getSex());
 			person.addName(name);
-			/*person.addAddress(address);
-			person.setAttributes(personAttributes);*/
+			person.addAddress(address);
+			person.setAttributes(personAttributes);
 			System.out.println("---------------------Person: "+ person.getFamilyName());
 			return person;
 		}
