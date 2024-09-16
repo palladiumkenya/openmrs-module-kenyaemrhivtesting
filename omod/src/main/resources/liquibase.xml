@@ -237,7 +237,29 @@
             <column name="uuid" value="8241376e-4954-11e8-842f-0ed5f89f718b" />
         </insert>
     </changeSet>
-
+    <changeSet id="kenyaemr_hiv_testing_022" author="schege">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.TestTaskOne'
+                  And name = 'We are testing things out'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting Contact Listing Processor Task into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="Test task one" />
+            <column name="description" value="Testing task execution" />
+            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.TestTaskOne" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="2024-08-25T23:59:59" />
+            <column name="repeat_interval" value="120" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="start_on_startup" value="1" />
+            <column name="started" value="1" />
+            <column name="uuid" value="2b7f36b2-8691-485f-bd00-a8ca79cbfaa2" />
+        </insert>
+    </changeSet>
     <changeSet author="aojwang" id="kenyaemr_hiv_testing_008">
         <preConditions onFail="MARK_RAN">
             <foreignKeyConstraintExists foreignKeyName="kemr_patient_contact_obs_group"/>
@@ -380,33 +402,33 @@
     </changeSet>
 
     <!--Adding scheduled task to process migration of unregistered patient contacts-->
-   <!-- <changeSet id="kenyaemr_hiv_testing_021" author="schege">
+    <changeSet id="kenyaemr_hiv_testing_025" author="schege">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM scheduler_task_config
-                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.MigrateUnregisteredPatientContactsTask'
-                  And name = 'HTS unregistered Contacts migration'
+                WHERE schedulable_class = 'org.openmrs.module.hivtestingservices.task.TestTaskOne'
+                  And name = 'Contacts migration Task one'
             </sqlCheck>
         </preConditions>
         <comment>Inserting unregistered Contacts migration Task into 'schedule_task_config' table</comment>
         <insert tableName="scheduler_task_config">
-            <column name="name" value="HTS unregistered Contacts migration" />
+            <column name="name" value="Contacts migration Task one" />
             <column name="description" value="Migrates patient contacts not yet registered as patients" />
-            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.MigrateUnregisteredPatientContactsTask" />
+            <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.TestTaskOne" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2024-08-21T23:59:59" />
-            <column name="repeat_interval" value="120" />
+            <column name="repeat_interval" value="1800" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
-            <column name="start_on_startup" value="0" />
-            <column name="started" value="1" />
-            <column name="uuid" value="41bc14d5-00a3-450f-858b-bb5e944d540e" />
+            <column name="start_on_startup" value="1" />
+            <column name="started" value="0" />
+            <column name="uuid" value="2f1ca53d-dfca-49b2-813d-85e39238b5f6" />
         </insert>
 
-    </changeSet>-->
-      <!-- <changeSet author="schege" id="kenyaemr_hiv_testing_022">
+    </changeSet>
+<!--       <changeSet author="schege" id="kenyaemr_hiv_testing_026">
             <delete tableName="scheduler_task_config">
-                <where>schedulable_class='org.openmrs.module.hivtestingservices.task.MigrateUnregisteredPatientContactsTask'</where>
+                <where>schedulable_class='org.openmrs.module.hivtestingservices.task.TestTaskOne'</where>
             </delete>
         </changeSet>-->
 </databaseChangeLog>
