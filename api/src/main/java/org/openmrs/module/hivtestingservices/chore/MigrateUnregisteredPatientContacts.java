@@ -21,6 +21,7 @@ import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.kenyacore.chore.AbstractChore;
 import org.openmrs.module.kenyaemr.metadata.CommonMetadata;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +36,17 @@ import static org.openmrs.util.LocationUtility.getDefaultLocation;
  */
 @Component("hivtestingservices.chore.MigrateUnregisteredPatientContacts")
 public class MigrateUnregisteredPatientContacts extends AbstractChore {
+
+    @Autowired
+    HTSService htsService;
+    @Autowired
+    ConceptService conceptService;
+    @Autowired
+    ObsService obsService;
+
+/*    HTSService htsService = Context.getService(HTSService.class);
+    ConceptService conceptService = Context.getService(ConceptService.class);
+    ObsService obsService = Context.getService(ObsService.class);*/
 
     private static final String UNKNOWN = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     private static final List<String> CONCEPTS_FOR_OBS = Arrays.asList(
@@ -60,7 +72,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
 
     @PostConstruct
     public List<PatientContact> getPatientContactsToMigrate() {
-        HTSService htsService = Context.getService(HTSService.class);
+
         List<PatientContact> patientContacts = htsService.getPatientContacts();
         if (patientContacts == null) {
             return Collections.emptyList();
@@ -136,8 +148,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
     }
 
     private void saveObservations(Patient patient) {
-        ConceptService conceptService = Context.getService(ConceptService.class);
-        ObsService obsService = Context.getService(ObsService.class);
+
         for (String conceptUuid : CONCEPTS_FOR_OBS) {
             Obs obs = new Obs();
             obs.setPerson(patient);
