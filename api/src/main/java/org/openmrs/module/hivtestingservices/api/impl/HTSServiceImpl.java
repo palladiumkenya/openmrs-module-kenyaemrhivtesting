@@ -24,6 +24,7 @@ import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.hibernate.HibernateHTSDAO;
 import org.openmrs.module.reporting.common.DurationUnit;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
 /**
  * It is a default implementation of {@link HTSService}.
  */
-
+@Service("htsService")
 public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
 
     protected final Log log = LogFactory.getLog(this.getClass());

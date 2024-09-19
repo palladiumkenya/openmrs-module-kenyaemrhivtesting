@@ -9,7 +9,17 @@
  */
 package org.openmrs.module.hivtestingservices.chore;
 
-import org.openmrs.*;
+import org.openmrs.Obs;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.Person;
+import org.openmrs.PersonAddress;
+import org.openmrs.PersonAttribute;
+import org.openmrs.PersonAttributeType;
+import org.openmrs.PersonName;
+import org.openmrs.Relationship;
+import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.PersonService;
@@ -21,13 +31,19 @@ import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.kenyacore.chore.AbstractChore;
 import org.openmrs.module.kenyaemr.metadata.CommonMetadata;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.openmrs.util.LocationUtility.getDefaultLocation;
 
@@ -37,18 +53,8 @@ import static org.openmrs.util.LocationUtility.getDefaultLocation;
 @Component("hivtestingservices.chore.MigrateUnregisteredPatientContacts")
 public class MigrateUnregisteredPatientContacts extends AbstractChore {
 
-    @Autowired
-    HTSService htsService;
-    @Autowired
-    ConceptService conceptService;
-    @Autowired
-    ObsService obsService;
-
-/*    HTSService htsService = Context.getService(HTSService.class);
-    ConceptService conceptService = Context.getService(ConceptService.class);
-    ObsService obsService = Context.getService(ObsService.class);*/
-
     private static final String UNKNOWN = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    private static final String CAUSE_OF_DEATH_PLACEHOLDER = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     private static final List<String> CONCEPTS_FOR_OBS = Arrays.asList(
             "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // CIVIL_STATUS
             "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // OCCUPATION
@@ -57,6 +63,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             "1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // ORPHAN
             "165657AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"  // COUNTRY
     );
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public void perform(PrintWriter out) {
@@ -64,90 +71,48 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         out.println("----Starting migrating contacts");
         List<PatientContact> patientContacts = getPatientContactsToMigrate();
         System.out.println("-- here are the contacts to migrate----" + patientContacts.size());
-        processPatientContactsInBatches(patientContacts, 20);
-
+        if (patientContacts.isEmpty()) {
+            out.println("No patient contacts to migrate");
+            return;
+        }
+        int counter = 0;
+        for (PatientContact pc : patientContacts) {
+            composePerson(pc);
+            counter++;
+            if(counter % 100 == 0){
+                out.println("---Flushing and clearing session after "+counter+ " contacts");
+                Context.flushSession();
+                Context.clearSession();
+                counter = 0;
+            }
+        }
+        Context.flushSession();
+        Context.clearSession();
         out.println("--Successfully completed migrating contacts");
 
     }
 
-    @PostConstruct
     public List<PatientContact> getPatientContactsToMigrate() {
 
-        List<PatientContact> patientContacts = htsService.getPatientContacts();
-        if (patientContacts == null) {
-            return Collections.emptyList();
-        }
-        patientContacts.removeIf(patientContact -> patientContact.getPatient() != null || patientContact.getVoided());
-        return patientContacts;
-    }
-
-    public void processPatientContactsInBatches(List<PatientContact> patientContacts, int batchSize) {
-        for (int i = 0; i < patientContacts.size(); i += batchSize) {
-            List<PatientContact> batch = patientContacts.subList(i, Math.min(i + batchSize, patientContacts.size()));
-            processBatch(batch);
-        }
-    }
-
-    private void processBatch(List<PatientContact> batch) {
-        Set<Patient> contactPatients = new HashSet<>();
-        for (PatientContact pc : batch) {
-            Patient patient = (Patient) composePatientFromContact(pc);
-            contactPatients.add(patient);
-        }
-        for (Patient toSave : contactPatients) {
-            savePatientAndRelatedData(toSave, batch);
-        }
-    }
-
-    public Person composePatientFromContact(PatientContact pc) {
-        return composePerson(pc);
-    }
-
-    protected void savePatientAndRelatedData(Patient toSave, List<PatientContact> patientContacts) {
-	/*	PatientWrapper wrapper = new PatientWrapper(toSave);
-		wrapper.getPerson();*/
-
-        PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, PatientWrapper.OPENMRS_ID);
-        ensurePatientIdentifier(toSave, openmrsIdType);
-
+        HTSService htsService = Context.getService(HTSService.class);
         try {
-            // Attempt to save the patient
-            System.out.println("---------Attempting to sav ethe patient: " + toSave);
-            Patient savedPatient = Context.getPatientService().savePatient(toSave);
-            System.out.println(" --------We succeeded saving patient with ID: " + savedPatient.getPatientId());
-            // If successful, save the patient identifiers
-            savePatientIdentifiers(savedPatient);
-
-            // Continue with saving observations and relationships
-            saveObservations(savedPatient);
-
-            for (PatientContact contact : patientContacts) {
-                addRelationship(contact.getPatientRelatedTo(), savedPatient, contact.getRelationType());
+            List<PatientContact> patientContacts = htsService.getPatientContacts();
+            if (patientContacts == null) {
+                System.out.println("-----No patient contacts found to migrate");
+                return Collections.emptyList();
             }
-
+            patientContacts.removeIf(patientContact -> patientContact.getPatient() != null || patientContact.getVoided());
+            return patientContacts;
         } catch (Exception e) {
-            // Handle the exception if saving the patient fails
-            throw new RuntimeException("---Failed to save patient data: " + e.getMessage(), e);
-        }
-    }
-
-    private void ensurePatientIdentifier(Patient toSave, PatientIdentifierType idType) {
-        PatientIdentifier id = toSave.getPatientIdentifier(idType);
-        if (id == null) {
-            String generatedId = Context.getService(IdentifierSourceService.class).generateIdentifier(idType, "Registration");
-            id = new PatientIdentifier(generatedId, idType, getDefaultLocation());
-            id.setPreferred(true);
-            toSave.addIdentifier(id);
-        }
-    }
-
-    private void savePatientIdentifiers(Patient toSave) {
-        for (PatientIdentifier identifier : toSave.getIdentifiers()) {
-            Context.getPatientService().savePatientIdentifier(identifier);
+            System.out.println("Error in getPatientContactsToMigrate: " + e.getMessage());
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 
     private void saveObservations(Patient patient) {
+        ConceptService conceptService = Context.getService(ConceptService.class);
+        ObsService obsService = Context.getService(ObsService.class);
 
         for (String conceptUuid : CONCEPTS_FOR_OBS) {
             Obs obs = new Obs();
@@ -185,47 +150,105 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         return options.get(relType);
     }
 
-    public Person composePerson(PatientContact pc) {
-        Person person = new Person();
-        PersonName name = new PersonName(
-                defaultIfEmpty(pc.getLastName(), "Unknown"),
-                defaultIfEmpty(pc.getFirstName(), "Unknown"),
-                defaultIfEmpty(pc.getMiddleName(), "Unknown")
-        );
+    public void composePerson(PatientContact pc) {
 
-        PersonAddress address = new PersonAddress();
-        address.setAddress1(defaultIfEmpty(pc.getPhysicalAddress(), "Unknown"));
-        address.setAddress2("Unknown");
-        address.setCityVillage("Unknown");
-        address.setCountry("Unknown");
+        Patient toSave = new Patient();
+        Patient savedPatient;
 
-        Set<PersonAttribute> personAttributes = new HashSet<>(Arrays.asList(
-                createPersonAttribute(CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact()),
-                createPersonAttribute(CommonMetadata._PersonAttributeType.PNS_APPROACH, pc.getPnsApproach().toString()),
-                createPersonAttribute(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_BASELINE_HIV_STATUS, pc.getBaselineHivStatus()),
-                createPersonAttribute(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_LIVING_WITH_PATIENT, pc.getLivingWithPatient().toString()),
-                createPersonAttribute(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_IPV_OUTCOME, pc.getIpvOutcome()),
-                createPersonAttribute(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_REGISTRATION_SOURCE, "1065"),
-                createPersonAttribute(CommonMetadata._PersonAttributeType.NEAREST_HEALTH_CENTER, "Unknown")
-        ));
-        // Format birthdate if it's not null
-        String formattedBirthdate = null;
-        if (pc.getBirthDate() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            formattedBirthdate = sdf.format(pc.getBirthDate());
+        toSave.setBirthdateEstimated(false);
+        toSave.setDead(false);
+        toSave.setDeathDate(null);
+        toSave.setCauseOfDeath(null);
+
+        try {
+            if (pc.getBirthDate() != null) {
+                toSave.setBirthdate(sdf.parse(sdf.format(pc.getBirthDate())));
+            }
+            toSave.setGender(pc.getSex());
+
+            PersonName name = new PersonName(
+                    defaultIfEmpty(pc.getLastName(), "Unknown"),
+                    defaultIfEmpty(pc.getFirstName(), "Unknown"),
+                    defaultIfEmpty(pc.getMiddleName(), "Unknown")
+            );
+            toSave.addName(name);
+        } catch (ParseException e) {
+            throw new RuntimeException("Failed to parse birthdate: " + e.getMessage(), e);
         }
-        person.setBirthdate(formattedBirthdate != null ? new Date(formattedBirthdate) : null);
-        person.setGender(pc.getSex());
-        person.addName(name);
-        person.addAddress(address);
-        person.setAttributes(personAttributes);
-        System.out.println("---------------------Person: " + person.getFamilyName());
-        return person;
+        try {
+            PersonAddress address = new PersonAddress();
+            address.setAddress1(defaultIfEmpty(pc.getPhysicalAddress(), "Unknown"));
+            address.setAddress2("Unknown");
+            address.setCountyDistrict("Unknown");
+            address.setStateProvince("Unknown");
+            address.setAddress4("Unknown");
+            address.setCityVillage("Unknown");
+            address.setCountry("Unknown");
+
+            toSave.addAddress(address);
+
+            PatientWrapper wrapper = new PatientWrapper(toSave);
+            wrapper.getPerson();
+
+            wrapper.getPerson().setTelephoneContact(pc.getPhoneContact());
+            wrapper.setNearestHealthFacility("Unknown");
+            wrapper.setEmailAddress("Unknown");
+            wrapper.setGuardianFirstName("Unknown");
+            wrapper.setGuardianLastName("Unknown");
+
+            PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, PatientWrapper.OPENMRS_ID);
+            System.out.println("====OpenMRS ID Type: " + openmrsIdType.toString());
+
+            PatientIdentifier openmrsId = toSave.getPatientIdentifier(openmrsIdType);
+            System.out.println("------------ID: " + openmrsId);
+
+            if (openmrsId == null) {
+                String generated = Context.getService(IdentifierSourceService.class).generateIdentifier(openmrsIdType, "Registration");
+                openmrsId = new PatientIdentifier(generated, openmrsIdType, getDefaultLocation());
+                toSave.addIdentifier(openmrsId);
+
+                if (!toSave.getPatientIdentifier().isPreferred()) {
+                    openmrsId.setPreferred(true);
+                }
+            }
+
+            // Attempt to save the patient
+            System.out.println("---------Attempting to save the patient: " + toSave);
+            savedPatient = Context.getPatientService().savePatient(toSave);
+            System.out.println("---------Successfully saved patient with ID: " + savedPatient.getPatientId());
+
+            for (PatientIdentifier identifier : toSave.getIdentifiers()) {
+                Context.getPatientService().savePatientIdentifier(identifier);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to handle address and identifiers: " + e.getMessage(), e);
+        }
+        try {
+            SortedSet<PersonAttribute> personAttributes = new TreeSet<>();
+            addPersonAttribute(personAttributes, CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact());
+            addPersonAttribute(personAttributes, CommonMetadata._PersonAttributeType.PNS_APPROACH, pc.getPnsApproach().toString());
+            addPersonAttribute(personAttributes, CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_BASELINE_HIV_STATUS, pc.getBaselineHivStatus());
+            addPersonAttribute(personAttributes, CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_LIVING_WITH_PATIENT, pc.getLivingWithPatient().toString());
+            addPersonAttribute(personAttributes, CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_IPV_OUTCOME, pc.getIpvOutcome());
+            addPersonAttribute(personAttributes, CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_REGISTRATION_SOURCE, "1065");
+            addPersonAttribute(personAttributes, CommonMetadata._PersonAttributeType.NEAREST_HEALTH_CENTER, "Unknown");
+
+            savedPatient.setAttributes(personAttributes);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to handle attributes: " + e.getMessage(), e);
+        }
+        saveObservations(savedPatient);
+
+        // Add relationship
+        addRelationship(pc.getPatientRelatedTo(), savedPatient, pc.getRelationType());
     }
 
-    private PersonAttribute createPersonAttribute(String uuid, String value) {
-        PersonAttributeType attributeType = MetadataUtils.existing(PersonAttributeType.class, uuid);
-        return new PersonAttribute(attributeType, value);
+    private void addPersonAttribute(SortedSet<PersonAttribute> personAttributes, String attributeTypeUuid, String value) {
+        PersonAttributeType attributeType = MetadataUtils.existing(PersonAttributeType.class, attributeTypeUuid);
+        if (attributeType != null && value != null && !value.trim().isEmpty()) {
+            PersonAttribute attribute = new PersonAttribute(attributeType, value);
+            personAttributes.add(attribute);
+        }
     }
 
     private String defaultIfEmpty(String value, String defaultValue) {
