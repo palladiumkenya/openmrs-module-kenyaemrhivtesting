@@ -9,6 +9,9 @@
  */
 package org.openmrs.module.hivtestingservices.chore;
 
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -21,6 +24,7 @@ import org.openmrs.PersonName;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
@@ -79,10 +83,14 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         for (PatientContact pc : patientContacts) {
             Person newPerson;
             newPerson = composePerson(pc);
+
             System.out.println("-------The new person is : " + newPerson);
             handlePersonAttributes(newPerson, pc);
             addRelationship(pc.getPatientRelatedTo().getPerson(), newPerson, pc.getRelationType());
-            saveObservations(newPerson);
+            Encounter encounter = createRegistrationEncounter((Patient)newPerson);
+            System.out.println("---The new encounter is : "+encounter);
+            saveObservations(newPerson,encounter);
+
             counter++;
             if (counter % 100 == 0) {
                 out.println("---Flushing and clearing session after " + counter + " contacts");
@@ -115,7 +123,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         }
     }
 
-    private void saveObservations(Person person) {
+    private void saveObservations(Person person, Encounter encounter) {
         ConceptService conceptService = Context.getService(ConceptService.class);
         ObsService obsService = Context.getService(ObsService.class);
         Obs savedObs = null;
@@ -128,6 +136,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
                 obs.setObsDatetime(new Date());
                 obs.setValueCoded(conceptService.getConceptByUuid(UNKNOWN));
                 obs.setLocation(getDefaultLocation());
+                obs.setEncounter(encounter);
                 savedObs = obsService.saveObs(obs, "KenyaEMR edit patient");
                 System.out.println("=-------Saved Obs: " + savedObs.toString());
             }
@@ -331,7 +340,18 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             throw new RuntimeException("Failed to handle person attributes: " + e.getMessage(), e);
         }
     }
-
+    private Encounter createRegistrationEncounter(Patient contact){
+        EncounterService encounterService = Context.getEncounterService();
+        EncounterType encounterType = encounterService.getEncounterTypeByUuid(CommonMetadata._EncounterType.REGISTRATION);
+        Encounter encounter = new Encounter();
+        encounter.setEncounterType(encounterType);
+        encounter.setEncounterType(encounterType);encounter.setEncounterDatetime(new Date());
+        encounter.setPatient(contact);
+        encounter.setLocation(getDefaultLocation());
+        encounter.setForm(MetadataUtils.existing(Form.class,CommonMetadata._Form.BASIC_REGISTRATION));
+        encounterService.saveEncounter(encounter);
+        return encounter;
+    }
 
     private String defaultIfEmpty(String value, String defaultValue) {
         return value == null || value.trim().isEmpty() ? defaultValue : value;
