@@ -30,6 +30,7 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.hivtestingservices.api.HTSService;
 import org.openmrs.module.hivtestingservices.api.PatientContact;
+import org.openmrs.module.hivtestingservices.util.Utils;
 import org.openmrs.module.hivtestingservices.wrapper.PatientWrapper;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.kenyacore.chore.AbstractChore;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -48,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import static org.openmrs.util.LocationUtility.getDefaultLocation;
 
@@ -58,7 +61,6 @@ import static org.openmrs.util.LocationUtility.getDefaultLocation;
 public class MigrateUnregisteredPatientContacts extends AbstractChore {
 
     private static final String UNKNOWN = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    private static final String CAUSE_OF_DEATH_PLACEHOLDER = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     private static final List<String> CONCEPTS_FOR_OBS = Arrays.asList(
             "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // CIVIL_STATUS
             "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // OCCUPATION
@@ -67,42 +69,48 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             "1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // ORPHAN
             "165657AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"  // COUNTRY
     );
+    private static final Pattern VALID_NAME_PATTERN = Pattern.compile("[^a-zA-Z ]");
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public void perform(PrintWriter out) {
 
-        out.println("----Starting migrating contacts");
+        out.println("Starting migrating patient contacts");
         List<PatientContact> patientContacts = getPatientContactsToMigrate();
-        System.out.println("-- here are the contacts to migrate----" + patientContacts.size());
         if (patientContacts.isEmpty()) {
             out.println("No patient contacts to migrate");
             return;
         }
         int counter = 0;
+        List<PatientContact> contactsWithExceptions = new ArrayList<>();
         for (PatientContact pc : patientContacts) {
-            Person newPerson;
-            newPerson = composePerson(pc);
+            Patient newPatient;
+            newPatient = composePerson(pc);
 
-            System.out.println("-------The new person is : " + newPerson);
-            handlePersonAttributes(newPerson, pc);
-            addRelationship(pc.getPatientRelatedTo().getPerson(), newPerson, pc.getRelationType());
-            Encounter encounter = createRegistrationEncounter((Patient)newPerson);
-            System.out.println("---The new encounter is : "+encounter);
-            saveObservations(newPerson,encounter);
+            if (newPatient != null) {
+                handlePersonAttributes(newPatient, pc);
+                addRelationship(pc.getPatientRelatedTo(), newPatient, pc.getRelationType());
+                Encounter encounter = createRegistrationEncounter(newPatient);
+                saveObservations(newPatient, encounter);
+            } else {
+                contactsWithExceptions.add(pc);
 
+            }
             counter++;
-            if (counter % 100 == 0) {
-                out.println("---Flushing and clearing session after " + counter + " contacts");
+            if (counter % 500 == 0) {
                 Context.flushSession();
                 Context.clearSession();
                 counter = 0;
             }
         }
+
         Context.flushSession();
         Context.clearSession();
-        out.println("--Successfully completed migrating contacts");
-
+        if (!contactsWithExceptions.isEmpty()) {
+            out.println("Finished migrating patient contacts, with exceptions");
+        } else {
+            out.println("Finished migrating patient contacts");
+        }
     }
 
     public List<PatientContact> getPatientContactsToMigrate() {
@@ -111,13 +119,13 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         try {
             List<PatientContact> patientContacts = htsService.getPatientContacts();
             if (patientContacts == null) {
-                System.out.println("-----No patient contacts found to migrate");
+                System.out.println("No patient contacts to migrate");
                 return Collections.emptyList();
             }
             patientContacts.removeIf(patientContact -> patientContact.getPatient() != null || patientContact.getVoided());
             return patientContacts;
         } catch (Exception e) {
-            System.out.println("Error in getPatientContactsToMigrate: " + e.getMessage());
+            System.out.println("Error getPatientContactsToMigrate: " + e.getMessage());
             e.printStackTrace();
             return Collections.emptyList();
         }
@@ -126,8 +134,6 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
     private void saveObservations(Person person, Encounter encounter) {
         ConceptService conceptService = Context.getService(ConceptService.class);
         ObsService obsService = Context.getService(ObsService.class);
-        Obs savedObs = null;
-        System.out.println("---I am now trying to save Obs: ");
         try {
             for (String conceptUuid : CONCEPTS_FOR_OBS) {
                 Obs obs = new Obs();
@@ -135,67 +141,54 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
                 obs.setConcept(conceptService.getConceptByUuid(conceptUuid));
                 obs.setObsDatetime(new Date());
                 obs.setValueCoded(conceptService.getConceptByUuid(UNKNOWN));
-                obs.setLocation(getDefaultLocation());
+                obs.setLocation(Utils.getDefaultLocation());
                 obs.setEncounter(encounter);
-                savedObs = obsService.saveObs(obs, "KenyaEMR edit patient");
-                System.out.println("=-------Saved Obs: " + savedObs.toString());
+                obsService.saveObs(obs, "KenyaEMR new patient");
             }
         } catch (Exception e) {
-            System.out.println("-----Error in saving observations: " + e.getMessage());
+            System.err.println("Error saving observations: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void addRelationship(Person patient, Person contact, Integer relationshipType) {
+    private void addRelationship(Patient patient, Patient contact, Integer relationshipType) {
 
         try {
-            // Catch errors related to obtaining the PersonService or relationship type
             PersonService personService;
             personService = Context.getService(PersonService.class);
             RelationshipType relType;
             try {
                 String relTypeUuid = relationshipOptionsToRelTypeMapper(relationshipType);
                 if (relTypeUuid == null) {
-                    System.err.println("-----No mapping found for relationship type: " + relationshipType);
                     return;
                 }
-                System.out.println("-----Mapped Relationship type :" + relTypeUuid);
             } catch (Exception e) {
-                System.err.println("Error in fetching relationship map: " + e.getMessage());
+                System.err.println("Error fetching relationship from relationship map: " + e.getMessage());
                 e.printStackTrace();
                 return;
             }
             try {
                 String relTypeUuid = relationshipOptionsToRelTypeMapper(relationshipType);
-                System.out.println("----We have relationship typ euuid: " + relTypeUuid);
-                System.out.println("---PersonService HC" + personService.hashCode() + " PERSON Service String" + personService);
                 relType = personService.getRelationshipTypeByUuid(relTypeUuid);
-                System.out.println("---Relationship type is :" + relType.toString());
             } catch (Exception e) {
-                System.err.println("Error in fetching RelationshipType: " + e.getMessage());
+                System.err.println("Error fetching RelationshipType: " + e.getMessage());
                 e.printStackTrace();
                 return;
             }
-
-            // Catch errors related to saving the relationship
             try {
                 Relationship relationship = new Relationship();
                 relationship.setRelationshipType(relType);
                 relationship.setPersonA(patient);
                 relationship.setPersonB(contact);
-                //TODO    Get start data from contact date created
-                // relationship.setStartDate(new Date());
+                relationship.setStartDate(new Date());
 
-                Relationship savedRelationship = personService.saveRelationship(relationship);
-                System.out.println("=====saved relationship: " + savedRelationship.toString());
+                personService.saveRelationship(relationship);
             } catch (Exception e) {
-                System.err.println("Error in saving relationship: " + e.getMessage());
+                System.err.println("Error saving relationship: " + e.getMessage());
                 e.printStackTrace();
             }
 
         } catch (Exception e) {
-            // This catch is for any unforeseen exceptions
-            System.err.println("General error in addRelationship: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -215,15 +208,14 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         } catch (Exception e) {
             System.err.println("Error mapping relationship type: " + e.getMessage());
             e.printStackTrace();
-            return null; // or any default value if necessary
+            return null;
         }
     }
 
-    public Person composePerson(PatientContact pc) {
+    public Patient composePerson(PatientContact pc) {
 
         Patient toSave = new Patient();
-        Person savedPatient = new Person();
-
+        Patient savedPatient = new Patient();
         try {
             toSave.setBirthdateEstimated(false);
             toSave.setDead(false);
@@ -236,9 +228,9 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             toSave.setGender(pc.getSex());
 
             PersonName name = new PersonName(
-                    defaultIfEmpty(pc.getLastName(), "Unknown"),
-                    defaultIfEmpty(pc.getFirstName(), "Unknown"),
-                    defaultIfEmpty(pc.getMiddleName(), "Unknown")
+                    defaultIfEmpty(cleanName(pc.getFirstName()), "Unknown"),
+                    defaultIfEmpty(cleanName(pc.getMiddleName()), "Unknown"),
+                    defaultIfEmpty(cleanName(pc.getLastName()), "Unknown")
             );
             toSave.addName(name);
 
@@ -261,7 +253,6 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             toSave.setAddresses(addresses);
 
             PatientWrapper wrapper = new PatientWrapper(toSave);
-            // wrapper.getPerson();
 
             wrapper.getPerson().setTelephoneContact(pc.getPhoneContact());
             wrapper.setNearestHealthFacility("Unknown");
@@ -270,10 +261,8 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             wrapper.setGuardianLastName("Unknown");
 
             PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, PatientWrapper.OPENMRS_ID);
-            System.out.println("====OpenMRS ID Type: " + openmrsIdType.toString());
 
             PatientIdentifier openmrsId = toSave.getPatientIdentifier(openmrsIdType);
-            System.out.println("------------ID: " + openmrsId);
 
             if (openmrsId == null) {
                 String generated = Context.getService(IdentifierSourceService.class).generateIdentifier(openmrsIdType, "Registration");
@@ -290,12 +279,8 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             e.printStackTrace();
         }
         try {
-            // Attempt to save the patient
-            System.out.println("---------Attempting to save the patient: ");
             savedPatient = Context.getPatientService().savePatient(toSave);
-            System.out.println("---------Successfully saved patient with ID: " + savedPatient.getPersonId());
             Person savedPerson = savedPatient;
-            System.out.println("---------Successfully saved person with ID: " + savedPerson.getPersonId());
         } catch (Exception e) {
             System.err.println("Error saving person: " + e.getMessage());
             e.printStackTrace();
@@ -305,9 +290,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
     }
 
     private void handlePersonAttributes(Person savedPatient, PatientContact pc) {
-        System.out.println("----We are now handling person attributes");
         try {
-            // Define attributes and their values
             Map<String, String> attributes = new LinkedHashMap<>();
             attributes.put(CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact());
             attributes.put(CommonMetadata._PersonAttributeType.PNS_APPROACH,
@@ -320,16 +303,12 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_REGISTRATION_SOURCE, "1065");
             attributes.put(CommonMetadata._PersonAttributeType.NEAREST_HEALTH_CENTER, "Unknown");
 
-            // Add attributes to the set
             attributes.forEach((attributeTypeUuid, value) -> {
                 try {
-                    // Fetch attribute type and add the attribute
                     PersonAttributeType attributeType = MetadataUtils.existing(PersonAttributeType.class, attributeTypeUuid);
                     if (attributeType != null && value != null && !value.trim().isEmpty()) {
                         PersonAttribute attribute = new PersonAttribute(attributeType, value);
-                        System.out.println("---Adding attribute to saved patient");
                         savedPatient.addAttribute(attribute);
-                        System.out.println("-----We now have this attribute-> " + attribute);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException("Failed to add person attribute: " + attributeTypeUuid + " - " + e.getMessage(), e);
@@ -340,20 +319,29 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             throw new RuntimeException("Failed to handle person attributes: " + e.getMessage(), e);
         }
     }
-    private Encounter createRegistrationEncounter(Patient contact){
+
+    private Encounter createRegistrationEncounter(Patient contact) {
         EncounterService encounterService = Context.getEncounterService();
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(CommonMetadata._EncounterType.REGISTRATION);
         Encounter encounter = new Encounter();
         encounter.setEncounterType(encounterType);
-        encounter.setEncounterType(encounterType);encounter.setEncounterDatetime(new Date());
+        encounter.setEncounterType(encounterType);
+        encounter.setEncounterDatetime(new Date());
         encounter.setPatient(contact);
         encounter.setLocation(getDefaultLocation());
-        encounter.setForm(MetadataUtils.existing(Form.class,CommonMetadata._Form.BASIC_REGISTRATION));
+        encounter.setForm(MetadataUtils.existing(Form.class, CommonMetadata._Form.BASIC_REGISTRATION));
         encounterService.saveEncounter(encounter);
         return encounter;
     }
 
     private String defaultIfEmpty(String value, String defaultValue) {
         return value == null || value.trim().isEmpty() ? defaultValue : value;
+    }
+
+    public static String cleanName(String name) {
+        if (name == null) {
+            return null;
+        }
+        return VALID_NAME_PATTERN.matcher(name).replaceAll("");
     }
 }
