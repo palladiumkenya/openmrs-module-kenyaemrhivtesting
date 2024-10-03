@@ -469,6 +469,7 @@ public class RegisterContactFragmentController {
 				Context.getPatientService().savePatientIdentifier(identifier);
 			}
 
+
 			// Save remaining fields as obs
 			List<Obs> obsToSave = new ArrayList<Obs>();
 			List<Obs> obsToVoid = new ArrayList<Obs>();

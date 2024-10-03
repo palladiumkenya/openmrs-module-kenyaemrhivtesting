@@ -1,11 +1,9 @@
 package org.openmrs.module.hivtestingservices.util;
 
-import org.openmrs.Relationship;
+import org.openmrs.GlobalProperty;
+import org.openmrs.Location;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.hivtestingservices.api.HTSService;
-import org.openmrs.module.hivtestingservices.api.PatientContact;
-import org.openmrs.ui.framework.fragment.action.SuccessResult;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.openmrs.util.PrivilegeConstants;
 
 public class Utils {
     /**
@@ -33,4 +31,17 @@ public class Utils {
     public static final String UNIQUE_PATIENT_NUMBER = "05ee9cf4-7242-4a17-b4d4-00f707265c8a";
     public static final String NATIONAL_UNIQUE_PATIENT_IDENTIFIER = "f85081e2-b4be-4e48-b3a4-7994b69bb101";
 
+    public static Location getDefaultLocation() {
+        try {
+            Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+            Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+            String GP_DEFAULT_LOCATION = "kenyaemr.defaultLocation";
+            GlobalProperty gp = Context.getAdministrationService().getGlobalPropertyObject(GP_DEFAULT_LOCATION);
+            return gp != null ? ((Location) gp.getValue()) : null;
+        }
+        finally {
+            Context.removeProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+            Context.removeProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+        }
+    }
 }

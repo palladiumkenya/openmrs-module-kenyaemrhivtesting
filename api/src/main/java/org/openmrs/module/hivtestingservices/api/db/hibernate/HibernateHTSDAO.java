@@ -14,8 +14,13 @@
 package org.openmrs.module.hivtestingservices.api.db.hibernate;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.Query;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Cohort;
@@ -23,10 +28,9 @@ import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.hivtestingservices.api.ContactTrace;
+import org.openmrs.module.hivtestingservices.api.PatientContact;
 import org.openmrs.module.hivtestingservices.api.db.HTSDAO;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.Query;
+import org.openmrs.module.reporting.common.DurationUnit;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,12 +38,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.hibernate.SessionFactory;
-import org.openmrs.module.hivtestingservices.api.PatientContact;
-import org.openmrs.module.reporting.common.DurationUnit;
-
-import javax.persistence.criteria.CriteriaBuilder;
 
 
 public class HibernateHTSDAO implements HTSDAO {
@@ -122,6 +120,17 @@ public class HibernateHTSDAO implements HTSDAO {
         Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
         criteria.add(Restrictions.eq("voided", false));
         //return result
+        return criteria.list();
+    }
+
+    @Override
+    public List<PatientContact> getBatchedPatientContacts(Integer pageNumber, Integer pageSize) {
+        Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(PatientContact.class);
+        criteria.setFetchMode("patient", FetchMode.JOIN);
+        criteria.add(Restrictions.eq("voided", false));
+        criteria.setFirstResult((pageNumber - 1) * pageSize);
+        criteria.setMaxResults(pageSize);
+
         return criteria.list();
     }
 
