@@ -38,6 +38,7 @@ import java.util.List;
 @Component
 public interface HTSService extends OpenmrsService {
     public List<PatientContact> getPatientContacts();
+    public List<PatientContact> getBatchedPatientContacts(Integer pageNumber, Integer pageSize);
     public PatientContact savePatientContact(PatientContact patientContact);
     public List<PatientContact> searchPatientContact(String searchName);
     public void voidPatientContact(int theId);
