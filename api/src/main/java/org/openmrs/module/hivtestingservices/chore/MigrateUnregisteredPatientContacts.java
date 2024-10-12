@@ -37,6 +37,7 @@ import org.openmrs.module.hivtestingservices.util.Utils;
 import org.openmrs.module.hivtestingservices.wrapper.PatientWrapper;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.kenyacore.chore.AbstractChore;
+import org.openmrs.module.kenyaemr.Dictionary;
 import org.openmrs.module.kenyaemr.metadata.CommonMetadata;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.springframework.stereotype.Component;
@@ -75,13 +76,21 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("[^a-zA-Z ]");
     private final static int BATCH_SIZE = 100;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private final Map<String, Concept> conceptCache = new HashMap<>();
 
     @Override
     public void perform(PrintWriter out) {
         out.println("Starting migration of patient contacts");
         int totalProcessed = 0;
         int offSet = 1;
+        ConceptService conceptService = Context.getService(ConceptService.class);
         List<PatientContact> patientContacts;
+
+        for (String conceptUuid : CONCEPTS_FOR_OBS) {
+            conceptCache.put(conceptUuid, conceptService.getConceptByUuid(conceptUuid));
+        }
+        conceptCache.put(UNKNOWN, Dictionary.getConcept(Dictionary.UNKNOWN));
+
         try {
             do {
                 patientContacts = getPatientContactsToMigrate(offSet, BATCH_SIZE);
@@ -134,7 +143,6 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
     }
 
     private void saveObservations(Integer person, Integer encounter) {
-        Map<String, Concept> conceptCache = new HashMap<>();
         ConceptService conceptService = Context.getService(ConceptService.class);
         ObsService obsService = Context.getService(ObsService.class);
         PersonService personService = Context.getService(PersonService.class);
@@ -227,6 +235,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
                     defaultIfEmpty(cleanName(patientContact.getMiddleName()), "Unknown"),
                     defaultIfEmpty(cleanName(patientContact.getLastName()), "Unknown")
             );
+
             toSave.addName(name);
 
         } catch (Exception e) {
@@ -236,27 +245,14 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             SortedSet<PersonAddress> addresses = new TreeSet<>();
             PersonAddress address = new PersonAddress();
 
-            address.setAddress1(defaultIfEmpty(patientContact.getPhysicalAddress(), "Unknown"));
-            address.setAddress2("Unknown");
-            address.setCountyDistrict("Unknown");
-            address.setStateProvince("Unknown");
-            address.setAddress4("Unknown");
-            address.setCityVillage("Unknown");
-            address.setCountry("Unknown");
-
+            address.setAddress1(patientContact.getPhysicalAddress());
             addresses.add(address);
             toSave.setAddresses(addresses);
 
             PatientWrapper wrapper = new PatientWrapper(toSave);
-
             wrapper.getPerson().setTelephoneContact(patientContact.getPhoneContact());
-            wrapper.setNearestHealthFacility("Unknown");
-            wrapper.setEmailAddress("Unknown");
-            wrapper.setGuardianFirstName("Unknown");
-            wrapper.setGuardianLastName("Unknown");
 
             PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, PatientWrapper.OPENMRS_ID);
-
             PatientIdentifier openmrsId = toSave.getPatientIdentifier(openmrsIdType);
 
             if (openmrsId == null) {
