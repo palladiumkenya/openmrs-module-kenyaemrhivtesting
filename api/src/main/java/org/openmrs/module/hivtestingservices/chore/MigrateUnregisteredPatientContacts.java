@@ -9,6 +9,7 @@
  */
 package org.openmrs.module.hivtestingservices.chore;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -62,7 +63,7 @@ import static org.openmrs.util.LocationUtility.getDefaultLocation;
 @Component("hivtestingservices.chore.MigrateUnregisteredPatientContacts")
 public class MigrateUnregisteredPatientContacts extends AbstractChore {
 
-    private static final Pattern VALID_NAME_PATTERN = Pattern.compile("[^a-zA-Z ]");
+    private static final Pattern NAME_VALIDATION_PATTERN = Pattern.compile("[^a-zA-Z \\-]");
     private final static int BATCH_SIZE = 100;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -86,8 +87,8 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
                     if (newPatient != null) {
                         handlePersonAttributes(newPatient.getPatientId(), pc.getId());
                         addRelationship(pc.getPatientRelatedTo().getPatientId(), newPatient.getPatientId(), pc.getRelationType());
-                        Encounter encounter = createRegistrationEncounter(newPatient.getPatientId());
-                        saveObservations(newPatient.getPatientId(), encounter.getEncounterId(), pc.getMaritalStatus());
+                        createRegistrationEncounter(newPatient.getPatientId());
+                        saveObservations(newPatient.getPatientId(), pc.getMaritalStatus());
                         totalProcessed++;
                     }
                 }
@@ -124,7 +125,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         }
     }
 
-    private void saveObservations(Integer person, Integer encounter, Integer maritalStatus) {
+    private void saveObservations(Integer person, Integer maritalStatus) {
         if (maritalStatus == null) {
             return;
         }
@@ -132,7 +133,6 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         ConceptService conceptService = Context.getService(ConceptService.class);
         ObsService obsService = Context.getService(ObsService.class);
         PersonService personService = Context.getService(PersonService.class);
-        EncounterService encounterService = Context.getService(EncounterService.class);
         Obs obs = new Obs();
         try {
                 obs.setPerson(personService.getPerson(person));
@@ -140,7 +140,6 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
                 obs.setObsDatetime(new Date());
                 obs.setValueCoded(conceptService.getConcept(maritalStatus));
                 obs.setLocation(Utils.getDefaultLocation());
-                obs.setEncounter(encounterService.getEncounter(encounter));
 
         } catch (Exception e) {
             System.err.println("Error saving observation: " + e.getMessage());
@@ -201,6 +200,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         Patient toSave = new Patient();
         Patient savedPatient = new Patient();
         PatientContact patientContact = htsService.getPatientContactByID(pc);
+
         try {
             toSave.setBirthdateEstimated(false);
             toSave.setDead(false);
@@ -213,9 +213,9 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             toSave.setGender(patientContact.getSex());
 
             PersonName name = new PersonName(
-                    defaultIfEmpty(cleanName(patientContact.getFirstName()), "Unknown"),
-                    defaultIfEmpty(cleanName(patientContact.getMiddleName()), "Unknown"),
-                    defaultIfEmpty(cleanName(patientContact.getLastName()), "Unknown")
+                    cleanName(patientContact.getFirstName()),
+                    cleanName(patientContact.getMiddleName()),
+                    cleanName(patientContact.getLastName())
             );
 
             toSave.addName(name);
@@ -231,14 +231,9 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             address.setCountyDistrict("Unknown");
             address.setStateProvince("Unknown");
             address.setAddress4("Unknown");
-            address.setCityVillage("Unknown");
-            address.setCountry("Unknown");
 
             addresses.add(address);
             toSave.setAddresses(addresses);
-
-            PatientWrapper wrapper = new PatientWrapper(toSave);
-            wrapper.getPerson().setTelephoneContact(patientContact.getPhoneContact());
 
             PatientIdentifierType openmrsIdType = MetadataUtils.existing(PatientIdentifierType.class, PatientWrapper.OPENMRS_ID);
             PatientIdentifier openmrsId = toSave.getPatientIdentifier(openmrsIdType);
@@ -274,7 +269,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             PatientContact pc = htsService.getPatientContactByID(contactId);
             Patient savedPatient = patientService.getPatient(savedPatientId);
             Map<String, String> attributes = new LinkedHashMap<>();
-            attributes.put(CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact());
+            if(StringUtils.isNotBlank(pc.getPhoneContact())) { attributes.put(CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact()); }
             attributes.put(CommonMetadata._PersonAttributeType.PNS_APPROACH,
                     pc.getPnsApproach() != null ? pc.getPnsApproach().toString() : null);
             attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_BASELINE_HIV_STATUS,
@@ -302,7 +297,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         }
     }
 
-    private Encounter createRegistrationEncounter(Integer contact) {
+    private void createRegistrationEncounter(Integer contact) {
         PatientService patientService = Context.getPatientService();
         EncounterService encounterService = Context.getEncounterService();
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(CommonMetadata._EncounterType.REGISTRATION);
@@ -314,17 +309,12 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         encounter.setLocation(getDefaultLocation());
         encounter.setForm(MetadataUtils.existing(Form.class, CommonMetadata._Form.BASIC_REGISTRATION));
         encounterService.saveEncounter(encounter);
-        return encounter;
-    }
-
-    private String defaultIfEmpty(String value, String defaultValue) {
-        return value == null || value.trim().isEmpty() ? defaultValue : value;
     }
 
     public static String cleanName(String name) {
         if (name == null) {
             return null;
         }
-        return VALID_NAME_PATTERN.matcher(name).replaceAll("");
+        return NAME_VALIDATION_PATTERN.matcher(name).replaceAll("");
     }
 }
