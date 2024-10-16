@@ -44,8 +44,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,32 +62,16 @@ import static org.openmrs.util.LocationUtility.getDefaultLocation;
 @Component("hivtestingservices.chore.MigrateUnregisteredPatientContacts")
 public class MigrateUnregisteredPatientContacts extends AbstractChore {
 
-    private static final String UNKNOWN = "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-    private static final List<String> CONCEPTS_FOR_OBS = Arrays.asList(
-            "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // CIVIL_STATUS
-            "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // OCCUPATION
-            "1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // EDUCATION
-            "5629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // IN_SCHOOL
-            "1174AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", // ORPHAN
-            "165657AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"  // COUNTRY
-    );
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("[^a-zA-Z ]");
     private final static int BATCH_SIZE = 100;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    private final Map<String, Concept> conceptCache = new HashMap<>();
 
     @Override
     public void perform(PrintWriter out) {
         out.println("Starting migration of patient contacts");
         int totalProcessed = 0;
         int offSet = 1;
-        ConceptService conceptService = Context.getService(ConceptService.class);
         List<PatientContact> patientContacts;
-
-        for (String conceptUuid : CONCEPTS_FOR_OBS) {
-            conceptCache.put(conceptUuid, conceptService.getConceptByUuid(conceptUuid));
-        }
-        conceptCache.put(UNKNOWN, Dictionary.getConcept(Dictionary.UNKNOWN));
 
         try {
             do {
@@ -105,7 +87,7 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
                         handlePersonAttributes(newPatient.getPatientId(), pc.getId());
                         addRelationship(pc.getPatientRelatedTo().getPatientId(), newPatient.getPatientId(), pc.getRelationType());
                         Encounter encounter = createRegistrationEncounter(newPatient.getPatientId());
-                        saveObservations(newPatient.getPatientId(), encounter.getEncounterId());
+                        saveObservations(newPatient.getPatientId(), encounter.getEncounterId(), pc.getMaritalStatus());
                         totalProcessed++;
                     }
                 }
@@ -142,29 +124,29 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         }
     }
 
-    private void saveObservations(Integer person, Integer encounter) {
+    private void saveObservations(Integer person, Integer encounter, Integer maritalStatus) {
+        if (maritalStatus == null) {
+            return;
+        }
+        Concept civilStatus = Dictionary.getConcept(Dictionary.CIVIL_STATUS);
         ConceptService conceptService = Context.getService(ConceptService.class);
         ObsService obsService = Context.getService(ObsService.class);
         PersonService personService = Context.getService(PersonService.class);
         EncounterService encounterService = Context.getService(EncounterService.class);
-        List<Obs> obsBatch = new ArrayList<>();
+        Obs obs = new Obs();
         try {
-            for (String conceptUuid : CONCEPTS_FOR_OBS) {
-                Concept concept = conceptCache.computeIfAbsent(conceptUuid, conceptService::getConceptByUuid);
-                Obs obs = new Obs();
                 obs.setPerson(personService.getPerson(person));
-                obs.setConcept(concept);
+                obs.setConcept(civilStatus);
                 obs.setObsDatetime(new Date());
-                obs.setValueCoded(conceptCache.computeIfAbsent(UNKNOWN, conceptService::getConceptByUuid));
+                obs.setValueCoded(conceptService.getConcept(maritalStatus));
                 obs.setLocation(Utils.getDefaultLocation());
                 obs.setEncounter(encounterService.getEncounter(encounter));
-                obsBatch.add(obs);
-            }
+
         } catch (Exception e) {
-            System.err.println("Error saving observations: " + e.getMessage());
+            System.err.println("Error saving observation: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            obsBatch.forEach(obs -> obsService.saveObs(obs, "KenyaEMR new patient"));
+          obsService.saveObs(obs, "KenyaEMR new patient");
         }
     }
 
@@ -246,6 +228,12 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             PersonAddress address = new PersonAddress();
 
             address.setAddress1(patientContact.getPhysicalAddress());
+            address.setCountyDistrict("Unknown");
+            address.setStateProvince("Unknown");
+            address.setAddress4("Unknown");
+            address.setCityVillage("Unknown");
+            address.setCountry("Unknown");
+
             addresses.add(address);
             toSave.setAddresses(addresses);
 
