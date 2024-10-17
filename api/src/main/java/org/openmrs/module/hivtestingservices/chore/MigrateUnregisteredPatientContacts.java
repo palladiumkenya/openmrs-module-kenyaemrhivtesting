@@ -12,9 +12,6 @@ package org.openmrs.module.hivtestingservices.chore;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
 import org.openmrs.Concept;
-import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
-import org.openmrs.Form;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -27,7 +24,6 @@ import org.openmrs.PersonName;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
@@ -87,7 +83,6 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
                     if (newPatient != null) {
                         handlePersonAttributes(newPatient.getPatientId(), pc.getId());
                         addRelationship(pc.getPatientRelatedTo().getPatientId(), newPatient.getPatientId(), pc.getRelationType());
-                        createRegistrationEncounter(newPatient.getPatientId());
                         saveObservations(newPatient.getPatientId(), pc.getMaritalStatus());
                         totalProcessed++;
                     }
@@ -269,16 +264,24 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             PatientContact pc = htsService.getPatientContactByID(contactId);
             Patient savedPatient = patientService.getPatient(savedPatientId);
             Map<String, String> attributes = new LinkedHashMap<>();
-            if(StringUtils.isNotBlank(pc.getPhoneContact())) { attributes.put(CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact()); }
-            attributes.put(CommonMetadata._PersonAttributeType.PNS_APPROACH,
-                    pc.getPnsApproach() != null ? pc.getPnsApproach().toString() : null);
-            attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_BASELINE_HIV_STATUS,
-                    pc.getBaselineHivStatus());
-            attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_LIVING_WITH_PATIENT,
-                    pc.getLivingWithPatient() != null ? pc.getLivingWithPatient().toString() : null);
-            attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_IPV_OUTCOME, pc.getIpvOutcome());
+            if (StringUtils.isNotBlank(pc.getPhoneContact())) {
+                attributes.put(CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact());
+            }
+            if (StringUtils.isNotBlank(pc.getPnsApproach().toString())) {
+                attributes.put(CommonMetadata._PersonAttributeType.PNS_APPROACH, pc.getPnsApproach().toString());
+            }
+            if (StringUtils.isNotBlank(pc.getBaselineHivStatus())) {
+                attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_BASELINE_HIV_STATUS,
+                        pc.getBaselineHivStatus());
+            }
+            if (StringUtils.isNotBlank(pc.getLivingWithPatient().toString())) {
+                attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_LIVING_WITH_PATIENT,
+                        pc.getLivingWithPatient().toString());
+            }
+            if (StringUtils.isNotBlank(pc.getIpvOutcome())) {
+                attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_IPV_OUTCOME, pc.getIpvOutcome());
+            }
             attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_REGISTRATION_SOURCE, "1065");
-            attributes.put(CommonMetadata._PersonAttributeType.NEAREST_HEALTH_CENTER, "Unknown");
 
             attributes.forEach((attributeTypeUuid, value) -> {
                 try {
@@ -295,20 +298,6 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
         } catch (Exception e) {
             throw new RuntimeException("Failed to handle person attributes: " + e.getMessage(), e);
         }
-    }
-
-    private void createRegistrationEncounter(Integer contact) {
-        PatientService patientService = Context.getPatientService();
-        EncounterService encounterService = Context.getEncounterService();
-        EncounterType encounterType = encounterService.getEncounterTypeByUuid(CommonMetadata._EncounterType.REGISTRATION);
-        Encounter encounter = new Encounter();
-        encounter.setEncounterType(encounterType);
-        encounter.setEncounterType(encounterType);
-        encounter.setEncounterDatetime(new Date());
-        encounter.setPatient(patientService.getPatient(contact));
-        encounter.setLocation(getDefaultLocation());
-        encounter.setForm(MetadataUtils.existing(Form.class, CommonMetadata._Form.BASIC_REGISTRATION));
-        encounterService.saveEncounter(encounter);
     }
 
     public static String cleanName(String name) {
