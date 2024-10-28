@@ -267,14 +267,14 @@ public class MigrateUnregisteredPatientContacts extends AbstractChore {
             if (StringUtils.isNotBlank(pc.getPhoneContact())) {
                 attributes.put(CommonMetadata._PersonAttributeType.TELEPHONE_CONTACT, pc.getPhoneContact());
             }
-            if (StringUtils.isNotBlank(pc.getPnsApproach().toString())) {
+            if (pc.getPnsApproach() != null && StringUtils.isNotBlank(pc.getPnsApproach().toString())) {
                 attributes.put(CommonMetadata._PersonAttributeType.PNS_APPROACH, pc.getPnsApproach().toString());
             }
             if (StringUtils.isNotBlank(pc.getBaselineHivStatus())) {
                 attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_BASELINE_HIV_STATUS,
                         pc.getBaselineHivStatus());
             }
-            if (StringUtils.isNotBlank(pc.getLivingWithPatient().toString())) {
+            if (pc.getLivingWithPatient() != null && StringUtils.isNotBlank(pc.getLivingWithPatient().toString())) {
                 attributes.put(CommonMetadata._PersonAttributeType.PNS_PATIENT_CONTACT_LIVING_WITH_PATIENT,
                         pc.getLivingWithPatient().toString());
             }
