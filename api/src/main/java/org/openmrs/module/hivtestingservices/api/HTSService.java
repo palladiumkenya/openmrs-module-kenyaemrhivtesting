@@ -18,6 +18,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.hivtestingservices.advice.model.AOPEncounterEntry;
 import org.openmrs.module.reporting.common.DurationUnit;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -34,8 +35,10 @@ import java.util.List;
  * @see org.openmrs.api.context.Context
  */
 @Transactional
+@Component
 public interface HTSService extends OpenmrsService {
     public List<PatientContact> getPatientContacts();
+    public List<PatientContact> getBatchedPatientContacts(Integer pageNumber, Integer pageSize);
     public PatientContact savePatientContact(PatientContact patientContact);
     public List<PatientContact> searchPatientContact(String searchName);
     public void voidPatientContact(int theId);
