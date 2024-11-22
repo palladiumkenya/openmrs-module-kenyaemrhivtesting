@@ -149,6 +149,11 @@ public class HTSServiceImpl extends BaseOpenmrsService implements HTSService {
     }
 
     @Override
+    public List<PatientContact> getBatchedPatientContacts(Integer pageNumber, Integer pageSize) {
+        return patientContactDAO.getBatchedPatientContacts(pageNumber, pageSize);
+    }
+
+    @Override
     public void onStartup() {
 
     }
