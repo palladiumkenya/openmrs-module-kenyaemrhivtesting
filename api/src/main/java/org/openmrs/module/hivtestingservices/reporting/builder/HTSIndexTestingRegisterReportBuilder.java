@@ -111,6 +111,7 @@ public class HTSIndexTestingRegisterReportBuilder extends AbstractReportBuilder 
         dsd.addColumn("Age", new RelatedPatientDOBDataDefinition(), "");
         dsd.addColumn("Visit Date", new RelatedPatientVisitDateDataDefinition(),"", new DateConverter(ENC_DATE_FORMAT));
         dsd.addColumn("Telephone No", new RelatedPatientPhoneContactDataDefinition(), "");
+        dsd.addColumn("Provider Name", new ProvidersNameDataDefinition(), "");
 
         dsd.addColumn("Marital Status", new RelatedPatientMaritalStatusDataDefinition(), null, new MaritalStatusConverter());
         dsd.addColumn("Occupation", new RelatedPatientOccupationDataDefinition(), null);
