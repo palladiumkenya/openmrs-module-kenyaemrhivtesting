@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.openmrs.module</groupId>
@@ -46,7 +48,7 @@
 		<reportingVersion>1.25.0</reportingVersion>
 		<serializationxstreamVersion>0.2.14</serializationxstreamVersion>
 		<uiframeworkVersion>3.23.0</uiframeworkVersion>
-     	<kenyacoreVersion>3.0.1</kenyacoreVersion>
+		<kenyacoreVersion>3.0.1</kenyacoreVersion>
 		<kenyaemrVersion>19.1.4-SNAPSHOT</kenyaemrVersion>
 		<kenyauiVersion>3.0.0</kenyauiVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
@@ -141,19 +143,19 @@
 				<scope>provided</scope>
 			</dependency>
 
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>kenyacore-api</artifactId>
-                <version>${kenyacoreVersion}</version>
-                <scope>provided</scope>
-            </dependency>
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>kenyacore-api</artifactId>
+				<version>${kenyacoreVersion}</version>
+				<scope>provided</scope>
+			</dependency>
 
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>kenyacore-test</artifactId>
-                <version>${kenyacoreVersion}</version>
-                <scope>test</scope>
-            </dependency>
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>kenyacore-test</artifactId>
+				<version>${kenyacoreVersion}</version>
+				<scope>test</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>kenyaui-api</artifactId>
@@ -218,7 +220,7 @@
 				<scope>test</scope>
 			</dependency>
 
-            <!-- End OpenMRS core -->
+			<!-- End OpenMRS core -->
 
 			<!-- Begin external libraries -->
 
@@ -277,6 +279,14 @@
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
 			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+		</repository>
+		<repository>
+			<id>mks-repo-snapshots</id>
+			<name>Mekom Solutions Nexus Snapshots</name>
+			<url>https://nexus.mekomsolutions.net/repository/maven-snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 
