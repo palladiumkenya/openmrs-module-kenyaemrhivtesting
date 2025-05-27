@@ -46,7 +46,8 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 				"             de.patient_id                                                          as started_on_drugs\n" +
 				"      from kenyaemr_etl.etl_patient_contact c\n" +
 				"               join kenyaemr_etl.etl_patient_hiv_followup fup on fup.patient_id = c.patient_related_to\n" +
-				"               join kenyaemr_etl.etl_patient_demographics p on p.patient_id = fup.patient_id\n" +
+				"               join kenyaemr_etl.etl_patient_demographics p on p.patient_id = fup.patient_id and timestampdiff(YEAR, date(p.dob), date(:endDate)) between 15 and 49\n" +
+				"               join kenyaemr_etl.etl_patient_demographics p1 on c.patient_id = p1.patient_id and timestampdiff(YEAR, date(p1.dob), date(:endDate)) < 15\n" +
 				"               join kenyaemr_etl.etl_hiv_enrollment e on fup.patient_id = e.patient_id\n" +
 				"               left outer join kenyaemr_etl.etl_drug_event de on e.patient_id = de.patient_id and de.program = 'HIV' and\n" +
 				"                                                                 date(date_started) <= date(:endDate)\n" +
@@ -60,8 +61,6 @@ public class ChildrenContactsOfTXCurrWRACohortDefinitionEvaluator implements Pat
 				"            group by patient_id) d on d.patient_id = fup.patient_id\n" +
 				"      where fup.visit_date <= date(:endDate)\n" +
 				"        and p.gender = 'F'\n" +
-				"        and timestampdiff(YEAR, date(p.dob), date(:endDate)) between 15 and 49\n" +
-				"        and timestampdiff(YEAR, date(c.birth_date), date(:endDate)) < 15\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
 				"        and c.relationship_type = 3\n" +
 				"        and c.voided = 0\n" +
