@@ -225,8 +225,7 @@
         <comment>Inserting Contact Listing Processor Task into 'schedule_task_config' table</comment>
         <insert tableName="scheduler_task_config">
             <column name="name" value="HTS Contact Listing form processor" />
-            <column name="description" value="Processes patient
-             listed through contact listing form on mobile client" />
+            <column name="description" value="Processes patient contacts listed through contact listing form on mobile client" />
             <column name="schedulable_class" value="org.openmrs.module.hivtestingservices.task.ContactListingFormProcessorTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2017-11-28T23:59:59" />
