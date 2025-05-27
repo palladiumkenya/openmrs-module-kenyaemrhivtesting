@@ -51,7 +51,8 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"                          from kenyaemr_etl.etl_hts_test t\n" +
 				"                          where date(t.visit_date) <= date(:endDate)\n" +
 				"                          group by t.patient_id) t on c.patient_id = t.patient_id\n" +
-				"               join kenyaemr_etl.etl_patient_demographics p on p.patient_id = fup.patient_id\n" +
+				"               join kenyaemr_etl.etl_patient_demographics p on p.patient_id = fup.patient_id and timestampdiff(YEAR, date(p.dob), date(:endDate)) between 15 and 49\n" +
+				"               join kenyaemr_etl.etl_patient_demographics p1 on c.patient_id = p1.patient_id and timestampdiff(YEAR, date(p1.dob), date(:endDate)) < 15\n" +
 				"               join kenyaemr_etl.etl_hiv_enrollment e on fup.patient_id = e.patient_id\n" +
 				"               left outer join kenyaemr_etl.etl_drug_event de on e.patient_id = de.patient_id and de.program = 'HIV' and\n" +
 				"                                                                 date(date_started) <= date(:endDate)\n" +
@@ -66,10 +67,7 @@ public class ChildrenContactsOfTXCurrWRAUnknownHIVStatusCohortDefinitionEvaluato
 				"      where fup.visit_date <= date(:endDate)\n" +
 				"        and date(c.date_created) <= date(:endDate)\n" +
 				"        and p.gender = 'F'\n" +
-				"        and timestampdiff(YEAR, date(p.dob), date(:endDate)) between 15 and 49\n" +
-				"        and (\n" +
-				"                  timestampdiff(YEAR, date(c.birth_date), date(:endDate)) < 15\n" +
-				"              and relationship_type = 3 and\n" +
+				"        and (relationship_type = 3 and\n" +
 				"                  (c.baseline_hiv_status not in ('Positive', 'Negative') or c.baseline_hiv_status is null) and\n" +
 				"                  (t.latest_hts_test_status not in ('Positive', 'Negative') or t.latest_hts_test_status is null))\n" +
 				"          and date(c.date_created) <= date(:endDate) and c.voided = 0\n" +
